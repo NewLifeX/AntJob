@@ -23,14 +23,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\AntJob\JobModes.cs" Link="JobModes.cs" />
+    <Compile Include="..\AntJob\JobStatus.cs" Link="JobStatus.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Build.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Build.log</LastGenOutput>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
 
   <ItemGroup>
