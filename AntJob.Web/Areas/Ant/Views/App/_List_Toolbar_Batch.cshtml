@@ -1,0 +1,20 @@
+﻿@using NewLife.Common;
+@using System.Collections.Generic;
+@{
+    var user = ViewBag.User as IUser ?? User.Identity as IUser;
+    var fact = ViewBag.Factory as IEntityOperate;
+    var enableSelect = this.EnableSelect();
+
+}
+@if (enableSelect)
+{
+    <button type="button" class="btn btn-warning btn-sm" data-action="action" data-url="@Url.Action("ResetApp")" data-fields="keys" disabled>
+        <span title="清空作业、作业项、统计、错误，开始时间设为本月一号">重置</span>
+    </button>
+    <button type="button" class="btn btn-success btn-sm" data-action="action" data-url="@Url.Action("Set")?enable=true" data-fields="keys" disabled>
+        批量启用
+    </button>
+    <button type="button" class="btn btn-error btn-sm" data-action="action" data-url="@Url.Action("Set")?enable=false" data-fields="keys" disabled>
+        批量禁用
+    </button>
+}

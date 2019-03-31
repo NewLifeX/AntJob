@@ -1,24 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using System.Xml.Serialization;
-using NewLife;
 using NewLife.Data;
-using NewLife.Log;
-using NewLife.Model;
-using NewLife.Reflection;
-using NewLife.Threading;
-using NewLife.Web;
 using XCode;
-using XCode.Cache;
-using XCode.Configuration;
-using XCode.DataAccessLayer;
 using XCode.Membership;
 
 namespace AntJob.Data.Entity
@@ -29,10 +14,6 @@ namespace AntJob.Data.Entity
         #region 对象操作
         static JobError()
         {
-            // 累加字段
-            //var df = Meta.Factory.AdditionalFields;
-            //df.Add(__.AppID);
-
             // 过滤器 UserModule、TimeModule、IPModule
             Meta.Modules.Add<TimeModule>();
         }
@@ -44,94 +25,36 @@ namespace AntJob.Data.Entity
             // 如果没有脏数据，则不需要进行任何处理
             if (!HasDirty) return;
 
-            // 在新插入数据或者修改了指定字段时进行修正
-            //if (isNew && !Dirtys[nameof(CreateTime)]) nameof(CreateTime) = DateTime.Now;
-            //if (!Dirtys[nameof(UpdateTime)]) nameof(UpdateTime) = DateTime.Now;
+            // 截断错误信息，避免过长
+            var len = _.Message.Length;
+            if (!Message.IsNullOrEmpty() && len > 0 && Message.Length > len) Message = Message.Substring(0, len);
         }
-
-        ///// <summary>首次连接数据库时初始化数据，仅用于实体类重载，用户不应该调用该方法</summary>
-        //[EditorBrowsable(EditorBrowsableState.Never)]
-        //protected override void InitData()
-        //{
-        //    // InitData一般用于当数据表没有数据时添加一些默认数据，该实体类的任何第一次数据库操作都会触发该方法，默认异步调用
-        //    if (Meta.Session.Count > 0) return;
-
-        //    if (XTrace.Debug) XTrace.WriteLine("开始初始化JobError[作业错误]数据……");
-
-        //    var entity = new JobError();
-        //    entity.ID = 0;
-        //    entity.AppID = 0;
-        //    entity.JobID = 0;
-        //    entity.JobLogID = 0;
-        //    entity.Client = "abc";
-        //    entity.Start = DateTime.Now;
-        //    entity.End = DateTime.Now;
-        //    entity.Row = 0;
-        //    entity.Step = 0;
-        //    entity.BatchSize = 0;
-        //    entity.Key = "abc";
-        //    entity.Data = "abc";
-        //    entity.Server = "abc";
-        //    entity.ProcessID = 0;
-        //    entity.ThreadID = 0;
-        //    entity.ErrorCode = "abc";
-        //    entity.Message = "abc";
-        //    entity.CreateTime = DateTime.Now;
-        //    entity.UpdateTime = DateTime.Now;
-        //    entity.Insert();
-
-        //    if (XTrace.Debug) XTrace.WriteLine("完成初始化JobError[作业错误]数据！");
-        //}
-
-        ///// <summary>已重载。基类先调用Valid(true)验证数据，然后在事务保护内调用OnInsert</summary>
-        ///// <returns></returns>
-        //public override Int32 Insert()
-        //{
-        //    return base.Insert();
-        //}
-
-        ///// <summary>已重载。在事务保护范围内处理业务，位于Valid之后</summary>
-        ///// <returns></returns>
-        //protected override Int32 OnDelete()
-        //{
-        //    return base.OnDelete();
-        //}
         #endregion
 
         #region 扩展属性
-        /// <summary>应用</summary>
-        [XmlIgnore]
-        //[ScriptIgnore]
-        public App App { get { return Extends.Get(nameof(App), k => App.FindByID(AppID)); } }
-
-        /// <summary>应用</summary>
-        [XmlIgnore]
-        //[ScriptIgnore]
-        [DisplayName("应用")]
-        [Map(__.AppID, typeof(App), "ID")]
-        public String AppName { get { return App?.Name; } }
         /// <summary>作业</summary>
         [XmlIgnore]
         //[ScriptIgnore]
-        public Job Job { get { return Extends.Get(nameof(Job), k => Job.FindByID(JobID)); } }
+        public Job Job => Extends.Get(nameof(Job), k => Job.FindByID(JobID));
 
         /// <summary>作业</summary>
         [XmlIgnore]
         //[ScriptIgnore]
         [DisplayName("作业")]
-        [Map(__.JobID, typeof(Job), "ID")]
-        public String JobName { get { return Job?.Name; } }
-        /// <summary>作业项</summary>
-        [XmlIgnore]
-        //[ScriptIgnore]
-        public JobLog JobLog { get { return Extends.Get(nameof(JobLog), k => JobLog.FindByID(JobLogID)); } }
+        [Map(__.JobID)]
+        public String JobName => Job?.Name;
 
-        /// <summary>作业项</summary>
+        /// <summary>应用</summary>
         [XmlIgnore]
         //[ScriptIgnore]
-        [DisplayName("作业项")]
-        [Map(__.JobLogID, typeof(JobLog), "ID")]
-        public Int32 JobLogID { get { return JobLog != null ? JobLog.ID : 0; } }
+        public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
+
+        /// <summary>应用</summary>
+        [XmlIgnore]
+        //[ScriptIgnore]
+        [DisplayName("应用")]
+        [Map(__.AppID)]
+        public String AppName => App?.Name;
         #endregion
 
         #region 扩展查询
@@ -142,66 +65,41 @@ namespace AntJob.Data.Entity
         {
             if (id <= 0) return null;
 
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.ID == id);
-
-            // 单对象缓存
-            return Meta.SingleCache[id];
-
-            //return Find(_.ID == id);
-        }
-
-        /// <summary>根据编号、应用查找</summary>
-        /// <param name="id">编号</param>
-        /// <param name="appid">应用</param>
-        /// <returns>实体列表</returns>
-        public static IList<JobError> FindAllByIDAndAppID(Int32 id, Int32 appid)
-        {
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ID == id && e.AppID == appid);
-
-            return FindAll(_.ID == id & _.AppID == appid);
-        }
-
-        /// <summary>根据编号、作业查找</summary>
-        /// <param name="id">编号</param>
-        /// <param name="jobid">作业</param>
-        /// <returns>实体列表</returns>
-        public static IList<JobError> FindAllByIDAndJobID(Int32 id, Int32 jobid)
-        {
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ID == id && e.JobID == jobid);
-
-            return FindAll(_.ID == id & _.JobID == jobid);
-        }
-
-        /// <summary>根据数据键查找</summary>
-        /// <param name="key">数据键</param>
-        /// <returns>实体列表</returns>
-        public static IList<JobError> FindAllByKey(String key)
-        {
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.Key == key);
-
-            return FindAll(_.Key == key);
-        }
-
-        /// <summary>根据错误码查找</summary>
-        /// <param name="errorcode">错误码</param>
-        /// <returns>实体列表</returns>
-        public static IList<JobError> FindAllByErrorCode(String errorcode)
-        {
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ErrorCode == errorcode);
-
-            return FindAll(_.ErrorCode == errorcode);
+            return Find(_.ID == id);
         }
         #endregion
 
         #region 高级查询
+        public static IEnumerable<JobError> Search(Int32 appid, Int32 jobid, String client, DateTime start, DateTime end, String key, PageParameter p)
+        {
+            var exp = new WhereExpression();
+
+            if (appid > 0) exp &= _.AppID == appid;
+            if (jobid > 0) exp &= _.JobID == jobid;
+            if (!client.IsNullOrEmpty()) exp &= _.Client == client;
+            if (!key.IsNullOrEmpty()) exp &= _.Message.Contains(key);
+            exp &= _.Start.Between(start, end);
+
+            return FindAll(exp, p);
+        }
+
+        public static IList<JobError> SearchByAppID(Int32 appid, PageParameter p)
+        {
+            if (appid == 0) return new List<JobError>();
+
+            return FindAll(_.AppID == appid, p);
+        }
+
+        public static IList<JobError> FindAllByJobId(Int32 jobid)
+        {
+            if (jobid == 0) return new List<JobError>();
+
+            return FindAll(_.JobID == jobid);
+        }
         #endregion
 
         #region 业务操作
+        public static Int32 DeleteByAppId(Int32 appid) => Delete(_.AppID == appid);
         #endregion
     }
 }

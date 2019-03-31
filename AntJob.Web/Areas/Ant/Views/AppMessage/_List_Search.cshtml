@@ -1,0 +1,11 @@
+﻿@using AntJob.Data.Entity;
+@using AntJob.Data;
+@{
+    var page = ViewBag.Page as Pager;
+    var apps = AntJob.Data.Entity.App.FindAllWithCache().Cast<IEntity>().ToList();
+}
+<div class="form-group">
+    <label for="status" class="control-label">应用：</label>
+    @Html.ForDropDownList("appid", apps, "全部", true)
+</div>
+@Html.Partial("_DateRange")

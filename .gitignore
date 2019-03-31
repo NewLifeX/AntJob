@@ -22,3 +22,6 @@ bld/
 *.nuspec
 *.nupkg
 /Avatars
+/AntJob.Web/Config
+/AntJob.Web/Content
+/AntJob.Web/Plugins

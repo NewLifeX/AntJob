@@ -1,0 +1,105 @@
+﻿@model IList<AntJob.Data.Entity.JobLog>
+@using NewLife;
+@using NewLife.Web;
+@using XCode;
+@using XCode.Configuration;
+@using System.Web.Mvc.Html;
+@using AntJob.Data.Entity;
+@using AntJob;
+@{
+    var fact = ViewBag.Factory as IEntityOperate;
+    var page = ViewBag.Page as Pager;
+    var fields = ViewBag.Fields as List<FieldItem>;
+    var fk = fact.Unique;
+    var enableSelect = this.EnableSelect();
+}
+<table class="table table-bordered table-hover table-striped table-condensed">
+    <thead>
+        <tr>
+            @if (enableSelect)
+            {
+                <th class="text-center" style="width:10px;"><input type="checkbox" id="chkAll" title="全选" /></th>
+            }
+            <th class="text-center hidden-md hidden-sm hidden-xs"><a href="@Html.Raw(page.GetSortUrl("ID"))">编号</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("TaskID"))">任务</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Start"))">开始</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Client"))">客户端</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Row"))">行</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Step"))">步进</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("BatchSize"))">批大小</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Total"))">总数</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Success"))">成功</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Error"))">错误</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Times"))">次数</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Speed"))">速度</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("FetchSpeed"))">抽取速度</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Cost"))">耗时</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("FullCost"))">全耗时</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Status"))">状态</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Key"))">最后键</a></th>
+            <th class="text-center" style="min-width:134px;"><a href="@Html.Raw(page.GetSortUrl("UpdateTime"))">更新时间</a></th>
+            @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
+            {
+                <th class="text-center">操作</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entity in Model)
+        {
+            var cls = "";
+            switch (entity.Status)
+            {
+                case JobStatus.就绪:
+                    break;
+                case JobStatus.抽取中:
+                    cls = "warning";
+                    break;
+                case JobStatus.处理中:
+                    cls = "info";
+                    break;
+                case JobStatus.错误:
+                    cls = "danger";
+                    break;
+                case JobStatus.完成:
+                    cls = "success";
+                    break;
+                case JobStatus.取消:
+                    cls = "active";
+                    break;
+                default:
+                    break;
+            }
+            <tr>
+                @if (enableSelect)
+                {
+                    <td class="text-center"><input type="checkbox" name="keys" value="@entity[fk.Name]" /></td>
+                }
+                <td class="text-center hidden-md hidden-sm hidden-xs">@entity.ID</td>
+                <td class="text-center"><a href="Job?ID=@entity.JobID">@entity.JobName</a></td>
+                <td>@entity.Start.ToFullString("")</td>
+                <td>@entity.Client</td>
+                <td class="text-right">@entity.Row.ToString("n0")</td>
+                <td class="text-right">@entity.Step.ToString("n0")</td>
+                <td class="text-right">@entity.BatchSize.ToString("n0")</td>
+                <td class="text-right">@entity.Total.ToString("n0")</td>
+                <td class="text-right" style="color:forestgreen"><b>@entity.Success.ToString("n0")</b></td>
+                <td class="text-right" style="color:red">@entity.Error.ToString("n0")</td>
+                <td class="text-right">@entity.Times.ToString("n0")</td>
+                <td class="text-right">@entity.Speed.ToString("n0")</td>
+                <td class="text-right">@entity.FetchSpeed.ToString("n0")</td>
+                <td class="text-right">@TimeSpan.FromSeconds(entity.Cost)</td>
+                <td class="text-right">@TimeSpan.FromSeconds(entity.FullCost)</td>
+                <td class="text-center @cls">@entity.Status</td>
+                <td>@entity.Key</td>
+                <td>@entity.UpdateTime.ToFullString("")</td>
+                @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
+                {
+                    <td class="text-center">
+                        @Html.Partial("_List_Data_Action", (Object)entity)
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

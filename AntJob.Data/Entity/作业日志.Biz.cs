@@ -1,25 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using System.Xml.Serialization;
-using NewLife;
 using NewLife.Data;
-using NewLife.Log;
-using NewLife.Model;
-using NewLife.Reflection;
-using NewLife.Threading;
-using NewLife.Web;
 using XCode;
-using XCode.Cache;
-using XCode.Configuration;
-using XCode.DataAccessLayer;
-using XCode.Membership;
 
 namespace AntJob.Data.Entity
 {
@@ -30,11 +15,9 @@ namespace AntJob.Data.Entity
         static JobLog()
         {
             // 累加字段
-            //var df = Meta.Factory.AdditionalFields;
-            //df.Add(__.AppID);
-
-            // 过滤器 UserModule、TimeModule、IPModule
-            Meta.Modules.Add<TimeModule>();
+            var df = Meta.Factory.AdditionalFields;
+            df.Add(__.Error);
+            df.Add(__.Times);
         }
 
         /// <summary>验证数据，通过抛出异常的方式提示验证失败。</summary>
@@ -44,93 +27,39 @@ namespace AntJob.Data.Entity
             // 如果没有脏数据，则不需要进行任何处理
             if (!HasDirty) return;
 
-            // 在新插入数据或者修改了指定字段时进行修正
-            //if (isNew && !Dirtys[nameof(CreateTime)]) nameof(CreateTime) = DateTime.Now;
-            //if (!Dirtys[nameof(UpdateTime)]) nameof(UpdateTime) = DateTime.Now;
+            var len = _.Data.Length;
+            if (len > 0 && !Data.IsNullOrEmpty() && Data.Length > len) throw new InvalidOperationException($"字段[{__.Data}]超长");
+
+            // 截断错误信息，避免过长
+            len = _.Message.Length;
+            if (!Message.IsNullOrEmpty() && len > 0 && Message.Length > len) Message = Message.Substring(0, len);
         }
-
-        ///// <summary>首次连接数据库时初始化数据，仅用于实体类重载，用户不应该调用该方法</summary>
-        //[EditorBrowsable(EditorBrowsableState.Never)]
-        //protected override void InitData()
-        //{
-        //    // InitData一般用于当数据表没有数据时添加一些默认数据，该实体类的任何第一次数据库操作都会触发该方法，默认异步调用
-        //    if (Meta.Session.Count > 0) return;
-
-        //    if (XTrace.Debug) XTrace.WriteLine("开始初始化JobLog[作业日志]数据……");
-
-        //    var entity = new JobLog();
-        //    entity.ID = 0;
-        //    entity.AppID = 0;
-        //    entity.JobID = 0;
-        //    entity.LinkID = 0;
-        //    entity.Client = "abc";
-        //    entity.Start = DateTime.Now;
-        //    entity.End = DateTime.Now;
-        //    entity.Row = 0;
-        //    entity.Step = 0;
-        //    entity.BatchSize = 0;
-        //    entity.Offset = 0;
-        //    entity.Total = 0;
-        //    entity.Success = 0;
-        //    entity.Error = 0;
-        //    entity.Times = 0;
-        //    entity.Speed = 0;
-        //    entity.FetchSpeed = 0;
-        //    entity.Cost = 0;
-        //    entity.FullCost = 0;
-        //    entity.Status = 0;
-        //    entity.MsgCount = 0;
-        //    entity.Server = "abc";
-        //    entity.ProcessID = 0;
-        //    entity.ThreadID = 0;
-        //    entity.Key = "abc";
-        //    entity.Data = "abc";
-        //    entity.Message = "abc";
-        //    entity.CreateTime = DateTime.Now;
-        //    entity.UpdateTime = DateTime.Now;
-        //    entity.Insert();
-
-        //    if (XTrace.Debug) XTrace.WriteLine("完成初始化JobLog[作业日志]数据！");
-        //}
-
-        ///// <summary>已重载。基类先调用Valid(true)验证数据，然后在事务保护内调用OnInsert</summary>
-        ///// <returns></returns>
-        //public override Int32 Insert()
-        //{
-        //    return base.Insert();
-        //}
-
-        ///// <summary>已重载。在事务保护范围内处理业务，位于Valid之后</summary>
-        ///// <returns></returns>
-        //protected override Int32 OnDelete()
-        //{
-        //    return base.OnDelete();
-        //}
         #endregion
 
         #region 扩展属性
         /// <summary>应用</summary>
         [XmlIgnore]
         //[ScriptIgnore]
-        public App App { get { return Extends.Get(nameof(App), k => App.FindByID(AppID)); } }
+        public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
 
         /// <summary>应用</summary>
         [XmlIgnore]
         //[ScriptIgnore]
         [DisplayName("应用")]
-        [Map(__.AppID, typeof(App), "ID")]
-        public String AppName { get { return App?.Name; } }
+        [Map(__.AppID)]
+        public String AppName => App?.Name;
+
         /// <summary>作业</summary>
         [XmlIgnore]
         //[ScriptIgnore]
-        public Job Job { get { return Extends.Get(nameof(Job), k => Job.FindByID(JobID)); } }
+        public Job Job => Extends.Get(nameof(Job), k => Job.FindByID(JobID));
 
         /// <summary>作业</summary>
         [XmlIgnore]
         //[ScriptIgnore]
         [DisplayName("作业")]
-        [Map(__.JobID, typeof(Job), "ID")]
-        public String JobName { get { return Job?.Name; } }
+        [Map(__.JobID)]
+        public String JobName => Job?.Name;
         #endregion
 
         #region 扩展查询
@@ -141,33 +70,122 @@ namespace AntJob.Data.Entity
         {
             if (id <= 0) return null;
 
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.ID == id);
-
             // 单对象缓存
             return Meta.SingleCache[id];
-
-            //return Find(_.ID == id);
         }
 
-        /// <summary>根据应用、客户端、状态查找</summary>
-        /// <param name="appid">应用</param>
-        /// <param name="client">客户端</param>
+        /// <summary>根据编号、作业、状态查找</summary>
+        /// <param name="id">编号</param>
+        /// <param name="jobid">作业</param>
         /// <param name="status">状态</param>
         /// <returns>实体列表</returns>
-        public static IList<JobLog> FindAllByAppIDAndClientAndStatus(Int32 appid, String client, Int32 status)
+        public static IList<JobLog> FindAllByIDAndJobIDAndStatus(Int32 id, Int32 jobid, JobStatus status)
         {
             // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.AppID == appid && e.Client == client && e.Status == status);
+            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ID == id && e.JobID == jobid && e.Status == status);
 
-            return FindAll(_.AppID == appid & _.Client == client & _.Status == status);
+            return FindAll(_.ID == id & _.JobID == jobid & _.Status == status);
+        }
+
+        /// <summary>根据编号、状态查找</summary>
+        /// <param name="id">编号</param>
+        /// <param name="status">状态</param>
+        /// <returns>实体列表</returns>
+        public static IList<JobLog> FindAllByIDAndStatus(Int32 id, JobStatus status)
+        {
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ID == id && e.Status == status);
+
+            return FindAll(_.ID == id & _.Status == status);
+        }
+
+        public static IList<JobLog> FindAllByAppID(Int32 appid)
+        {
+            if (appid == 0) return new List<JobLog>();
+
+            return FindAll(_.AppID == appid);
+        }
+
+        public static IList<JobLog> FindAllByJobId(Int32 jobid)
+        {
+            if (jobid == 0) return new List<JobLog>();
+
+            return FindAll(_.JobID == jobid);
+        }
+
+        public static Int32 FindCountByJobId(Int32 jobid) => (Int32)FindCount(_.JobID == jobid);
+
+        /// <summary>查找作业下小于指定创建时间的最后一个任务</summary>
+        /// <param name="jobid"></param>
+        /// <param name="createTime"></param>
+        /// <returns></returns>
+        public static JobLog FindLastByJobId(Int32 jobid, DateTime createTime)
+        {
+            return FindAll(_.JobID == jobid & _.CreateTime < createTime, _.CreateTime.Desc(), null, 0, 1).FirstOrDefault();
         }
         #endregion
 
         #region 高级查询
+        public static IEnumerable<JobLog> Search(Int32 id, Int32 appid, Int32 jobid, JobStatus status, DateTime start, DateTime end, String client, String key, PageParameter p)
+        {
+            var exp = new WhereExpression();
+
+            if (id > 0) exp &= _.ID == id;
+            if (appid > 0) exp &= _.AppID == appid;
+            if (jobid > 0) exp &= _.JobID == jobid;
+            if (status >= JobStatus.就绪) exp &= _.Status == status;
+            if (!client.IsNullOrEmpty()) exp &= _.Client == client;
+            if (!key.IsNullOrEmpty()) exp &= _.Data.Contains(key) | _.Message.Contains(key) | _.Key == key;
+            exp &= _.Start.Between(start, end);
+
+            return FindAll(exp, p);
+        }
+
+        /// <summary>获取该任务下特定状态的任务项</summary>
+        /// <param name="taskid"></param>
+        /// <param name="end"></param>
+        /// <param name="maxRetry"></param>
+        /// <param name="stats"></param>
+        /// <param name="count">要申请的任务个数</param>
+        /// <returns></returns>
+        public static IList<JobLog> Search(Int32 taskid, DateTime end, Int32 maxRetry, JobStatus[] stats, Int32 count)
+        {
+            var exp = new WhereExpression();
+            if (taskid > 0) exp &= _.JobID == taskid;
+            if (maxRetry > 0) exp &= _.Times < maxRetry;
+            exp &= _.Status.In(stats);
+            exp &= _.UpdateTime >= DateTime.Now.AddDays(-7);
+            if (end > DateTime.MinValue)
+            {
+                exp &= _.UpdateTime < end;
+            }
+
+            // 限制任务的错误次数，避免无限执行
+            exp &= _.Error < 32;
+
+            return FindAll(exp, _.ID.Asc(), null, 0, count);
+        }
         #endregion
 
         #region 业务操作
+        /// <summary>重置</summary>
+        public void Reset()
+        {
+            Row = 0;
+            Total = 0;
+            Success = 0;
+            Status = JobStatus.就绪;
+
+            Save();
+        }
+
+        /// <summary>删除该ID及以前的作业项</summary>
+        /// <param name="jobid"></param>
+        /// <param name="maxid"></param>
+        /// <returns></returns>
+        public static Int32 DeleteByID(Int32 jobid, Int32 maxid) => maxid <= 0 ? 0 : Delete(_.JobID == jobid & _.ID <= maxid);
+
+        public static Int32 DeleteByAppId(Int32 appid) => Delete(_.AppID == appid);
         #endregion
     }
 }

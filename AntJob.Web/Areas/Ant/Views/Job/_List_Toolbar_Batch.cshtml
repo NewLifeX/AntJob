@@ -1,0 +1,43 @@
+﻿@using NewLife.Common;
+@using System.Collections.Generic;
+@{
+    var user = ViewBag.User as IUser ?? User.Identity as IUser;
+    var fact = ViewBag.Factory as IEntityOperate;
+    var enableSelect = this.EnableSelect();
+
+    var sdic = new Dictionary<String, String>();
+    sdic["strFormat"] = "yyyy-MM-dd HH:mm:ss";
+    sdic["dname"] = "sday";
+    sdic["title"] = "开始";
+
+    var edic = new Dictionary<String, String>();
+    edic["strFormat"] = "yyyy-MM-dd HH:mm:ss";
+    edic["dname"] = "eday";
+    edic["title"] = "结束";
+}
+@if (enableSelect)
+{
+    <button type="button" class="btn btn-success btn-sm" data-action="action" data-url="@Url.Action("Set")?enable=true" data-fields="keys" disabled>
+        批量启用
+    </button>
+    <button type="button" class="btn btn-error btn-sm" data-action="action" data-url="@Url.Action("Set")?enable=false" data-fields="keys" disabled>
+        批量禁用
+    </button>
+    <input type="number" name="days" value="-1" title="重置到多少天之前（-1表示直接清空开始时间）" style="width:40px" />
+    <button type="button" class="btn btn-warning btn-sm" data-action="action" data-url="@Url.Action("ResetTime")" data-fields="keys,days" disabled>
+        重置时间
+    </button>
+    <button type="button" class="btn btn-danger btn-sm" data-action="action" data-url="@Url.Action("AllReset")" data-fi data-fields="keys" disabled>
+        重置其它
+    </button>
+    <input type="number" name="offset" value="15" title="距离实际时间秒数" style="width:40px" />
+    <button type="button" class="btn btn-success btn-sm" data-action="action" data-url="@Url.Action("SetOffset")" data-fields="keys,offset" disabled>
+        设置偏移
+    </button>
+    <button type="button" class="btn btn-success btn-sm" data-action="action" data-url="@Url.Action("ClearError")" data-fields="keys" disabled>
+        清空错误数
+    </button>
+    <button type="button" class="btn btn-success btn-sm" data-action="action" data-url="@Url.Action("ClearStepRate")" data-fields="keys" disabled title="将步进率置为0">
+        清空步进率
+    </button>
+}

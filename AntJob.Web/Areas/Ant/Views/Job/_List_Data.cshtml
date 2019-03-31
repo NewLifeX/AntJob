@@ -1,0 +1,135 @@
+﻿@model IList<AntJob.Data.Entity.Job>
+@using NewLife;
+@using NewLife.Web;
+@using XCode;
+@using XCode.Configuration;
+@using System.Web.Mvc;
+@using System.Web.Mvc.Ajax;
+@using System.Web.Mvc.Html;
+@using System.Web.Routing;
+@using AntJob.Data.Entity;
+@{
+    var fact = ViewBag.Factory as IEntityOperate;
+    var page = ViewBag.Page as Pager;
+    var fields = ViewBag.Fields as List<FieldItem>;
+    var fk = fact.Unique;
+    var enableSelect = this.EnableSelect();
+
+    var appid = page["appid"].ToInt();
+}
+<table class="table table-bordered table-hover table-striped table-condensed">
+    <thead>
+        <tr>
+            @if (enableSelect)
+            {
+                <th class="text-center" style="width:10px;"><input type="checkbox" id="chkAll" title="全选" /></th>
+            }
+            <th class="text-center hidden-md hidden-sm hidden-xs"><a href="@Html.Raw(page.GetSortUrl("ID"))">编号</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Name"))">名称</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("DisplayName"))">显示名</a></th>
+            @if (appid == 0)
+            {
+                <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("AppName"))">应用</a></th>
+            }
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Start"))" title="@Job._.Start.Description">开始时间</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("End"))" title="@Job._.End.Description">结束</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Step"))" title="@Job._.Step.Description">步进</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("BatchSize"))" title="@Job._.BatchSize.Description">批大小</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Offset"))" title="@Job._.Offset.Description">偏移</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("MaxTask"))" title="@Job._.MaxTask.Description">并行</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Total"))">总数</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Success"))">成功</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Error"))">错误</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Times"))">次数</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Speed"))">速度</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Enable"))">启用</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("UpdateTime"))">更新时间</a></th>
+            <th class="text-center">消息</th>
+            <th class="text-center">任务</th>
+            <th class="text-center">统计</th>
+            <th class="text-center">错误</th>
+            @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
+            {
+                <th class="text-center">操作</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entity in Model)
+        {
+            var st = entity.Start.ToFullString("");
+            if (entity.Start.Date == DateTime.Now.Date) { st = entity.Start.ToString("HH:mm:ss"); }
+            if (entity.Mode == AntJob.JobModes.Message) { st = "{0}/{1}".F(entity.Topic, entity.MessageCount); }
+
+            var ut = entity.UpdateTime.ToFullString("");
+            if (entity.UpdateTime.Date == DateTime.Now.Date) { ut = entity.UpdateTime.ToString("HH:mm:ss"); }
+            <tr>
+                @if (enableSelect)
+                {
+                    <td class="text-center"><input type="checkbox" name="keys" value="@entity[fk.Name]" /></td>
+                }
+                <td class="text-center hidden-md hidden-sm hidden-xs">@entity.ID</td>
+                <td><a href="JobItem?JobID=@entity.ID">@entity.Name</a></td>
+                <td title="@entity.Description">@entity.DisplayName</td>
+                @if (appid == 0)
+                {
+                    <td>@entity.AppName</td>
+                }
+                <td class="text-center" title="@entity.Mode.GetDescription()">
+                    @if (entity.Mode == AntJob.JobModes.Alarm)
+                    {
+                        <b>@st</b>
+                    }
+                    else
+                    {
+                        @st
+                    }
+                </td>
+                <td class="text-center">@entity.End.ToFullString("")</td>
+                <td class="text-right">
+                    @if (entity.Mode != AntJob.JobModes.Message)
+                    {
+                        if (entity.StepRate > 0)
+                        {
+                            <span style="color:lightseagreen">
+                                @TimeSpan.FromSeconds(entity.Step)
+                            </span>
+                        }
+                        else
+                        {
+                            @TimeSpan.FromSeconds(entity.Step)
+                        }
+
+                    }
+                </td>
+                <td class="text-right">@entity.BatchSize.ToString("n0")</td>
+                <td class="text-right">
+                    @if (entity.Mode != AntJob.JobModes.Message)
+                    {
+                        @TimeSpan.FromSeconds(entity.Offset)
+                    }
+                </td>
+                <td class="text-right">@entity.MaxTask.ToString("n0")</td>
+                <td class="text-right">@entity.Total.ToString("n0")</td>
+                <td class="text-right">@entity.Success.ToString("n0")</td>
+                <td class="text-right" title="@entity.MaxError">@entity.Error.ToString("n0")</td>
+                <td class="text-right">@entity.Times.ToString("n0")</td>
+                <td class="text-right">@entity.Speed.ToString("n0")</td>
+                <td class="text-center">
+                    <a href="Job/Set/@entity.ID?enable=@(entity.Enable?"false":"true")" data-action="action"><i class="glyphicon glyphicon-@(entity.Enable ? "ok" : "remove")" style="color: @(entity.Enable ? "green" : "red");"></i></a>
+                </td>
+                <td class="text-center">@ut</td>
+                <td class="text-center"><a href="JobMessage?JobID=@entity.ID">消息</a></td>
+                <td class="text-center"><a href="JobItem?JobID=@entity.ID">任务</a></td>
+                <td class="text-center"><a href="JobStat?JobID=@entity.ID">统计</a></td>
+                <td class="text-center"><a href="JobError?JobID=@entity.ID">错误</a></td>
+                @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
+                {
+                    <td class="text-center">
+                        @Html.Partial("_List_Data_Action", (Object)entity)
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

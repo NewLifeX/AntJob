@@ -1,24 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using System.Xml.Serialization;
-using NewLife;
 using NewLife.Data;
-using NewLife.Log;
-using NewLife.Model;
-using NewLife.Reflection;
-using NewLife.Threading;
-using NewLife.Web;
+using NewLife.Serialization;
 using XCode;
-using XCode.Cache;
-using XCode.Configuration;
-using XCode.DataAccessLayer;
 using XCode.Membership;
 
 namespace AntJob.Data.Entity
@@ -30,8 +17,12 @@ namespace AntJob.Data.Entity
         static Job()
         {
             // 累加字段
-            //var df = Meta.Factory.AdditionalFields;
-            //df.Add(__.AppID);
+            var df = Meta.Factory.AdditionalFields;
+            df.Add(__.Total);
+            df.Add(__.Success);
+            df.Add(__.Error);
+            df.Add(__.Times);
+            //df.Add(__.MessageCount);
 
             // 过滤器 UserModule、TimeModule、IPModule
             Meta.Modules.Add<UserModule>();
@@ -46,103 +37,66 @@ namespace AntJob.Data.Entity
             // 如果没有脏数据，则不需要进行任何处理
             if (!HasDirty) return;
 
-            // 在新插入数据或者修改了指定字段时进行修正
-            // 处理当前已登录用户信息，可以由UserModule过滤器代劳
-            /*var user = ManageProvider.User;
-            if (user != null)
-            {
-                if (isNew && !Dirtys[nameof(CreateUserID)) nameof(CreateUserID) = user.ID;
-                if (!Dirtys[nameof(UpdateUserID)]) nameof(UpdateUserID) = user.ID;
-            }*/
-            //if (isNew && !Dirtys[nameof(CreateTime)]) nameof(CreateTime) = DateTime.Now;
-            //if (!Dirtys[nameof(UpdateTime)]) nameof(UpdateTime) = DateTime.Now;
-            //if (isNew && !Dirtys[nameof(CreateIP)]) nameof(CreateIP) = ManageProvider.UserHost;
-            //if (!Dirtys[nameof(UpdateIP)]) nameof(UpdateIP) = ManageProvider.UserHost;
+            // 参数默认值
+            if (Step == 0) Step = 5;
+            if (MaxRetain == 0) MaxRetain = 3;
+            if (MaxIdle == 0) MaxIdle = GetDefaultIdle();
 
-            // 检查唯一索引
-            // CheckExist(isNew, __.AppID, __.Name);
+            if (isNew)
+            {
+                if (!Dirtys[nameof(MaxRetry)]) MaxRetry = 10;
+                if (!Dirtys[nameof(MaxTime)]) MaxTime = 600;
+                if (!Dirtys[nameof(ErrorDelay)]) ErrorDelay = 60;
+                if (!Dirtys[nameof(MaxIdle)]) MaxIdle = GetDefaultIdle();
+            }
+
+            // 截断错误信息，避免过长
+            var len = _.Description.Length;
+            if (!Description.IsNullOrEmpty() && len > 0 && Description.Length > len) Description = Description.Substring(0, len);
+
+            var app = App;
+            if (isNew && app != null)
+            {
+                app.JobCount = FindCountByAppID(app.ID);
+                app.SaveAsync();
+            }
         }
 
-        ///// <summary>首次连接数据库时初始化数据，仅用于实体类重载，用户不应该调用该方法</summary>
-        //[EditorBrowsable(EditorBrowsableState.Never)]
-        //protected override void InitData()
-        //{
-        //    // InitData一般用于当数据表没有数据时添加一些默认数据，该实体类的任何第一次数据库操作都会触发该方法，默认异步调用
-        //    if (Meta.Session.Count > 0) return;
+        private Int32 GetDefaultIdle()
+        {
+            // 定时调度，取步进加一分钟
+            if (Mode == JobModes.Alarm) return Step + 600;
 
-        //    if (XTrace.Debug) XTrace.WriteLine("开始初始化Job[作业]数据……");
+            return 3600;
+        }
 
-        //    var entity = new Job();
-        //    entity.ID = 0;
-        //    entity.AppID = 0;
-        //    entity.Name = "abc";
-        //    entity.DisplayName = "abc";
-        //    entity.Mode = 0;
-        //    entity.Topic = "abc";
-        //    entity.MessageCount = 0;
-        //    entity.Start = DateTime.Now;
-        //    entity.End = DateTime.Now;
-        //    entity.Step = 0;
-        //    entity.MinStep = 0;
-        //    entity.MaxStep = 0;
-        //    entity.StepRate = 0;
-        //    entity.BatchSize = 0;
-        //    entity.Offset = 0;
-        //    entity.MaxTask = 0;
-        //    entity.MaxError = 0;
-        //    entity.MaxRetry = 0;
-        //    entity.MaxTime = 0;
-        //    entity.MaxRetain = 0;
-        //    entity.MaxIdle = 0;
-        //    entity.ErrorDelay = 0;
-        //    entity.Total = 0;
-        //    entity.Success = 0;
-        //    entity.Error = 0;
-        //    entity.Times = 0;
-        //    entity.Speed = 0;
-        //    entity.FetchSpeed = 0;
-        //    entity.Enable = true;
-        //    entity.Description = "abc";
-        //    entity.CreateUserID = 0;
-        //    entity.CreateUser = "abc";
-        //    entity.CreateTime = DateTime.Now;
-        //    entity.CreateIP = "abc";
-        //    entity.UpdateUserID = 0;
-        //    entity.UpdateUser = "abc";
-        //    entity.UpdateTime = DateTime.Now;
-        //    entity.UpdateIP = "abc";
-        //    entity.Insert();
+        protected override Int32 OnDelete()
+        {
+            var rs = base.OnDelete();
 
-        //    if (XTrace.Debug) XTrace.WriteLine("完成初始化Job[作业]数据！");
-        //}
+            var app = App;
+            if (app != null)
+            {
+                app.JobCount = FindCountByAppID(app.ID);
+                app.SaveAsync();
+            }
 
-        ///// <summary>已重载。基类先调用Valid(true)验证数据，然后在事务保护内调用OnInsert</summary>
-        ///// <returns></returns>
-        //public override Int32 Insert()
-        //{
-        //    return base.Insert();
-        //}
-
-        ///// <summary>已重载。在事务保护范围内处理业务，位于Valid之后</summary>
-        ///// <returns></returns>
-        //protected override Int32 OnDelete()
-        //{
-        //    return base.OnDelete();
-        //}
+            return rs;
+        }
         #endregion
 
         #region 扩展属性
         /// <summary>应用</summary>
         [XmlIgnore]
         //[ScriptIgnore]
-        public App App { get { return Extends.Get(nameof(App), k => App.FindByID(AppID)); } }
+        public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
 
         /// <summary>应用</summary>
         [XmlIgnore]
         //[ScriptIgnore]
         [DisplayName("应用")]
-        [Map(__.AppID, typeof(App), "ID")]
-        public String AppName { get { return App?.Name; } }
+        [Map(__.AppID)]
+        public String AppName => App?.Name;
         #endregion
 
         #region 扩展查询
@@ -158,8 +112,6 @@ namespace AntJob.Data.Entity
 
             // 单对象缓存
             return Meta.SingleCache[id];
-
-            //return Find(_.ID == id);
         }
 
         /// <summary>根据应用、名称查找</summary>
@@ -173,12 +125,360 @@ namespace AntJob.Data.Entity
 
             return Find(_.AppID == appid & _.Name == name);
         }
+
+        public static IList<Job> FindAllByAppID(Int32 appid)
+        {
+            if (appid == 0) return new List<Job>();
+
+            // 实体缓存
+            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.AppID == appid);
+
+            return FindAll(_.AppID == appid);
+        }
+
+        /// <summary>
+        /// 直接查库，不查缓存
+        /// </summary>
+        /// <param name="appid"></param>
+        /// <returns></returns>
+        public static IList<Job> FindAllByAppID2(Int32 appid)
+        {
+            if (appid == 0) return new List<Job>();
+
+            return FindAll(_.AppID == appid);
+        }
+
+        /// <summary>
+        /// 查询当前应用的作业数
+        /// </summary>
+        /// <param name="appid"></param>
+        /// <returns></returns>
+        public static Int32 FindCountByAppID(Int32 appid)
+        {
+            if (appid == 0) return 0;
+
+            return (Int32)FindCount(_.AppID == appid);
+        }
         #endregion
 
         #region 高级查询
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static IEnumerable<Job> Search(Int32 id, Int32 appid, DateTime start, DateTime end, Int32 mode, String key, PageParameter p)
+        {
+            var exp = new WhereExpression();
+            if (id > 0) exp &= _.ID == id;
+            if (appid > 0) exp &= _.AppID == appid;
+            if (mode > 0) exp &= _.Mode == mode;
+            if (!key.IsNullOrEmpty()) exp &= _.Name.Contains(key);
+            exp &= _.CreateTime.Between(start, end);
+
+            return FindAll(exp, p);
+        }
         #endregion
 
         #region 业务操作
+        /// <summary>重置任务，让它从新开始工作</summary>
+        /// <param name="days">重置到多少天之前</param>
+        /// <param name="stime">开始时间（优先级低于days）</param>
+        /// <param name="etime">结束时间（优先级低于days）</param>
+        public void ResetTime(Int32 days, DateTime stime, DateTime etime)
+        {
+            if (days < 0)
+            {
+                Start = DateTime.MinValue;
+
+                if (stime > DateTime.MinValue)
+                    Start = stime;
+                End = etime;
+            }
+            else
+                Start = DateTime.Now.Date.AddDays(-days);
+
+            Save();
+        }
+
+        /// <summary>重置任务，让它从新开始工作</summary>
+        public void ResetOther()
+        {
+            Total = 0;
+            Success = 0;
+            Times = 0;
+            Speed = 0;
+            FetchSpeed = 0;
+            Error = 0;
+
+            Save();
+        }
+
+        /// <summary>删除过期</summary>
+        /// <returns></returns>
+        public Int32 DeleteItems()
+        {
+            // 每个作业保留1000行
+            var count = JobLog.FindCountByJobId(ID);
+            if (count <= 1000) return 0;
+
+            var days = MaxRetain;
+            if (days <= 0) days = 3;
+            var last = JobLog.FindLastByJobId(ID, DateTime.Now.AddDays(-days));
+            if (last == null) return 0;
+
+            return JobLog.DeleteByID(ID, last.ID);
+        }
+        #endregion
+
+        #region 申请任务
+        /// <summary>申请任务分片</summary>
+        /// <param name="server">申请任务的服务端</param>
+        /// <param name="ip">申请任务的IP</param>
+        /// <param name="pid">申请任务的服务端进程ID</param>
+        /// <param name="count">要申请的任务个数</param>
+        /// <returns></returns>
+        public IList<JobLog> Acquire(String server, String ip, Int32 pid, Int32 count)
+        {
+            var list = new List<JobLog>();
+
+            if (!Enable) return list;
+
+            var step = Step;
+            if (step <= 0) step = 30;
+
+            lock (this)
+            {
+                using (var ts = Meta.CreateTrans())
+                {
+                    var start = Start;
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (!TrySplit(start, step, out var end)) break;
+
+                        // 创建新的分片
+                        var ti = new JobLog
+                        {
+                            AppID = AppID,
+                            JobID = ID,
+                            Start = start,
+                            End = end,
+                            Step = step,
+                            BatchSize = BatchSize,
+                        };
+
+                        ti.Server = server;
+                        ti.ProcessID = pid;
+                        ti.Client = $"{ip}@{pid}";
+                        ti.Status = JobStatus.就绪;
+                        //根据数据任务设置的偏移量来计算任务项的偏移量
+                        ti.Offset = Offset;
+                        ti.CreateTime = DateTime.Now;
+                        ti.UpdateTime = DateTime.Now;
+
+                        ti.Insert();
+
+                        // 更新任务
+                        Start = end;
+                        start = end;
+
+                        list.Add(ti);
+                    }
+
+                    if (list.Count > 0)
+                    {
+                        // 任务需要ID，不能批量插入优化
+                        //list.Insert(null);
+
+                        UpdateTime = DateTime.Now;
+                        Save();
+                        ts.Commit();
+                    }
+
+                    return list;
+                }
+            }
+        }
+
+        /// <summary>尝试分割时间片</summary>
+        /// <param name="start"></param>
+        /// <param name="step"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public Boolean TrySplit(DateTime start, Int32 step, out DateTime end)
+        {
+            // 当前时间减去偏移量，作为当前时间。数据抽取不许超过该时间
+            var now = DateTime.Now.AddSeconds(-Offset);
+            // 每毫秒有10000个滴答
+            var sec = now.Ticks / 1_000_0000;
+            now = new DateTime(sec * 1_000_0000);
+
+            end = DateTime.MinValue;
+
+            // 开始时间和结束时间是否越界
+            if (start >= now) return false;
+
+            if (step <= 0) step = 30;
+
+            // 必须严格要求按照步进大小分片，除非有合适的End
+            end = start.AddSeconds(step);
+            // 任务结束时间超过作业结束时间时，取后者
+            if (End.Year > 2000 && end > End) end = End;
+
+            // 时间片必须严格要求按照步进大小分片，除非有合适的End
+            if (Mode != JobModes.Alarm)
+            {
+                if (end > now) return false;
+            }
+
+            // 时间区间判断
+            if (start >= end) return false;
+
+            return true;
+        }
+
+        /// <summary>申请历史错误或中断的任务</summary>
+        /// <param name="server">申请任务的服务端</param>
+        /// <param name="ip">申请任务的IP</param>
+        /// <param name="pid">申请任务的服务端进程ID</param>
+        /// <param name="count">要申请的任务个数</param>
+        /// <returns></returns>
+        public IList<JobLog> AcquireOld(String server, String ip, Int32 pid, Int32 count)
+        {
+            lock (this)
+            {
+                using (var ts = Meta.CreateTrans())
+                {
+                    var list = new List<JobLog>();
+
+                    // 查找历史错误任务
+                    if (ErrorDelay > 0)
+                    {
+                        var dt = DateTime.Now.AddSeconds(-ErrorDelay);
+                        var list2 = JobLog.Search(ID, dt, MaxRetry, new[] { JobStatus.错误, JobStatus.取消 }, count);
+                        if (list2.Count > 0) list.AddRange(list2);
+                    }
+
+                    // 查找历史中断任务，持续10分钟仍然未完成
+                    if (MaxTime > 0 && list.Count < count)
+                    {
+                        var dt = DateTime.Now.AddSeconds(-MaxTime);
+                        var list2 = JobLog.Search(ID, dt, MaxRetry, new[] { JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中 }, count - list.Count);
+                        if (list2.Count > 0) list.AddRange(list2);
+                    }
+                    if (list.Count > 0)
+                    {
+                        foreach (var ti in list)
+                        {
+                            ti.Server = server;
+                            ti.ProcessID = pid;
+                            ti.Client = $"{ip}@{pid}";
+                            //ti.Status = JobStatus.就绪;
+                            ti.CreateTime = DateTime.Now;
+                            ti.UpdateTime = DateTime.Now;
+                        }
+                        list.Save();
+                    }
+
+                    ts.Commit();
+
+                    return list;
+                }
+            }
+        }
+
+        /// <summary>申请任务分片</summary>
+        /// <param name="topic">主题</param>
+        /// <param name="server">申请任务的服务端</param>
+        /// <param name="ip">申请任务的IP</param>
+        /// <param name="pid">申请任务的服务端进程ID</param>
+        /// <param name="count">要申请的任务个数</param>
+        /// <returns></returns>
+        public IList<JobLog> AcquireMessage(String topic, String server, String ip, Int32 pid, Int32 count)
+        {
+            // 消费消息时，保存主题
+            if (Topic != topic)
+            {
+                Topic = topic;
+                SaveAsync();
+            }
+
+            var list = new List<JobLog>();
+
+            if (!Enable) return list;
+
+            // 验证消息数
+            var now = DateTime.Now;
+            if (MessageCount == 0 && UpdateTime.AddMinutes(2) > now) return list;
+
+            lock (this)
+            {
+                using (var ts = Meta.CreateTrans())
+                {
+                    var size = BatchSize;
+                    if (size == 0) size = 1;
+
+                    // 消费消息。请求任务数量=空闲线程*批大小
+                    var msgs = AppMessage.GetTopic(AppID, topic, now, count * size);
+                    if (msgs.Count > 0)
+                    {
+                        for (var i = 0; i < msgs.Count;)
+                        {
+                            var msgList = msgs.Skip(i).Take(size).ToList();
+                            if (msgList.Count == 0) break;
+
+                            i += msgList.Count;
+
+                            // 创建新的分片
+                            var ti = new JobLog
+                            {
+                                AppID = AppID,
+                                JobID = ID,
+                                Data = msgList.Select(e => e.Data).ToJson(),
+                                MsgCount = msgList.Count,
+
+                                BatchSize = size,
+                            };
+
+                            ti.Server = server;
+                            ti.ProcessID = pid;
+                            ti.Client = $"{ip}@{pid}";
+                            ti.Status = JobStatus.就绪;
+                            ti.CreateTime = DateTime.Now;
+                            ti.UpdateTime = DateTime.Now;
+
+                            ti.Insert();
+
+                            list.Add(ti);
+                        }
+
+                        // 批量删除消息
+                        msgs.Delete();
+                    }
+
+                    // 更新作业下的消息数
+                    MessageCount = AppMessage.FindCountByAppIDAndTopic(AppID, topic);
+                    UpdateTime = now;
+                    Save();
+
+                    // 消费完成后，更新应用的消息数
+                    if (MessageCount == 0)
+                    {
+                        var app = App;
+                        if (app != null)
+                        {
+                            app.MessageCount = AppMessage.FindCountByAppID(ID);
+                            app.SaveAsync();
+                        }
+                    }
+
+                    ts.Commit();
+
+                    return list;
+                }
+            }
+        }
         #endregion
     }
 }
