@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
-    <AssemblyTitle>蚂蚁调度系统</AssemblyTitle>
+    <AssemblyTitle>蚂蚁调度系统扩展</AssemblyTitle>
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累！面向1000作业以内中小企业大数据分析场景。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2019</Copyright>
@@ -23,7 +23,7 @@
     <RepositoryUrl>https://github.com/NewLifeX/AntJob</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>新生命团队;X组件;NewLife;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes>重量级任务调度系统</PackageReleaseNotes>
+    <PackageReleaseNotes>支持数据作业</PackageReleaseNotes>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -48,15 +48,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Program.cs" />
-    <Compile Remove="Setting.cs" />
-    <Compile Remove="StarService.cs" />
+    <PackageReference Include="NewLife.XCode" Version="9.11.2019.327" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <Reference Include="NewLife.Core">
-      <HintPath>..\DLL20\NewLife.Core.dll</HintPath>
-    </Reference>
+  <ItemGroup>
+    <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
 
 </Project>
