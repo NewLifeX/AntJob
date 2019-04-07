@@ -399,42 +399,38 @@ namespace AntJob.Server
 
         #region 状态报告
         /// <summary>报告状态（进度、成功、错误）</summary>
-        /// <param name="item"></param>
+        /// <param name="task"></param>
         /// <returns></returns>
         [Api(nameof(Report))]
-        public Boolean Report(JobTask item)
+        public Boolean Report(JobTask task)
         {
-            if (item == null || item.ID == 0) throw new InvalidOperationException("无效操作 JobItemID=" + item?.ID);
+            if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 JobItemID=" + task?.ID);
 
             // 判断是否有权
             var app = Session["App"] as App;
 
-            var ji = JobTask.FindByID(item.ID);
-            if (ji == null) throw new InvalidOperationException($"找不到任务[{item.ID}]");
+            var ji = JobTask.FindByID(task.ID);
+            if (ji == null) throw new InvalidOperationException($"找不到任务[{task.ID}]");
 
             var job = Job.FindByID(ji.JobID);
             if (job == null || job.AppID != app.ID)
             {
-                XTrace.WriteLine(item.ToJson());
+                XTrace.WriteLine(task.ToJson());
                 throw new InvalidOperationException($"应用[{app}]无权操作作业[{job}#{ji}]");
             }
 
             // 只有部分字段允许客户端修改
-            if (item.Status > 0) ji.Status = item.Status;
+            if (task.Status > 0) ji.Status = task.Status;
 
-            ji.Row = item.Row;
-            ji.FetchSpeed = item.FetchSpeed;
-            ji.Speed = item.Speed;
-            ji.Total = item.Total;
-            ji.Success = item.Success;
-            ji.Cost = item.Cost;
-            ji.Key = item.Key;
-            ji.Message = item.Message;
-
-            ji.ThreadID = item.ThreadID;
+            ji.Speed = task.Speed;
+            ji.Total = task.Total;
+            ji.Success = task.Success;
+            ji.Cost = task.Cost;
+            ji.Key = task.Key;
+            ji.Message = task.Message;
 
             // 动态调整步进
-            if (item.Status == JobStatus.完成)
+            if (task.Status == JobStatus.完成)
             {
                 AdjustStep(job, ji, Session as IExtend);
 
@@ -442,7 +438,7 @@ namespace AntJob.Server
                 //UpdateLatency(job, ji);
             }
             // 已终结的作业，汇总统计
-            if (item.Status == JobStatus.完成 || item.Status == JobStatus.错误)
+            if (task.Status == JobStatus.完成 || task.Status == JobStatus.错误)
             {
                 ji.Times++;
 
@@ -451,7 +447,7 @@ namespace AntJob.Server
                 // 记录状态
                 UpdateOnline(app, ji, Session as INetSession);
             }
-            if (item.Status == JobStatus.错误)
+            if (task.Status == JobStatus.错误)
             {
                 var ps = ControllerContext.Current.Parameters;
 
@@ -474,18 +470,16 @@ namespace AntJob.Server
             return true;
         }
 
-        //private static readonly MsgRpcClient _MsgClient = new MsgRpcClient();
-        private void SetJobFinish(Job job, JobTask ji)
+        private void SetJobFinish(Job job, JobTask task)
         {
-            job.Total += ji.Total;
-            job.Success += ji.Success;
-            job.Error += ji.Error;
+            job.Total += task.Total;
+            job.Success += task.Success;
+            job.Error += task.Error;
             job.Times++;
 
             var ths = job.MaxTask;
 
-            var p1 = ji.Speed * ths;
-            var p2 = ji.FetchSpeed * ths;
+            var p1 = task.Speed * ths;
 
             if (p1 > 0)
             {
@@ -496,37 +490,27 @@ namespace AntJob.Server
                     job.Speed = p1;
             }
 
-            if (p2 > 0)
-            {
-                if (job.FetchSpeed > 0)
-                    job.FetchSpeed = (Int32)((job.FetchSpeed * 3L + p2) / 4);
-                else
-                    job.FetchSpeed = p2;
-            }
-
             job.SaveAsync();
             //job.Save();
         }
 
-        private JobError SetJobError(IJob job, JobTask ji, IDictionary<String, Object> ps)
+        private JobError SetJobError(IJob job, JobTask task, IDictionary<String, Object> ps)
         {
             var err = new JobError
             {
                 AppID = job.AppID,
                 JobID = job.ID,
-                Start = ji.Start,
-                End = ji.End,
-                Row = ji.Row,
-                Step = ji.Step,
-                BatchSize = ji.BatchSize,
+                Start = task.Start,
+                End = task.End,
+                Step = task.Step,
+                BatchSize = task.BatchSize,
                 CreateTime = DateTime.Now,
                 UpdateTime = DateTime.Now,
-                Server = ji.Server,
-                ProcessID = ji.ProcessID,
-                ThreadID = ji.ThreadID,
-                Client = ji.Client,
+                Server = task.Server,
+                ProcessID = task.ProcessID,
+                Client = task.Client,
             };
-            err.Key = ji.Key;
+            err.Key = task.Key;
 
             err.Data = ps["Data"] + "";
 
@@ -534,7 +518,7 @@ namespace AntJob.Server
             if (code != nameof(Exception)) code = code.TrimEnd(nameof(Exception));
             err.ErrorCode = code;
 
-            var msg = ji.Message;
+            var msg = task.Message;
             if (!msg.IsNullOrEmpty() && msg.Contains("Exception:")) msg = msg.Substring("Exception:").Trim();
             err.Message = msg;
 

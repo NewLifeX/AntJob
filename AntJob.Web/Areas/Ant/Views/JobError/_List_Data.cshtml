@@ -27,7 +27,6 @@
             <th class="text-center hidden-md hidden-sm hidden-xs"><a href="@Html.Raw(page.GetSortUrl("ID"))">编号</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("AppID"))">应用</a></th>
             <th class="text-center" style="min-width:134px;"><a href="@Html.Raw(page.GetSortUrl("TaskItemID"))">任务项</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Row"))">行</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Step"))">步进</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("BatchSize"))">批大小</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Key"))">数据键</a></th>
@@ -47,7 +46,6 @@
                 <td class="text-center hidden-md hidden-sm hidden-xs">@entity.ID</td>
                 <td><a href="Job?AppID=@entity.AppID">@entity.AppName</a></td>
                 <td><a href="JobLog?JobID=@entity.JobID">@entity.JobName</a></td>
-                <td class="text-right">@entity.Row.ToString("n0")</td>
                 <td class="text-right">@entity.Step.ToString("n0")</td>
                 <td class="text-right">@entity.BatchSize.ToString("n0")</td>
                 <td>@entity.Key</td>

@@ -171,7 +171,6 @@ namespace AntJob.Data.Entity
         /// <summary>重置</summary>
         public void Reset()
         {
-            Row = 0;
             Total = 0;
             Success = 0;
             Status = JobStatus.就绪;

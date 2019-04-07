@@ -137,7 +137,7 @@ namespace AntJob
         /// <returns></returns>
         public Boolean Report(ITask task, Object ext = null)
         {
-            var dic = new { item = task }.ToDictionary();
+            var dic = new { task }.ToDictionary();
             if (ext != null) dic = dic.Merge(ext);
 
             var retry = 3;

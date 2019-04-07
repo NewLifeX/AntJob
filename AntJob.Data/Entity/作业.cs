@@ -232,14 +232,6 @@ namespace AntJob.Data.Entity
         [BindColumn("Speed", "速度", "")]
         public Int32 Speed { get { return _Speed; } set { if (OnPropertyChanging(__.Speed, value)) { _Speed = value; OnPropertyChanged(__.Speed); } } }
 
-        private Int32 _FetchSpeed;
-        /// <summary>抽取速度</summary>
-        [DisplayName("抽取速度")]
-        [Description("抽取速度")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("FetchSpeed", "抽取速度", "")]
-        public Int32 FetchSpeed { get { return _FetchSpeed; } set { if (OnPropertyChanging(__.FetchSpeed, value)) { _FetchSpeed = value; OnPropertyChanged(__.FetchSpeed); } } }
-
         private Boolean _Enable;
         /// <summary>启用</summary>
         [DisplayName("启用")]
@@ -358,7 +350,6 @@ namespace AntJob.Data.Entity
                     case __.Error : return _Error;
                     case __.Times : return _Times;
                     case __.Speed : return _Speed;
-                    case __.FetchSpeed : return _FetchSpeed;
                     case __.Enable : return _Enable;
                     case __.Description : return _Description;
                     case __.CreateUserID : return _CreateUserID;
@@ -403,7 +394,6 @@ namespace AntJob.Data.Entity
                     case __.Error : _Error = value.ToInt(); break;
                     case __.Times : _Times = value.ToInt(); break;
                     case __.Speed : _Speed = value.ToInt(); break;
-                    case __.FetchSpeed : _FetchSpeed = value.ToInt(); break;
                     case __.Enable : _Enable = value.ToBoolean(); break;
                     case __.Description : _Description = Convert.ToString(value); break;
                     case __.CreateUserID : _CreateUserID = value.ToInt(); break;
@@ -504,9 +494,6 @@ namespace AntJob.Data.Entity
 
             /// <summary>速度</summary>
             public static readonly Field Speed = FindByName(__.Speed);
-
-            /// <summary>抽取速度</summary>
-            public static readonly Field FetchSpeed = FindByName(__.FetchSpeed);
 
             /// <summary>启用</summary>
             public static readonly Field Enable = FindByName(__.Enable);
@@ -625,9 +612,6 @@ namespace AntJob.Data.Entity
             /// <summary>速度</summary>
             public const String Speed = "Speed";
 
-            /// <summary>抽取速度</summary>
-            public const String FetchSpeed = "FetchSpeed";
-
             /// <summary>启用</summary>
             public const String Enable = "Enable";
 
@@ -745,9 +729,6 @@ namespace AntJob.Data.Entity
 
         /// <summary>速度</summary>
         Int32 Speed { get; set; }
-
-        /// <summary>抽取速度</summary>
-        Int32 FetchSpeed { get; set; }
 
         /// <summary>启用</summary>
         Boolean Enable { get; set; }

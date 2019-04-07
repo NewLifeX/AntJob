@@ -74,14 +74,6 @@ namespace AntJob.Data.Entity
         [BindColumn("End", "结束。小于，不等于", "")]
         public DateTime End { get { return _End; } set { if (OnPropertyChanging(__.End, value)) { _End = value; OnPropertyChanged(__.End); } } }
 
-        private Int32 _Row;
-        /// <summary>行。分页起始行</summary>
-        [DisplayName("行")]
-        [Description("行。分页起始行")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("Row", "行。分页起始行", "")]
-        public Int32 Row { get { return _Row; } set { if (OnPropertyChanging(__.Row, value)) { _Row = value; OnPropertyChanged(__.Row); } } }
-
         private Int32 _Step;
         /// <summary>步进。最大区间大小，秒</summary>
         [DisplayName("步进")]
@@ -146,14 +138,6 @@ namespace AntJob.Data.Entity
         [BindColumn("Speed", "速度", "")]
         public Int32 Speed { get { return _Speed; } set { if (OnPropertyChanging(__.Speed, value)) { _Speed = value; OnPropertyChanged(__.Speed); } } }
 
-        private Int32 _FetchSpeed;
-        /// <summary>抽取速度</summary>
-        [DisplayName("抽取速度")]
-        [Description("抽取速度")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("FetchSpeed", "抽取速度", "")]
-        public Int32 FetchSpeed { get { return _FetchSpeed; } set { if (OnPropertyChanging(__.FetchSpeed, value)) { _FetchSpeed = value; OnPropertyChanged(__.FetchSpeed); } } }
-
         private Int32 _Cost;
         /// <summary>耗时。秒</summary>
         [DisplayName("耗时")]
@@ -201,14 +185,6 @@ namespace AntJob.Data.Entity
         [DataObjectField(false, false, false, 0)]
         [BindColumn("ProcessID", "进程", "")]
         public Int32 ProcessID { get { return _ProcessID; } set { if (OnPropertyChanging(__.ProcessID, value)) { _ProcessID = value; OnPropertyChanged(__.ProcessID); } } }
-
-        private Int32 _ThreadID;
-        /// <summary>线程</summary>
-        [DisplayName("线程")]
-        [Description("线程")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("ThreadID", "线程", "")]
-        public Int32 ThreadID { get { return _ThreadID; } set { if (OnPropertyChanging(__.ThreadID, value)) { _ThreadID = value; OnPropertyChanged(__.ThreadID); } } }
 
         private String _Key;
         /// <summary>最后键</summary>
@@ -268,7 +244,6 @@ namespace AntJob.Data.Entity
                     case __.Client : return _Client;
                     case __.Start : return _Start;
                     case __.End : return _End;
-                    case __.Row : return _Row;
                     case __.Step : return _Step;
                     case __.BatchSize : return _BatchSize;
                     case __.Offset : return _Offset;
@@ -277,14 +252,12 @@ namespace AntJob.Data.Entity
                     case __.Error : return _Error;
                     case __.Times : return _Times;
                     case __.Speed : return _Speed;
-                    case __.FetchSpeed : return _FetchSpeed;
                     case __.Cost : return _Cost;
                     case __.FullCost : return _FullCost;
                     case __.Status : return _Status;
                     case __.MsgCount : return _MsgCount;
                     case __.Server : return _Server;
                     case __.ProcessID : return _ProcessID;
-                    case __.ThreadID : return _ThreadID;
                     case __.Key : return _Key;
                     case __.Data : return _Data;
                     case __.Message : return _Message;
@@ -304,7 +277,6 @@ namespace AntJob.Data.Entity
                     case __.Client : _Client = Convert.ToString(value); break;
                     case __.Start : _Start = value.ToDateTime(); break;
                     case __.End : _End = value.ToDateTime(); break;
-                    case __.Row : _Row = value.ToInt(); break;
                     case __.Step : _Step = value.ToInt(); break;
                     case __.BatchSize : _BatchSize = value.ToInt(); break;
                     case __.Offset : _Offset = value.ToInt(); break;
@@ -313,14 +285,12 @@ namespace AntJob.Data.Entity
                     case __.Error : _Error = value.ToInt(); break;
                     case __.Times : _Times = value.ToInt(); break;
                     case __.Speed : _Speed = value.ToInt(); break;
-                    case __.FetchSpeed : _FetchSpeed = value.ToInt(); break;
                     case __.Cost : _Cost = value.ToInt(); break;
                     case __.FullCost : _FullCost = value.ToInt(); break;
                     case __.Status : _Status = (JobStatus)value.ToInt(); break;
                     case __.MsgCount : _MsgCount = value.ToInt(); break;
                     case __.Server : _Server = Convert.ToString(value); break;
                     case __.ProcessID : _ProcessID = value.ToInt(); break;
-                    case __.ThreadID : _ThreadID = value.ToInt(); break;
                     case __.Key : _Key = Convert.ToString(value); break;
                     case __.Data : _Data = Convert.ToString(value); break;
                     case __.Message : _Message = Convert.ToString(value); break;
@@ -357,9 +327,6 @@ namespace AntJob.Data.Entity
             /// <summary>结束。小于，不等于</summary>
             public static readonly Field End = FindByName(__.End);
 
-            /// <summary>行。分页起始行</summary>
-            public static readonly Field Row = FindByName(__.Row);
-
             /// <summary>步进。最大区间大小，秒</summary>
             public static readonly Field Step = FindByName(__.Step);
 
@@ -384,9 +351,6 @@ namespace AntJob.Data.Entity
             /// <summary>速度</summary>
             public static readonly Field Speed = FindByName(__.Speed);
 
-            /// <summary>抽取速度</summary>
-            public static readonly Field FetchSpeed = FindByName(__.FetchSpeed);
-
             /// <summary>耗时。秒</summary>
             public static readonly Field Cost = FindByName(__.Cost);
 
@@ -404,9 +368,6 @@ namespace AntJob.Data.Entity
 
             /// <summary>进程</summary>
             public static readonly Field ProcessID = FindByName(__.ProcessID);
-
-            /// <summary>线程</summary>
-            public static readonly Field ThreadID = FindByName(__.ThreadID);
 
             /// <summary>最后键</summary>
             public static readonly Field Key = FindByName(__.Key);
@@ -450,9 +411,6 @@ namespace AntJob.Data.Entity
             /// <summary>结束。小于，不等于</summary>
             public const String End = "End";
 
-            /// <summary>行。分页起始行</summary>
-            public const String Row = "Row";
-
             /// <summary>步进。最大区间大小，秒</summary>
             public const String Step = "Step";
 
@@ -477,9 +435,6 @@ namespace AntJob.Data.Entity
             /// <summary>速度</summary>
             public const String Speed = "Speed";
 
-            /// <summary>抽取速度</summary>
-            public const String FetchSpeed = "FetchSpeed";
-
             /// <summary>耗时。秒</summary>
             public const String Cost = "Cost";
 
@@ -497,9 +452,6 @@ namespace AntJob.Data.Entity
 
             /// <summary>进程</summary>
             public const String ProcessID = "ProcessID";
-
-            /// <summary>线程</summary>
-            public const String ThreadID = "ThreadID";
 
             /// <summary>最后键</summary>
             public const String Key = "Key";
@@ -544,9 +496,6 @@ namespace AntJob.Data.Entity
         /// <summary>结束。小于，不等于</summary>
         DateTime End { get; set; }
 
-        /// <summary>行。分页起始行</summary>
-        Int32 Row { get; set; }
-
         /// <summary>步进。最大区间大小，秒</summary>
         Int32 Step { get; set; }
 
@@ -571,9 +520,6 @@ namespace AntJob.Data.Entity
         /// <summary>速度</summary>
         Int32 Speed { get; set; }
 
-        /// <summary>抽取速度</summary>
-        Int32 FetchSpeed { get; set; }
-
         /// <summary>耗时。秒</summary>
         Int32 Cost { get; set; }
 
@@ -591,9 +537,6 @@ namespace AntJob.Data.Entity
 
         /// <summary>进程</summary>
         Int32 ProcessID { get; set; }
-
-        /// <summary>线程</summary>
-        Int32 ThreadID { get; set; }
 
         /// <summary>最后键</summary>
         String Key { get; set; }

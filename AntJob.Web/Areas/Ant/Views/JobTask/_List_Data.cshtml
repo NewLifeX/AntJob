@@ -1,4 +1,4 @@
-﻿@model IList<AntJob.Data.Entity.JobLog>
+﻿@model IList<AntJob.Data.Entity.JobTask>
 @using NewLife;
 @using NewLife.Web;
 @using XCode;
@@ -24,7 +24,6 @@
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("TaskID"))">任务</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Start"))">开始</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Client"))">客户端</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Row"))">行</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Step"))">步进</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("BatchSize"))">批大小</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Total"))">总数</a></th>
@@ -32,7 +31,6 @@
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Error"))">错误</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Times"))">次数</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Speed"))">速度</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("FetchSpeed"))">抽取速度</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Cost"))">耗时</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("FullCost"))">全耗时</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Status"))">状态</a></th>
@@ -79,7 +77,6 @@
                 <td class="text-center"><a href="Job?ID=@entity.JobID">@entity.JobName</a></td>
                 <td>@entity.Start.ToFullString("")</td>
                 <td>@entity.Client</td>
-                <td class="text-right">@entity.Row.ToString("n0")</td>
                 <td class="text-right">@entity.Step.ToString("n0")</td>
                 <td class="text-right">@entity.BatchSize.ToString("n0")</td>
                 <td class="text-right">@entity.Total.ToString("n0")</td>
@@ -87,7 +84,6 @@
                 <td class="text-right" style="color:red">@entity.Error.ToString("n0")</td>
                 <td class="text-right">@entity.Times.ToString("n0")</td>
                 <td class="text-right">@entity.Speed.ToString("n0")</td>
-                <td class="text-right">@entity.FetchSpeed.ToString("n0")</td>
                 <td class="text-right">@TimeSpan.FromSeconds(entity.Cost)</td>
                 <td class="text-right">@TimeSpan.FromSeconds(entity.FullCost)</td>
                 <td class="text-center @cls">@entity.Status</td>

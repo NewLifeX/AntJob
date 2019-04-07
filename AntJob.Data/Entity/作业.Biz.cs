@@ -209,7 +209,6 @@ namespace AntJob.Data.Entity
             Success = 0;
             Times = 0;
             Speed = 0;
-            FetchSpeed = 0;
             Error = 0;
 
             Save();

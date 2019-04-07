@@ -48,11 +48,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
                 if (dt == null) throw new ArgumentNullException(nameof(id), "找不到任务 " + id);
 
                 dt.Status = JobStatus.取消;
-                dt.Row = 0;
-                if (dt.Times >= 10)
-                {
-                    dt.Times = 0;
-                }
+                if (dt.Times >= 10) dt.Times = 0;
 
                 dt.Save();
             }
@@ -66,11 +62,8 @@ namespace AntJob.Web.Areas.Ant.Controllers
                     if (dt != null)
                     {
                         dt.Status = JobStatus.取消;
-                        dt.Row = 0;
-                        if (dt.Times >= 10)
-                        {
-                            dt.Times = 0;
-                        }
+                        if (dt.Times >= 10) dt.Times = 0;
+
                         dt.Save();
                     }
                 }
