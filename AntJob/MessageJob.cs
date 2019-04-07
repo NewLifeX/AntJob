@@ -49,16 +49,23 @@ namespace AntJob
         /// <param name="ctx"></param>
         protected override void OnProcess(JobContext ctx)
         {
-            if (!(ctx.Data is MyTask ji)) return;
+            if (ctx.Task.Data.IsNullOrEmpty()) return;
 
-            var ss = ji.Data.ToJsonEntity<String[]>();
+            var ss = ctx.Task.Data.ToJsonEntity<String[]>();
             if (ss == null || ss.Length == 0) return;
 
-            // 消息工作者特殊优待字符串，不需要再次Json解码
+            // 消息作业特殊优待字符串，不需要再次Json解码
             if (typeof(TModel) == typeof(String))
+            {
+                ctx.Total = ss.Length;
                 ctx.Data = ss;
+            }
             else
-                ctx.Data = ss.Select(e => e.ToJsonEntity<TModel>()).ToArray();
+            {
+                var ms = ss.Select(e => e.ToJsonEntity<TModel>()).ToList();
+                ctx.Total = ms.Count;
+                ctx.Data = ms;
+            }
 
             Execute(ctx);
         }
@@ -71,18 +78,10 @@ namespace AntJob
             var count = 0;
             foreach (var item in ctx.Data as IEnumerable)
             {
-                try
-                {
-                    ctx.Key = item as String;
-                    ctx.Entity = item;
+                //ctx.Key = item as String;
+                ctx.Entity = item;
 
-                    if (ProcessItem(ctx, (TModel)item)) count++;
-                }
-                catch (Exception ex)
-                {
-                    ctx.Error = ex;
-                    if (!OnError(ctx)) throw;
-                }
+                if (ProcessItem(ctx, (TModel)item)) count++;
             }
 
             return count;

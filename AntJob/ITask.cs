@@ -26,6 +26,9 @@ namespace AntJob
         /// <summary>批大小</summary>
         Int32 BatchSize { get; set; }
 
+        /// <summary>数据</summary>
+        String Data { get; set; }
+
         /// <summary>内容</summary>
         String Message { get; set; }
     }

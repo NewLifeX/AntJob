@@ -149,8 +149,7 @@ namespace AntJob
             ji.Times++;
 
             // 区分正常完成还是错误终止
-            //ti.Status = ctx.Status;
-            if (ctx.Error != null && !ctx.Job.IgnoreItemError)
+            if (ctx.Error != null)
                 ji.Status = JobStatus.错误;
             else
             {

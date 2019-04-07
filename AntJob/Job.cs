@@ -30,9 +30,6 @@ namespace AntJob
         /// <summary>调度模式</summary>
         public virtual JobModes Mode { get; set; } = JobModes.Alarm;
 
-        /// <summary>是否忽略每一行数据的错误。大批量数据数据时可选忽略，默认false</summary>
-        public Boolean IgnoreItemError { get; set; }
-
         private volatile Int32 _Busy;
         /// <summary>正在处理中的任务数</summary>
         public Int32 Busy => _Busy;
@@ -140,6 +137,8 @@ namespace AntJob
             }
             catch (Exception ex)
             {
+                ctx.Error = ex;
+
                 XTrace.WriteException(ex);
             }
             finally
@@ -150,8 +149,7 @@ namespace AntJob
             sw.Stop();
             ctx.Cost = sw.Elapsed.TotalMilliseconds;
 
-            // 忽略内部异常，有错误已经被处理，这里不需要再次报告
-            if (ctx.Error == null) OnFinish(ctx);
+            OnFinish(ctx);
 
             ctx.Items.Clear();
         }
@@ -174,38 +172,6 @@ namespace AntJob
         /// <returns></returns>
         public Int32 Produce(String topic, String[] messages, MessageOption option = null) => Provider.Produce(topic, messages, option);
 
-        private String _lastError;
-        /// <summary>遇到错误时如何处理，返回是否已处理</summary>
-        /// <param name="ctx">数据上下文</param>
-        /// <returns>是否处理成功</returns>
-        protected virtual Boolean OnError(JobContext ctx)
-        {
-            var ex = ctx.Error;
-            ex = ex?.GetTrue();
-            if (ex == null) return true;
-
-            Provider?.Error(ctx);
-
-            if (ctx.Entity != null)
-            {
-                // 忽略子项异常
-                if (IgnoreItemError) return true;
-            }
-
-            if (ShowError)
-            {
-                // 过滤掉重复错误日志
-                if (_lastError != ex.Message)
-                {
-                    _lastError = ex.Message;
-
-                    WriteError(ctx.Error.GetMessage());
-                }
-            }
-
-            return false;
-        }
-
         /// <summary>整个任务完成</summary>
         /// <param name="ctx"></param>
         protected virtual void OnFinish(JobContext ctx) => Provider?.Finish(ctx);
@@ -219,14 +185,6 @@ namespace AntJob
         /// <param name="format"></param>
         /// <param name="args"></param>
         public void WriteLog(String format, params Object[] args) => Log?.Info(Name + " " + format, args);
-
-        /// <summary>显示错误日志</summary>
-        public Boolean ShowError { get; set; }
-
-        /// <summary>写错误日志</summary>
-        /// <param name="format"></param>
-        /// <param name="args"></param>
-        public virtual void WriteError(String format, params Object[] args) => Log?.Error(Name + " " + format, args);
         #endregion
     }
 }

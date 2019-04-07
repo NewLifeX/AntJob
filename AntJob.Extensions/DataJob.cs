@@ -66,49 +66,27 @@ namespace AntJob
                 ctx.Entity = null;
                 ctx.Error = null;
 
-                try
-                {
-                    // 报告进度
-                    ctx.Status = JobStatus.抽取中;
-                    prov?.Report(ctx);
+                // 分批抽取
+                var data = Fetch(ctx, ctx.Task);
 
-                    // 分批抽取
-                    var data = Fetch(ctx, ctx.Task);
+                var list = data as IList;
+                if (list != null) ctx.Total += list.Count;
+                ctx.Data = data;
 
-                    var list = data as IList;
-                    if (list != null) ctx.Total += list.Count;
-                    ctx.Data = data;
+                if (data == null || list != null && list.Count == 0) break;
 
-                    // 报告进度
-                    ctx.Status = JobStatus.处理中;
-                    prov?.Report(ctx);
+                // 报告进度
+                ctx.Status = JobStatus.处理中;
+                prov?.Report(ctx);
 
-                    if (data == null || list != null && list.Count == 0)
-                    {
-                        ctx.Status = JobStatus.完成;
-                        break;
-                    }
+                // 批量处理
+                ctx.Success += Execute(ctx);
 
-                    // 批量处理
-                    ctx.Success += Execute(ctx);
+                // 报告进度
+                ctx.Status = JobStatus.抽取中;
 
-                    // 报告进度
-                    ctx.Status = JobStatus.完成;
-
-                    // 不满一批，结束
-                    if (list != null && list.Count < ctx.Task.BatchSize) break;
-                }
-                catch (Exception ex)
-                {
-                    ctx.Status = JobStatus.错误;
-
-                    ctx.Error = ex;
-
-                    if (!OnError(ctx)) break;
-
-                    // 抽取异常，退出任务。处理异常则继续
-                    if (ctx.Data == null) break;
-                }
+                // 不满一批，结束
+                if (list != null && list.Count < ctx.Task.BatchSize) break;
             }
         }
 
@@ -142,7 +120,7 @@ namespace AntJob
 
             return list;
         }
-        
+
         /// <summary>处理一批数据</summary>
         /// <param name="ctx">上下文</param>
         /// <returns></returns>
@@ -151,18 +129,10 @@ namespace AntJob
             var count = 0;
             foreach (var item in ctx.Data as IEnumerable)
             {
-                try
-                {
-                    //ctx.Key = item + "";
-                    ctx.Entity = item;
+                //ctx.Key = item + "";
+                ctx.Entity = item;
 
-                    if (ProcessItem(ctx, item as IEntity)) count++;
-                }
-                catch (Exception ex)
-                {
-                    ctx.Error = ex;
-                    if (!OnError(ctx)) throw;
-                }
+                if (ProcessItem(ctx, item as IEntity)) count++;
             }
 
             return count;

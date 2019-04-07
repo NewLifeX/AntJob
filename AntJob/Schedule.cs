@@ -71,8 +71,6 @@ namespace AntJob
                 if (job != null && job.Mode == 0) job.Mode = wrk.Mode;
 
                 wrk.Log = XTrace.Log;
-                wrk.ShowError = Debug;
-
                 wrk.Start();
             }
 
@@ -98,7 +96,6 @@ namespace AntJob
             }
         }
 
-        private IDictionary<String, IJob> _Jobs;
         /// <summary>任务调度</summary>
         /// <returns></returns>
         public Boolean Process()
@@ -118,8 +115,6 @@ namespace AntJob
             // 拿到工作者对应的作业
             var jobs = prv.GetJobs(names.ToArray());
             if (jobs == null) return false;
-
-            _Jobs = jobs.ToDictionary(e => e.Name, e => e);
 
             var flag = false;
             // 遍历工作者，给空闲的增加任务

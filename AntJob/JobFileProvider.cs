@@ -159,7 +159,6 @@ namespace AntJob
         /// <param name="ctx">上下文</param>
         public override void Finish(JobContext ctx)
         {
-            var job = ctx.Job?.Model;
             if (ctx.Total > 0)
             {
                 var set = ctx.Task;
