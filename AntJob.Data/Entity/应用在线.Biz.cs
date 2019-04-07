@@ -97,7 +97,7 @@ namespace AntJob.Data.Entity
 
             return FindAll(exp);
         }
-        
+
         public static IList<AppOnline> SearchByAppID(Int32 appid, PageParameter p)
         {
             // 实体缓存
@@ -118,6 +118,9 @@ namespace AntJob.Data.Entity
                 Client = Client,
                 Machine = Name,
                 Version = Version,
+
+                CreateTime = CreateTime,
+                UpdateTime = UpdateTime,
             };
         }
         #endregion

@@ -16,6 +16,12 @@ namespace AntJob.Data
 
         /// <summary>版本。客户端</summary>
         String Version { get; set; }
+
+        /// <summary>创建时间</summary>
+        DateTime CreateTime { get; set; }
+
+        /// <summary>更新时间</summary>
+        DateTime UpdateTime { get; set; }
     }
 
     public partial class PeerModel : IPeer { }

@@ -12,6 +12,7 @@ namespace AntJob.Providers
     /// <summary>网络任务提供者</summary>
     public class JobNetworkProvider : JobProvider
     {
+        #region 属性
         /// <summary>调度中心地址</summary>
         public String Server { get; set; }
 
@@ -24,6 +25,23 @@ namespace AntJob.Providers
         /// <summary>客户端</summary>
         public AntClient Ant { get; set; }
 
+        /// <summary>邻居伙伴</summary>
+        public IPeer[] Peers { get; private set; }
+        #endregion
+
+        #region 构造
+        /// <summary>销毁</summary>
+        /// <param name="disposing"></param>
+        protected override void OnDispose(Boolean disposing)
+        {
+            base.OnDispose(disposing);
+
+            _timer.TryDispose();
+            _timer = null;
+        }
+        #endregion
+
+        #region 启动停止
         /// <summary>开始</summary>
         public override void Start()
         {
@@ -64,6 +82,9 @@ namespace AntJob.Providers
                 list.Add(job);
             }
             if (list.Count > 0) Ant.AddJobs(list.ToArray());
+
+            // 定时更新邻居
+            _timer = new TimerX(DoCheckPeer, null, 1_000, 30_000) { Async = true };
         }
 
         /// <summary>停止</summary>
@@ -73,7 +94,9 @@ namespace AntJob.Providers
             Ant.TryDispose();
             Ant = null;
         }
+        #endregion
 
+        #region 作业消息控制
         private IJob[] _jobs;
         private DateTime _NextGetJobs;
         /// <summary>获取所有作业名称</summary>
@@ -114,7 +137,9 @@ namespace AntJob.Providers
 
             return Ant.Produce(topic, messages, option);
         }
+        #endregion
 
+        #region 报告状态
         private static readonly String _MachineName = Environment.MachineName;
         private static readonly Int32 _ProcessID = Process.GetCurrentProcess().Id;
 
@@ -194,5 +219,31 @@ namespace AntJob.Providers
                 XTrace.WriteLine("[{0}]的[{1}]状态报告失败！{2}", job, task.Status, ex.GetTrue().Message);
             }
         }
+        #endregion
+
+        #region 邻居
+        private TimerX _timer;
+        private void DoCheckPeer(Object state)
+        {
+            var ps = Ant?.GetPeers();
+            if (ps == null || ps.Length == 0) return;
+
+            var old = (Peers ?? new IPeer[0]).ToList();
+            foreach (var item in ps)
+            {
+                var pr = old.FirstOrDefault(e => e.Instance == item.Instance);
+                if (pr == null)
+                    XTrace.WriteLine("[{0}]上线！{1}", item.Instance, item.Machine);
+                else
+                    old.Remove(pr);
+            }
+            foreach (var item in old)
+            {
+                XTrace.WriteLine("[{0}]下线！{1}", item.Instance, item.Machine);
+            }
+
+            Peers = ps;
+        }
+        #endregion
     }
 }

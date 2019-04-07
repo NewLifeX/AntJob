@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NewLife.Core, Version=8.1.7035.41050, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NewLife.Core.8.1.2019.406\lib\net45\NewLife.Core.dll</HintPath>
+    <Reference Include="NewLife.Core, Version=8.1.7036.39889, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NewLife.Core.8.1.2019.407\lib\net45\NewLife.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -54,13 +54,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\AntJob\AntJob.csproj">
       <Project>{717a3c5a-c4e9-4e85-bb57-916ed6fac936}</Project>
       <Name>AntJob</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
