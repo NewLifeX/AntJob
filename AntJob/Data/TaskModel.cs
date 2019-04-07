@@ -15,23 +15,23 @@ namespace AntJob.Data
         /// <summary>结束。小于，不等于</summary>
         public DateTime End { get; set; }
 
+        /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
+        public Int32 Offset { get; set; }
+
         /// <summary>步进。最大区间大小，秒</summary>
         public Int32 Step { get; set; }
 
-        /// <summary>耗时，秒</summary>
-        public Int32 Cost { get; set; }
-
         /// <summary>批大小</summary>
         public Int32 BatchSize { get; set; }
-
-        /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
-        public Int32 Offset { get; set; }
 
         /// <summary>总数</summary>
         public Int32 Total { get; set; }
 
         /// <summary>成功</summary>
         public Int32 Success { get; set; }
+
+        /// <summary>耗时，秒</summary>
+        public Int32 Cost { get; set; }
 
         /// <summary>错误</summary>
         public Int32 Error { get; set; }

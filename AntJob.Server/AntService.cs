@@ -162,7 +162,7 @@ namespace AntJob.Server
         /// <param name="jobs"></param>
         /// <returns></returns>
         [Api(nameof(AddJobs))]
-        public String[] AddJobs(Job[] jobs)
+        public String[] AddJobs(JobModel[] jobs)
         {
             if (jobs == null || jobs.Length == 0) return new String[0];
 
@@ -185,9 +185,6 @@ namespace AntJob.Server
                         End = item.End,
                         Offset = item.Offset,
                         Step = item.Step,
-                        MinStep = item.MinStep,
-                        MaxStep = item.MaxStep,
-                        StepRate = item.StepRate,
                         BatchSize = item.BatchSize,
                         MaxTask = item.MaxTask,
                         Mode = item.Mode,
@@ -225,16 +222,16 @@ namespace AntJob.Server
         /// <param name="topic">主题</param>
         /// <returns></returns>
         [Api(nameof(Acquire))]
-        public JobTask[] Acquire(String job, Int32 count)
+        public TaskModel[] Acquire(String job, Int32 count)
         {
             job = job?.Trim();
-            if (job.IsNullOrEmpty()) return new JobTask[0];
+            if (job.IsNullOrEmpty()) return new TaskModel[0];
 
-            if (!(Session["App"] is App app)) return new JobTask[0];
+            if (!(Session["App"] is App app)) return new TaskModel[0];
 
             // 应用停止发放作业
             app = App.FindByID(app.ID) ?? app;
-            if (!app.Enable) return new JobTask[0];
+            if (!app.Enable) return new TaskModel[0];
 
             // 找到作业。为了确保能够快速拿到新的作业参数，这里做二次查询
             var jb = app.Jobs.FirstOrDefault(e => e.Name == job);
@@ -286,7 +283,7 @@ namespace AntJob.Server
             online.Tasks += list.Count;
             online.SaveAsync();
 
-            return list.ToArray();
+            return list.Select(e=>e.ToModel()).ToArray();
         }
 
         private void CheckErrorTask(App app, Job jb, Int32 count, List<JobTask> list)
@@ -395,37 +392,37 @@ namespace AntJob.Server
         /// <param name="task"></param>
         /// <returns></returns>
         [Api(nameof(Report))]
-        public Boolean Report(JobTask task)
+        public Boolean Report(TaskModel task)
         {
             if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 
             // 判断是否有权
             var app = Session["App"] as App;
 
-            var ji = JobTask.FindByID(task.ID);
-            if (ji == null) throw new InvalidOperationException($"找不到任务[{task.ID}]");
+            var jt = JobTask.FindByID(task.ID);
+            if (jt == null) throw new InvalidOperationException($"找不到任务[{task.ID}]");
 
-            var job = Job.FindByID(ji.JobID);
+            var job = Job.FindByID(jt.JobID);
             if (job == null || job.AppID != app.ID)
             {
                 XTrace.WriteLine(task.ToJson());
-                throw new InvalidOperationException($"应用[{app}]无权操作作业[{job}#{ji}]");
+                throw new InvalidOperationException($"应用[{app}]无权操作作业[{job}#{jt}]");
             }
 
             // 只有部分字段允许客户端修改
-            if (task.Status > 0) ji.Status = task.Status;
+            if (task.Status > 0) jt.Status = task.Status;
 
-            ji.Speed = task.Speed;
-            ji.Total = task.Total;
-            ji.Success = task.Success;
-            ji.Cost = task.Cost;
-            ji.Key = task.Key;
-            ji.Message = task.Message;
+            jt.Speed = task.Speed;
+            jt.Total = task.Total;
+            jt.Success = task.Success;
+            jt.Cost = task.Cost;
+            jt.Key = task.Key;
+            jt.Message = task.Message;
 
             // 动态调整步进
             if (task.Status == JobStatus.完成)
             {
-                AdjustStep(job, ji, Session as IExtend);
+                AdjustStep(job, jt, Session as IExtend);
 
                 //// 更新积压数
                 //UpdateLatency(job, ji);
@@ -433,20 +430,20 @@ namespace AntJob.Server
             // 已终结的作业，汇总统计
             if (task.Status == JobStatus.完成 || task.Status == JobStatus.错误)
             {
-                ji.Times++;
+                jt.Times++;
 
-                SetJobFinish(job, ji);
+                SetJobFinish(job, jt);
 
                 // 记录状态
-                UpdateOnline(app, ji, Session as INetSession);
+                UpdateOnline(app, jt, Session as INetSession);
             }
             if (task.Status == JobStatus.错误)
             {
                 var ps = ControllerContext.Current.Parameters;
 
-                SetJobError(job, ji, ps);
+                SetJobError(job, jt, ps);
 
-                ji.Error++;
+                jt.Error++;
                 //ji.Message = err.Message;
 
                 // 出错时判断如果超过最大错误数，则停止作业
@@ -454,10 +451,10 @@ namespace AntJob.Server
             }
 
             // 从创建到完成的全部耗时
-            var ts = DateTime.Now - ji.CreateTime;
-            ji.FullCost = (Int32)ts.TotalSeconds;
+            var ts = DateTime.Now - jt.CreateTime;
+            jt.FullCost = (Int32)ts.TotalSeconds;
 
-            ji.SaveAsync();
+            jt.SaveAsync();
             //ji.Save();
 
             return true;
@@ -497,14 +494,15 @@ namespace AntJob.Server
                 End = task.End,
                 Step = task.Step,
                 BatchSize = task.BatchSize,
-                CreateTime = DateTime.Now,
-                UpdateTime = DateTime.Now,
+
                 Server = task.Server,
                 ProcessID = task.ProcessID,
                 Client = task.Client,
+
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
             };
             err.Key = task.Key;
-
             err.Data = ps["Data"] + "";
 
             var code = ps["ErrorCode"] + "";

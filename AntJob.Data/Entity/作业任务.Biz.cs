@@ -185,6 +185,24 @@ namespace AntJob.Data.Entity
         public static Int32 DeleteByID(Int32 jobid, Int32 maxid) => maxid <= 0 ? 0 : Delete(_.JobID == jobid & _.ID <= maxid);
 
         public static Int32 DeleteByAppId(Int32 appid) => Delete(_.AppID == appid);
+
+        /// <summary>转模型类</summary>
+        /// <returns></returns>
+        public TaskModel ToModel()
+        {
+            return new TaskModel
+            {
+                ID = ID,
+
+                Start = Start,
+                End = End,
+                Offset = Offset,
+                Step = Step,
+                BatchSize = BatchSize,
+
+                Data = Data,
+            };
+        }
         #endregion
     }
 }
