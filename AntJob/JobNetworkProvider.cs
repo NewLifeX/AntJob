@@ -93,58 +93,12 @@ namespace AntJob
             return _jobs;
         }
 
-        private readonly IDictionary<String, Queue<ITask>> _ItemCache = new Dictionary<String, Queue<ITask>>();
         /// <summary>申请任务</summary>
         /// <param name="job">作业</param>
         /// <param name="data">扩展数据</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public override ITask[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count)
-        {
-            if (!_ItemCache.TryGetValue(job.Name, out var q))
-            {
-                q = new Queue<ITask>();
-                _ItemCache[job.Name] = q;
-            }
-
-            var list = new List<ITask>();
-
-            // 拿历史备份
-            while (count > 0 && q.Count > 0)
-            {
-                var item = q.Dequeue();
-                if (item == null) break;
-
-                list.Add(item);
-                count--;
-            }
-
-            // 不够时申请
-            if (count > 0)
-            {
-                // 按最大并行数申请
-                var count2 = Math.Max(job.MaxTask, count);
-                var rs = Ant.Acquire(job.Name, count2, data);
-                if (rs != null && rs.Length > 0)
-                {
-                    // 先给够返回，然后缓存
-                    list.AddRange(rs.Take(count));
-                    if (rs.Length > count)
-                    {
-                        foreach (var item in rs.Skip(count))
-                        {
-                            q.Enqueue(item);
-                        }
-                    }
-
-#if DEBUG
-                    WriteLog("[{0}]申请任务{1}个，取得[{2}]", job, count2, rs.Length);
-#endif
-                }
-            }
-
-            return list.ToArray();
-        }
+        public override ITask[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count) => Ant.Acquire(job.Name, count, data);
 
         /// <summary>生产消息</summary>
         /// <param name="topic">主题</param>
@@ -156,22 +110,6 @@ namespace AntJob
             if (topic.IsNullOrEmpty() || messages == null || messages.Length < 1) return 0;
 
             return Ant.Produce(topic, messages, option);
-        }
-
-        /// <summary>停止指定作业</summary>
-        /// <param name="job"></param>
-        public override void Stop(IJob job)
-        {
-            if (job != null && _ItemCache.TryGetValue(job.Name, out var q))
-            {
-                while (q.Count > 0)
-                {
-                    var ji = q.Dequeue() as MyTask;
-                    ji.Status = JobStatus.取消;
-
-                    Report(job, ji);
-                }
-            }
         }
 
         private static readonly String _MachineName = Environment.MachineName;
@@ -221,10 +159,8 @@ namespace AntJob
                 if (ctx["Message"] is String msg) ji.Message = msg;
 
                 ji.Cost = (Int32)(ctx.Cost / 1000);
-                //ext = new { Cost = (Int32)ctx.TotalCost };
             }
             if (ji.Message.IsNullOrEmpty()) ji.Message = ctx.Remark;
-            //if (ji.Message.IsNullOrEmpty()) ji.Message = ctx.Entity?.ToJson();
 
             var key = ctx.Key;
             if (key.IsNullOrEmpty()) key = ctx["Key"] as String;
@@ -274,7 +210,6 @@ namespace AntJob
                 ErrorCode = errorCode,
             };
 
-            //Ant.Report(ti, ext).Wait();
             Report(ctx.Job.Model, ji, ext);
         }
 
@@ -297,10 +232,7 @@ namespace AntJob
         /// <summary>写日志</summary>
         /// <param name="format"></param>
         /// <param name="args"></param>
-        public void WriteLog(String format, params Object[] args)
-        {
-            Log?.Info(format, args);
-        }
+        public void WriteLog(String format, params Object[] args) => Log?.Info(format, args);
         #endregion
     }
 }

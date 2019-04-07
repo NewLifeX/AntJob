@@ -29,7 +29,7 @@ namespace AntJob
         /// <summary>实例化数据库工作者</summary>
         public DataJob()
         {
-            SupportPage = true;
+            //SupportPage = true;
         }
         #endregion
 
@@ -54,18 +54,75 @@ namespace AntJob
         }
         #endregion
 
-        #region 数据抽取
+        #region 数据处理
+        /// <summary>处理任务。内部分批处理</summary>
+        /// <param name="ctx"></param>
+        protected override void OnProcess(JobContext ctx)
+        {
+            var prov = Provider;
+            while (true)
+            {
+                ctx.Data = null;
+                ctx.Entity = null;
+                ctx.Error = null;
+
+                try
+                {
+                    // 报告进度
+                    ctx.Status = JobStatus.抽取中;
+                    prov?.Report(ctx);
+
+                    // 分批抽取
+                    var data = Fetch(ctx, ctx.Task);
+
+                    var list = data as IList;
+                    if (list != null) ctx.Total += list.Count;
+                    ctx.Data = data;
+
+                    // 报告进度
+                    ctx.Status = JobStatus.处理中;
+                    prov?.Report(ctx);
+
+                    if (data == null || list != null && list.Count == 0)
+                    {
+                        ctx.Status = JobStatus.完成;
+                        break;
+                    }
+
+                    // 批量处理
+                    ctx.Success += Execute(ctx);
+
+                    // 报告进度
+                    ctx.Status = JobStatus.完成;
+
+                    // 不满一批，结束
+                    if (list != null && list.Count < ctx.Task.BatchSize) break;
+                }
+                catch (Exception ex)
+                {
+                    ctx.Status = JobStatus.错误;
+
+                    ctx.Error = ex;
+
+                    if (!OnError(ctx)) break;
+
+                    // 抽取异常，退出任务。处理异常则继续
+                    if (ctx.Data == null) break;
+                }
+            }
+        }
+
         /// <summary>分批抽取数据，一个任务内多次调用</summary>
         /// <param name="ctx">上下文</param>
-        /// <param name="set"></param>
+        /// <param name="task"></param>
         /// <returns></returns>
-        protected override Object Fetch(JobContext ctx, ITask set)
+        protected virtual Object Fetch(JobContext ctx, ITask task)
         {
-            if (set == null) throw new ArgumentNullException(nameof(set), "没有设置数据抽取配置");
+            if (task == null) throw new ArgumentNullException(nameof(task), "没有设置数据抽取配置");
 
             // 验证时间段
-            var start = set.Start;
-            var end = set.End;
+            var start = task.Start;
+            var end = task.End;
 
             // 区间无效
             if (start >= end) return null;
@@ -78,16 +135,14 @@ namespace AntJob
 
             if (!Where.IsNullOrEmpty()) exp &= Where;
 
-            var list = Factory.FindAll(exp, OrderBy, Selects, set.Row, set.BatchSize);
+            var list = Factory.FindAll(exp, OrderBy, Selects, task.Row, task.BatchSize);
 
             // 取到数据，需要滑动窗口
-            if (list.Count > 0) set.Row += list.Count;
+            if (list.Count > 0) task.Row += list.Count;
 
             return list;
         }
-        #endregion
-
-        #region 数据处理
+        
         /// <summary>处理一批数据</summary>
         /// <param name="ctx">上下文</param>
         /// <returns></returns>

@@ -17,10 +17,7 @@ namespace AntJob
 
         #region 构造
         /// <summary>实例化</summary>
-        public MessageJob()
-        {
-            Mode = JobModes.Message;
-        }
+        public MessageJob() => Mode = JobModes.Message;
         #endregion
 
         #region 方法
@@ -48,25 +45,25 @@ namespace AntJob
             return base.Acquire(data, count);
         }
 
-        /// <summary>解析出来一批消息</summary>
+        /// <summary>解码一批消息，处理任务</summary>
         /// <param name="ctx"></param>
-        /// <param name="set"></param>
-        /// <returns></returns>
-        protected override Object Fetch(JobContext ctx, ITask set)
+        protected override void OnProcess(JobContext ctx)
         {
-            // 只有蚂蚁调度支持消息
-            if (!(set is MyTask ji)) return null;
+            if (!(ctx.Data is MyTask ji)) return;
 
             var ss = ji.Data.ToJsonEntity<String[]>();
-            if (ss == null || ss.Length == 0) return null;
+            if (ss == null || ss.Length == 0) return;
 
             // 消息工作者特殊优待字符串，不需要再次Json解码
-            if (typeof(TModel) == typeof(String)) return ss;
+            if (typeof(TModel) == typeof(String))
+                ctx.Data = ss;
+            else
+                ctx.Data = ss.Select(e => e.ToJsonEntity<TModel>()).ToArray();
 
-            return ss.Select(e => e.ToJsonEntity<TModel>()).ToArray();
+            Execute(ctx);
         }
 
-        /// <summary>处理一批数据</summary>
+        /// <summary>根据解码后的消息执行任务</summary>
         /// <param name="ctx">上下文</param>
         /// <returns></returns>
         protected override Int32 Execute(JobContext ctx)
@@ -76,7 +73,7 @@ namespace AntJob
             {
                 try
                 {
-                    //ctx.Key = item as String;
+                    ctx.Key = item as String;
                     ctx.Entity = item;
 
                     if (ProcessItem(ctx, (TModel)item)) count++;

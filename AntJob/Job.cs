@@ -33,9 +33,6 @@ namespace AntJob
         /// <summary>是否忽略每一行数据的错误。大批量数据数据时可选忽略，默认false</summary>
         public Boolean IgnoreItemError { get; set; }
 
-        /// <summary>是否支持分页。默认false按单页处理，DataWorker默认true</summary>
-        protected Boolean SupportPage { get; set; }
-
         private volatile Int32 _Busy;
         /// <summary>正在处理中的任务数</summary>
         public Int32 Busy => _Busy;
@@ -130,9 +127,16 @@ namespace AntJob
         {
             if (task == null) return;
 
+            var ctx = new JobContext
+            {
+                Job = this,
+                Task = task,
+            };
+
+            var sw = Stopwatch.StartNew();
             try
             {
-                OnProcess(task);
+                OnProcess(ctx);
             }
             catch (Exception ex)
             {
@@ -142,102 +146,19 @@ namespace AntJob
             {
                 Interlocked.Decrement(ref _Busy);
             }
-        }
 
-        /// <summary>处理任务。内部分批处理，多次调用OnProcess</summary>
-        /// <param name="task"></param>
-        private void OnProcess(ITask task)
-        {
-            var ctx = new JobContext
-            {
-                Job = this,
-                Task = task,
-            };
-
-            var swTotal = Stopwatch.StartNew();
-            var prov = Provider;
-            while (true)
-            {
-                ctx.Data = null;
-                ctx.Entity = null;
-                ctx.Error = null;
-
-                try
-                {
-                    // 报告进度
-                    ctx.Status = JobStatus.抽取中;
-                    prov?.Report(ctx);
-
-                    // 分批抽取
-                    var data = Fetch(ctx, task);
-
-                    var list = data as IList;
-                    if (list != null) ctx.Total += list.Count;
-                    ctx.Data = data;
-
-                    // 报告进度
-                    ctx.Status = JobStatus.处理中;
-                    prov?.Report(ctx);
-
-                    if (data == null || list != null && list.Count == 0)
-                    {
-                        ctx.Status = JobStatus.完成;
-                        break;
-                    }
-
-                    // 批量处理
-                    ctx.Success += Execute(ctx);
-
-                    // 报告进度
-                    ctx.Status = JobStatus.完成;
-
-                    // 不满一批，结束
-                    if (list != null && list.Count < task.BatchSize) break;
-                }
-                catch (Exception ex)
-                {
-                    ctx.Status = JobStatus.错误;
-
-                    ctx.Error = ex;
-
-                    if (!OnError(ctx)) break;
-
-                    // 抽取异常，退出任务。处理异常则继续
-                    if (ctx.Data == null) break;
-                }
-
-                if (!SupportPage) break;
-            }
-
-            swTotal.Stop();
-            ctx.Cost = swTotal.Elapsed.TotalMilliseconds;
+            sw.Stop();
+            ctx.Cost = sw.Elapsed.TotalMilliseconds;
 
             // 忽略内部异常，有错误已经被处理，这里不需要再次报告
             if (ctx.Error == null) OnFinish(ctx);
 
             ctx.Items.Clear();
         }
-        #endregion
 
-        #region 数据抽取
-        /// <summary>分批抽取数据，一个任务内多次调用</summary>
-        /// <param name="ctx">上下文</param>
-        /// <param name="set"></param>
-        /// <returns></returns>
-        protected virtual Object Fetch(JobContext ctx, ITask set)
-        {
-            if (set == null) throw new ArgumentNullException(nameof(set), "没有设置数据抽取配置");
-
-            // 时间未到
-            if (set.Start > DateTime.Now) return null;
-
-            var list = new List<DateTime>
-            {
-                set.Start
-            };
-
-            return list;
-        }
+        /// <summary>处理任务。内部分批处理</summary>
+        /// <param name="ctx"></param>
+        protected virtual void OnProcess(JobContext ctx) => ctx.Success = Execute(ctx);
         #endregion
 
         #region 数据处理
