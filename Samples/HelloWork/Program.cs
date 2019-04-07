@@ -12,7 +12,9 @@ namespace HelloWork
 
             // 实例化调度器
             var sc = new Scheduler();
-            sc.Period = 10;
+
+            //// 使用分布式调度引擎替换默认的本地文件调度
+            //sc.Provider = new JobNetworkProvider { Server = "tcp://127.0.0.1:9999", AppID = "Hello" };
 
             // 添加作业处理器
             sc.Jobs.Add(new HelloJob());
@@ -22,6 +24,27 @@ namespace HelloWork
 
             Console.WriteLine("OK!");
             Console.ReadKey();
+        }
+    }
+
+    class HelloJob : Job
+    {
+        public HelloJob()
+        {
+            // 今天零点开始，每5分钟一次
+            var job = Model;
+            job.Start = DateTime.Today;
+            job.Step = 5 * 60;
+        }
+
+        protected override Int32 Execute(JobContext ctx)
+        {
+            // 当前任务时间
+            var time = ctx.Task.Start;
+            WriteLog("新生命蚂蚁调度系统！当前任务时间：{0}", time);
+
+            // 成功处理数据量
+            return 1;
         }
     }
 }

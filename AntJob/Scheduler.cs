@@ -59,7 +59,7 @@ namespace AntJob
 
             // 输出日志
             var mode = $"定时{Period}秒";
-            var msg = $"启动任务调度，作业[{bs.Count}]项，模式：{mode}";
+            var msg = $"启动任务调度引擎[{prv}]，作业[{bs.Count}]项，模式：{mode}";
             XTrace.WriteLine(msg);
 
             // 设置日志
