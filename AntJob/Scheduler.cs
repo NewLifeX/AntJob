@@ -168,8 +168,8 @@ namespace AntJob
         #endregion
 
         #region 定时调度
-        /// <summary>定时轮询周期。默认1秒</summary>
-        public Int32 Period { get; set; } = 1;
+        /// <summary>定时轮询周期。默认5秒</summary>
+        public Int32 Period { get; set; } = 5;
 
         private TimerX _timer;
         void Loop(Object state)

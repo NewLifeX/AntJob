@@ -42,14 +42,14 @@ namespace AntJob
 
             var ws = Schedule?.Jobs;
 
-            var jobs = GetJobs(ws.Select(e => e.Name).ToArray());
+            //var jobs = GetJobs(ws.Select(e => e.Name).ToArray());
             var list = new List<IJob>();
             foreach (var wrk in ws)
             {
-                var job = wrk.Model ?? new MyJob { Name = wrk.Name };
+                var job = wrk.Model ?? new MyJob();
 
-                // 调度模式
-                if (wrk != null) job.Mode = wrk.Mode;
+                job.Name = wrk.Name;
+                job.Mode = wrk.Mode;
 
                 // 描述
                 if (job is MyJob job2)

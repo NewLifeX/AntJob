@@ -92,7 +92,6 @@ namespace AntJob.Server
             if (app.ID == 0)
             {
                 app.Name = name;
-                //app.DisplayName = dname;
                 app.CreateIP = ip;
                 app.CreateTime = DateTime.Now;
 

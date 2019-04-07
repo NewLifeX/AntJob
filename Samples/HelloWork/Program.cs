@@ -13,8 +13,8 @@ namespace HelloWork
             // 实例化调度器
             var sc = new Scheduler();
 
-            //// 使用分布式调度引擎替换默认的本地文件调度
-            //sc.Provider = new JobNetworkProvider { Server = "tcp://127.0.0.1:9999", AppID = "Hello" };
+            // 使用分布式调度引擎替换默认的本地文件调度
+            sc.Provider = new JobNetworkProvider { Server = "tcp://127.0.0.1:9999", AppID = "Hello" };
 
             // 添加作业处理器
             sc.Jobs.Add(new HelloJob());

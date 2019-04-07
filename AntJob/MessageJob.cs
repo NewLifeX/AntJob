@@ -17,7 +17,13 @@ namespace AntJob
 
         #region 构造
         /// <summary>实例化</summary>
-        public MessageJob() => Mode = JobModes.Message;
+        public MessageJob()
+        {
+            Mode = JobModes.Message;
+
+            var job = Model;
+            job.BatchSize = 8;
+        }
         #endregion
 
         #region 方法
