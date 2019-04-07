@@ -17,9 +17,6 @@ namespace AntJob
         /// <summary>时间偏移。距离实时时间的秒数，部分业务不能跑到实时</summary>
         Int32 Offset { get; set; }
 
-        /// <summary>开始行。分页</summary>
-        Int32 Row { get; set; }
-
         /// <summary>步进。最大区间大小，秒</summary>
         Int32 Step { get; set; }
 
@@ -33,7 +30,14 @@ namespace AntJob
         String Message { get; set; }
     }
 
-    class MyTask : ITask
+    /// <summary>数据任务</summary>
+    public interface IDataTask : ITask
+    {
+        /// <summary>开始行。分页</summary>
+        Int32 Row { get; set; }
+    }
+
+    class MyTask : IDataTask
     {
         #region 属性
         /// <summary>编号</summary>

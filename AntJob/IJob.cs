@@ -86,9 +86,6 @@ namespace AntJob
         #endregion
 
         #region 构造
-        /// <summary>实例化</summary>
-        public MyJob() { }
-
         /// <summary>已重载。</summary>
         /// <returns></returns>
         public override String ToString() => Name;

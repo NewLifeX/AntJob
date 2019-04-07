@@ -67,7 +67,7 @@ namespace AntJob
                 ctx.Error = null;
 
                 // 分批抽取
-                var data = Fetch(ctx, ctx.Task);
+                var data = Fetch(ctx, ctx.Task as IDataTask);
 
                 var list = data as IList;
                 if (list != null) ctx.Total += list.Count;
@@ -94,7 +94,7 @@ namespace AntJob
         /// <param name="ctx">上下文</param>
         /// <param name="task"></param>
         /// <returns></returns>
-        protected virtual Object Fetch(JobContext ctx, ITask task)
+        protected virtual Object Fetch(JobContext ctx, IDataTask task)
         {
             if (task == null) throw new ArgumentNullException(nameof(task), "没有设置数据抽取配置");
 
