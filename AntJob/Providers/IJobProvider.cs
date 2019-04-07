@@ -29,12 +29,13 @@ namespace AntJob.Providers
         /// <returns></returns>
         ITask[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count = 1);
 
-        /// <summary></summary>
+        /// <summary>生产消息</summary>
+        /// <param name="job">作业</param>
         /// <param name="topic">主题</param>
         /// <param name="messages">消息集合</param>
         /// <param name="option">消息选项</param>
         /// <returns></returns>
-        Int32 Produce(String topic, String[] messages, MessageOption option);
+        Int32 Produce(String job, String topic, String[] messages, MessageOption option);
 
         /// <summary>报告进度</summary>
         /// <param name="ctx">上下文</param>
@@ -69,11 +70,12 @@ namespace AntJob.Providers
         public abstract ITask[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count);
 
         /// <summary>生产消息</summary>
+        /// <param name="job">作业</param>
         /// <param name="topic">主题</param>
         /// <param name="messages">消息集合</param>
         /// <param name="option">消息选项</param>
         /// <returns></returns>
-        public virtual Int32 Produce(String topic, String[] messages, MessageOption option = null) => 0;
+        public virtual Int32 Produce(String job, String topic, String[] messages, MessageOption option = null) => 0;
 
         /// <summary>报告进度，每个任务多次调用</summary>
         /// <param name="ctx">上下文</param>

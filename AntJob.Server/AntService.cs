@@ -318,14 +318,14 @@ namespace AntJob.Server
         }
 
         /// <summary>生产消息</summary>
-        /// <param name="jobid">作业</param>
+        /// <param name="job">作业</param>
         /// <param name="topic">主体</param>
         /// <param name="messages">消息集合</param>
         /// <param name="delayTime">延迟执行间隔（实际执行时间=延迟+生产时间），单位秒</param>
         /// <param name="unique">消息去重。避免单个消息被重复生产</param>
         /// <returns></returns>
         [Api(nameof(Produce))]
-        public Int32 Produce(Int32 jobid, String topic, String[] messages, Int32 delayTime = 0, Boolean unique = false)
+        public Int32 Produce(String job, String topic, String[] messages, Int32 delayTime = 0, Boolean unique = false)
         {
             if (messages == null) return 0;
             messages = messages.Distinct().ToArray();
@@ -349,12 +349,14 @@ namespace AntJob.Server
             if (dTime.Year < 2000)
                 dTime = now.AddSeconds(delayTime);
 
+            var jb = Job.FindByAppIDAndName(app.ID, job);
+
             foreach (var item in messages)
             {
                 var jm = new AppMessage
                 {
                     AppID = app.ID,
-                    JobID = jobid,
+                    JobID = jb == null ? 0 : jb.ID,
                     Topic = topic,
                     Data = item,
                 };

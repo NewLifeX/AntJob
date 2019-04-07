@@ -162,6 +162,7 @@ namespace AntJob
         /// <param name="ctx"></param>
         protected virtual void OnProcess(JobContext ctx)
         {
+            ctx.Total = 1;
             ctx.Success = Execute(ctx);
         }
         #endregion
@@ -179,7 +180,7 @@ namespace AntJob
         /// <returns></returns>
         public Int32 Produce(String topic, String[] messages, MessageOption option = null)
         {
-            return Provider.Produce(topic, messages, option);
+            return Provider.Produce(Model?.Name, topic, messages, option);
         }
 
         /// <summary>整个任务完成</summary>

@@ -127,15 +127,16 @@ namespace AntJob.Providers
         }
 
         /// <summary>生产消息</summary>
+        /// <param name="job">作业</param>
         /// <param name="topic">主题</param>
         /// <param name="messages">消息集合</param>
         /// <param name="option">消息选项</param>
         /// <returns></returns>
-        public override Int32 Produce(String topic, String[] messages, MessageOption option = null)
+        public override Int32 Produce(String job, String topic, String[] messages, MessageOption option = null)
         {
             if (topic.IsNullOrEmpty() || messages == null || messages.Length < 1) return 0;
 
-            return Ant.Produce(topic, messages, option);
+            return Ant.Produce(job, topic, messages, option);
         }
         #endregion
 
