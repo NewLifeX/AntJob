@@ -230,6 +230,26 @@ namespace AntJob.Data.Entity
 
             return JobTask.DeleteByID(ID, last.ID);
         }
+
+        /// <summary>转模型类</summary>
+        /// <returns></returns>
+        public JobModel ToModel()
+        {
+            return new JobModel
+            {
+                Name = Name,
+                Enable = Enable,
+
+                Start = Start,
+                End = End,
+                Offset = Offset,
+                Step = Step,
+                BatchSize = BatchSize,
+                MaxTask = MaxTask,
+
+                Mode = Mode,
+            };
+        }
         #endregion
 
         #region 申请任务

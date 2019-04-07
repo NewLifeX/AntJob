@@ -148,14 +148,14 @@ namespace AntJob.Server
         /// <param name="names"></param>
         /// <returns></returns>
         [Api(nameof(GetJobs))]
-        public IJob[] GetJobs(String[] names)
+        public JobModel[] GetJobs(String[] names)
         {
             var app = Session["App"] as App;
 
             var jobs = Job.FindAllByAppID(app.ID);
             if (names != null && names.Length > 0) jobs = jobs.Where(e => names.Contains(e.Name)).ToList();
 
-            return jobs.ToArray();
+            return jobs.Select(e => e.ToModel()).ToArray();
         }
 
         /// <summary>批量添加作业</summary>
