@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
-    <PackageReference Include="NewLife.Core" Version="8.1.2019.406" />
+    <PackageReference Include="NewLife.Core" Version="8.1.2019.407" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
@@ -48,7 +48,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="9.11.2019.406" />
+    <PackageReference Include="NewLife.XCode" Version="9.11.2019.407" />
   </ItemGroup>
 
   <ItemGroup>
