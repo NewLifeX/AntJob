@@ -34,7 +34,7 @@
       <Column Name="Name" DataType="String" Master="True" Description="名称。机器名称" />
       <Column Name="Version" DataType="String" Description="版本。客户端" />
       <Column Name="Server" DataType="String" Description="服务端。客户端登录到哪个服务端，IP加端口" />
-      <Column Name="Logs" DataType="Int32" Description="任务数" />
+      <Column Name="Tasks" DataType="Int32" Description="任务数" />
       <Column Name="Total" DataType="Int64" Description="总数" />
       <Column Name="Success" DataType="Int64" Description="成功" />
       <Column Name="Error" DataType="Int64" Description="错误" />
@@ -136,7 +136,7 @@
       <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
       <Column Name="AppID" DataType="Int32" Description="应用" />
       <Column Name="JobID" DataType="Int32" Description="作业" />
-      <Column Name="JobLogID" DataType="Int32" Description="作业项" />
+      <Column Name="TaskID" DataType="Int32" Description="作业项" />
       <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
       <Column Name="Start" DataType="DateTime" Description="开始。大于等于" />
       <Column Name="End" DataType="DateTime" Description="结束。小于，不等于" />

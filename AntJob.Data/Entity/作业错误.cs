@@ -43,13 +43,13 @@ namespace AntJob.Data.Entity
         [BindColumn("JobID", "作业", "")]
         public Int32 JobID { get { return _JobID; } set { if (OnPropertyChanging(__.JobID, value)) { _JobID = value; OnPropertyChanged(__.JobID); } } }
 
-        private Int32 _JobLogID;
+        private Int32 _TaskID;
         /// <summary>作业项</summary>
         [DisplayName("作业项")]
         [Description("作业项")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("JobLogID", "作业项", "")]
-        public Int32 JobLogID { get { return _JobLogID; } set { if (OnPropertyChanging(__.JobLogID, value)) { _JobLogID = value; OnPropertyChanged(__.JobLogID); } } }
+        [BindColumn("TaskID", "作业项", "")]
+        public Int32 TaskID { get { return _TaskID; } set { if (OnPropertyChanging(__.TaskID, value)) { _TaskID = value; OnPropertyChanged(__.TaskID); } } }
 
         private String _Client;
         /// <summary>客户端。IP加进程</summary>
@@ -169,7 +169,7 @@ namespace AntJob.Data.Entity
                     case __.ID : return _ID;
                     case __.AppID : return _AppID;
                     case __.JobID : return _JobID;
-                    case __.JobLogID : return _JobLogID;
+                    case __.TaskID : return _TaskID;
                     case __.Client : return _Client;
                     case __.Start : return _Start;
                     case __.End : return _End;
@@ -193,7 +193,7 @@ namespace AntJob.Data.Entity
                     case __.ID : _ID = value.ToInt(); break;
                     case __.AppID : _AppID = value.ToInt(); break;
                     case __.JobID : _JobID = value.ToInt(); break;
-                    case __.JobLogID : _JobLogID = value.ToInt(); break;
+                    case __.TaskID : _TaskID = value.ToInt(); break;
                     case __.Client : _Client = Convert.ToString(value); break;
                     case __.Start : _Start = value.ToDateTime(); break;
                     case __.End : _End = value.ToDateTime(); break;
@@ -227,7 +227,7 @@ namespace AntJob.Data.Entity
             public static readonly Field JobID = FindByName(__.JobID);
 
             /// <summary>作业项</summary>
-            public static readonly Field JobLogID = FindByName(__.JobLogID);
+            public static readonly Field TaskID = FindByName(__.TaskID);
 
             /// <summary>客户端。IP加进程</summary>
             public static readonly Field Client = FindByName(__.Client);
@@ -284,7 +284,7 @@ namespace AntJob.Data.Entity
             public const String JobID = "JobID";
 
             /// <summary>作业项</summary>
-            public const String JobLogID = "JobLogID";
+            public const String TaskID = "TaskID";
 
             /// <summary>客户端。IP加进程</summary>
             public const String Client = "Client";
@@ -342,7 +342,7 @@ namespace AntJob.Data.Entity
         Int32 JobID { get; set; }
 
         /// <summary>作业项</summary>
-        Int32 JobLogID { get; set; }
+        Int32 TaskID { get; set; }
 
         /// <summary>客户端。IP加进程</summary>
         String Client { get; set; }

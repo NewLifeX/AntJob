@@ -74,13 +74,13 @@ namespace AntJob.Data.Entity
         [BindColumn("Server", "服务端。客户端登录到哪个服务端，IP加端口", "")]
         public String Server { get { return _Server; } set { if (OnPropertyChanging(__.Server, value)) { _Server = value; OnPropertyChanged(__.Server); } } }
 
-        private Int32 _Logs;
+        private Int32 _Tasks;
         /// <summary>任务数</summary>
         [DisplayName("任务数")]
         [Description("任务数")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("Logs", "任务数", "")]
-        public Int32 Logs { get { return _Logs; } set { if (OnPropertyChanging(__.Logs, value)) { _Logs = value; OnPropertyChanged(__.Logs); } } }
+        [BindColumn("Tasks", "任务数", "")]
+        public Int32 Tasks { get { return _Tasks; } set { if (OnPropertyChanging(__.Tasks, value)) { _Tasks = value; OnPropertyChanged(__.Tasks); } } }
 
         private Int64 _Total;
         /// <summary>总数</summary>
@@ -180,7 +180,7 @@ namespace AntJob.Data.Entity
                     case __.Name : return _Name;
                     case __.Version : return _Version;
                     case __.Server : return _Server;
-                    case __.Logs : return _Logs;
+                    case __.Tasks : return _Tasks;
                     case __.Total : return _Total;
                     case __.Success : return _Success;
                     case __.Error : return _Error;
@@ -205,7 +205,7 @@ namespace AntJob.Data.Entity
                     case __.Name : _Name = Convert.ToString(value); break;
                     case __.Version : _Version = Convert.ToString(value); break;
                     case __.Server : _Server = Convert.ToString(value); break;
-                    case __.Logs : _Logs = value.ToInt(); break;
+                    case __.Tasks : _Tasks = value.ToInt(); break;
                     case __.Total : _Total = value.ToLong(); break;
                     case __.Success : _Success = value.ToLong(); break;
                     case __.Error : _Error = value.ToLong(); break;
@@ -248,7 +248,7 @@ namespace AntJob.Data.Entity
             public static readonly Field Server = FindByName(__.Server);
 
             /// <summary>任务数</summary>
-            public static readonly Field Logs = FindByName(__.Logs);
+            public static readonly Field Tasks = FindByName(__.Tasks);
 
             /// <summary>总数</summary>
             public static readonly Field Total = FindByName(__.Total);
@@ -308,7 +308,7 @@ namespace AntJob.Data.Entity
             public const String Server = "Server";
 
             /// <summary>任务数</summary>
-            public const String Logs = "Logs";
+            public const String Tasks = "Tasks";
 
             /// <summary>总数</summary>
             public const String Total = "Total";
@@ -369,7 +369,7 @@ namespace AntJob.Data.Entity
         String Server { get; set; }
 
         /// <summary>任务数</summary>
-        Int32 Logs { get; set; }
+        Int32 Tasks { get; set; }
 
         /// <summary>总数</summary>
         Int64 Total { get; set; }

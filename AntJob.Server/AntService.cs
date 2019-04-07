@@ -283,7 +283,7 @@ namespace AntJob.Server
 
             // 记录状态
             var online = GetOnline(app, Session as INetSession);
-            online.Logs += list.Count;
+            online.Tasks += list.Count;
             online.SaveAsync();
 
             return list.ToArray();
@@ -321,24 +321,20 @@ namespace AntJob.Server
         }
 
         /// <summary>生产消息</summary>
-        /// <param name="jobitemid">任务</param>
+        /// <param name="jobid">作业</param>
         /// <param name="topic">主体</param>
         /// <param name="messages">消息集合</param>
         /// <param name="delayTime">延迟执行间隔（实际执行时间=延迟+生产时间），单位秒</param>
         /// <param name="unique">消息去重。避免单个消息被重复生产</param>
         /// <returns></returns>
         [Api(nameof(Produce))]
-        public Int32 Produce(Int32 jobitemid, String topic, String[] messages, Int32 delayTime = 0, Boolean unique = false)
+        public Int32 Produce(Int32 jobid, String topic, String[] messages, Int32 delayTime = 0, Boolean unique = false)
         {
             if (messages == null) return 0;
             messages = messages.Distinct().ToArray();
             if (messages.Length == 0) return 0;
 
             var app = Session["App"] as App;
-
-            var ji = JobTask.FindByID(jobitemid);
-            var job = ji?.Job;
-            //if (job == null) throw new Exception($"无效作业编号[jobIten={jobitemid}]无效");
 
             // 去重过滤
             if (unique)
@@ -353,9 +349,7 @@ namespace AntJob.Server
             var now = DateTime.Now;
             // 延迟需要基于任务开始时间，而不能用使用当前时间，防止回头跑数据时无法快速执行
             var dTime = delayTime.ToDateTime();
-            if (ji != null)
-                dTime = ji.Start.AddSeconds(delayTime);
-            else if (dTime.Year < 2000)
+            if (dTime.Year < 2000)
                 dTime = now.AddSeconds(delayTime);
 
             foreach (var item in messages)
@@ -363,11 +357,10 @@ namespace AntJob.Server
                 var jm = new AppMessage
                 {
                     AppID = app.ID,
-                    //JobID = job.ID,
+                    JobID = jobid,
                     Topic = topic,
                     Data = item,
                 };
-                if (job != null) jm.JobID = job.ID;
 
                 jm.CreateTime = jm.UpdateTime = now;
                 if (delayTime > 0) jm.UpdateTime = dTime;
@@ -404,7 +397,7 @@ namespace AntJob.Server
         [Api(nameof(Report))]
         public Boolean Report(JobTask task)
         {
-            if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 JobItemID=" + task?.ID);
+            if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 
             // 判断是否有权
             var app = Session["App"] as App;

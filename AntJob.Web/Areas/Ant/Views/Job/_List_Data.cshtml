@@ -8,6 +8,7 @@
 @using System.Web.Mvc.Html;
 @using System.Web.Routing;
 @using AntJob.Data.Entity;
+@using AntJob.Data;
 @{
     var fact = ViewBag.Factory as IEntityOperate;
     var page = ViewBag.Page as Pager;
@@ -59,7 +60,7 @@
         {
             var st = entity.Start.ToFullString("");
             if (entity.Start.Date == DateTime.Now.Date) { st = entity.Start.ToString("HH:mm:ss"); }
-            if (entity.Mode == AntJob.JobModes.Message) { st = "{0}/{1}".F(entity.Topic, entity.MessageCount); }
+            if (entity.Mode == JobModes.Message) { st = "{0}/{1}".F(entity.Topic, entity.MessageCount); }
 
             var ut = entity.UpdateTime.ToFullString("");
             if (entity.UpdateTime.Date == DateTime.Now.Date) { ut = entity.UpdateTime.ToString("HH:mm:ss"); }
@@ -69,14 +70,14 @@
                     <td class="text-center"><input type="checkbox" name="keys" value="@entity[fk.Name]" /></td>
                 }
                 <td class="text-center hidden-md hidden-sm hidden-xs">@entity.ID</td>
-                <td><a href="JobItem?JobID=@entity.ID">@entity.Name</a></td>
+                <td><a href="JobTask?JobID=@entity.ID">@entity.Name</a></td>
                 <td title="@entity.Description">@entity.DisplayName</td>
                 @if (appid == 0)
                 {
                     <td>@entity.AppName</td>
                 }
                 <td class="text-center" title="@entity.Mode.GetDescription()">
-                    @if (entity.Mode == AntJob.JobModes.Alarm)
+                    @if (entity.Mode == JobModes.Alarm)
                     {
                         <b>@st</b>
                     }
@@ -87,7 +88,7 @@
                 </td>
                 <td class="text-center">@entity.End.ToFullString("")</td>
                 <td class="text-right">
-                    @if (entity.Mode != AntJob.JobModes.Message)
+                    @if (entity.Mode != JobModes.Message)
                     {
                         if (entity.StepRate > 0)
                         {
@@ -104,7 +105,7 @@
                 </td>
                 <td class="text-right">@entity.BatchSize.ToString("n0")</td>
                 <td class="text-right">
-                    @if (entity.Mode != AntJob.JobModes.Message)
+                    @if (entity.Mode != JobModes.Message)
                     {
                         @TimeSpan.FromSeconds(entity.Offset)
                     }
@@ -119,8 +120,8 @@
                     <a href="Job/Set/@entity.ID?enable=@(entity.Enable?"false":"true")" data-action="action"><i class="glyphicon glyphicon-@(entity.Enable ? "ok" : "remove")" style="color: @(entity.Enable ? "green" : "red");"></i></a>
                 </td>
                 <td class="text-center">@ut</td>
-                <td class="text-center"><a href="JobMessage?JobID=@entity.ID">消息</a></td>
-                <td class="text-center"><a href="JobItem?JobID=@entity.ID">任务</a></td>
+                <td class="text-center"><a href="AppMessage?JobID=@entity.ID">消息</a></td>
+                <td class="text-center"><a href="JobTask?JobID=@entity.ID">任务</a></td>
                 <td class="text-center"><a href="JobStat?JobID=@entity.ID">统计</a></td>
                 <td class="text-center"><a href="JobError?JobID=@entity.ID">错误</a></td>
                 @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))

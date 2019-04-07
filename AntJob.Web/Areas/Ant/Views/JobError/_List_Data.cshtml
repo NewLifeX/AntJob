@@ -45,7 +45,7 @@
             <tr>
                 <td class="text-center hidden-md hidden-sm hidden-xs">@entity.ID</td>
                 <td><a href="Job?AppID=@entity.AppID">@entity.AppName</a></td>
-                <td><a href="JobLog?JobID=@entity.JobID">@entity.JobName</a></td>
+                <td><a href="JobTask?JobID=@entity.JobID">@entity.JobName</a></td>
                 <td class="text-right">@entity.Step.ToString("n0")</td>
                 <td class="text-right">@entity.BatchSize.ToString("n0")</td>
                 <td>@entity.Key</td>

@@ -54,9 +54,9 @@
                 <td class="text-center">
                     <a href="App/Set/@entity.ID?enable=@(entity.Enable?"false":"true")" data-action="action"><i class="glyphicon glyphicon-@(entity.Enable ? "ok" : "remove")" style="color: @(entity.Enable ? "green" : "red");"></i></a>
                 </td>
-                <td class="text-center"><a href="@Url.Action("Index","JobMessage",new {appid=entity.ID})">消息</a></td>
+                <td class="text-center"><a href="@Url.Action("Index","AppMessage",new {appid=entity.ID})">消息</a></td>
                 <td class="text-center"><a href="@Url.Action("Index","AppOnline",new {appid=entity.ID})">在线</a></td>
-                <td class="text-center"><a href="@Url.Action("Index","JobItem",new {appid=entity.ID})">任务</a></td>
+                <td class="text-center"><a href="@Url.Action("Index","JobTask",new {appid=entity.ID})">任务</a></td>
                 <td class="text-center"><a href="@Url.Action("Index","JobError",new {appid=entity.ID})">错误</a></td>
                 <td>@entity.UpdateTime.ToFullString("")</td>
                 @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
