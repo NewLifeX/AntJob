@@ -148,7 +148,11 @@ namespace AntJob
                     // 送给工作者处理
                     for (var i = 0; i < count && ts != null && i < ts.Length; i++)
                     {
-                        ProcessItem(wrk, ts[i]);
+                        // 准备就绪，增加Busy，避免超额分配
+                        wrk.Prepare(ts[i]);
+
+                        // 使用线程池调度，避免Task排队影响使用
+                        ThreadPoolX.QueueUserWorkItem(wrk.Process, ts[i]);
                     }
 
                     if (ts != null && ts.Length > 0) flag = true;
@@ -158,16 +162,9 @@ namespace AntJob
             return flag;
         }
 
-        private void ProcessItem(Job worker, ITask task)
-        {
-            if (task == null) return;
-
-            // 准备就绪，增加Busy，避免超额分配
-            worker.Prepare(task);
-
-            // 使用线程池调度，避免Task排队影响使用
-            ThreadPoolX.QueueUserWorkItem(worker.Process, task);
-        }
+        /// <summary>已完成</summary>
+        /// <param name="ctx"></param>
+        internal protected virtual void OnFinish(JobContext ctx) => _timer?.SetNext(-1);
         #endregion
 
         #region 定时调度

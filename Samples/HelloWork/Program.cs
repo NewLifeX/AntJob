@@ -12,6 +12,7 @@ namespace HelloWork
 
             // 实例化调度器
             var sc = new Scheduler();
+            sc.Period = 10;
 
             // 添加作业处理器
             sc.Jobs.Add(new HelloJob());

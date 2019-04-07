@@ -149,6 +149,7 @@ namespace AntJob
             ctx.Cost = sw.Elapsed.TotalMilliseconds;
 
             OnFinish(ctx);
+            Schedule?.OnFinish(ctx);
 
             ctx.Items.Clear();
         }
