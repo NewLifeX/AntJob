@@ -65,6 +65,14 @@ namespace AntJob
             if (list.Count > 0) Ant.AddJobs(list.ToArray());
         }
 
+        /// <summary>停止</summary>
+        public override void Stop()
+        {
+            // 断开前一个连接
+            Ant.TryDispose();
+            Ant = null;
+        }
+
         private IJob[] _jobs;
         private DateTime _NextGetJobs;
         /// <summary>获取所有作业名称</summary>
@@ -185,18 +193,5 @@ namespace AntJob
                 XTrace.WriteLine("[{0}]的[{1}]状态报告失败！{2}", job, task.Status, ex.GetTrue().Message);
             }
         }
-
-        #region 日志
-        /// <summary>日志</summary>
-        public ILog Log { get; set; }
-
-        /// <summary>写日志</summary>
-        /// <param name="format"></param>
-        /// <param name="args"></param>
-        public void WriteLog(String format, params Object[] args)
-        {
-            Log?.Info(format, args);
-        }
-        #endregion
     }
 }

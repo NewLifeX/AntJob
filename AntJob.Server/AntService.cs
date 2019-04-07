@@ -266,7 +266,7 @@ namespace AntJob.Server
                     case JobModes.Message:
                         list.AddRange(jb.AcquireMessage(topic, server, ip, pid, count - list.Count));
                         break;
-                    case JobModes.Time:
+                    case JobModes.Data:
                     case JobModes.Alarm:
                     default:
                         {

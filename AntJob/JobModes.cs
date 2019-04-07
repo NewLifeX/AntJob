@@ -6,9 +6,9 @@ namespace AntJob
     [Description("作业模式")]
     public enum JobModes
     {
-        /// <summary>时间片调度</summary>
-        [Description("时间片调度")]
-        Time = 1,
+        /// <summary>数据调度</summary>
+        [Description("数据调度")]
+        Data = 1,
 
         /// <summary>定时调度</summary>
         [Description("定时调度")]
