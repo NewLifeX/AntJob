@@ -150,13 +150,13 @@ namespace AntJob
         }
 
         /// <summary>处理任务。内部分批处理，多次调用OnProcess</summary>
-        /// <param name="set"></param>
-        private void OnProcess(ITask set)
+        /// <param name="task"></param>
+        private void OnProcess(ITask task)
         {
             var ctx = new JobContext
             {
                 Job = this,
-                Setting = set,
+                Task = task,
             };
 
             var swTotal = Stopwatch.StartNew();
@@ -173,15 +173,11 @@ namespace AntJob
                     ctx.Status = JobStatus.抽取中;
                     prov?.Report(ctx);
 
-                    var sw = Stopwatch.StartNew();
-
                     // 分批抽取
-                    var data = Fetch(ctx, set);
-                    sw.Stop();
+                    var data = Fetch(ctx, task);
 
                     var list = data as IList;
                     if (list != null) ctx.Total += list.Count;
-                    ctx.FetchCost += sw.Elapsed.TotalMilliseconds;
                     ctx.Data = data;
 
                     // 报告进度
@@ -194,19 +190,14 @@ namespace AntJob
                         break;
                     }
 
-                    sw = Stopwatch.StartNew();
-
                     // 批量处理
                     ctx.Success += Execute(ctx);
-
-                    sw.Stop();
-                    ctx.ProcessCost += sw.Elapsed.TotalMilliseconds;
 
                     // 报告进度
                     ctx.Status = JobStatus.完成;
 
                     // 不满一批，结束
-                    if (list != null && list.Count < set.BatchSize) break;
+                    if (list != null && list.Count < task.BatchSize) break;
                 }
                 catch (Exception ex)
                 {
@@ -224,7 +215,7 @@ namespace AntJob
             }
 
             swTotal.Stop();
-            ctx.TotalCost = swTotal.Elapsed.TotalMilliseconds;
+            ctx.Cost = swTotal.Elapsed.TotalMilliseconds;
 
             // 忽略内部异常，有错误已经被处理，这里不需要再次报告
             if (ctx.Error == null) OnFinish(ctx);

@@ -162,14 +162,14 @@ namespace AntJob
             var job = ctx.Job?.Model;
             if (ctx.Total > 0)
             {
-                var set = ctx.Setting;
+                var set = ctx.Task;
                 var n = 0;
                 if (set.End > set.Start) n = (Int32)(set.End - set.Start).TotalSeconds;
                 var msg = $"{ctx.Job.Name} 处理{ctx.Total:n0} 行，区间（{set.Start} + {n}, {set.End:HH:mm:ss}）";
                 if (ctx.Job.Mode == JobModes.Alarm)
-                    msg += $"，耗时{ctx.TotalCost:n0}ms";
+                    msg += $"，耗时{ctx.Cost:n0}ms";
                 else
-                    msg += $"，抽取{ctx.FetchSpeed:n0}qps，处理{ctx.ProcessSpeed:n0}tps，耗时{ctx.TotalCost:n0}ms";
+                    msg += $"，速度{ctx.Speed:n0}tps，耗时{ctx.Cost:n0}ms";
                 XTrace.WriteLine(msg);
             }
         }

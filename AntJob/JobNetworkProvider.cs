@@ -53,12 +53,8 @@ namespace AntJob
                     Name = wrk.Name
                 };
 
-                // 动态步进
-                if (wrk != null)
-                {
-                    // 调度模式
-                    dt.Mode = wrk.Mode;
-                }
+                // 调度模式
+                if (wrk != null) dt.Mode = wrk.Mode;
 
                 // 描述
                 var dis = wrk.GetType().GetDisplayName();
@@ -189,19 +185,17 @@ namespace AntJob
             // 不用上报抽取中
             if (ctx.Status == JobStatus.抽取中) return;
 
-            if (!(ctx?.Setting is MyTask ji)) return;
+            if (!(ctx?.Task is MyTask ji)) return;
 
             // 区分抽取和处理
             ji.Status = ctx.Status;
 
-            ji.FetchSpeed = ctx.FetchSpeed;
-            ji.Speed = ctx.ProcessSpeed;
+            ji.Speed = ctx.Speed;
             ji.Total = ctx.Total;
             ji.Success = ctx.Success;
 
             ji.Server = _MachineName;
             ji.ProcessID = _ProcessID;
-            ji.ThreadID = Thread.CurrentThread.ManagedThreadId;
 
             Report(ctx.Job.Model, ji, null);
         }
@@ -210,19 +204,12 @@ namespace AntJob
         /// <param name="ctx">上下文</param>
         public override void Finish(JobContext ctx)
         {
-            if (!(ctx?.Setting is MyTask ji)) return;
+            if (!(ctx?.Task is MyTask ji)) return;
 
-            ji.Speed = ctx.ProcessSpeed;
-            ji.FetchSpeed = ctx.FetchSpeed;
-            //ji.TimeSpeed = (Int32)Math.Round(ctx.TimeSpeed);
-
+            ji.Speed = ctx.Speed;
             ji.Total = ctx.Total;
             ji.Success = ctx.Success;
             ji.Times++;
-
-            ji.ThreadID = Thread.CurrentThread.ManagedThreadId;
-
-            //Object ext = null;
 
             // 区分正常完成还是错误终止
             //ti.Status = ctx.Status;
@@ -234,7 +221,7 @@ namespace AntJob
 
                 if (ctx["Message"] is String msg) ji.Message = msg;
 
-                ji.Cost = (Int32)(ctx.TotalCost / 1000);
+                ji.Cost = (Int32)(ctx.Cost / 1000);
                 //ext = new { Cost = (Int32)ctx.TotalCost };
             }
             if (ji.Message.IsNullOrEmpty()) ji.Message = ctx.Remark;
@@ -251,7 +238,7 @@ namespace AntJob
         /// <param name="ctx">上下文</param>
         public override void Error(JobContext ctx)
         {
-            var ji = ctx.Setting as MyTask;
+            var ji = ctx.Task as MyTask;
 
             var key = ctx.Key;
             var data = "";

@@ -72,18 +72,6 @@ namespace AntJob
         [XmlAttribute]
         public Int32 MaxTask { get; set; }
 
-        /// <summary>最小步进。默认5秒</summary>
-        [XmlAttribute]
-        public Int32 MinStep { get; set; } = 5;
-
-        /// <summary>最大步进。默认3600秒</summary>
-        [XmlAttribute]
-        public Int32 MaxStep { get; set; } = 3600;
-
-        /// <summary>步进变化率。动态调节步进时，不能超过该比率，百分位，默认100%</summary>
-        [XmlAttribute]
-        public Int32 StepRate { get; set; } = 100;
-
         /// <summary>调度模式</summary>
         [XmlAttribute]
         public JobModes Mode { get; set; }

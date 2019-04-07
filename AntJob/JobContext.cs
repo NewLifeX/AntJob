@@ -12,8 +12,8 @@ namespace AntJob
         /// <summary>作业</summary>
         public Job Job { get; set; }
 
-        /// <summary>抽取设置</summary>
-        public ITask Setting { get; set; }
+        /// <summary>任务</summary>
+        public ITask Task { get; set; }
 
         /// <summary>状态</summary>
         public JobStatus Status { get; set; }
@@ -28,13 +28,7 @@ namespace AntJob
         public Int32 Success { get; set; }
 
         /// <summary>总耗时，毫秒</summary>
-        public Double TotalCost { get; set; }
-
-        /// <summary>抽取耗时，毫秒</summary>
-        public Double FetchCost { get; set; }
-
-        /// <summary>处理耗时</summary>
-        public Double ProcessCost { get; set; }
+        public Double Cost { get; set; }
 
         /// <summary>最后处理键值。由业务决定，便于分析问题</summary>
         public String Key { get; set; }
@@ -60,11 +54,8 @@ namespace AntJob
         #endregion
 
         #region 扩展属性
-        /// <summary>抽取速度</summary>
-        public Int32 FetchSpeed => (FetchCost <= 0 || Total == 0) ? 0 : (Int32)Math.Min(Total * 1000L / FetchCost, Int32.MaxValue);
-
         /// <summary>处理速度</summary>
-        public Int32 ProcessSpeed => (ProcessCost <= 0 || Total == 0) ? 0 : (Int32)Math.Min(Total * 1000L / ProcessCost, Int32.MaxValue);
+        public Int32 Speed => (Cost <= 0 || Total == 0) ? 0 : (Int32)Math.Min(Total * 1000L / Cost, Int32.MaxValue);
         #endregion
     }
 }

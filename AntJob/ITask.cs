@@ -72,12 +72,6 @@ namespace AntJob
         /// <summary>速度</summary>
         public Int32 Speed { get; set; }
 
-        /// <summary>抽取速度</summary>
-        public Int32 FetchSpeed { get; set; }
-
-        ///// <summary>时间速度。每秒处理多少秒历史数据</summary>
-        //public Int32 TimeSpeed { get; set; }
-
         /// <summary>状态</summary>
         public JobStatus Status { get; set; }
 
@@ -86,9 +80,6 @@ namespace AntJob
 
         /// <summary>进程</summary>
         public Int32 ProcessID { get; set; }
-
-        /// <summary>线程</summary>
-        public Int32 ThreadID { get; set; }
 
         /// <summary>数据</summary>
         public String Data { get; set; }
