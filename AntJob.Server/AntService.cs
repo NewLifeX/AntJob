@@ -611,6 +611,18 @@ namespace AntJob.Server
         #endregion
 
         #region 在线状态
+        /// <summary>获取当前应用的所有在线实例</summary>
+        /// <returns></returns>
+        [Api(nameof(GetPeers))]
+        public IAppOnline[] GetPeers()
+        {
+            var app = Session["App"] as App;
+
+            var olts = AppOnline.FindAllByAppID(app.ID);
+
+            return olts.ToArray();
+        }
+
         AppOnline CreateOnline(IApp app, INetSession ns, String machine, Int32 pid, String version)
         {
             var ip = ns.Remote.Host;
