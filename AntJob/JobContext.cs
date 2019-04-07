@@ -13,7 +13,7 @@ namespace AntJob
         public Job Job { get; set; }
 
         /// <summary>抽取设置</summary>
-        public IJobItem Setting { get; set; }
+        public ITask Setting { get; set; }
 
         /// <summary>状态</summary>
         public JobStatus Status { get; set; }

@@ -31,10 +31,10 @@ namespace AntJob
         /// <param name="ctx"></param>
         /// <param name="set"></param>
         /// <returns></returns>
-        protected override Object Fetch(JobContext ctx, IJobItem set)
+        protected override Object Fetch(JobContext ctx, ITask set)
         {
             // 只有蚂蚁调度支持消息
-            if (!(set is JobItem ji)) return null;
+            if (!(set is MyTask ji)) return null;
 
             var ss = ji.Data.ToJsonEntity<String[]>();
             if (ss == null || ss.Length == 0) return null;

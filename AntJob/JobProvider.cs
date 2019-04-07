@@ -26,7 +26,7 @@ namespace AntJob
         /// <param name="data">扩展数据</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        IJobItem[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count = 1);
+        ITask[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count = 1);
 
         /// <summary></summary>
         /// <param name="topic">主题</param>
@@ -73,7 +73,7 @@ namespace AntJob
         /// <param name="data">扩展数据</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public abstract IJobItem[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count);
+        public abstract ITask[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count);
 
         /// <summary>生产消息</summary>
         /// <param name="topic">主题</param>

@@ -162,7 +162,7 @@ namespace AntJob
             return flag;
         }
 
-        private void ProcessItem(Job worker, IJobItem task)
+        private void ProcessItem(Job worker, ITask task)
         {
             if (task == null) return;
 

@@ -59,7 +59,7 @@ namespace AntJob
         /// <param name="ctx">上下文</param>
         /// <param name="set"></param>
         /// <returns></returns>
-        protected override Object Fetch(JobContext ctx, IJobItem set)
+        protected override Object Fetch(JobContext ctx, ITask set)
         {
             if (set == null) throw new ArgumentNullException(nameof(set), "没有设置数据抽取配置");
 

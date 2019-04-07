@@ -97,7 +97,7 @@ namespace AntJob
         {
             if (names == null) names = new String[0];
 
-            return Invoke<JobModel[]>(nameof(GetJobs), new { names });
+            return Invoke<MyJob[]>(nameof(GetJobs), new { names });
         }
 
         /// <summary>批量添加作业</summary>
@@ -110,12 +110,12 @@ namespace AntJob
         /// <param name="count">要申请的任务个数</param>
         /// <param name="ext">扩展数据</param>
         /// <returns></returns>
-        public IJobItem[] Acquire(String job, Int32 count, Object ext = null)
+        public ITask[] Acquire(String job, Int32 count, Object ext = null)
         {
             var dic = new { job, count }.ToDictionary();
             if (ext != null) dic = dic.Merge(ext);
 
-            return Invoke<JobItem[]>(nameof(Acquire), dic);
+            return Invoke<MyTask[]>(nameof(Acquire), dic);
         }
 
         /// <summary>生产消息</summary>
@@ -135,7 +135,7 @@ namespace AntJob
         /// <param name="task"></param>
         /// <param name="ext"></param>
         /// <returns></returns>
-        public Boolean Report(IJobItem task, Object ext = null)
+        public Boolean Report(ITask task, Object ext = null)
         {
             var dic = new { item = task }.ToDictionary();
             if (ext != null) dic = dic.Merge(ext);

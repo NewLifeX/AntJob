@@ -3,7 +3,7 @@
 namespace AntJob
 {
     /// <summary>任务参数</summary>
-    public interface IJobItem
+    public interface ITask
     {
         /// <summary>任务项编号</summary>
         Int32 ID { get; set; }
@@ -30,7 +30,7 @@ namespace AntJob
         String Message { get; set; }
     }
 
-    class JobItem : IJobItem
+    class MyTask : ITask
     {
         #region 属性
         /// <summary>编号</summary>

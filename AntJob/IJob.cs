@@ -37,7 +37,7 @@ namespace AntJob
 
     /// <summary>作业参数</summary>
     [DebuggerDisplay("{Name} {Enable} {Start}")]
-    public class JobModel : IJob
+    public class MyJob : IJob
     {
         #region 属性
         /// <summary>名称</summary>
@@ -99,11 +99,11 @@ namespace AntJob
 
         #region 构造
         /// <summary>实例化</summary>
-        public JobModel() { }
-        #endregion
+        public MyJob() { }
 
         /// <summary>已重载。</summary>
         /// <returns></returns>
         public override String ToString() => Name;
+        #endregion
     }
 }

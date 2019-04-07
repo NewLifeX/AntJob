@@ -48,7 +48,7 @@ namespace AntJob
             var list = new List<IJob>();
             foreach (var wrk in ws)
             {
-                var dt = new JobModel
+                var dt = new MyJob
                 {
                     Name = wrk.Name
                 };
@@ -98,21 +98,21 @@ namespace AntJob
             return _jobs;
         }
 
-        private readonly IDictionary<String, Queue<IJobItem>> _ItemCache = new Dictionary<String, Queue<IJobItem>>();
+        private readonly IDictionary<String, Queue<ITask>> _ItemCache = new Dictionary<String, Queue<ITask>>();
         /// <summary>申请任务</summary>
         /// <param name="job">作业</param>
         /// <param name="data">扩展数据</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public override IJobItem[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count)
+        public override ITask[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count)
         {
             if (!_ItemCache.TryGetValue(job.Name, out var q))
             {
-                q = new Queue<IJobItem>();
+                q = new Queue<ITask>();
                 _ItemCache[job.Name] = q;
             }
 
-            var list = new List<IJobItem>();
+            var list = new List<ITask>();
 
             // 拿历史备份
             while (count > 0 && q.Count > 0)
@@ -171,7 +171,7 @@ namespace AntJob
             {
                 while (q.Count > 0)
                 {
-                    var ji = q.Dequeue() as JobItem;
+                    var ji = q.Dequeue() as MyTask;
                     ji.Status = JobStatus.取消;
 
                     Report(job, ji);
@@ -189,7 +189,7 @@ namespace AntJob
             // 不用上报抽取中
             if (ctx.Status == JobStatus.抽取中) return;
 
-            if (!(ctx?.Setting is JobItem ji)) return;
+            if (!(ctx?.Setting is MyTask ji)) return;
 
             // 区分抽取和处理
             ji.Status = ctx.Status;
@@ -210,7 +210,7 @@ namespace AntJob
         /// <param name="ctx">上下文</param>
         public override void Finish(JobContext ctx)
         {
-            if (!(ctx?.Setting is JobItem ji)) return;
+            if (!(ctx?.Setting is MyTask ji)) return;
 
             ji.Speed = ctx.ProcessSpeed;
             ji.FetchSpeed = ctx.FetchSpeed;
@@ -251,7 +251,7 @@ namespace AntJob
         /// <param name="ctx">上下文</param>
         public override void Error(JobContext ctx)
         {
-            var ji = ctx.Setting as JobItem;
+            var ji = ctx.Setting as MyTask;
 
             var key = ctx.Key;
             var data = "";
@@ -292,7 +292,7 @@ namespace AntJob
             Report(ctx.Job.Model, ji, ext);
         }
 
-        private void Report(IJob job, JobItem ji, Object ext = null)
+        private void Report(IJob job, MyTask ji, Object ext = null)
         {
             try
             {

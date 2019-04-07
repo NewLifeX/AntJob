@@ -28,8 +28,8 @@ namespace AntJob
         {
             var jf = _File = JobFile.Current;
 
-            var list = new List<JobModel>();
-            if (jf.Items != null && jf.Items.Length > 0) list.AddRange(jf.Items);
+            var list = new List<MyJob>();
+            if (jf.Jobs != null && jf.Jobs.Length > 0) list.AddRange(jf.Jobs);
 
             // 扫描所有Worker并添加到作业文件
             var flag = false;
@@ -38,7 +38,7 @@ namespace AntJob
                 if (!list.Any(e => e.Name == item.Key))
                 {
                     // 新增作业项
-                    var model = new JobModel();
+                    var model = new MyJob();
 
                     // 获取默认设置
                     var job = item.Value.CreateInstance() as Job;
@@ -63,8 +63,8 @@ namespace AntJob
             }
             if (flag)
             {
-                if (jf.Items == null || jf.Items.Length == 0) jf.CreateTime = DateTime.Now;
-                jf.Items = list.ToArray();
+                if (jf.Jobs == null || jf.Jobs.Length == 0) jf.CreateTime = DateTime.Now;
+                jf.Jobs = list.ToArray();
             }
             jf.Save();
 
@@ -79,9 +79,9 @@ namespace AntJob
             var jf = _File = JobFile.Current;
 
             var list = new List<IJob>();
-            if (jf.Items != null)
+            if (jf.Jobs != null)
             {
-                foreach (var item in jf.Items)
+                foreach (var item in jf.Jobs)
                 {
                     if (names.Contains(item.Name)) list.Add(item);
                 }
@@ -95,9 +95,9 @@ namespace AntJob
         /// <param name="data">扩展数据</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public override IJobItem[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count)
+        public override ITask[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count)
         {
-            var list = new List<IJobItem>();
+            var list = new List<ITask>();
 
             if (!job.Enable) return list.ToArray();
 
@@ -130,7 +130,7 @@ namespace AntJob
                 if (start >= end) break;
 
                 // 切分新任务
-                var set = new JobItem
+                var set = new MyTask
                 {
                     Start = start,
                     End = end,
@@ -228,8 +228,8 @@ namespace AntJob
         [Description("更新时间")]
         public DateTime UpdateTime { get; set; }
 
-        /// <summary>作业项</summary>
-        [Description("作业项")]
-        public JobModel[] Items { get; set; }
+        /// <summary>作业集合</summary>
+        [Description("作业集合")]
+        public MyJob[] Jobs { get; set; }
     }
 }

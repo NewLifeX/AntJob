@@ -59,7 +59,7 @@ namespace AntJob
             Name = GetType().Name.TrimEnd(nameof(Job));
 
             var now = DateTime.Now;
-            var job = new JobModel
+            var job = new MyJob
             {
                 Start = new DateTime(now.Year, now.Month, 1),
                 Step = 30,
@@ -114,7 +114,7 @@ namespace AntJob
         /// <param name="data">扩展数据。服务器、进程等信息</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public virtual IJobItem[] Acquire(IDictionary<String, Object> data, Int32 count = 1)
+        public virtual ITask[] Acquire(IDictionary<String, Object> data, Int32 count = 1)
         {
             var prv = Provider;
             var job = Model;
@@ -127,11 +127,11 @@ namespace AntJob
         #endregion
 
         #region 整体调度
-        internal void Prepare(IJobItem task) => Interlocked.Increment(ref _Busy);
+        internal void Prepare(ITask task) => Interlocked.Increment(ref _Busy);
 
         /// <summary>异步处理一项新任务</summary>
         /// <param name="task"></param>
-        public void Process(IJobItem task)
+        public void Process(ITask task)
         {
             if (task == null) return;
 
@@ -151,7 +151,7 @@ namespace AntJob
 
         /// <summary>处理任务。内部分批处理，多次调用OnProcess</summary>
         /// <param name="set"></param>
-        private void OnProcess(IJobItem set)
+        private void OnProcess(ITask set)
         {
             var ctx = new JobContext
             {
@@ -238,7 +238,7 @@ namespace AntJob
         /// <param name="ctx">上下文</param>
         /// <param name="set"></param>
         /// <returns></returns>
-        protected virtual Object Fetch(JobContext ctx, IJobItem set)
+        protected virtual Object Fetch(JobContext ctx, ITask set)
         {
             if (set == null) throw new ArgumentNullException(nameof(set), "没有设置数据抽取配置");
 
