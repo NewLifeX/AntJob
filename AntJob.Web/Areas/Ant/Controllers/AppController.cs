@@ -7,7 +7,6 @@ using AntJob.Data.Entity;
 using NewLife.Cube;
 using NewLife.Web;
 using XCode.Membership;
-using JobX = AntJob.Data.Entity.Job;
 
 namespace AntJob.Web.Areas.Ant.Controllers
 {
@@ -22,13 +21,6 @@ namespace AntJob.Web.Areas.Ant.Controllers
             App.Meta.Modules.Add<UserModule>();
             App.Meta.Modules.Add<TimeModule>();
             App.Meta.Modules.Add<IPModule>();
-        }
-
-        protected override Int32 OnUpdate(App entity)
-        {
-            entity.JobCount = JobX.FindCountByAppID(entity.ID);
-
-            return base.OnUpdate(entity);
         }
 
         /// <summary>搜索数据集</summary>
@@ -49,6 +41,13 @@ namespace AntJob.Web.Areas.Ant.Controllers
             return App.Search(p["category"], p["Enable"]?.ToBoolean(), p["q"], p);
         }
 
+        protected override Int32 OnUpdate(App entity)
+        {
+            entity.JobCount = Job.FindCountByAppID(entity.ID);
+
+            return base.OnUpdate(entity);
+        }
+
         /// <summary>
         /// 重置应用
         /// 清空作业、作业项、统计、错误,开始时间设为本月一号
@@ -63,7 +62,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
             foreach (var appid in ids)
             {
                 // 清空作业
-                var jobs = JobX.FindAllByAppID2(appid);
+                var jobs = Job.FindAllByAppID2(appid);
                 foreach (var job in jobs)
                 {
                     job.Start = new DateTime(now.Year, now.Month, 1);

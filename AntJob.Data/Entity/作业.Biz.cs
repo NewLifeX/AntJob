@@ -171,6 +171,7 @@ namespace AntJob.Data.Entity
         public static IEnumerable<Job> Search(Int32 id, Int32 appid, DateTime start, DateTime end, Int32 mode, String key, PageParameter p)
         {
             var exp = new WhereExpression();
+
             if (id > 0) exp &= _.ID == id;
             if (appid > 0) exp &= _.AppID == appid;
             if (mode > 0) exp &= _.Mode == mode;

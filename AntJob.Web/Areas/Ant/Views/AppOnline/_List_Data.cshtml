@@ -26,7 +26,7 @@
             <th class="text-center" title="客户端。IP加进程"><a href="@Html.Raw(page.GetSortUrl("Client"))">客户端</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Version"))">版本</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Server"))">服务端</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Items"))">任务数</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Tasks"))">任务数</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Total"))">总数</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Success"))">成功</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Error"))">错误</a></th>
@@ -53,7 +53,7 @@
                 <td title="@entity.Name">@entity.Client</td>
                 <td>@entity.Version</td>
                 <td>@entity.Server</td>
-                <td class="text-right"><a href="@Url.Action("Index","JobTask",new {appid=entity.AppID,client=entity.Client})">@entity.Logs.ToString("n0")</a></td>
+                <td class="text-right"><a href="@Url.Action("Index","JobTask",new {appid=entity.AppID,client=entity.Client})">@entity.Tasks.ToString("n0")</a></td>
                 <td class="text-right">@entity.Total.ToString("n0")</td>
                 <td class="text-right">@entity.Success.ToString("n0")</td>
                 <td class="text-right"><a href="@Url.Action("Index","JobError",new {appid=entity.AppID,client=entity.Client})">@entity.Error.ToString("n0")</a></td>

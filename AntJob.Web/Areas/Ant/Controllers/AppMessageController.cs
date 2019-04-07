@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Web.Mvc;
 using AntJob.Data.Entity;
 using NewLife.Cube;
 using NewLife.Web;
@@ -20,12 +19,11 @@ namespace AntJob.Web.Areas.Ant.Controllers
         protected override IEnumerable<AppMessage> Search(Pager p)
         {
             var appid = p["appid"].ToInt(-1);
-            var JobID = p["JobID"].ToInt(-1);
+            var jobid = p["JobID"].ToInt(-1);
             var start = p["dtStart"].ToDateTime();
             var end = p["dtEnd"].ToDateTime();
-            var status = p["Status"];
 
-            return AppMessage.Search(appid, JobID, start, end, p["q"], p);
+            return AppMessage.Search(appid, jobid, start, end, p["q"], p);
         }
     }
 }

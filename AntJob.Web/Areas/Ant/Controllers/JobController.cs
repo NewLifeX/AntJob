@@ -6,35 +6,14 @@ using System.Web.Mvc;
 using AntJob.Data.Entity;
 using NewLife.Cube;
 using NewLife.Web;
-using XCode;
 using XCode.Membership;
-using JobX = AntJob.Data.Entity.Job;
 
 namespace AntJob.Web.Areas.Ant.Controllers
 {
     /// <summary>作业</summary>
     [DisplayName("作业")]
-    public class JobController : EntityController<JobX>
+    public class JobController : EntityController<Job>
     {
-        public JobController()
-        {
-            PageSetting.EnableAdd = false;
-        }
-
-        /// <summary>搜索数据集</summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        protected override IEnumerable<JobX> Search(Pager p)
-        {
-            var appid = p["appid"].ToInt(-1);
-            var ID = p["ID"].ToInt(-1);
-            var start = p["dtStart"].ToDateTime();
-            var end = p["dtEnd"].ToDateTime();
-            var mode = p["Mode"].ToInt(-1);
-
-            return JobX.Search(ID, appid, start, end, mode, p["q"], p);
-        }
-
         static JobController()
         {
             var list = ListFields;
@@ -48,6 +27,25 @@ namespace AntJob.Web.Areas.Ant.Controllers
             MenuOrder = 80;
         }
 
+        public JobController()
+        {
+            PageSetting.EnableAdd = false;
+        }
+
+        /// <summary>搜索数据集</summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        protected override IEnumerable<Job> Search(Pager p)
+        {
+            var id = p["ID"].ToInt(-1);
+            var appid = p["appid"].ToInt(-1);
+            var start = p["dtStart"].ToDateTime();
+            var end = p["dtEnd"].ToDateTime();
+            var mode = p["Mode"].ToInt(-1);
+
+            return Job.Search(id, appid, start, end, mode, p["q"], p);
+        }
+
         /// <summary>启用禁用任务</summary>
         /// <param name="id"></param>
         /// <param name="enable"></param>
@@ -57,7 +55,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
         {
             if (id > 0)
             {
-                var dt = JobX.FindByID(id);
+                var dt = Job.FindByID(id);
                 if (dt == null) throw new ArgumentNullException(nameof(id), "找不到任务 " + id);
 
                 dt.Enable = enable;
@@ -69,7 +67,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
 
                 foreach (var item in ids)
                 {
-                    var dt = JobX.FindByID(item);
+                    var dt = Job.FindByID(item);
                     if (dt != null && dt.Enable != enable)
                     {
                         dt.Enable = enable;
@@ -93,7 +91,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
             var et = Request["eday"].ToDateTime();
             Parallel.ForEach(ids, k =>
             {
-                var dt = JobX.FindByID(k);
+                var dt = Job.FindByID(k);
                 dt?.ResetTime(days, st, et);
             });
 
@@ -103,12 +101,12 @@ namespace AntJob.Web.Areas.Ant.Controllers
         /// <summary>完全重置</summary>
         /// <returns></returns>
         [EntityAuthorize(PermissionFlags.Update)]
-        public ActionResult AllReset()
+        public ActionResult ResetOther()
         {
             var ids = Request["keys"].SplitAsInt(",");
             Parallel.ForEach(ids, k =>
             {
-                var dt = JobX.FindByID(k);
+                var dt = Job.FindByID(k);
                 dt?.ResetOther();
             });
 
@@ -126,7 +124,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
             var ids = Request["keys"].SplitAsInt(",");
             Parallel.ForEach(ids, k =>
             {
-                var dt = JobX.FindByID(k);
+                var dt = Job.FindByID(k);
                 if (dt != null)
                 {
                     dt.Offset = offset;
@@ -145,36 +143,11 @@ namespace AntJob.Web.Areas.Ant.Controllers
             var ids = Request["keys"].SplitAsInt(",");
             Parallel.ForEach(ids, k =>
             {
-                var dt = JobX.FindByID(k);
+                var dt = Job.FindByID(k);
                 if (dt != null)
                 {
                     dt.Error = 0;
                     dt.Save();
-                }
-            });
-
-            return JsonRefresh("操作成功！");
-        }
-
-        /// <summary>清空错误项</summary>
-        /// <returns></returns>
-        [EntityAuthorize(PermissionFlags.Update)]
-        public ActionResult ClearErrorItem()
-        {
-            var ids = Request["keys"].SplitAsInt(",");
-            Parallel.ForEach(ids, k =>
-            {
-                var dt = JobError.FindAllByJobId(k);
-                if (dt.Count < 20000)
-                {
-                    dt.Delete(true);
-                }
-
-                var dtt = JobX.FindByID(k);
-                if (dtt != null)
-                {
-                    dtt.Error = 0;
-                    dtt.Save();
                 }
             });
 
