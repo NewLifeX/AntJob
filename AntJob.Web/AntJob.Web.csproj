@@ -92,7 +92,7 @@
     <Compile Include="Areas\Ant\Controllers\AppOnlineController.cs" />
     <Compile Include="Areas\Ant\Controllers\JobController.cs" />
     <Compile Include="Areas\Ant\Controllers\JobErrorController.cs" />
-    <Compile Include="Areas\Ant\Controllers\JobLogController.cs" />
+    <Compile Include="Areas\Ant\Controllers\JobTaskController.cs" />
     <Compile Include="Areas\Ant\Controllers\AppMessageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -107,9 +107,9 @@
     <Content Include="Areas\Ant\Views\App\_List_Toolbar_Batch.cshtml" />
     <Content Include="Areas\Ant\Views\JobError\_List_Data.cshtml" />
     <Content Include="Areas\Ant\Views\JobError\_List_Search.cshtml" />
-    <Content Include="Areas\Ant\Views\JobLog\_List_Data.cshtml" />
-    <Content Include="Areas\Ant\Views\JobLog\_List_Search.cshtml" />
-    <Content Include="Areas\Ant\Views\JobLog\_List_Toolbar_Batch.cshtml" />
+    <Content Include="Areas\Ant\Views\JobTask\_List_Data.cshtml" />
+    <Content Include="Areas\Ant\Views\JobTask\_List_Search.cshtml" />
+    <Content Include="Areas\Ant\Views\JobTask\_List_Toolbar_Batch.cshtml" />
     <Content Include="Areas\Ant\Views\AppMessage\_List_Data.cshtml" />
     <Content Include="Areas\Ant\Views\AppMessage\_List_Search.cshtml" />
     <Content Include="Areas\Ant\Views\Job\_List_Data.cshtml" />

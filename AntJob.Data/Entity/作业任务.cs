@@ -7,15 +7,15 @@ using XCode.DataAccessLayer;
 
 namespace AntJob.Data.Entity
 {
-    /// <summary>作业日志</summary>
+    /// <summary>作业任务</summary>
     [Serializable]
     [DataObject]
-    [Description("作业日志")]
-    [BindIndex("IX_JobLog_JobID_Status_Start", false, "JobID,Status,Start")]
-    [BindIndex("IX_JobLog_AppID_Client_Status", false, "AppID,Client,Status")]
-    [BindIndex("IX_JobLog_JobID_CreateTime", false, "JobID,CreateTime")]
-    [BindTable("JobLog", Description = "作业日志", ConnName = "Ant", DbType = DatabaseType.None)]
-    public partial class JobLog : IJobLog
+    [Description("作业任务")]
+    [BindIndex("IX_JobTask_JobID_Status_Start", false, "JobID,Status,Start")]
+    [BindIndex("IX_JobTask_AppID_Client_Status", false, "AppID,Client,Status")]
+    [BindIndex("IX_JobTask_JobID_CreateTime", false, "JobID,CreateTime")]
+    [BindTable("JobTask", Description = "作业任务", ConnName = "Ant", DbType = DatabaseType.None)]
+    public partial class JobTask : IJobTask
     {
         #region 属性
         private Int32 _ID;
@@ -333,7 +333,7 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 字段名
-        /// <summary>取得作业日志字段信息的快捷方式</summary>
+        /// <summary>取得作业任务字段信息的快捷方式</summary>
         public partial class _
         {
             /// <summary>编号</summary>
@@ -426,7 +426,7 @@ namespace AntJob.Data.Entity
             static Field FindByName(String name) { return Meta.Table.FindByName(name); }
         }
 
-        /// <summary>取得作业日志字段名称的快捷方式</summary>
+        /// <summary>取得作业任务字段名称的快捷方式</summary>
         public partial class __
         {
             /// <summary>编号</summary>
@@ -519,8 +519,8 @@ namespace AntJob.Data.Entity
         #endregion
     }
 
-    /// <summary>作业日志接口</summary>
-    public partial interface IJobLog
+    /// <summary>作业任务接口</summary>
+    public partial interface IJobTask
     {
         #region 属性
         /// <summary>编号</summary>

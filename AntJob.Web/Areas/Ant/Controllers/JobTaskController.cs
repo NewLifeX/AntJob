@@ -9,21 +9,21 @@ using XCode.Membership;
 
 namespace AntJob.Web.Areas.Ant.Controllers
 {
-    /// <summary>作业日志</summary>
-    [DisplayName("作业日志")]
-    public class JobLogController : EntityController<JobLog>
+    /// <summary>作业任务</summary>
+    [DisplayName("作业任务")]
+    public class JobTaskController : EntityController<JobTask>
     {
-        static JobLogController()
+        static JobTaskController()
         {
             MenuOrder = 70;
 
-            JobLog.Meta.Modules.Add<TimeModule>();
+            JobTask.Meta.Modules.Add<TimeModule>();
         }
 
         /// <summary>搜索数据集</summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        protected override IEnumerable<JobLog> Search(Pager p)
+        protected override IEnumerable<JobTask> Search(Pager p)
         {
             var id = p["id"].ToInt(-1);
             var jobid = p["JobID"].ToInt(-1);
@@ -33,7 +33,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
             var end = p["dtEnd"].ToDateTime();
             var client = p["Client"];
 
-            return JobLog.Search(id, appid, jobid, status, start, end, client, p["q"], p);
+            return JobTask.Search(id, appid, jobid, status, start, end, client, p["q"], p);
         }
 
         /// <summary>修改状态</summary>
@@ -44,7 +44,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
         {
             if (id > 0)
             {
-                var dt = JobLog.FindByID(id);
+                var dt = JobTask.FindByID(id);
                 if (dt == null) throw new ArgumentNullException(nameof(id), "找不到任务 " + id);
 
                 dt.Status = JobStatus.取消;
@@ -62,7 +62,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
 
                 foreach (var item in ids)
                 {
-                    var dt = JobLog.FindByID(item);
+                    var dt = JobTask.FindByID(item);
                     if (dt != null)
                     {
                         dt.Status = JobStatus.取消;

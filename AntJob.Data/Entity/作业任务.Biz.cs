@@ -8,11 +8,11 @@ using XCode;
 
 namespace AntJob.Data.Entity
 {
-    /// <summary>作业日志</summary>
-    public partial class JobLog : EntityBase<JobLog>
+    /// <summary>作业任务</summary>
+    public partial class JobTask : EntityBase<JobTask>
     {
         #region 对象操作
-        static JobLog()
+        static JobTask()
         {
             // 累加字段
             var df = Meta.Factory.AdditionalFields;
@@ -66,7 +66,7 @@ namespace AntJob.Data.Entity
         /// <summary>根据编号查找</summary>
         /// <param name="id">编号</param>
         /// <returns>实体对象</returns>
-        public static JobLog FindByID(Int32 id)
+        public static JobTask FindByID(Int32 id)
         {
             if (id <= 0) return null;
 
@@ -79,7 +79,7 @@ namespace AntJob.Data.Entity
         /// <param name="jobid">作业</param>
         /// <param name="status">状态</param>
         /// <returns>实体列表</returns>
-        public static IList<JobLog> FindAllByIDAndJobIDAndStatus(Int32 id, Int32 jobid, JobStatus status)
+        public static IList<JobTask> FindAllByIDAndJobIDAndStatus(Int32 id, Int32 jobid, JobStatus status)
         {
             // 实体缓存
             if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ID == id && e.JobID == jobid && e.Status == status);
@@ -91,7 +91,7 @@ namespace AntJob.Data.Entity
         /// <param name="id">编号</param>
         /// <param name="status">状态</param>
         /// <returns>实体列表</returns>
-        public static IList<JobLog> FindAllByIDAndStatus(Int32 id, JobStatus status)
+        public static IList<JobTask> FindAllByIDAndStatus(Int32 id, JobStatus status)
         {
             // 实体缓存
             if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ID == id && e.Status == status);
@@ -99,16 +99,16 @@ namespace AntJob.Data.Entity
             return FindAll(_.ID == id & _.Status == status);
         }
 
-        public static IList<JobLog> FindAllByAppID(Int32 appid)
+        public static IList<JobTask> FindAllByAppID(Int32 appid)
         {
-            if (appid == 0) return new List<JobLog>();
+            if (appid == 0) return new List<JobTask>();
 
             return FindAll(_.AppID == appid);
         }
 
-        public static IList<JobLog> FindAllByJobId(Int32 jobid)
+        public static IList<JobTask> FindAllByJobId(Int32 jobid)
         {
-            if (jobid == 0) return new List<JobLog>();
+            if (jobid == 0) return new List<JobTask>();
 
             return FindAll(_.JobID == jobid);
         }
@@ -119,14 +119,14 @@ namespace AntJob.Data.Entity
         /// <param name="jobid"></param>
         /// <param name="createTime"></param>
         /// <returns></returns>
-        public static JobLog FindLastByJobId(Int32 jobid, DateTime createTime)
+        public static JobTask FindLastByJobId(Int32 jobid, DateTime createTime)
         {
             return FindAll(_.JobID == jobid & _.CreateTime < createTime, _.CreateTime.Desc(), null, 0, 1).FirstOrDefault();
         }
         #endregion
 
         #region 高级查询
-        public static IEnumerable<JobLog> Search(Int32 id, Int32 appid, Int32 jobid, JobStatus status, DateTime start, DateTime end, String client, String key, PageParameter p)
+        public static IEnumerable<JobTask> Search(Int32 id, Int32 appid, Int32 jobid, JobStatus status, DateTime start, DateTime end, String client, String key, PageParameter p)
         {
             var exp = new WhereExpression();
 
@@ -148,7 +148,7 @@ namespace AntJob.Data.Entity
         /// <param name="stats"></param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public static IList<JobLog> Search(Int32 taskid, DateTime end, Int32 maxRetry, JobStatus[] stats, Int32 count)
+        public static IList<JobTask> Search(Int32 taskid, DateTime end, Int32 maxRetry, JobStatus[] stats, Int32 count)
         {
             var exp = new WhereExpression();
             if (taskid > 0) exp &= _.JobID == taskid;

@@ -71,7 +71,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
                 }
 
                 // 清空日志
-                var jobItems = JobLog.FindAllByAppID(appid);
+                var jobItems = JobTask.FindAllByAppID(appid);
                 foreach (var jobItem in jobItems)
                 {
                     jobItem.Delete();

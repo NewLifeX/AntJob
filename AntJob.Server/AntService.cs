@@ -225,16 +225,16 @@ namespace AntJob.Server
         /// <param name="topic">主题</param>
         /// <returns></returns>
         [Api(nameof(Acquire))]
-        public JobLog[] Acquire(String job, Int32 count)
+        public JobTask[] Acquire(String job, Int32 count)
         {
             job = job?.Trim();
-            if (job.IsNullOrEmpty()) return new JobLog[0];
+            if (job.IsNullOrEmpty()) return new JobTask[0];
 
-            if (!(Session["App"] is App app)) return new JobLog[0];
+            if (!(Session["App"] is App app)) return new JobTask[0];
 
             // 应用停止发放作业
             app = App.FindByID(app.ID) ?? app;
-            if (!app.Enable) return new JobLog[0];
+            if (!app.Enable) return new JobTask[0];
 
             // 找到作业。为了确保能够快速拿到新的作业参数，这里做二次查询
             var jb = app.Jobs.FirstOrDefault(e => e.Name == job);
@@ -246,7 +246,7 @@ namespace AntJob.Server
             if (jb == null) throw new XException($"应用[{app.ID}/{app.Name}]下未找到作业[{job}]");
             if (jb.Step == 0 || jb.Start.Year <= 2000) throw new XException("作业[{0}/{1}]未设置开始时间或步进", jb.ID, jb.Name);
 
-            var list = new List<JobLog>();
+            var list = new List<JobTask>();
 
             // 每分钟检查一下错误任务和中断任务
             CheckErrorTask(app, jb, count, list);
@@ -289,7 +289,7 @@ namespace AntJob.Server
             return list.ToArray();
         }
 
-        private void CheckErrorTask(App app, Job jb, Int32 count, List<JobLog> list)
+        private void CheckErrorTask(App app, Job jb, Int32 count, List<JobTask> list)
         {
             // 每分钟检查一下错误任务和中断任务
             var nextKey = $"_NextAcquireOld_{jb.ID}";
@@ -336,7 +336,7 @@ namespace AntJob.Server
 
             var app = Session["App"] as App;
 
-            var ji = JobLog.FindByID(jobitemid);
+            var ji = JobTask.FindByID(jobitemid);
             var job = ji?.Job;
             //if (job == null) throw new Exception($"无效作业编号[jobIten={jobitemid}]无效");
 
@@ -402,14 +402,14 @@ namespace AntJob.Server
         /// <param name="item"></param>
         /// <returns></returns>
         [Api(nameof(Report))]
-        public Boolean Report(JobLog item)
+        public Boolean Report(JobTask item)
         {
             if (item == null || item.ID == 0) throw new InvalidOperationException("无效操作 JobItemID=" + item?.ID);
 
             // 判断是否有权
             var app = Session["App"] as App;
 
-            var ji = JobLog.FindByID(item.ID);
+            var ji = JobTask.FindByID(item.ID);
             if (ji == null) throw new InvalidOperationException($"找不到任务[{item.ID}]");
 
             var job = Job.FindByID(ji.JobID);
@@ -475,7 +475,7 @@ namespace AntJob.Server
         }
 
         //private static readonly MsgRpcClient _MsgClient = new MsgRpcClient();
-        private void SetJobFinish(Job job, JobLog ji)
+        private void SetJobFinish(Job job, JobTask ji)
         {
             job.Total += ji.Total;
             job.Success += ji.Success;
@@ -508,7 +508,7 @@ namespace AntJob.Server
             //job.Save();
         }
 
-        private JobError SetJobError(IJob job, JobLog ji, IDictionary<String, Object> ps)
+        private JobError SetJobError(IJob job, JobTask ji, IDictionary<String, Object> ps)
         {
             var err = new JobError
             {
@@ -559,7 +559,7 @@ namespace AntJob.Server
         #endregion
 
         #region 动态步进
-        public static void AdjustStep(IJob job, JobLog ji, IExtend ext)
+        public static void AdjustStep(IJob job, JobTask ji, IExtend ext)
         {
             // 不许动态调节步进
             if (job.StepRate == 0 || job.MinStep == job.MaxStep) return;
@@ -662,7 +662,7 @@ namespace AntJob.Server
             return online;
         }
 
-        void UpdateOnline(IApp app, JobLog ji, INetSession ns)
+        void UpdateOnline(IApp app, JobTask ji, INetSession ns)
         {
             var online = GetOnline(app, ns);
             online.Total += ji.Total;

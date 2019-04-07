@@ -220,15 +220,15 @@ namespace AntJob.Data.Entity
         public Int32 DeleteItems()
         {
             // 每个作业保留1000行
-            var count = JobLog.FindCountByJobId(ID);
+            var count = JobTask.FindCountByJobId(ID);
             if (count <= 1000) return 0;
 
             var days = MaxRetain;
             if (days <= 0) days = 3;
-            var last = JobLog.FindLastByJobId(ID, DateTime.Now.AddDays(-days));
+            var last = JobTask.FindLastByJobId(ID, DateTime.Now.AddDays(-days));
             if (last == null) return 0;
 
-            return JobLog.DeleteByID(ID, last.ID);
+            return JobTask.DeleteByID(ID, last.ID);
         }
         #endregion
 
@@ -239,9 +239,9 @@ namespace AntJob.Data.Entity
         /// <param name="pid">申请任务的服务端进程ID</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public IList<JobLog> Acquire(String server, String ip, Int32 pid, Int32 count)
+        public IList<JobTask> Acquire(String server, String ip, Int32 pid, Int32 count)
         {
-            var list = new List<JobLog>();
+            var list = new List<JobTask>();
 
             if (!Enable) return list;
 
@@ -258,7 +258,7 @@ namespace AntJob.Data.Entity
                         if (!TrySplit(start, step, out var end)) break;
 
                         // 创建新的分片
-                        var ti = new JobLog
+                        var ti = new JobTask
                         {
                             AppID = AppID,
                             JobID = ID,
@@ -344,19 +344,19 @@ namespace AntJob.Data.Entity
         /// <param name="pid">申请任务的服务端进程ID</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public IList<JobLog> AcquireOld(String server, String ip, Int32 pid, Int32 count)
+        public IList<JobTask> AcquireOld(String server, String ip, Int32 pid, Int32 count)
         {
             lock (this)
             {
                 using (var ts = Meta.CreateTrans())
                 {
-                    var list = new List<JobLog>();
+                    var list = new List<JobTask>();
 
                     // 查找历史错误任务
                     if (ErrorDelay > 0)
                     {
                         var dt = DateTime.Now.AddSeconds(-ErrorDelay);
-                        var list2 = JobLog.Search(ID, dt, MaxRetry, new[] { JobStatus.错误, JobStatus.取消 }, count);
+                        var list2 = JobTask.Search(ID, dt, MaxRetry, new[] { JobStatus.错误, JobStatus.取消 }, count);
                         if (list2.Count > 0) list.AddRange(list2);
                     }
 
@@ -364,7 +364,7 @@ namespace AntJob.Data.Entity
                     if (MaxTime > 0 && list.Count < count)
                     {
                         var dt = DateTime.Now.AddSeconds(-MaxTime);
-                        var list2 = JobLog.Search(ID, dt, MaxRetry, new[] { JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中 }, count - list.Count);
+                        var list2 = JobTask.Search(ID, dt, MaxRetry, new[] { JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中 }, count - list.Count);
                         if (list2.Count > 0) list.AddRange(list2);
                     }
                     if (list.Count > 0)
@@ -395,7 +395,7 @@ namespace AntJob.Data.Entity
         /// <param name="pid">申请任务的服务端进程ID</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public IList<JobLog> AcquireMessage(String topic, String server, String ip, Int32 pid, Int32 count)
+        public IList<JobTask> AcquireMessage(String topic, String server, String ip, Int32 pid, Int32 count)
         {
             // 消费消息时，保存主题
             if (Topic != topic)
@@ -404,7 +404,7 @@ namespace AntJob.Data.Entity
                 SaveAsync();
             }
 
-            var list = new List<JobLog>();
+            var list = new List<JobTask>();
 
             if (!Enable) return list;
 
@@ -431,7 +431,7 @@ namespace AntJob.Data.Entity
                             i += msgList.Count;
 
                             // 创建新的分片
-                            var ti = new JobLog
+                            var ti = new JobTask
                             {
                                 AppID = AppID,
                                 JobID = ID,
