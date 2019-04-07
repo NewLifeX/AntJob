@@ -17,7 +17,7 @@ namespace HelloWork
         {
             // 当前任务时间
             var time = ctx.Task.Start;
-            WriteLog("Hello World! {0}", time);
+            WriteLog("新生命蚂蚁调度系统！当前任务时间：{0}", time);
 
             // 成功处理数据量
             return 1;

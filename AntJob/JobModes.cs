@@ -3,7 +3,7 @@
 namespace AntJob
 {
     /// <summary>作业模式</summary>
-    [Description("作业模式")]
+    //[Description("作业模式")]
     public enum JobModes
     {
         /// <summary>数据调度</summary>

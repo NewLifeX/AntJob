@@ -4,7 +4,7 @@ using NewLife.Log;
 
 namespace HelloWork
 {
-    internal class Program
+    class Program
     {
         private static void Main(String[] args)
         {

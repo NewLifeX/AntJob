@@ -65,4 +65,8 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>del "$(TargetDir)*.xml" /q
+del "$(TargetDir)*.dll.config" /q</PostBuildEvent>
+  </PropertyGroup>
 </Project>

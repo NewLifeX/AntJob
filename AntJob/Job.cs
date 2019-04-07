@@ -55,6 +55,7 @@ namespace AntJob
                 Start = new DateTime(now.Year, now.Month, 1),
                 Step = 30,
                 Offset = 15,
+                Mode = JobModes.Alarm,
             };
 
             // 默认并发数为核心数
