@@ -17,8 +17,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
-    <PackageReference Include="NewLife.Core" Version="8.1.2019.327" />
-    <PackageReference Include="NewLife.XCode" Version="9.11.2019.327" />
+    <PackageReference Include="NewLife.Core" Version="*" />
+    <PackageReference Include="NewLife.XCode" Version="*" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
@@ -42,9 +42,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
-    <PackageReference Include="NewLife.Agent">
-      <Version>8.1.2019.320</Version>
-    </PackageReference>
+    <PackageReference Include="NewLife.Agent" Version="*" />
   </ItemGroup>
 
 </Project>

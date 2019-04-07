@@ -35,25 +35,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NewLife.Core" Version="8.1.2019.406" />
+    <PackageReference Include="NewLife.XCode" Version="9.11.2019.406" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='net45'">
-    <Reference Include="NewLife.Core">
-      <HintPath>..\DLL\NewLife.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="XCode">
-      <HintPath>..\DLL\XCode.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <Reference Include="NewLife.Core">
-      <HintPath>..\DLL20\NewLife.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="XCode">
-      <HintPath>..\DLL20\XCode.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
