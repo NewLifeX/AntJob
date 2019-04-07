@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using AntJob.Data;
 using NewLife;
 
-namespace AntJob
+namespace AntJob.Providers
 {
     /// <summary>任务提供者接口</summary>
     public interface IJobProvider

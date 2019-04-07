@@ -1,5 +1,6 @@
 ﻿using System;
 using AntJob;
+using AntJob.Providers;
 using NewLife.Log;
 
 namespace HelloWork

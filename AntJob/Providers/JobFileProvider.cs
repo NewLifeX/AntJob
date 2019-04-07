@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using AntJob.Data;
 using NewLife;
 using NewLife.Log;
 using NewLife.Reflection;
 using NewLife.Xml;
 
-namespace AntJob
+namespace AntJob.Providers
 {
     /// <summary>文件任务提供者</summary>
     public class JobFileProvider : JobProvider
@@ -28,7 +29,7 @@ namespace AntJob
         {
             var jf = _File = JobFile.Current;
 
-            var list = new List<MyJob>();
+            var list = new List<JobModel>();
             if (jf.Jobs != null && jf.Jobs.Length > 0) list.AddRange(jf.Jobs);
 
             // 扫描所有Worker并添加到作业文件
@@ -38,7 +39,7 @@ namespace AntJob
                 if (!list.Any(e => e.Name == item.Key))
                 {
                     // 新增作业项
-                    var model = new MyJob();
+                    var model = new JobModel();
 
                     // 获取默认设置
                     var job = item.Value.CreateInstance() as Job;
@@ -130,7 +131,7 @@ namespace AntJob
                 if (start >= end) break;
 
                 // 切分新任务
-                var set = new MyTask
+                var set = new TaskModel
                 {
                     Start = start,
                     End = end,
@@ -224,6 +225,6 @@ namespace AntJob
 
         /// <summary>作业集合</summary>
         [Description("作业集合")]
-        public MyJob[] Jobs { get; set; }
+        public JobModel[] Jobs { get; set; }
     }
 }

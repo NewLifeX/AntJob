@@ -1,4 +1,4 @@
-﻿namespace AntJob
+﻿namespace AntJob.Data
 {
     /// <summary>作业状态</summary>
     public enum JobStatus

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using AntJob.Data;
 using NewLife.Log;
 using NewLife.Net;
 using NewLife.Reflection;
 using NewLife.Remoting;
 using NewLife.Serialization;
 
-namespace AntJob
+namespace AntJob.Providers
 {
     /// <summary>蚂蚁客户端</summary>
     public class AntClient : ApiClient
@@ -97,7 +98,7 @@ namespace AntJob
         {
             if (names == null) names = new String[0];
 
-            return Invoke<MyJob[]>(nameof(GetJobs), new { names });
+            return Invoke<JobModel[]>(nameof(GetJobs), new { names });
         }
 
         /// <summary>批量添加作业</summary>
@@ -115,7 +116,7 @@ namespace AntJob
             var dic = new { job, count }.ToDictionary();
             if (ext != null) dic = dic.Merge(ext);
 
-            return Invoke<MyTask[]>(nameof(Acquire), dic);
+            return Invoke<TaskModel[]>(nameof(Acquire), dic);
         }
 
         /// <summary>生产消息</summary>

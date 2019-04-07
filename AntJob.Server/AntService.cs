@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using AntJob.Data;
 using AntJob.Data.Entity;
 using NewLife;
 using NewLife.Data;

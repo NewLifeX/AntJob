@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AntJob.Providers;
 using NewLife;
 using NewLife.Log;
 using NewLife.Threading;
@@ -182,4 +183,4 @@ namespace AntJob
         }
         #endregion
     }
-}
+} 

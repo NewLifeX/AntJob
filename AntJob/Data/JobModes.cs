@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace AntJob
+namespace AntJob.Data
 {
     /// <summary>作业模式</summary>
     //[Description("作业模式")]

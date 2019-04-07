@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AntJob
+namespace AntJob.Providers
 {
     /// <summary>消息选项</summary>
     public class MessageOption

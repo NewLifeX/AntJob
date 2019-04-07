@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using AntJob.Data;
+using AntJob.Providers;
 using NewLife.Collections;
 using NewLife.Log;
 
@@ -50,7 +51,7 @@ namespace AntJob
             Name = GetType().Name.TrimEnd(nameof(Job));
 
             var now = DateTime.Now;
-            var job = new MyJob
+            var job = new JobModel
             {
                 Start = new DateTime(now.Year, now.Month, 1),
                 Step = 30,
@@ -115,7 +116,10 @@ namespace AntJob
         #endregion
 
         #region 整体调度
-        internal void Prepare(ITask task) => Interlocked.Increment(ref _Busy);
+        internal void Prepare(ITask task)
+        {
+            Interlocked.Increment(ref _Busy);
+        }
 
         /// <summary>异步处理一项新任务</summary>
         /// <param name="task"></param>
@@ -156,7 +160,10 @@ namespace AntJob
 
         /// <summary>处理任务。内部分批处理</summary>
         /// <param name="ctx"></param>
-        protected virtual void OnProcess(JobContext ctx) => ctx.Success = Execute(ctx);
+        protected virtual void OnProcess(JobContext ctx)
+        {
+            ctx.Success = Execute(ctx);
+        }
         #endregion
 
         #region 数据处理
@@ -170,11 +177,17 @@ namespace AntJob
         /// <param name="messages">消息集合</param>
         /// <param name="option">消息选项</param>
         /// <returns></returns>
-        public Int32 Produce(String topic, String[] messages, MessageOption option = null) => Provider.Produce(topic, messages, option);
+        public Int32 Produce(String topic, String[] messages, MessageOption option = null)
+        {
+            return Provider.Produce(topic, messages, option);
+        }
 
         /// <summary>整个任务完成</summary>
         /// <param name="ctx"></param>
-        protected virtual void OnFinish(JobContext ctx) => Provider?.Finish(ctx);
+        protected virtual void OnFinish(JobContext ctx)
+        {
+            Provider?.Finish(ctx);
+        }
         #endregion
 
         #region 日志

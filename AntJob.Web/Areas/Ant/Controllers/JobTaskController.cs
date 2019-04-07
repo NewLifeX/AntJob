@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Web.Mvc;
+using AntJob.Data;
 using AntJob.Data.Entity;
 using NewLife.Cube;
 using NewLife.Web;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AntJob.Data;
 using NewLife.Collections;
 using NewLife.Data;
 

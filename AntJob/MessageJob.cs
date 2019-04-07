@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using AntJob.Data;
 using NewLife.Serialization;
 
 namespace AntJob

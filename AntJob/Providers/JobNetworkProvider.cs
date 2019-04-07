@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using AntJob.Data;
 using NewLife;
 using NewLife.Log;
 using NewLife.Threading;
 
-namespace AntJob
+namespace AntJob.Providers
 {
     /// <summary>网络任务提供者</summary>
     public class JobNetworkProvider : JobProvider
@@ -46,13 +47,13 @@ namespace AntJob
             var list = new List<IJob>();
             foreach (var wrk in ws)
             {
-                var job = wrk.Model ?? new MyJob();
+                var job = wrk.Model ?? new JobModel();
 
                 job.Name = wrk.Name;
                 job.Mode = wrk.Mode;
 
                 // 描述
-                if (job is MyJob job2)
+                if (job is JobModel job2)
                 {
                     var dis = wrk.GetType().GetDisplayName();
                     if (!dis.IsNullOrEmpty()) job2.DisplayName = dis;
@@ -124,7 +125,7 @@ namespace AntJob
             // 不用上报抽取中
             if (ctx.Status == JobStatus.抽取中) return;
 
-            if (!(ctx?.Task is MyTask task)) return;
+            if (!(ctx?.Task is TaskModel task)) return;
 
             // 区分抽取和处理
             task.Status = ctx.Status;
@@ -143,7 +144,7 @@ namespace AntJob
         /// <param name="ctx">上下文</param>
         public override void Finish(JobContext ctx)
         {
-            if (!(ctx?.Task is MyTask task)) return;
+            if (!(ctx?.Task is TaskModel task)) return;
 
             task.Speed = ctx.Speed;
             task.Total = ctx.Total;
@@ -182,7 +183,7 @@ namespace AntJob
             Report(ctx.Job.Model, task);
         }
 
-        private void Report(IJob job, MyTask task)
+        private void Report(IJob job, TaskModel task)
         {
             try
             {

@@ -23,8 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\AntJob\JobModes.cs" Link="JobModes.cs" />
-    <Compile Include="..\AntJob\JobStatus.cs" Link="JobStatus.cs" />
+    <Compile Include="..\AntJob\Data\JobModel.cs" Link="Data\JobModel.cs" />
+    <Compile Include="..\AntJob\Data\JobModes.cs" Link="Data\JobModes.cs" />
+    <Compile Include="..\AntJob\Data\JobStatus.cs" Link="Data\JobStatus.cs" />
+    <Compile Include="..\AntJob\Data\TaskModel.cs" Link="Data\TaskModel.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,6 +51,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Build.tt</DependentUpon>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>
