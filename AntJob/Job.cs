@@ -27,9 +27,6 @@ namespace AntJob
         /// <summary>是否工作中</summary>
         public Boolean Active { get; private set; }
 
-        /// <summary>主题。设置后使用消费调度模式</summary>
-        public String Topic { get; set; }
-
         /// <summary>调度模式</summary>
         public virtual JobModes Mode { get; set; } = JobModes.Alarm;
 
@@ -118,8 +115,6 @@ namespace AntJob
         {
             var prv = Provider;
             var job = Model;
-            // 消费模式，设置Topic值
-            if (!Topic.IsNullOrEmpty()) data[nameof(Topic)] = Topic;
 
             // 循环申请任务，喂饱工作者
             return prv.Acquire(job, data, count);
