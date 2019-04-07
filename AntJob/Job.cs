@@ -16,7 +16,7 @@ namespace AntJob
         public String Name { get; set; }
 
         /// <summary>调度器</summary>
-        public Schedule Schedule { get; set; }
+        public Scheduler Schedule { get; set; }
 
         /// <summary>作业提供者</summary>
         public IJobProvider Provider { get; set; }

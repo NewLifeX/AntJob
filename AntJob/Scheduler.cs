@@ -8,7 +8,7 @@ using NewLife.Threading;
 namespace AntJob
 {
     /// <summary>作业调度器</summary>
-    public class Schedule : DisposeBase
+    public class Scheduler : DisposeBase
     {
         #region 属性
         /// <summary>调试开关。打开内部工作者日志</summary>
@@ -46,6 +46,7 @@ namespace AntJob
 
             // 启动作业提供者，获取所有作业
             var prv = Provider;
+            if (prv == null) prv = Provider = new JobFileProvider();
             if (prv.Schedule == null) prv.Schedule = this;
             prv.Start();
 

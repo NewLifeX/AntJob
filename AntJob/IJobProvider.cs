@@ -8,7 +8,7 @@ namespace AntJob
     public interface IJobProvider
     {
         /// <summary>调度器</summary>
-        Schedule Schedule { get; set; }
+        Scheduler Schedule { get; set; }
 
         /// <summary>开始工作</summary>
         void Start();
@@ -48,7 +48,7 @@ namespace AntJob
     public abstract class JobProvider : DisposeBase, IJobProvider
     {
         /// <summary>调度器</summary>
-        public Schedule Schedule { get; set; }
+        public Scheduler Schedule { get; set; }
 
         /// <summary>开始工作</summary>
         public virtual void Start() { }
