@@ -283,7 +283,7 @@ namespace AntJob.Server
             online.Tasks += list.Count;
             online.SaveAsync();
 
-            return list.Select(e=>e.ToModel()).ToArray();
+            return list.Select(e => e.ToModel()).ToArray();
         }
 
         private void CheckErrorTask(App app, Job jb, Int32 count, List<JobTask> list)
@@ -605,13 +605,13 @@ namespace AntJob.Server
         /// <summary>获取当前应用的所有在线实例</summary>
         /// <returns></returns>
         [Api(nameof(GetPeers))]
-        public IAppOnline[] GetPeers()
+        public PeerModel[] GetPeers()
         {
             var app = Session["App"] as App;
 
             var olts = AppOnline.FindAllByAppID(app.ID);
 
-            return olts.ToArray();
+            return olts.Select(e => e.ToModel()).ToArray();
         }
 
         AppOnline CreateOnline(IApp app, INetSession ns, String machine, Int32 pid, String version)

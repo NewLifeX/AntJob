@@ -29,6 +29,7 @@
     <Compile Include="..\AntJob\Data\JobModel.cs" Link="Data\JobModel.cs" />
     <Compile Include="..\AntJob\Data\JobModes.cs" Link="Data\JobModes.cs" />
     <Compile Include="..\AntJob\Data\JobStatus.cs" Link="Data\JobStatus.cs" />
+    <Compile Include="..\AntJob\Data\PeerModel.cs" Link="Data\PeerModel.cs" />
     <Compile Include="..\AntJob\Data\TaskModel.cs" Link="Data\TaskModel.cs" />
   </ItemGroup>
 

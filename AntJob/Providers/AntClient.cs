@@ -157,6 +157,10 @@ namespace AntJob.Providers
 
             throw lastex;
         }
+
+        /// <summary>获取当前应用的所有在线实例</summary>
+        /// <returns></returns>
+        public IPeer[] GetPeers() => Invoke<PeerModel[]>(nameof(GetPeers));
         #endregion
     }
 }

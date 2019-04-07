@@ -108,6 +108,18 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 业务操作
+        /// <summary>转模型类</summary>
+        /// <returns></returns>
+        public PeerModel ToModel()
+        {
+            return new PeerModel
+            {
+                Instance = Instance,
+                Client = Client,
+                Machine = Name,
+                Version = Version,
+            };
+        }
         #endregion
     }
 }
