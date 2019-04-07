@@ -60,6 +60,7 @@ namespace AntJob
         protected override void OnProcess(JobContext ctx)
         {
             var prov = Provider;
+            var row = 0;
             while (true)
             {
                 ctx.Data = null;
@@ -67,7 +68,7 @@ namespace AntJob
                 ctx.Error = null;
 
                 // 分批抽取
-                var data = Fetch(ctx, ctx.Task as IDataTask);
+                var data = Fetch(ctx, ref row);
 
                 var list = data as IList;
                 if (list != null) ctx.Total += list.Count;
@@ -92,10 +93,11 @@ namespace AntJob
 
         /// <summary>分批抽取数据，一个任务内多次调用</summary>
         /// <param name="ctx">上下文</param>
-        /// <param name="task"></param>
+        /// <param name="row">开始行数</param>
         /// <returns></returns>
-        protected virtual Object Fetch(JobContext ctx, IDataTask task)
+        protected virtual Object Fetch(JobContext ctx, ref Int32 row)
         {
+            var task = ctx.Task;
             if (task == null) throw new ArgumentNullException(nameof(task), "没有设置数据抽取配置");
 
             // 验证时间段
@@ -113,10 +115,10 @@ namespace AntJob
 
             if (!Where.IsNullOrEmpty()) exp &= Where;
 
-            var list = Factory.FindAll(exp, OrderBy, Selects, task.Row, task.BatchSize);
+            var list = Factory.FindAll(exp, OrderBy, Selects, row, task.BatchSize);
 
             // 取到数据，需要滑动窗口
-            if (list.Count > 0) task.Row += list.Count;
+            if (list.Count > 0) row += list.Count;
 
             return list;
         }

@@ -30,14 +30,7 @@ namespace AntJob
         String Message { get; set; }
     }
 
-    /// <summary>数据任务</summary>
-    public interface IDataTask : ITask
-    {
-        /// <summary>开始行。分页</summary>
-        Int32 Row { get; set; }
-    }
-
-    class MyTask : IDataTask
+    class MyTask : ITask
     {
         #region 属性
         /// <summary>编号</summary>
@@ -48,9 +41,6 @@ namespace AntJob
 
         /// <summary>结束。小于，不等于</summary>
         public DateTime End { get; set; }
-
-        /// <summary>行。分页起始行</summary>
-        public Int32 Row { get; set; }
 
         /// <summary>步进。最大区间大小，秒</summary>
         public Int32 Step { get; set; }

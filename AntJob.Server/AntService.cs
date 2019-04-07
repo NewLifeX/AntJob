@@ -230,8 +230,7 @@ namespace AntJob.Server
             job = job?.Trim();
             if (job.IsNullOrEmpty()) return new JobLog[0];
 
-            var app = Session["App"] as App;
-            if (app == null) return new JobLog[0];
+            if (!(Session["App"] is App app)) return new JobLog[0];
 
             // 应用停止发放作业
             app = App.FindByID(app.ID) ?? app;
@@ -456,7 +455,7 @@ namespace AntJob.Server
             {
                 var ps = ControllerContext.Current.Parameters;
 
-                var err = SetJobError(job, ji, ps);
+                SetJobError(job, ji, ps);
 
                 ji.Error++;
                 //ji.Message = err.Message;
