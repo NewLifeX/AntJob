@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using NewLife;
 using NewLife.Log;
 using NewLife.Serialization;
@@ -48,21 +47,21 @@ namespace AntJob
             var list = new List<IJob>();
             foreach (var wrk in ws)
             {
-                var dt = new MyJob
-                {
-                    Name = wrk.Name
-                };
+                var job = wrk.Model ?? new MyJob { Name = wrk.Name };
 
                 // 调度模式
-                if (wrk != null) dt.Mode = wrk.Mode;
+                if (wrk != null) job.Mode = wrk.Mode;
 
                 // 描述
-                var dis = wrk.GetType().GetDisplayName();
-                if (!dis.IsNullOrEmpty()) dt.DisplayName = dis;
-                var des = wrk.GetType().GetDescription();
-                if (!des.IsNullOrEmpty()) dt.Description = des;
+                if (job is MyJob job2)
+                {
+                    var dis = wrk.GetType().GetDisplayName();
+                    if (!dis.IsNullOrEmpty()) job2.DisplayName = dis;
+                    var des = wrk.GetType().GetDescription();
+                    if (!des.IsNullOrEmpty()) job2.Description = des;
+                }
 
-                list.Add(dt);
+                list.Add(job);
             }
             if (list.Count > 0) Ant.AddJobs(list.ToArray());
         }
@@ -298,7 +297,10 @@ namespace AntJob
         /// <summary>写日志</summary>
         /// <param name="format"></param>
         /// <param name="args"></param>
-        public void WriteLog(String format, params Object[] args) => Log?.Info(format, args);
+        public void WriteLog(String format, params Object[] args)
+        {
+            Log?.Info(format, args);
+        }
         #endregion
     }
 }

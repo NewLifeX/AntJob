@@ -21,7 +21,7 @@ namespace AntJob
         /// <summary>作业提供者</summary>
         public IJobProvider Provider { get; set; }
 
-        /// <summary>作业</summary>
+        /// <summary>作业模型。启动前作为创建作业的默认值，启动后表示作业当前设置和状态</summary>
         public IJob Model { get; set; }
 
         /// <summary>是否工作中</summary>
