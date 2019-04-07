@@ -91,8 +91,6 @@ namespace AntJob
 
             Active = false;
 
-            Provider?.Stop(Model);
-
             return true;
         }
         #endregion

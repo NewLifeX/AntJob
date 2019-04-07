@@ -159,6 +159,9 @@ namespace AntJob
         /// <param name="ctx">上下文</param>
         public override void Finish(JobContext ctx)
         {
+            var ex = ctx.Error?.GetTrue();
+            if (ex != null) XTrace.WriteException(ex);
+
             if (ctx.Total > 0)
             {
                 var set = ctx.Task;
@@ -171,14 +174,6 @@ namespace AntJob
                     msg += $"，速度{ctx.Speed:n0}tps，耗时{ctx.Cost:n0}ms";
                 XTrace.WriteLine(msg);
             }
-        }
-
-        /// <summary>任务出错</summary>
-        /// <param name="ctx">上下文</param>
-        public override void Error(JobContext ctx)
-        {
-            var ex = ctx.Error?.GetTrue();
-            if (ex != null) XTrace.WriteException(ex);
         }
 
         #region 静态扫描

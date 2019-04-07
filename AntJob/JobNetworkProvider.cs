@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using NewLife;
 using NewLife.Log;
-using NewLife.Serialization;
 using NewLife.Threading;
 
 namespace AntJob
@@ -80,14 +79,6 @@ namespace AntJob
                 _NextGetJobs = now.AddSeconds(5);
 
                 _jobs = Ant.GetJobs(names);
-                if (_jobs != null)
-                {
-                    // 某个作业停止了，需要清理它残留的任务
-                    foreach (var job in _jobs)
-                    {
-                        if (!job.Enable) Stop(job);
-                    }
-                }
             }
 
             return _jobs;
@@ -98,7 +89,10 @@ namespace AntJob
         /// <param name="data">扩展数据</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public override ITask[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count) => Ant.Acquire(job.Name, count, data);
+        public override ITask[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count)
+        {
+            return Ant.Acquire(job.Name, count, data);
+        }
 
         /// <summary>生产消息</summary>
         /// <param name="topic">主题</param>
@@ -122,105 +116,73 @@ namespace AntJob
             // 不用上报抽取中
             if (ctx.Status == JobStatus.抽取中) return;
 
-            if (!(ctx?.Task is MyTask ji)) return;
+            if (!(ctx?.Task is MyTask task)) return;
 
             // 区分抽取和处理
-            ji.Status = ctx.Status;
+            task.Status = ctx.Status;
 
-            ji.Speed = ctx.Speed;
-            ji.Total = ctx.Total;
-            ji.Success = ctx.Success;
+            task.Speed = ctx.Speed;
+            task.Total = ctx.Total;
+            task.Success = ctx.Success;
 
-            ji.Server = _MachineName;
-            ji.ProcessID = _ProcessID;
+            task.Server = _MachineName;
+            task.ProcessID = _ProcessID;
 
-            Report(ctx.Job.Model, ji, null);
+            Report(ctx.Job.Model, task);
         }
 
         /// <summary>完成任务，每个任务只调用一次</summary>
         /// <param name="ctx">上下文</param>
         public override void Finish(JobContext ctx)
         {
-            if (!(ctx?.Task is MyTask ji)) return;
+            if (!(ctx?.Task is MyTask task)) return;
 
-            ji.Speed = ctx.Speed;
-            ji.Total = ctx.Total;
-            ji.Success = ctx.Success;
-            ji.Times++;
+            task.Speed = ctx.Speed;
+            task.Total = ctx.Total;
+            task.Success = ctx.Success;
+            task.Times++;
+
+            task.Server = _MachineName;
+            task.ProcessID = _ProcessID;
 
             // 区分正常完成还是错误终止
             if (ctx.Error != null)
-                ji.Status = JobStatus.错误;
+            {
+                task.Error++;
+                task.Status = JobStatus.错误;
+
+                var ex = ctx.Error?.GetTrue();
+                if (ex != null)
+                {
+                    var msg = ctx.Error.GetMessage();
+                    if (msg.Contains("Exception:")) msg = msg.Substring("Exception:").Trim();
+                    task.Message = msg;
+                }
+            }
             else
             {
-                ji.Status = JobStatus.完成;
+                task.Status = JobStatus.完成;
 
-                if (ctx["Message"] is String msg) ji.Message = msg;
+                if (ctx["Message"] is String msg) task.Message = msg;
 
-                ji.Cost = (Int32)(ctx.Cost / 1000);
+                task.Cost = (Int32)(ctx.Cost / 1000);
             }
-            if (ji.Message.IsNullOrEmpty()) ji.Message = ctx.Remark;
+            if (task.Message.IsNullOrEmpty()) task.Message = ctx.Remark;
 
-            var key = ctx.Key;
-            if (key.IsNullOrEmpty()) key = ctx["Key"] as String;
-            ji.Key = key;
+            task.Key = ctx.Key;
 
-            Report(ctx.Job.Model, ji);
+            Report(ctx.Job.Model, task);
         }
 
-        /// <summary>任务出错</summary>
-        /// <param name="ctx">上下文</param>
-        public override void Error(JobContext ctx)
-        {
-            var ji = ctx.Task as MyTask;
-
-            var key = ctx.Key;
-            var data = "";
-            var errorCode = "";
-            var message = "";
-
-            // 单个实体对象出错，记录为任务错误
-            var entity = ctx.Entity;
-            if (entity != null) data = entity.ToJson();
-            ji.Key = key;
-
-            var ex = ctx.Error?.GetTrue();
-            if (ex != null)
-            {
-                errorCode = ex.GetType()?.Name;
-                if (errorCode != nameof(Exception)) errorCode = errorCode.TrimEnd(nameof(Exception));
-
-                var msg = ctx.Error.GetMessage();
-                if (msg.Contains("Exception:")) msg = msg.Substring("Exception:").Trim();
-                message = msg;
-            }
-            ji.Message = message;
-
-            if (ji.ID > 0)
-            {
-                ji.Error++;
-                //ji.Message = ctx.Error?.GetTrue()?.Message;
-                ji.Status = JobStatus.错误;
-            }
-
-            var ext = new
-            {
-                Data = data,
-                ErrorCode = errorCode,
-            };
-
-            Report(ctx.Job.Model, ji, ext);
-        }
-
-        private void Report(IJob job, MyTask ji, Object ext = null)
+        private void Report(IJob job, MyTask task)
         {
             try
             {
-                Ant.Report(ji, ext);
+                Ant.Report(task);
             }
             catch (Exception ex)
             {
-                XTrace.WriteLine("[{0}]的[{1}]状态报告失败！{2}", job, ji.Status, ex.GetTrue().Message);
+                XTrace.WriteLine("[{0}]的[{1}]状态报告失败！{2}", job, task.Status, ex.GetTrue().Message);
             }
         }
 
@@ -231,7 +193,10 @@ namespace AntJob
         /// <summary>写日志</summary>
         /// <param name="format"></param>
         /// <param name="args"></param>
-        public void WriteLog(String format, params Object[] args) => Log?.Info(format, args);
+        public void WriteLog(String format, params Object[] args)
+        {
+            Log?.Info(format, args);
+        }
         #endregion
     }
 }
