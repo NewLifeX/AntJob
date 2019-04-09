@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
-    <AssemblyTitle>星尘数据</AssemblyTitle>
-    <Description>星尘，轻量级服务框架。远程方法调用，服务自动注册和发现，负载均衡，动态伸缩，故障转移，性能监控。</Description>
-    <Copyright>版权所有(C) 新生命开发团队 2019</Copyright>
+    <AssemblyTitle>蚂蚁数据</AssemblyTitle>
+    <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累！面向1000作业以内中小企业大数据分析场景。</Description>
     <Company>新生命开发团队</Company>
-    <Version>1.0.2019.0320</Version>
-    <FileVersion>1.0.2019.0320</FileVersion>
+    <Copyright>版权所有(C) 新生命开发团队 2019</Copyright>
+    <Version>1.0.2019.0409</Version>
+    <FileVersion>1.0.2019.0409</FileVersion>
     <AssemblyVersion>1.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
   </PropertyGroup>
