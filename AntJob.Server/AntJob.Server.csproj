@@ -17,8 +17,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
-    <PackageReference Include="NewLife.Core" Version="8.1.2019.407" />
-    <PackageReference Include="NewLife.XCode" Version="9.11.2019.407" />
+    <PackageReference Include="NewLife.Core" Version="8.1.2019.415" />
+    <PackageReference Include="NewLife.XCode" Version="9.11.2019.415" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
