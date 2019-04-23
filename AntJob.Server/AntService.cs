@@ -12,6 +12,7 @@ using NewLife.Remoting;
 using NewLife.Serialization;
 using NewLife.Threading;
 using XCode;
+using IJob = AntJob.Data.Entity.IJob;
 
 namespace AntJob.Server
 {

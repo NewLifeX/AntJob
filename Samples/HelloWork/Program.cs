@@ -16,7 +16,7 @@ namespace HelloWork
 
             // 使用分布式调度引擎替换默认的本地文件调度
             //sc.Provider = new JobNetworkProvider { Server = "tcp://127.0.0.1:9999", AppID = "Hello" };
-            sc.Provider = new JobNetworkProvider { Server = "tcp://ant.newlifex.com:9999", AppID = "Hello" };
+            sc.Provider = new NetworkJobProvider { Server = "tcp://ant.newlifex.com:9999", AppID = "Hello" };
 
             // 添加作业处理器
             sc.Jobs.Add(new HelloJob());
@@ -29,12 +29,12 @@ namespace HelloWork
         }
     }
 
-    class HelloJob : Job
+    class HelloJob : Handler
     {
         public HelloJob()
         {
             // 今天零点开始，每5分钟一次
-            var job = Model;
+            var job = Job;
             job.Start = DateTime.Today;
             job.Step = 5 * 60;
         }

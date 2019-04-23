@@ -11,7 +11,7 @@ namespace AntJob
     {
         #region 属性
         /// <summary>作业</summary>
-        public Job Job { get; set; }
+        public Handler Handler { get; set; }
 
         /// <summary>任务</summary>
         public ITask Task { get; set; }

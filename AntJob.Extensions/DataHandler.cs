@@ -7,7 +7,7 @@ using XCode.Configuration;
 namespace AntJob
 {
     /// <summary>从数据库抽取数据</summary>
-    public abstract class DataJob : Job
+    public abstract class DataHandler : Handler
     {
         #region 属性
         /// <summary>实体工厂</summary>
@@ -28,7 +28,7 @@ namespace AntJob
 
         #region 构造
         /// <summary>实例化数据库工作者</summary>
-        public DataJob()
+        public DataHandler()
         {
             //SupportPage = true;
         }
@@ -45,7 +45,7 @@ namespace AntJob
             if (Field == null) Field = Factory.MasterTime;
             if (Field == null) throw new ArgumentNullException(nameof(Field));
 
-            var job = Model;
+            var job = Job;
             if (job.Step == 0) job.Step = 30;
 
             // 获取最小时间

@@ -16,7 +16,7 @@ namespace AntJob
         public Boolean Debug { get; set; }
 
         /// <summary>作业集合</summary>
-        public List<Job> Jobs { get; } = new List<Job>();
+        public List<Handler> Jobs { get; } = new List<Handler>();
 
         /// <summary>任务提供者</summary>
         public IJobProvider Provider { get; set; }
@@ -47,7 +47,7 @@ namespace AntJob
 
             // 启动作业提供者，获取所有作业
             var prv = Provider;
-            if (prv == null) prv = Provider = new JobFileProvider();
+            if (prv == null) prv = Provider = new FileJobProvider();
             if (prv.Schedule == null) prv.Schedule = this;
             prv.Start();
 
@@ -69,7 +69,7 @@ namespace AntJob
                 wrk.Schedule = this;
                 wrk.Provider = prv;
 
-                var job = wrk.Model = jobs.FirstOrDefault(e => e.Name == wrk.Name);
+                var job = wrk.Job = jobs.FirstOrDefault(e => e.Name == wrk.Name);
                 if (job != null && job.Mode == 0) job.Mode = wrk.Mode;
 
                 wrk.Log = XTrace.Log;
@@ -135,7 +135,7 @@ namespace AntJob
                 wrk.Provider = prv;
 
                 // 更新作业参数，并启动工作者
-                wrk.Model = job;
+                wrk.Job = job;
                 if (job.Mode == 0) job.Mode = wrk.Mode;
                 if (!wrk.Active) wrk.Start();
 

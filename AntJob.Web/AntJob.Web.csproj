@@ -248,6 +248,10 @@
       <Project>{01639cc1-1574-4ae1-bbc5-e0538fa5c44c}</Project>
       <Name>AntJob.Data</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AntJob\AntJob.csproj">
+      <Project>{717a3c5a-c4e9-4e85-bb57-916ed6fac936}</Project>
+      <Name>AntJob</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

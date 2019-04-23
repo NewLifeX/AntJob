@@ -10,7 +10,7 @@ using NewLife.Threading;
 namespace AntJob.Providers
 {
     /// <summary>网络任务提供者</summary>
-    public class JobNetworkProvider : JobProvider
+    public class NetworkJobProvider : JobProvider
     {
         #region 属性
         /// <summary>调度中心地址</summary>
@@ -65,7 +65,7 @@ namespace AntJob.Providers
             var list = new List<IJob>();
             foreach (var wrk in ws)
             {
-                var job = wrk.Model ?? new JobModel();
+                var job = wrk.Job ?? new JobModel();
 
                 job.Name = wrk.Name;
                 job.Mode = wrk.Mode;
@@ -163,7 +163,7 @@ namespace AntJob.Providers
             task.Server = _MachineName;
             task.ProcessID = _ProcessID;
 
-            Report(ctx.Job.Model, task);
+            Report(ctx.Handler.Job, task);
         }
 
         /// <summary>完成任务，每个任务只调用一次</summary>
@@ -206,7 +206,7 @@ namespace AntJob.Providers
 
             task.Key = ctx.Key;
 
-            Report(ctx.Job.Model, task);
+            Report(ctx.Handler.Job, task);
         }
 
         private void Report(IJob job, TaskModel task)

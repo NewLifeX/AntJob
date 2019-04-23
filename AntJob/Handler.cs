@@ -9,8 +9,8 @@ using NewLife.Log;
 
 namespace AntJob
 {
-    /// <summary>作业基类</summary>
-    public abstract class Job
+    /// <summary>处理器基类</summary>
+    public abstract class Handler
     {
         #region 属性
         /// <summary>名称</summary>
@@ -23,7 +23,7 @@ namespace AntJob
         public IJobProvider Provider { get; set; }
 
         /// <summary>作业模型。启动前作为创建作业的默认值，启动后表示作业当前设置和状态</summary>
-        public IJob Model { get; set; }
+        public IJob Job { get; set; }
 
         /// <summary>是否工作中</summary>
         public Boolean Active { get; private set; }
@@ -46,9 +46,9 @@ namespace AntJob
 
         #region 构造
         /// <summary>实例化</summary>
-        public Job()
+        public Handler()
         {
-            Name = GetType().Name.TrimEnd(nameof(Job));
+            Name = GetType().Name.TrimEnd(nameof(Handler));
 
             var now = DateTime.Now;
             var job = new JobModel
@@ -63,7 +63,7 @@ namespace AntJob
             job.MaxTask = Environment.ProcessorCount;
             if (job.MaxTask > 8) job.MaxTask = 8;
 
-            Model = job;
+            Job = job;
         }
         #endregion
 
@@ -74,7 +74,7 @@ namespace AntJob
             if (Active) return false;
 
             var msg = "开始工作";
-            var job = Model;
+            var job = Job;
             if (job != null) msg += " {0} 区间（{1}, {2}） Offset={3} Step={4} MaxTask={5}".F(job.Enable, job.Start, job.End, job.Offset, job.Step, job.MaxTask);
 
             WriteLog(msg);
@@ -108,7 +108,7 @@ namespace AntJob
         public virtual ITask[] Acquire(IDictionary<String, Object> data, Int32 count = 1)
         {
             var prv = Provider;
-            var job = Model;
+            var job = Job;
 
             // 循环申请任务，喂饱工作者
             return prv.Acquire(job, data, count);
@@ -129,7 +129,7 @@ namespace AntJob
 
             var ctx = new JobContext
             {
-                Job = this,
+                Handler = this,
                 Task = task,
             };
 
@@ -180,7 +180,7 @@ namespace AntJob
         /// <returns></returns>
         public Int32 Produce(String topic, String[] messages, MessageOption option = null)
         {
-            return Provider.Produce(Model?.Name, topic, messages, option);
+            return Provider.Produce(Job?.Name, topic, messages, option);
         }
 
         /// <summary>整个任务完成</summary>

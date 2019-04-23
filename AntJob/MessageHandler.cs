@@ -9,7 +9,7 @@ namespace AntJob
 {
     /// <summary>消息调度基类</summary>
     /// <typeparam name="TModel">消息模型类</typeparam>
-    public abstract class MessageJob<TModel> : Job
+    public abstract class MessageHandler<TModel> : Handler
     {
         #region 属性
         /// <summary>主题。设置后使用消费调度模式</summary>
@@ -18,11 +18,11 @@ namespace AntJob
 
         #region 构造
         /// <summary>实例化</summary>
-        public MessageJob()
+        public MessageHandler()
         {
             Mode = JobModes.Message;
 
-            var job = Model;
+            var job = Job;
             job.BatchSize = 8;
         }
         #endregion

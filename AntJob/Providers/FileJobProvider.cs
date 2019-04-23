@@ -10,8 +10,8 @@ using NewLife.Xml;
 
 namespace AntJob.Providers
 {
-    /// <summary>文件任务提供者</summary>
-    public class JobFileProvider : JobProvider
+    /// <summary>文件作业提供者</summary>
+    public class FileJobProvider : JobProvider
     {
         private JobFile _File;
 
@@ -42,8 +42,8 @@ namespace AntJob.Providers
                     var model = new JobModel();
 
                     // 获取默认设置
-                    var job = item.Value.CreateInstance() as Job;
-                    var df = job?.Model;
+                    var job = item.Value.CreateInstance() as Handler;
+                    var df = job?.Job;
                     if (df != null) model.Copy(df);
 
                     if (model.Start.Year <= 2000) model.Start = DateTime.Now.Date;
@@ -168,8 +168,8 @@ namespace AntJob.Providers
                 var set = ctx.Task;
                 var n = 0;
                 if (set.End > set.Start) n = (Int32)(set.End - set.Start).TotalSeconds;
-                var msg = $"{ctx.Job.Name} 处理{ctx.Total:n0} 行，区间（{set.Start} + {n}, {set.End:HH:mm:ss}）";
-                if (ctx.Job.Mode == JobModes.Alarm)
+                var msg = $"{ctx.Handler.Name} 处理{ctx.Total:n0} 行，区间（{set.Start} + {n}, {set.End:HH:mm:ss}）";
+                if (ctx.Handler.Mode == JobModes.Alarm)
                     msg += $"，耗时{ctx.Cost:n0}ms";
                 else
                     msg += $"，速度{ctx.Speed:n0}tps，耗时{ctx.Cost:n0}ms";
@@ -187,14 +187,14 @@ namespace AntJob.Providers
             var dic = new Dictionary<String, Type>();
 
             // 反射所有任务
-            foreach (var item in typeof(Job).GetAllSubclasses(false))
+            foreach (var item in typeof(Handler).GetAllSubclasses(false))
             {
                 if (item.IsAbstract) continue;
 
                 var name = item.GetDisplayName();
                 if (name.IsNullOrEmpty())
                 {
-                    var wrk = item.CreateInstance() as Job;
+                    var wrk = item.CreateInstance() as Handler;
                     name = wrk?.Name;
                 }
                 if (name.IsNullOrEmpty()) name = item.FullName;

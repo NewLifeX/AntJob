@@ -14,23 +14,18 @@
 
   <ItemGroup>
     <Compile Remove="Config\**" />
+    <Compile Remove="Data\**" />
     <Compile Remove="Log\**" />
     <EmbeddedResource Remove="Config\**" />
+    <EmbeddedResource Remove="Data\**" />
     <EmbeddedResource Remove="Log\**" />
     <None Remove="Config\**" />
+    <None Remove="Data\**" />
     <None Remove="Log\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Build.tt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\AntJob\Data\JobModel.cs" Link="Data\JobModel.cs" />
-    <Compile Include="..\AntJob\Data\JobModes.cs" Link="Data\JobModes.cs" />
-    <Compile Include="..\AntJob\Data\JobStatus.cs" Link="Data\JobStatus.cs" />
-    <Compile Include="..\AntJob\Data\PeerModel.cs" Link="Data\PeerModel.cs" />
-    <Compile Include="..\AntJob\Data\TaskModel.cs" Link="Data\TaskModel.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -58,7 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\" />
+    <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
 
 </Project>
