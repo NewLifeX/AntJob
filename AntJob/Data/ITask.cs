@@ -23,6 +23,9 @@ namespace AntJob.Data
         /// <summary>批大小</summary>
         Int32 BatchSize { get; set; }
 
+        /// <summary>状态</summary>
+        JobStatus Status { get; set; }
+
         /// <summary>数据</summary>
         String Data { get; set; }
 

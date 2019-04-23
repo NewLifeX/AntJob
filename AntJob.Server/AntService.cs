@@ -58,6 +58,7 @@ namespace AntJob.Server
                 if (app == null) throw new ArgumentOutOfRangeException(nameof(user));
             }
 
+            if (app == null) throw new Exception("应用不存在！");
             if (!app.Enable) throw new Exception("已禁用！");
 
             // 核对密码
@@ -89,7 +90,14 @@ namespace AntJob.Server
         {
             //  本地账号不存在时
             var name = user;
-            if (app == null) app = App.FindByName(name) ?? new App();
+            if (app == null)
+            {
+                // 是否支持自动注册
+                var set = Setting.Current;
+                if (!set.AutoRegistry) return null;
+
+                app = App.FindByName(name) ?? new App();
+            }
 
             if (app.ID == 0)
             {
@@ -104,7 +112,7 @@ namespace AntJob.Server
             app.UpdateIP = ip;
             app.UpdateTime = DateTime.Now;
 
-            app.Save();
+            //app.Save();
 
             return app;
         }
@@ -149,7 +157,7 @@ namespace AntJob.Server
         /// <param name="names"></param>
         /// <returns></returns>
         [Api(nameof(GetJobs))]
-        public JobModel[] GetJobs(String[] names)
+        public AntJob.Data.IJob[] GetJobs(String[] names)
         {
             var app = Session["App"] as App;
 
@@ -223,7 +231,7 @@ namespace AntJob.Server
         /// <param name="topic">主题</param>
         /// <returns></returns>
         [Api(nameof(Acquire))]
-        public TaskModel[] Acquire(String job, Int32 count)
+        public ITask[] Acquire(String job, Int32 count)
         {
             job = job?.Trim();
             if (job.IsNullOrEmpty()) return new TaskModel[0];
