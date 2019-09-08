@@ -7,7 +7,7 @@ namespace AntJob.Data
     {
         #region 属性
         /// <summary>编号</summary>
-        public Int32 ID { get; set; }
+        public Int64 ID { get; set; }
 
         /// <summary>开始。大于等于</summary>
         public DateTime Start { get; set; }

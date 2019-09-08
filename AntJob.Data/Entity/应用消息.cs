@@ -17,13 +17,13 @@ namespace AntJob.Data.Entity
     public partial class AppMessage : IAppMessage
     {
         #region 属性
-        private Int32 _ID;
+        private Int64 _ID;
         /// <summary>编号</summary>
         [DisplayName("编号")]
         [Description("编号")]
         [DataObjectField(true, true, false, 0)]
         [BindColumn("ID", "编号", "")]
-        public Int32 ID { get { return _ID; } set { if (OnPropertyChanging(__.ID, value)) { _ID = value; OnPropertyChanged(__.ID); } } }
+        public Int64 ID { get { return _ID; } set { if (OnPropertyChanging(__.ID, value)) { _ID = value; OnPropertyChanged(__.ID); } } }
 
         private Int32 _AppID;
         /// <summary>应用</summary>
@@ -98,7 +98,7 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case __.ID : _ID = value.ToInt(); break;
+                    case __.ID : _ID = value.ToLong(); break;
                     case __.AppID : _AppID = value.ToInt(); break;
                     case __.JobID : _JobID = value.ToInt(); break;
                     case __.Topic : _Topic = Convert.ToString(value); break;
@@ -171,7 +171,7 @@ namespace AntJob.Data.Entity
     {
         #region 属性
         /// <summary>编号</summary>
-        Int32 ID { get; set; }
+        Int64 ID { get; set; }
 
         /// <summary>应用</summary>
         Int32 AppID { get; set; }

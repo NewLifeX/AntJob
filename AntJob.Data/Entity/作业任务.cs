@@ -18,13 +18,13 @@ namespace AntJob.Data.Entity
     public partial class JobTask : IJobTask
     {
         #region 属性
-        private Int32 _ID;
+        private Int64 _ID;
         /// <summary>编号</summary>
         [DisplayName("编号")]
         [Description("编号")]
         [DataObjectField(true, true, false, 0)]
         [BindColumn("ID", "编号", "")]
-        public Int32 ID { get { return _ID; } set { if (OnPropertyChanging(__.ID, value)) { _ID = value; OnPropertyChanged(__.ID); } } }
+        public Int64 ID { get { return _ID; } set { if (OnPropertyChanging(__.ID, value)) { _ID = value; OnPropertyChanged(__.ID); } } }
 
         private Int32 _AppID;
         /// <summary>应用</summary>
@@ -42,13 +42,13 @@ namespace AntJob.Data.Entity
         [BindColumn("JobID", "作业", "")]
         public Int32 JobID { get { return _JobID; } set { if (OnPropertyChanging(__.JobID, value)) { _JobID = value; OnPropertyChanged(__.JobID); } } }
 
-        private Int32 _LinkID;
+        private Int64 _LinkID;
         /// <summary>关联任务。消息作业关联的生产任务</summary>
         [DisplayName("关联任务")]
         [Description("关联任务。消息作业关联的生产任务")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("LinkID", "关联任务。消息作业关联的生产任务", "")]
-        public Int32 LinkID { get { return _LinkID; } set { if (OnPropertyChanging(__.LinkID, value)) { _LinkID = value; OnPropertyChanged(__.LinkID); } } }
+        public Int64 LinkID { get { return _LinkID; } set { if (OnPropertyChanging(__.LinkID, value)) { _LinkID = value; OnPropertyChanged(__.LinkID); } } }
 
         private String _Client;
         /// <summary>客户端。IP加进程</summary>
@@ -270,10 +270,10 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case __.ID : _ID = value.ToInt(); break;
+                    case __.ID : _ID = value.ToLong(); break;
                     case __.AppID : _AppID = value.ToInt(); break;
                     case __.JobID : _JobID = value.ToInt(); break;
-                    case __.LinkID : _LinkID = value.ToInt(); break;
+                    case __.LinkID : _LinkID = value.ToLong(); break;
                     case __.Client : _Client = Convert.ToString(value); break;
                     case __.Start : _Start = value.ToDateTime(); break;
                     case __.End : _End = value.ToDateTime(); break;
@@ -476,7 +476,7 @@ namespace AntJob.Data.Entity
     {
         #region 属性
         /// <summary>编号</summary>
-        Int32 ID { get; set; }
+        Int64 ID { get; set; }
 
         /// <summary>应用</summary>
         Int32 AppID { get; set; }
@@ -485,7 +485,7 @@ namespace AntJob.Data.Entity
         Int32 JobID { get; set; }
 
         /// <summary>关联任务。消息作业关联的生产任务</summary>
-        Int32 LinkID { get; set; }
+        Int64 LinkID { get; set; }
 
         /// <summary>客户端。IP加进程</summary>
         String Client { get; set; }

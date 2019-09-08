@@ -43,13 +43,13 @@ namespace AntJob.Data.Entity
         [BindColumn("JobID", "作业", "")]
         public Int32 JobID { get { return _JobID; } set { if (OnPropertyChanging(__.JobID, value)) { _JobID = value; OnPropertyChanged(__.JobID); } } }
 
-        private Int32 _TaskID;
+        private Int64 _TaskID;
         /// <summary>作业项</summary>
         [DisplayName("作业项")]
         [Description("作业项")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("TaskID", "作业项", "")]
-        public Int32 TaskID { get { return _TaskID; } set { if (OnPropertyChanging(__.TaskID, value)) { _TaskID = value; OnPropertyChanged(__.TaskID); } } }
+        public Int64 TaskID { get { return _TaskID; } set { if (OnPropertyChanging(__.TaskID, value)) { _TaskID = value; OnPropertyChanged(__.TaskID); } } }
 
         private String _Client;
         /// <summary>客户端。IP加进程</summary>
@@ -193,7 +193,7 @@ namespace AntJob.Data.Entity
                     case __.ID : _ID = value.ToInt(); break;
                     case __.AppID : _AppID = value.ToInt(); break;
                     case __.JobID : _JobID = value.ToInt(); break;
-                    case __.TaskID : _TaskID = value.ToInt(); break;
+                    case __.TaskID : _TaskID = value.ToLong(); break;
                     case __.Client : _Client = Convert.ToString(value); break;
                     case __.Start : _Start = value.ToDateTime(); break;
                     case __.End : _End = value.ToDateTime(); break;
@@ -342,7 +342,7 @@ namespace AntJob.Data.Entity
         Int32 JobID { get; set; }
 
         /// <summary>作业项</summary>
-        Int32 TaskID { get; set; }
+        Int64 TaskID { get; set; }
 
         /// <summary>客户端。IP加进程</summary>
         String Client { get; set; }

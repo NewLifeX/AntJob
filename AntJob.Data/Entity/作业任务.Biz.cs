@@ -66,37 +66,12 @@ namespace AntJob.Data.Entity
         /// <summary>根据编号查找</summary>
         /// <param name="id">编号</param>
         /// <returns>实体对象</returns>
-        public static JobTask FindByID(Int32 id)
+        public static JobTask FindByID(Int64 id)
         {
             if (id <= 0) return null;
 
             // 单对象缓存
             return Meta.SingleCache[id];
-        }
-
-        /// <summary>根据编号、作业、状态查找</summary>
-        /// <param name="id">编号</param>
-        /// <param name="jobid">作业</param>
-        /// <param name="status">状态</param>
-        /// <returns>实体列表</returns>
-        public static IList<JobTask> FindAllByIDAndJobIDAndStatus(Int32 id, Int32 jobid, JobStatus status)
-        {
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ID == id && e.JobID == jobid && e.Status == status);
-
-            return FindAll(_.ID == id & _.JobID == jobid & _.Status == status);
-        }
-
-        /// <summary>根据编号、状态查找</summary>
-        /// <param name="id">编号</param>
-        /// <param name="status">状态</param>
-        /// <returns>实体列表</returns>
-        public static IList<JobTask> FindAllByIDAndStatus(Int32 id, JobStatus status)
-        {
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.ID == id && e.Status == status);
-
-            return FindAll(_.ID == id & _.Status == status);
         }
 
         public static IList<JobTask> FindAllByAppID(Int32 appid)
@@ -182,7 +157,7 @@ namespace AntJob.Data.Entity
         /// <param name="jobid"></param>
         /// <param name="maxid"></param>
         /// <returns></returns>
-        public static Int32 DeleteByID(Int32 jobid, Int32 maxid) => maxid <= 0 ? 0 : Delete(_.JobID == jobid & _.ID <= maxid);
+        public static Int32 DeleteByID(Int32 jobid, Int64 maxid) => maxid <= 0 ? 0 : Delete(_.JobID == jobid & _.ID <= maxid);
 
         public static Int32 DeleteByAppId(Int32 appid) => Delete(_.AppID == appid);
 
