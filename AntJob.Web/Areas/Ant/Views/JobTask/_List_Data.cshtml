@@ -3,7 +3,6 @@
 @using NewLife.Web;
 @using XCode;
 @using XCode.Configuration;
-@using System.Web.Mvc.Html;
 @using AntJob.Data.Entity;
 @using AntJob;
 @using AntJob.Data;
@@ -12,12 +11,12 @@
     var page = ViewBag.Page as Pager;
     var fields = ViewBag.Fields as List<FieldItem>;
     var fk = fact.Unique;
-    var enableSelect = this.EnableSelect();
+    var set = ViewBag.PageSetting as PageSetting;
 }
 <table class="table table-bordered table-hover table-striped table-condensed">
     <thead>
         <tr>
-            @if (enableSelect)
+            @if (set.EnableSelect)
             {
                 <th class="text-center" style="width:10px;"><input type="checkbox" id="chkAll" title="全选" /></th>
             }
@@ -70,7 +69,7 @@
                     break;
             }
             <tr>
-                @if (enableSelect)
+                @if (set.EnableSelect)
                 {
                     <td class="text-center"><input type="checkbox" name="keys" value="@entity[fk.Name]" /></td>
                 }
@@ -93,7 +92,7 @@
                 @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
                 {
                     <td class="text-center">
-                        @Html.Partial("_List_Data_Action", (Object)entity)
+                        @await Html.PartialAsync("_List_Data_Action", (Object)entity)
                     </td>
                 }
             </tr>

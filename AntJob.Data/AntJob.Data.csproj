@@ -16,20 +16,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-  <PropertyGroup>
-    <PackageId>NewLife.$(AssemblyName)</PackageId>
-    <Authors>$(Company)</Authors>
-    <ProjectUrl>https://github.com/NewLifeX</ProjectUrl>
-    <PackageIconUrl>http://www.NewLifeX.com/favicon.ico</PackageIconUrl>
-    <RepositoryUrl>https://github.com/NewLifeX/AntJob</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>新生命团队;X组件;NewLife;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes>重量级任务调度系统</PackageReleaseNotes>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <IncludeSource>true</IncludeSource>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <DefineConstants>$(DefineConstants);NETSTANDARD2_0;__CORE__</DefineConstants>
   </PropertyGroup>
@@ -42,37 +28,21 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Config\**" />
-    <Compile Remove="Data\**" />
-    <Compile Remove="Log\**" />
-    <EmbeddedResource Remove="Config\**" />
-    <EmbeddedResource Remove="Data\**" />
-    <EmbeddedResource Remove="Log\**" />
-    <None Remove="Config\**" />
-    <None Remove="Data\**" />
-    <None Remove="Log\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Build.tt" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="Build.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Build.log</LastGenOutput>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="NewLife.Core" Version="8.5.2020.101" />
     <PackageReference Include="NewLife.XCode" Version="9.14.2020.101" />
   </ItemGroup>
-
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="Build.log">
       <DesignTime>True</DesignTime>
@@ -80,7 +50,6 @@
       <DependentUpon>Build.tt</DependentUpon>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>

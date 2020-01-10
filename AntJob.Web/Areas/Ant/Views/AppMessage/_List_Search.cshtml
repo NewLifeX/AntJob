@@ -8,4 +8,4 @@
     <label for="status" class="control-label">应用：</label>
     @Html.ForDropDownList("appid", apps, "全部", true)
 </div>
-@Html.Partial("_DateRange")
+@await Html.PartialAsync("_DateRange")

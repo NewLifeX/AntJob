@@ -3,7 +3,7 @@
 @{
     var user = ViewBag.User as IUser ?? User.Identity as IUser;
     var fact = ViewBag.Factory as IEntityOperate;
-    var enableSelect = this.EnableSelect();
+    var set = ViewBag.PageSetting as PageSetting;
 
     var sdic = new Dictionary<String, String>();
     sdic["strFormat"] = "yyyy-MM-dd HH:mm:ss";
@@ -15,7 +15,7 @@
     edic["dname"] = "eday";
     edic["title"] = "结束";
 }
-@if (enableSelect)
+@if (set.EnableSelect)
 {
     <button type="button" class="btn btn-success btn-sm" data-action="action" data-url="@Url.Action("Set")?enable=true" data-fields="keys" disabled>
         批量启用

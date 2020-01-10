@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Web.Mvc;
 using AntJob.Data.Entity;
+using Microsoft.AspNetCore.Mvc;
 using NewLife.Cube;
 using NewLife.Web;
 using XCode.Membership;
@@ -12,6 +12,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
 {
     /// <summary>应用系统</summary>
     [DisplayName("应用系统")]
+    [Area("Ant")]
     public class AppController : EntityController<App>
     {
         static AppController()
@@ -55,7 +56,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
         /// <returns></returns>
         public ActionResult ResetApp()
         {
-            var ids = Request["keys"].SplitAsInt(",");
+            var ids = GetRequest("keys").SplitAsInt();
             if (!ids.Any()) return JsonRefresh("未选中项！");
 
             var now = DateTime.Now;
@@ -100,7 +101,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
             }
             else
             {
-                var ids = Request["keys"].SplitAsInt(",");
+                var ids = GetRequest("keys").SplitAsInt();
 
                 foreach (var item in ids)
                 {

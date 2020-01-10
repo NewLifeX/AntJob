@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using AntJob.Data.Entity;
+using Microsoft.AspNetCore.Mvc;
 using NewLife.Cube;
 using NewLife.Web;
 
@@ -9,6 +10,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
 {
     /// <summary>应用在线</summary>
     [DisplayName("应用在线")]
+    [Area("Ant")]
     public class AppOnlineController : EntityController<AppOnline>
     {
         static AppOnlineController()

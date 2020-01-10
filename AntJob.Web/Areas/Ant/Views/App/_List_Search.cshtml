@@ -7,7 +7,7 @@
 }
 <div class="form-group">
     <label for="enable" class="control-label">状态：</label>
-    @Html.ForDropDownList("enable", dic, Request["enable"], "全部", true)
+    @Html.ForDropDownList("enable", dic, page["enable"], "全部", true)
     <label for="category" class="control-label">分类：</label>
-    @Html.ForDropDownList("category", AntJob.Data.Entity.App.FindAllCategoryByCache(), Request["category"], "全部", true)
+    @Html.ForDropDownList("category", AntJob.Data.Entity.App.FindAllCategoryByCache(), page["category"], "全部", true)
 </div>

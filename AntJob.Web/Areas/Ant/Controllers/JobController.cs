@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using System.Web.Mvc;
 using AntJob.Data.Entity;
+using Microsoft.AspNetCore.Mvc;
 using NewLife.Cube;
 using NewLife.Web;
 using XCode.Membership;
@@ -12,6 +12,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
 {
     /// <summary>作业</summary>
     [DisplayName("作业")]
+    [Area("Ant")]
     public class JobController : EntityController<Job>
     {
         static JobController()
@@ -27,10 +28,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
             MenuOrder = 80;
         }
 
-        public JobController()
-        {
-            PageSetting.EnableAdd = false;
-        }
+        public JobController() => PageSetting.EnableAdd = false;
 
         /// <summary>搜索数据集</summary>
         /// <param name="p"></param>
@@ -63,7 +61,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
             }
             else
             {
-                var ids = Request["keys"].SplitAsInt(",");
+                var ids = GetRequest("keys").SplitAsInt();
 
                 foreach (var item in ids)
                 {
@@ -86,9 +84,9 @@ namespace AntJob.Web.Areas.Ant.Controllers
         [EntityAuthorize(PermissionFlags.Update)]
         public ActionResult ResetTime(Int32 days = 0)
         {
-            var ids = Request["keys"].SplitAsInt(",");
-            var st = Request["sday"].ToDateTime();
-            var et = Request["eday"].ToDateTime();
+            var ids = GetRequest("keys").SplitAsInt();
+            var st = GetRequest("sday").ToDateTime();
+            var et = GetRequest("eday").ToDateTime();
             Parallel.ForEach(ids, k =>
             {
                 var dt = Job.FindByID(k);
@@ -103,7 +101,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
         [EntityAuthorize(PermissionFlags.Update)]
         public ActionResult ResetOther()
         {
-            var ids = Request["keys"].SplitAsInt(",");
+            var ids = GetRequest("keys").SplitAsInt();
             Parallel.ForEach(ids, k =>
             {
                 var dt = Job.FindByID(k);
@@ -121,7 +119,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
         {
             if (offset < 0) offset = 15;
 
-            var ids = Request["keys"].SplitAsInt(",");
+            var ids = GetRequest("keys").SplitAsInt();
             Parallel.ForEach(ids, k =>
             {
                 var dt = Job.FindByID(k);
@@ -140,7 +138,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
         [EntityAuthorize(PermissionFlags.Update)]
         public ActionResult ClearError()
         {
-            var ids = Request["keys"].SplitAsInt(",");
+            var ids = GetRequest("keys").SplitAsInt();
             Parallel.ForEach(ids, k =>
             {
                 var dt = Job.FindByID(k);

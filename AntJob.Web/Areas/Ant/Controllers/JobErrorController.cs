@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using AntJob.Data.Entity;
+using Microsoft.AspNetCore.Mvc;
 using NewLife.Cube;
 using NewLife.Web;
 
@@ -9,6 +10,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
 {
     /// <summary>作业错误</summary>
     [DisplayName("作业错误")]
+    [Area("Ant")]
     public class JobErrorController : EntityController<JobError>
     {
         static JobErrorController() => MenuOrder = 60;

@@ -1,296 +1,32 @@
-﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>
-    </ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{A9E0597C-E818-4B33-8AC3-BE134D68B78E}</ProjectGuid>
-    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AntJob.Web</RootNamespace>
-    <AssemblyName>AntJob.Web</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <UseIISExpress>true</UseIISExpress>
-    <Use64BitIISExpress />
-    <IISExpressSSLPort />
-    <IISExpressAnonymousAuthentication />
-    <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
-    <UseGlobalApplicationHostFile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyTitle>蚂蚁调度控制台</AssemblyTitle>
+    <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累！面向1000作业以内中小企业大数据分析场景。</Description>
+    <Company>新生命开发团队</Company>
+    <Copyright>版权所有(C) 新生命开发团队 2020</Copyright>
+    <Version>1.0.2020.0110</Version>
+    <FileVersion>1.0.2020.0110</FileVersion>
+    <AssemblyVersion>1.0.*</AssemblyVersion>
+    <Deterministic>false</Deterministic>
+    <OutputPath>..\BinWeb</OutputPath>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-    </Reference>
-    <Reference Include="NewLife.Core, Version=8.5.7305.42329, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NewLife.Core.8.5.2020.101\lib\net46\NewLife.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="NewLife.Cube, Version=2.8.7253.589, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NewLife.Cube.2.8.7253.589\lib\net45\NewLife.Cube.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.6\lib\net45\System.Web.Helpers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Mvc, Version=5.2.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.6\lib\net45\System.Web.Mvc.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.6\lib\net45\System.Web.Razor.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.6\lib\net45\System.Web.WebPages.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.6\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="XCode, Version=9.14.7305.42400, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NewLife.XCode.9.14.2020.101\lib\net45\XCode.dll</HintPath>
-    </Reference>
+    <PackageReference Include="NewLife.Core" Version="8.5.2020.101" />
+    <PackageReference Include="NewLife.Cube.Core" Version="3.0.2020.101" />
+    <PackageReference Include="NewLife.XCode" Version="9.14.2020.101" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Global.asax" />
+    <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
+    <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Areas\Ant\AntAreaRegistration.cs" />
-    <Compile Include="Areas\Ant\Controllers\AppController.cs" />
-    <Compile Include="Areas\Ant\Controllers\AppOnlineController.cs" />
-    <Compile Include="Areas\Ant\Controllers\JobController.cs" />
-    <Compile Include="Areas\Ant\Controllers\JobErrorController.cs" />
-    <Compile Include="Areas\Ant\Controllers\JobTaskController.cs" />
-    <Compile Include="Areas\Ant\Controllers\AppMessageController.cs" />
-    <Compile Include="Areas\Ant\Views\AppMessage\_List_Data.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Data.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\AppMessage\_List_Search.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Search.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\AppOnline\_List_Data.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Data.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\AppOnline\_List_Search.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Search.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\App\_List_Data.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Data.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\App\_List_Search.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Search.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\App\_List_Toolbar_Batch.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Toolbar_Batch.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\JobError\_List_Data.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Data.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\JobError\_List_Search.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Search.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\JobTask\_List_Data.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Data.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\JobTask\_List_Search.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Search.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\JobTask\_List_Toolbar_Batch.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Toolbar_Batch.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\Job\_List_Data.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Data.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\Job\_List_Search.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Search.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\Ant\Views\Job\_List_Toolbar_Batch.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>_List_Toolbar_Batch.cshtml</DependentUpon>
-    </Compile>
-    <Compile Include="Global.asax.cs">
-      <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Areas\Ant\Views\AppOnline\_List_Data.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Data.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\AppOnline\_List_Search.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Search.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\App\_List_Data.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Data.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\App\_List_Search.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Search.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\App\_List_Toolbar_Batch.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Toolbar_Batch.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\JobError\_List_Data.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Data.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\JobError\_List_Search.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Search.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\JobTask\_List_Data.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Data.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\JobTask\_List_Search.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Search.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\JobTask\_List_Toolbar_Batch.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Toolbar_Batch.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\AppMessage\_List_Data.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Data.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\AppMessage\_List_Search.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Search.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\Job\_List_Data.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Data.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\Job\_List_Search.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Search.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\Job\_List_Toolbar_Batch.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>_List_Toolbar_Batch.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Areas\Ant\Views\web.config" />
-    <None Include="packages.config" />
-    <Content Include="Web.config" />
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Areas\Ant\Views\Shared\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj">
-      <Project>{01639cc1-1574-4ae1-bbc5-e0538fa5c44c}</Project>
-      <Name>AntJob.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AntJob\AntJob.csproj">
-      <Project>{717a3c5a-c4e9-4e85-bb57-916ed6fac936}</Project>
-      <Name>AntJob</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <PropertyGroup>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-  </PropertyGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
-        <WebProjectProperties>
-          <UseIIS>True</UseIIS>
-          <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>20092</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:20092/</IISUrl>
-          <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
-          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
-        </WebProjectProperties>
-      </FlavorProperties>
-    </VisualStudio>
-  </ProjectExtensions>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

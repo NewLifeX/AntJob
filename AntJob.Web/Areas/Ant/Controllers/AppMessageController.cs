@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using AntJob.Data.Entity;
+using Microsoft.AspNetCore.Mvc;
 using NewLife.Cube;
 using NewLife.Web;
 
@@ -9,6 +10,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
 {
     /// <summary>应用消息</summary>
     [DisplayName("应用消息")]
+    [Area("Ant")]
     public class AppMessageController : EntityController<AppMessage>
     {
         static AppMessageController() => MenuOrder = 49;

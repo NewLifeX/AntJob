@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Web.Mvc;
 using AntJob.Data;
 using AntJob.Data.Entity;
+using Microsoft.AspNetCore.Mvc;
 using NewLife.Cube;
 using NewLife.Web;
 using XCode.Membership;
@@ -12,6 +12,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
 {
     /// <summary>作业任务</summary>
     [DisplayName("作业任务")]
+    [Area("Ant")]
     public class JobTaskController : EntityController<JobTask>
     {
         static JobTaskController()
@@ -55,7 +56,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
             }
             else
             {
-                var ids = Request["keys"].SplitAsInt(",");
+                var ids = GetRequest("keys").SplitAsInt();
 
                 foreach (var item in ids)
                 {
