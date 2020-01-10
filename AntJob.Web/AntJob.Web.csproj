@@ -47,8 +47,8 @@
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="NewLife.Core, Version=8.4.7252.1562, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NewLife.Core.8.4.2019.1109\lib\net46\NewLife.Core.dll</HintPath>
+    <Reference Include="NewLife.Core, Version=8.5.7305.42329, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NewLife.Core.8.5.2020.101\lib\net46\NewLife.Core.dll</HintPath>
     </Reference>
     <Reference Include="NewLife.Cube, Version=2.8.7253.589, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NewLife.Cube.2.8.7253.589\lib\net45\NewLife.Cube.dll</HintPath>
@@ -82,8 +82,8 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
-    <Reference Include="XCode, Version=9.14.7252.1601, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NewLife.XCode.9.14.2019.1109\lib\net45\XCode.dll</HintPath>
+    <Reference Include="XCode, Version=9.14.7305.42400, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NewLife.XCode.9.14.2020.101\lib\net45\XCode.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
