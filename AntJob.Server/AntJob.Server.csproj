@@ -34,6 +34,16 @@
     <DefineConstants>$(DefineConstants);__WIN__</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="NewLife.Agent" Version="8.5.2020.101" />
     <PackageReference Include="NewLife.Core" Version="8.5.2020.101" />
     <PackageReference Include="NewLife.XCode" Version="9.14.2020.101" />
