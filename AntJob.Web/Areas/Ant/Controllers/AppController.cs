@@ -11,8 +11,8 @@ using XCode.Membership;
 namespace AntJob.Web.Areas.Ant.Controllers
 {
     /// <summary>应用系统</summary>
+    [AntArea]
     [DisplayName("应用系统")]
-    [Area("Ant")]
     public class AppController : EntityController<App>
     {
         static AppController()

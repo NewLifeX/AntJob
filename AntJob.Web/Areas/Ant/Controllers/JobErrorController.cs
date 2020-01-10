@@ -9,8 +9,8 @@ using NewLife.Web;
 namespace AntJob.Web.Areas.Ant.Controllers
 {
     /// <summary>作业错误</summary>
+    [AntArea]
     [DisplayName("作业错误")]
-    [Area("Ant")]
     public class JobErrorController : EntityController<JobError>
     {
         static JobErrorController() => MenuOrder = 60;

@@ -9,8 +9,8 @@ using NewLife.Web;
 namespace AntJob.Web.Areas.Ant.Controllers
 {
     /// <summary>应用在线</summary>
+    [AntArea]
     [DisplayName("应用在线")]
-    [Area("Ant")]
     public class AppOnlineController : EntityController<AppOnline>
     {
         static AppOnlineController()

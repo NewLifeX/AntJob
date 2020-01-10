@@ -11,8 +11,8 @@ using XCode.Membership;
 namespace AntJob.Web.Areas.Ant.Controllers
 {
     /// <summary>作业</summary>
+    [AntArea]
     [DisplayName("作业")]
-    [Area("Ant")]
     public class JobController : EntityController<Job>
     {
         static JobController()
