@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntJob", "AntJob\AntJob.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntJob.Data", "AntJob.Data\AntJob.Data.csproj", "{01639CC1-1574-4AE1-BBC5-E0538FA5C44C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntJob.Web", "AntJob.Web\AntJob.Web.csproj", "{A9E0597C-E818-4B33-8AC3-BE134D68B78E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntJob.Web", "AntJob.Web\AntJob.Web.csproj", "{A9E0597C-E818-4B33-8AC3-BE134D68B78E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntJob.Server", "AntJob.Server\AntJob.Server.csproj", "{6780F068-804B-45D4-8907-1CD7C6FA0F81}"
 EndProject
@@ -28,6 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntJob.Agent", "AntJob.Agent\AntJob.Agent.csproj", "{0970FDBA-2331-4600-8DD5-A37B41AF989F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{5E610811-2352-4882-ADD2-87222CCDE807}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E610811-2352-4882-ADD2-87222CCDE807}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E610811-2352-4882-ADD2-87222CCDE807}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0970FDBA-2331-4600-8DD5-A37B41AF989F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0970FDBA-2331-4600-8DD5-A37B41AF989F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0970FDBA-2331-4600-8DD5-A37B41AF989F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0970FDBA-2331-4600-8DD5-A37B41AF989F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

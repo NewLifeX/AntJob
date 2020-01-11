@@ -1,16 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net45;netcoreapp3.1</TargetFrameworks>
-    <AssemblyTitle>蚂蚁调度系统</AssemblyTitle>
-    <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累！面向1000作业以内中小企业大数据分析场景。</Description>
+    <AssemblyTitle>蚂蚁调度代理</AssemblyTitle>
+    <Description>调度中心下发C#或Sql给蚂蚁代理执行</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2020</Copyright>
-    <Version>1.0.2020.0110</Version>
-    <FileVersion>1.0.2020.0110</FileVersion>
+    <Version>1.0.2020.0111</Version>
+    <FileVersion>1.0.2020.0111</FileVersion>
     <AssemblyVersion>1.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
-    <OutputPath>..\BinServer</OutputPath>
+    <OutputPath>..\BinAgent</OutputPath>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
@@ -27,22 +28,14 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="appsettings.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="NewLife.Agent" Version="8.5.2020.101" />
-    <PackageReference Include="NewLife.Core" Version="8.5.2020.101" />
-    <PackageReference Include="NewLife.XCode" Version="9.14.2020.101" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
+    <ProjectReference Include="..\AntJob.Extensions\AntJob.Extensions.csproj" />
+    <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
+
 </Project>
