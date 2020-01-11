@@ -120,7 +120,7 @@ namespace AntJob.Data.Entity
 
         /// <summary>获取所有类别名称</summary>
         /// <returns></returns>
-        public static IDictionary<String, String> FindAllActionName() => ActionCache.FindAllName();
+        public static IDictionary<String, String> FindAllAction() => ActionCache.FindAllName();
         #endregion
 
         #region 业务

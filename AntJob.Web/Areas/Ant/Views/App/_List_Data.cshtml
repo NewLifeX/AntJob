@@ -27,6 +27,8 @@
             <th class="text-center">在线</th>
             <th class="text-center">任务</th>
             <th class="text-center">错误</th>
+            <th class="text-center">配置</th>
+            <th class="text-center">历史</th>
             <th class="text-center" style="min-width:134px;"><a href="@Html.Raw(page.GetSortUrl("UpdateTime"))">更新时间</a></th>
             @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
             {
@@ -54,6 +56,8 @@
                 <td class="text-center"><a href="@Url.Action("Index","AppOnline",new {appid=entity.ID})">在线</a></td>
                 <td class="text-center"><a href="@Url.Action("Index","JobTask",new {appid=entity.ID})">任务</a></td>
                 <td class="text-center"><a href="@Url.Action("Index","JobError",new {appid=entity.ID})">错误</a></td>
+                <td class="text-center"><a href="AppConfig?appId=@entity.ID">配置</a></td>
+                <td class="text-center"><a href="AppHistory?appId=@entity.ID">历史</a></td>
                 <td>@entity.UpdateTime.ToFullString("")</td>
                 @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
                 {

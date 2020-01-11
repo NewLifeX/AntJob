@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using NewLife.Data;
 using XCode;
+using XCode.Cache;
 using XCode.Membership;
 
 namespace AntJob.Data.Entity
@@ -154,6 +155,12 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 业务操作
+        /// <summary>类别名实体缓存，异步，缓存10分钟</summary>
+        static readonly FieldCache<AppConfig> NameCache = new FieldCache<AppConfig>(_.Name);
+
+        /// <summary>获取所有类别名称</summary>
+        /// <returns></returns>
+        public static IDictionary<String, String> FindAllName() => NameCache.FindAllName();
         #endregion
     }
 }

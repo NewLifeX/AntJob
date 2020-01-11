@@ -1,0 +1,12 @@
+﻿@using NewLife;
+@using NewLife.Web;
+@using NewLife.Cube;
+@using XCode;
+@{
+    var fact = ViewBag.Factory as IEntityOperate;
+    var page = ViewBag.Page as Pager;
+}
+<div class="form-group">
+    <label for="name" class="control-label">分类：</label>
+    @Html.ForDropDownList("name", AppConfig.FindAllName(), page["name"], "全部", true)
+</div>
