@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <AssemblyTitle>蚂蚁数据</AssemblyTitle>
-    <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累！面向1000作业以内中小企业大数据分析场景。</Description>
+    <Description>蚂蚁调度系统数据库结构</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2020</Copyright>
     <Version>1.0.2020.0110</Version>
