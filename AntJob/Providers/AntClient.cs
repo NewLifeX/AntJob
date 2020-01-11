@@ -109,14 +109,8 @@ namespace AntJob.Providers
 
         #region 核心方法
         /// <summary>获取指定名称的作业</summary>
-        /// <param name="names"></param>
         /// <returns></returns>
-        public IJob[] GetJobs(String[] names)
-        {
-            if (names == null) names = new String[0];
-
-            return Invoke<JobModel[]>(nameof(GetJobs), new { names });
-        }
+        public IJob[] GetJobs() => Invoke<JobModel[]>(nameof(GetJobs));
 
         /// <summary>批量添加作业</summary>
         /// <param name="jobs"></param>

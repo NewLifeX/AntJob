@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -238,6 +238,7 @@ namespace AntJob.Data.Entity
             return new JobModel
             {
                 Name = Name,
+                ClassName = ClassName,
                 Enable = Enable,
 
                 Start = Start,

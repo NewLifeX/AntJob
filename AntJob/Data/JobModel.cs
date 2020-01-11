@@ -11,6 +11,10 @@ namespace AntJob.Data
         [XmlAttribute]
         public String Name { get; set; }
 
+        /// <summary>类名。支持该作业的处理器实现</summary>
+        [XmlAttribute]
+        public String ClassName { get; set; }
+
         /// <summary>是否启用</summary>
         [XmlAttribute]
         public Boolean Enable { get; set; }

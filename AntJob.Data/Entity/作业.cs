@@ -40,6 +40,14 @@ namespace AntJob.Data.Entity
         [BindColumn("Name", "名称", "", Master = true)]
         public String Name { get { return _Name; } set { if (OnPropertyChanging(__.Name, value)) { _Name = value; OnPropertyChanged(__.Name); } } }
 
+        private String _ClassName;
+        /// <summary>类名。支持该作业的处理器实现</summary>
+        [DisplayName("类名")]
+        [Description("类名。支持该作业的处理器实现")]
+        [DataObjectField(false, false, true, 50)]
+        [BindColumn("ClassName", "类名。支持该作业的处理器实现", "")]
+        public String ClassName { get { return _ClassName; } set { if (OnPropertyChanging(__.ClassName, value)) { _ClassName = value; OnPropertyChanged(__.ClassName); } } }
+
         private String _DisplayName;
         /// <summary>显示名</summary>
         [DisplayName("显示名")]
@@ -326,6 +334,7 @@ namespace AntJob.Data.Entity
                     case __.ID : return _ID;
                     case __.AppID : return _AppID;
                     case __.Name : return _Name;
+                    case __.ClassName : return _ClassName;
                     case __.DisplayName : return _DisplayName;
                     case __.Mode : return _Mode;
                     case __.Topic : return _Topic;
@@ -370,6 +379,7 @@ namespace AntJob.Data.Entity
                     case __.ID : _ID = value.ToInt(); break;
                     case __.AppID : _AppID = value.ToInt(); break;
                     case __.Name : _Name = Convert.ToString(value); break;
+                    case __.ClassName : _ClassName = Convert.ToString(value); break;
                     case __.DisplayName : _DisplayName = Convert.ToString(value); break;
                     case __.Mode : _Mode = (JobModes)value.ToInt(); break;
                     case __.Topic : _Topic = Convert.ToString(value); break;
@@ -422,6 +432,9 @@ namespace AntJob.Data.Entity
 
             /// <summary>名称</summary>
             public static readonly Field Name = FindByName(__.Name);
+
+            /// <summary>类名。支持该作业的处理器实现</summary>
+            public static readonly Field ClassName = FindByName(__.ClassName);
 
             /// <summary>显示名</summary>
             public static readonly Field DisplayName = FindByName(__.DisplayName);
@@ -540,6 +553,9 @@ namespace AntJob.Data.Entity
             /// <summary>名称</summary>
             public const String Name = "Name";
 
+            /// <summary>类名。支持该作业的处理器实现</summary>
+            public const String ClassName = "ClassName";
+
             /// <summary>显示名</summary>
             public const String DisplayName = "DisplayName";
 
@@ -657,6 +673,9 @@ namespace AntJob.Data.Entity
 
         /// <summary>名称</summary>
         String Name { get; set; }
+
+        /// <summary>类名。支持该作业的处理器实现</summary>
+        String ClassName { get; set; }
 
         /// <summary>显示名</summary>
         String DisplayName { get; set; }

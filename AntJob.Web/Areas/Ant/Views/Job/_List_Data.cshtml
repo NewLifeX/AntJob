@@ -45,6 +45,7 @@
             <th class="text-center">任务</th>
             <th class="text-center">统计</th>
             <th class="text-center">错误</th>
+            <th class="text-center">克隆</th>
             @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
             {
                 <th class="text-center">操作</th>
@@ -120,6 +121,7 @@
                 <td class="text-center"><a href="JobTask?JobID=@entity.ID">任务</a></td>
                 <td class="text-center"><a href="JobStat?JobID=@entity.ID">统计</a></td>
                 <td class="text-center"><a href="JobError?JobID=@entity.ID">错误</a></td>
+                <td class="text-center">@Html.ActionLink("克隆", "Clone", "Job", new { id = entity.ID })</td>
                 @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
                 {
                     <td class="text-center">

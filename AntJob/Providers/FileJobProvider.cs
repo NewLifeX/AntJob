@@ -73,9 +73,8 @@ namespace AntJob.Providers
         }
 
         /// <summary>获取所有作业名称</summary>
-        /// <param name="names">名称列表</param>
         /// <returns></returns>
-        public override IJob[] GetJobs(String[] names)
+        public override IJob[] GetJobs()
         {
             var jf = _File = JobFile.Current;
 
@@ -84,7 +83,8 @@ namespace AntJob.Providers
             {
                 foreach (var item in jf.Jobs)
                 {
-                    if (names.Contains(item.Name)) list.Add(item);
+                    /*if (names.Contains(item.Name))*/
+                    list.Add(item);
                 }
             }
 

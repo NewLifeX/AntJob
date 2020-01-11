@@ -18,9 +18,8 @@ namespace AntJob.Providers
         void Stop();
 
         /// <summary>获取所有作业。调度器定期获取以更新作业参数</summary>
-        /// <param name="names">名称列表</param>
         /// <returns></returns>
-        IJob[] GetJobs(String[] names);
+        IJob[] GetJobs();
 
         /// <summary>申请任务</summary>
         /// <param name="job">作业</param>
@@ -60,7 +59,7 @@ namespace AntJob.Providers
 
         /// <summary>获取所有作业名称</summary>
         /// <returns></returns>
-        public abstract IJob[] GetJobs(String[] names);
+        public abstract IJob[] GetJobs();
 
         /// <summary>申请任务</summary>
         /// <param name="job">作业</param>

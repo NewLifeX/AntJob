@@ -8,6 +8,9 @@ namespace AntJob.Data
         /// <summary>名称</summary>
         String Name { get; set; }
 
+        /// <summary>类名。支持该作业的处理器实现</summary>
+        String ClassName { get; set; }
+
         /// <summary>是否启用</summary>
         Boolean Enable { get; set; }
 

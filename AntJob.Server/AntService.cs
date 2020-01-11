@@ -186,15 +186,14 @@ namespace AntJob.Server
 
         #region 业务
         /// <summary>获取指定名称的作业</summary>
-        /// <param name="names"></param>
         /// <returns></returns>
         [Api(nameof(GetJobs))]
-        public AntJob.Data.IJob[] GetJobs(String[] names)
+        public AntJob.Data.IJob[] GetJobs()
         {
             var app = Session["App"] as App;
 
             var jobs = Job.FindAllByAppID(app.ID);
-            if (names != null && names.Length > 0) jobs = jobs.Where(e => names.Contains(e.Name)).ToList();
+            //if (names != null && names.Length > 0) jobs = jobs.Where(e => names.Contains(e.Name)).ToList();
 
             return jobs.Select(e => e.ToModel()).ToArray();
         }
@@ -236,6 +235,7 @@ namespace AntJob.Server
                 if (item.Mode > 0) jb.Mode = item.Mode;
                 if (!item.DisplayName.IsNullOrEmpty()) jb.DisplayName = item.DisplayName;
                 if (!item.Description.IsNullOrEmpty()) jb.Description = item.Description;
+                if (!item.ClassName.IsNullOrEmpty()) jb.ClassName = item.ClassName;
 
                 if (jb.Mode == JobModes.Message || jb.Mode == JobModes.Alarm)
                 {

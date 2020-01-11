@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AntJob.Data;
 using AntJob.Providers;
 using NewLife;
 using NewLife.Log;
+using NewLife.Reflection;
 using NewLife.Threading;
 
 namespace AntJob
@@ -51,7 +53,7 @@ namespace AntJob
             if (prv.Schedule == null) prv.Schedule = this;
             prv.Start();
 
-            var jobs = prv.GetJobs(bs.Select(e => e.Name).ToArray());
+            var jobs = prv.GetJobs();
             if (jobs == null || jobs.Length == 0)
             {
                 XTrace.WriteLine("没有可用作业");
@@ -106,12 +108,15 @@ namespace AntJob
 
             // 查询所有处理器和被依赖的作业
             var bs = Jobs;
-            var names = bs.Select(e => e.Name).ToList();
-            names = names.Distinct().ToList();
+            //var names = bs.Select(e => e.Name).ToList();
+            //names = names.Distinct().ToList();
 
             // 拿到处理器对应的作业
-            var jobs = prv.GetJobs(names.ToArray());
+            var jobs = prv.GetJobs();
             if (jobs == null) return false;
+
+            // 运行时动态往集合里面加处理器，为了配合Sql+C#
+            CheckHandlers(prv, jobs, bs);
 
             var flag = false;
             // 遍历处理器，给空闲的增加任务
@@ -158,6 +163,40 @@ namespace AntJob
             return flag;
         }
 
+        private void CheckHandlers(IJobProvider provider, IList<IJob> jobs, IList<Handler> handlers)
+        {
+            foreach (var job in jobs)
+            {
+                var handler = handlers.FirstOrDefault(e => e.Name == job.Name);
+                if (handler == null && job.Enable && !job.ClassName.IsNullOrEmpty())
+                {
+                    XTrace.WriteLine("发现未知作业[{0}]@[{1}]", job.Name, job.ClassName);
+                    try
+                    {
+                        // 实例化一个处理器
+                        var type = Type.GetType(job.ClassName);
+                        if (type != null)
+                        {
+                            handler = type.CreateInstance() as Handler;
+                            if (handler != null)
+                            {
+                                XTrace.WriteLine("添加新作业[{0}]@[{1}]", job.Name, job.ClassName);
+
+                                handler.Name = job.Name;
+                                handler.Schedule = this;
+                                handler.Provider = provider;
+                                handler.Log = XTrace.Log;
+                                handler.Start();
+
+                                handlers.Add(handler);
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+        }
+
         /// <summary>已完成</summary>
         /// <param name="ctx"></param>
         internal protected virtual void OnFinish(JobContext ctx) => _timer?.SetNext(-1);
@@ -178,4 +217,4 @@ namespace AntJob
         }
         #endregion
     }
-} 
+}

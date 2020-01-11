@@ -72,6 +72,7 @@ namespace AntJob.Providers
                 var job = handler.Job ?? new JobModel();
 
                 job.Name = handler.Name;
+                job.ClassName = handler.GetType().FullName;
                 job.Mode = handler.Mode;
 
                 // 描述
@@ -104,9 +105,8 @@ namespace AntJob.Providers
         private IJob[] _jobs;
         private DateTime _NextGetJobs;
         /// <summary>获取所有作业名称</summary>
-        /// <param name="names">名称列表</param>
         /// <returns></returns>
-        public override IJob[] GetJobs(String[] names)
+        public override IJob[] GetJobs()
         {
             // 周期性获取，避免请求过快
             var now = TimerX.Now;
@@ -114,7 +114,7 @@ namespace AntJob.Providers
             {
                 _NextGetJobs = now.AddSeconds(5);
 
-                _jobs = Ant.GetJobs(names);
+                _jobs = Ant.GetJobs();
             }
 
             return _jobs;
