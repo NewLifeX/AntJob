@@ -110,7 +110,7 @@ namespace AntJob
             var prv = Provider;
             var job = Job;
 
-            // 循环申请任务，喂饱工作者
+            // 循环申请任务，喂饱处理器
             return prv.Acquire(job, data, count);
         }
         #endregion

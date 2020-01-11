@@ -200,7 +200,7 @@ namespace AntJob.Providers
                 if (name.IsNullOrEmpty()) name = item.FullName;
 
                 if (dic.TryGetValue(name, out var type))
-                    XTrace.WriteLine("工作者[{0}]重复出现，Type1={1}，Type2={2}", name, type.FullName, item.FullName);
+                    XTrace.WriteLine("处理器[{0}]重复出现，Type1={1}，Type2={2}", name, type.FullName, item.FullName);
                 else
                     dic[name] = item;
             }

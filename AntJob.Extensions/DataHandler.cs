@@ -27,7 +27,7 @@ namespace AntJob
         #endregion
 
         #region 构造
-        /// <summary>实例化数据库工作者</summary>
+        /// <summary>实例化数据库处理器</summary>
         public DataHandler()
         {
             //SupportPage = true;

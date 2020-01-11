@@ -12,7 +12,7 @@ namespace AntJob
     public class Scheduler : DisposeBase
     {
         #region 属性
-        /// <summary>调试开关。打开内部工作者日志</summary>
+        /// <summary>调试开关。打开内部处理器日志</summary>
         public Boolean Debug { get; set; }
 
         /// <summary>作业集合</summary>
@@ -37,11 +37,11 @@ namespace AntJob
         /// <summary>开始</summary>
         public void Start()
         {
-            // 如果没有指定工作者，则全局扫描
+            // 如果没有指定处理器，则全局扫描
             var bs = Jobs.ToList();
             if (bs.Count == 0)
             {
-                XTrace.WriteLine("没有可用工作者");
+                XTrace.WriteLine("没有可用处理器");
                 return;
             }
 
@@ -64,21 +64,21 @@ namespace AntJob
             XTrace.WriteLine(msg);
 
             // 设置日志
-            foreach (var wrk in bs)
+            foreach (var handler in bs)
             {
-                wrk.Schedule = this;
-                wrk.Provider = prv;
+                handler.Schedule = this;
+                handler.Provider = prv;
 
-                var job = wrk.Job = jobs.FirstOrDefault(e => e.Name == wrk.Name);
-                if (job != null && job.Mode == 0) job.Mode = wrk.Mode;
+                var job = handler.Job = jobs.FirstOrDefault(e => e.Name == handler.Name);
+                if (job != null && job.Mode == 0) job.Mode = handler.Mode;
 
-                wrk.Log = XTrace.Log;
-                wrk.Start();
+                handler.Log = XTrace.Log;
+                handler.Start();
             }
 
-            // 全部启动后再加入集合
-            Jobs.Clear();
-            Jobs.AddRange(bs);
+            //// 全部启动后再加入集合
+            //Jobs.Clear();
+            //Jobs.AddRange(bs);
 
             // 定时执行
             if (Period > 0) _timer = new TimerX(Loop, null, 100, Period * 1000, "Job") { Async = true };
@@ -92,9 +92,9 @@ namespace AntJob
 
             Provider?.Stop();
 
-            foreach (var wrk in Jobs)
+            foreach (var handler in Jobs)
             {
-                wrk.Stop();
+                handler.Stop();
             }
         }
 
@@ -109,17 +109,17 @@ namespace AntJob
                 ["pid"] = System.Diagnostics.Process.GetCurrentProcess().Id
             };
 
-            // 查询所有工作者和被依赖的作业
+            // 查询所有处理器和被依赖的作业
             var ws = Jobs;
             var names = ws.Select(e => e.Name).ToList();
             names = names.Distinct().ToList();
 
-            // 拿到工作者对应的作业
+            // 拿到处理器对应的作业
             var jobs = prv.GetJobs(names.ToArray());
             if (jobs == null) return false;
 
             var flag = false;
-            // 遍历工作者，给空闲的增加任务
+            // 遍历处理器，给空闲的增加任务
             foreach (var wrk in ws)
             {
                 var job = jobs.FirstOrDefault(e => e.Name == wrk.Name);
@@ -134,7 +134,7 @@ namespace AntJob
                 wrk.Schedule = this;
                 wrk.Provider = prv;
 
-                // 更新作业参数，并启动工作者
+                // 更新作业参数，并启动处理器
                 wrk.Job = job;
                 if (job.Mode == 0) job.Mode = wrk.Mode;
                 if (!wrk.Active) wrk.Start();
@@ -142,11 +142,11 @@ namespace AntJob
                 // 如果正在处理任务数没达到最大并行度，则继续安排任务
                 if (wrk.Busy < job.MaxTask)
                 {
-                    // 循环申请任务，喂饱工作者
+                    // 循环申请任务，喂饱处理器
                     var count = job.MaxTask - wrk.Busy;
                     var ts = wrk.Acquire(extend, count);
 
-                    // 送给工作者处理
+                    // 送给处理器处理
                     for (var i = 0; i < count && ts != null && i < ts.Length; i++)
                     {
                         // 准备就绪，增加Busy，避免超额分配
