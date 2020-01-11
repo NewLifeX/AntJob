@@ -43,7 +43,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Program.cs" />
-    <Compile Remove="Setting.cs" />
     <Compile Remove="StarService.cs" />
   </ItemGroup>
   <ItemGroup>
