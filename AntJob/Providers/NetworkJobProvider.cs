@@ -63,23 +63,23 @@ namespace AntJob.Providers
             Ant.TryDispose();
             Ant = ant;
 
-            var ws = Schedule?.Jobs;
+            var bs = Schedule?.Jobs;
 
             //var jobs = GetJobs(ws.Select(e => e.Name).ToArray());
             var list = new List<IJob>();
-            foreach (var wrk in ws)
+            foreach (var handler in bs)
             {
-                var job = wrk.Job ?? new JobModel();
+                var job = handler.Job ?? new JobModel();
 
-                job.Name = wrk.Name;
-                job.Mode = wrk.Mode;
+                job.Name = handler.Name;
+                job.Mode = handler.Mode;
 
                 // 描述
                 if (job is JobModel job2)
                 {
-                    var dis = wrk.GetType().GetDisplayName();
+                    var dis = handler.GetType().GetDisplayName();
                     if (!dis.IsNullOrEmpty()) job2.DisplayName = dis;
-                    var des = wrk.GetType().GetDescription();
+                    var des = handler.GetType().GetDescription();
                     if (!des.IsNullOrEmpty()) job2.Description = des;
                 }
 

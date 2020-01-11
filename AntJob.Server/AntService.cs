@@ -284,6 +284,8 @@ namespace AntJob.Server
             if (jb == null) throw new XException($"应用[{app.ID}/{app.Name}]下未找到作业[{job}]");
             if (jb.Step == 0 || jb.Start.Year <= 2000) throw new XException("作业[{0}/{1}]未设置开始时间或步进", jb.ID, jb.Name);
 
+            var online = GetOnline(app, Session as INetSession);
+
             var list = new List<JobTask>();
 
             // 每分钟检查一下错误任务和中断任务
@@ -293,8 +295,8 @@ namespace AntJob.Server
             if (list.Count < count)
             {
                 var ps = ControllerContext.Current.Parameters;
-                var server = ps["server"] + "";
-                var pid = ps["pid"].ToInt();
+                var server = online.Name;
+                var pid = online.ProcessId;
                 var topic = ps["topic"] + "";
                 var ip = (Session as INetSession).Remote.Host;
 
@@ -305,6 +307,8 @@ namespace AntJob.Server
                         break;
                     case JobModes.Data:
                     case JobModes.Alarm:
+                    case JobModes.CSharp:
+                    case JobModes.Sql:
                     default:
                         {
                             // 如果能够切片，则查询数据库后进入，避免缓存导致重复
@@ -320,7 +324,6 @@ namespace AntJob.Server
             }
 
             // 记录状态
-            var online = GetOnline(app, Session as INetSession);
             online.Tasks += list.Count;
             online.SaveAsync();
 
@@ -664,6 +667,7 @@ namespace AntJob.Server
             var online = GetOnline(app, ns);
             online.Client = $"{(ip.IsNullOrEmpty() ? machine : ip)}@{pid}";
             online.Name = machine;
+            online.ProcessId = pid;
             online.UpdateIP = ip;
             //online.Version = version;
 

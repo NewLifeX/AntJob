@@ -58,6 +58,14 @@ namespace AntJob.Data.Entity
         [BindColumn("Name", "名称。机器名称", "", Master = true)]
         public String Name { get { return _Name; } set { if (OnPropertyChanging(__.Name, value)) { _Name = value; OnPropertyChanged(__.Name); } } }
 
+        private Int32 _ProcessId;
+        /// <summary>进程。进程Id</summary>
+        [DisplayName("进程")]
+        [Description("进程。进程Id")]
+        [DataObjectField(false, false, false, 0)]
+        [BindColumn("ProcessId", "进程。进程Id", "")]
+        public Int32 ProcessId { get { return _ProcessId; } set { if (OnPropertyChanging(__.ProcessId, value)) { _ProcessId = value; OnPropertyChanged(__.ProcessId); } } }
+
         private String _Version;
         /// <summary>版本。客户端</summary>
         [DisplayName("版本")]
@@ -186,6 +194,7 @@ namespace AntJob.Data.Entity
                     case __.Instance : return _Instance;
                     case __.Client : return _Client;
                     case __.Name : return _Name;
+                    case __.ProcessId : return _ProcessId;
                     case __.Version : return _Version;
                     case __.CompileTime : return _CompileTime;
                     case __.Server : return _Server;
@@ -212,6 +221,7 @@ namespace AntJob.Data.Entity
                     case __.Instance : _Instance = Convert.ToString(value); break;
                     case __.Client : _Client = Convert.ToString(value); break;
                     case __.Name : _Name = Convert.ToString(value); break;
+                    case __.ProcessId : _ProcessId = value.ToInt(); break;
                     case __.Version : _Version = Convert.ToString(value); break;
                     case __.CompileTime : _CompileTime = value.ToDateTime(); break;
                     case __.Server : _Server = Convert.ToString(value); break;
@@ -250,6 +260,9 @@ namespace AntJob.Data.Entity
 
             /// <summary>名称。机器名称</summary>
             public static readonly Field Name = FindByName(__.Name);
+
+            /// <summary>进程。进程Id</summary>
+            public static readonly Field ProcessId = FindByName(__.ProcessId);
 
             /// <summary>版本。客户端</summary>
             public static readonly Field Version = FindByName(__.Version);
@@ -314,6 +327,9 @@ namespace AntJob.Data.Entity
             /// <summary>名称。机器名称</summary>
             public const String Name = "Name";
 
+            /// <summary>进程。进程Id</summary>
+            public const String ProcessId = "ProcessId";
+
             /// <summary>版本。客户端</summary>
             public const String Version = "Version";
 
@@ -377,6 +393,9 @@ namespace AntJob.Data.Entity
 
         /// <summary>名称。机器名称</summary>
         String Name { get; set; }
+
+        /// <summary>进程。进程Id</summary>
+        Int32 ProcessId { get; set; }
 
         /// <summary>版本。客户端</summary>
         String Version { get; set; }

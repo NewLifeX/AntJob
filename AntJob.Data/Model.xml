@@ -33,6 +33,7 @@
       <Column Name="Instance" DataType="String" Description="实例。IP加端口" />
       <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
       <Column Name="Name" DataType="String" Master="True" Description="名称。机器名称" />
+      <Column Name="ProcessId" DataType="Int32" Description="进程。进程Id" />
       <Column Name="Version" DataType="String" Description="版本。客户端" />
       <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
       <Column Name="Server" DataType="String" Description="服务端。客户端登录到哪个服务端，IP加端口" />

@@ -103,15 +103,10 @@ namespace AntJob
         public Boolean Process()
         {
             var prv = Provider;
-            var extend = new Dictionary<String, Object>
-            {
-                ["server"] = Environment.MachineName,
-                ["pid"] = System.Diagnostics.Process.GetCurrentProcess().Id
-            };
 
             // 查询所有处理器和被依赖的作业
-            var ws = Jobs;
-            var names = ws.Select(e => e.Name).ToList();
+            var bs = Jobs;
+            var names = bs.Select(e => e.Name).ToList();
             names = names.Distinct().ToList();
 
             // 拿到处理器对应的作业
@@ -120,40 +115,40 @@ namespace AntJob
 
             var flag = false;
             // 遍历处理器，给空闲的增加任务
-            foreach (var wrk in ws)
+            foreach (var handler in bs)
             {
-                var job = jobs.FirstOrDefault(e => e.Name == wrk.Name);
+                var job = jobs.FirstOrDefault(e => e.Name == handler.Name);
                 // 找不到或者已停用
                 if (job == null || !job.Enable)
                 {
-                    if (wrk.Active) wrk.Stop();
+                    if (handler.Active) handler.Stop();
                     continue;
                 }
 
                 // 可能外部添加的Worker并不完整
-                wrk.Schedule = this;
-                wrk.Provider = prv;
+                handler.Schedule = this;
+                handler.Provider = prv;
 
                 // 更新作业参数，并启动处理器
-                wrk.Job = job;
-                if (job.Mode == 0) job.Mode = wrk.Mode;
-                if (!wrk.Active) wrk.Start();
+                handler.Job = job;
+                if (job.Mode == 0) job.Mode = handler.Mode;
+                if (!handler.Active) handler.Start();
 
                 // 如果正在处理任务数没达到最大并行度，则继续安排任务
-                if (wrk.Busy < job.MaxTask)
+                if (handler.Busy < job.MaxTask)
                 {
                     // 循环申请任务，喂饱处理器
-                    var count = job.MaxTask - wrk.Busy;
-                    var ts = wrk.Acquire(extend, count);
+                    var count = job.MaxTask - handler.Busy;
+                    var ts = handler.Acquire(null, count);
 
                     // 送给处理器处理
                     for (var i = 0; i < count && ts != null && i < ts.Length; i++)
                     {
                         // 准备就绪，增加Busy，避免超额分配
-                        wrk.Prepare(ts[i]);
+                        handler.Prepare(ts[i]);
 
                         // 使用线程池调度，避免Task排队影响使用
-                        ThreadPoolX.QueueUserWorkItem(wrk.Process, ts[i]);
+                        ThreadPoolX.QueueUserWorkItem(handler.Process, ts[i]);
                     }
 
                     if (ts != null && ts.Length > 0) flag = true;
