@@ -66,6 +66,14 @@ namespace AntJob.Data.Entity
         [BindColumn("Version", "版本。客户端", "")]
         public String Version { get { return _Version; } set { if (OnPropertyChanging(__.Version, value)) { _Version = value; OnPropertyChanged(__.Version); } } }
 
+        private DateTime _CompileTime;
+        /// <summary>编译时间</summary>
+        [DisplayName("编译时间")]
+        [Description("编译时间")]
+        [DataObjectField(false, false, true, 0)]
+        [BindColumn("CompileTime", "编译时间", "")]
+        public DateTime CompileTime { get { return _CompileTime; } set { if (OnPropertyChanging(__.CompileTime, value)) { _CompileTime = value; OnPropertyChanged(__.CompileTime); } } }
+
         private String _Server;
         /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
         [DisplayName("服务端")]
@@ -179,6 +187,7 @@ namespace AntJob.Data.Entity
                     case __.Client : return _Client;
                     case __.Name : return _Name;
                     case __.Version : return _Version;
+                    case __.CompileTime : return _CompileTime;
                     case __.Server : return _Server;
                     case __.Tasks : return _Tasks;
                     case __.Total : return _Total;
@@ -204,6 +213,7 @@ namespace AntJob.Data.Entity
                     case __.Client : _Client = Convert.ToString(value); break;
                     case __.Name : _Name = Convert.ToString(value); break;
                     case __.Version : _Version = Convert.ToString(value); break;
+                    case __.CompileTime : _CompileTime = value.ToDateTime(); break;
                     case __.Server : _Server = Convert.ToString(value); break;
                     case __.Tasks : _Tasks = value.ToInt(); break;
                     case __.Total : _Total = value.ToLong(); break;
@@ -243,6 +253,9 @@ namespace AntJob.Data.Entity
 
             /// <summary>版本。客户端</summary>
             public static readonly Field Version = FindByName(__.Version);
+
+            /// <summary>编译时间</summary>
+            public static readonly Field CompileTime = FindByName(__.CompileTime);
 
             /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
             public static readonly Field Server = FindByName(__.Server);
@@ -304,6 +317,9 @@ namespace AntJob.Data.Entity
             /// <summary>版本。客户端</summary>
             public const String Version = "Version";
 
+            /// <summary>编译时间</summary>
+            public const String CompileTime = "CompileTime";
+
             /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
             public const String Server = "Server";
 
@@ -364,6 +380,9 @@ namespace AntJob.Data.Entity
 
         /// <summary>版本。客户端</summary>
         String Version { get; set; }
+
+        /// <summary>编译时间</summary>
+        DateTime CompileTime { get; set; }
 
         /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
         String Server { get; set; }

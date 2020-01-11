@@ -64,6 +64,14 @@ namespace AntJob.Data.Entity
         [BindColumn("Version", "版本", "")]
         public String Version { get { return _Version; } set { if (OnPropertyChanging(__.Version, value)) { _Version = value; OnPropertyChanged(__.Version); } } }
 
+        private DateTime _CompileTime;
+        /// <summary>编译时间</summary>
+        [DisplayName("编译时间")]
+        [Description("编译时间")]
+        [DataObjectField(false, false, true, 0)]
+        [BindColumn("CompileTime", "编译时间", "")]
+        public DateTime CompileTime { get { return _CompileTime; } set { if (OnPropertyChanging(__.CompileTime, value)) { _CompileTime = value; OnPropertyChanged(__.CompileTime); } } }
+
         private Boolean _Enable;
         /// <summary>启用</summary>
         [DisplayName("启用")]
@@ -177,6 +185,7 @@ namespace AntJob.Data.Entity
                     case __.Secret : return _Secret;
                     case __.Category : return _Category;
                     case __.Version : return _Version;
+                    case __.CompileTime : return _CompileTime;
                     case __.Enable : return _Enable;
                     case __.JobCount : return _JobCount;
                     case __.MessageCount : return _MessageCount;
@@ -202,6 +211,7 @@ namespace AntJob.Data.Entity
                     case __.Secret : _Secret = Convert.ToString(value); break;
                     case __.Category : _Category = Convert.ToString(value); break;
                     case __.Version : _Version = Convert.ToString(value); break;
+                    case __.CompileTime : _CompileTime = value.ToDateTime(); break;
                     case __.Enable : _Enable = value.ToBoolean(); break;
                     case __.JobCount : _JobCount = value.ToInt(); break;
                     case __.MessageCount : _MessageCount = value.ToInt(); break;
@@ -241,6 +251,9 @@ namespace AntJob.Data.Entity
 
             /// <summary>版本</summary>
             public static readonly Field Version = FindByName(__.Version);
+
+            /// <summary>编译时间</summary>
+            public static readonly Field CompileTime = FindByName(__.CompileTime);
 
             /// <summary>启用</summary>
             public static readonly Field Enable = FindByName(__.Enable);
@@ -302,6 +315,9 @@ namespace AntJob.Data.Entity
             /// <summary>版本</summary>
             public const String Version = "Version";
 
+            /// <summary>编译时间</summary>
+            public const String CompileTime = "CompileTime";
+
             /// <summary>启用</summary>
             public const String Enable = "Enable";
 
@@ -362,6 +378,9 @@ namespace AntJob.Data.Entity
 
         /// <summary>版本</summary>
         String Version { get; set; }
+
+        /// <summary>编译时间</summary>
+        DateTime CompileTime { get; set; }
 
         /// <summary>启用</summary>
         Boolean Enable { get; set; }

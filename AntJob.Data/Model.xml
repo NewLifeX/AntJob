@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Tables Version="9.14.7183.41843" Output="Entity" NameSpace="AntJob.Data.Entity" ConnName="Ant" BaseClass="EntityBase">
+<Tables Version="9.14.7315.27316" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="http://www.newlifex.com http://www.newlifex.com/Model2020.xsd" Output="Entity" NameSpace="AntJob.Data.Entity" ConnName="Ant" BaseClass="EntityBase" ChineseFileName="True" IgnoreNameCase="True" xmlns="http://www.newlifex.com/Model2020.xsd">
   <Table Name="App" Description="应用系统。数据作业隶属于某个应用">
     <Columns>
       <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
@@ -8,6 +8,7 @@
       <Column Name="Secret" DataType="String" Description="密钥" />
       <Column Name="Category" DataType="String" Description="类别" />
       <Column Name="Version" DataType="String" Description="版本" />
+      <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
       <Column Name="Enable" DataType="Boolean" Description="启用" />
       <Column Name="JobCount" DataType="Int32" Description="作业数" />
       <Column Name="MessageCount" DataType="Int32" Description="消息数" />
@@ -33,6 +34,7 @@
       <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
       <Column Name="Name" DataType="String" Master="True" Description="名称。机器名称" />
       <Column Name="Version" DataType="String" Description="版本。客户端" />
+      <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
       <Column Name="Server" DataType="String" Description="服务端。客户端登录到哪个服务端，IP加端口" />
       <Column Name="Tasks" DataType="Int32" Description="任务数" />
       <Column Name="Total" DataType="Int64" Description="总数" />
@@ -50,6 +52,43 @@
       <Index Columns="Instance" Unique="True" />
       <Index Columns="Client" />
       <Index Columns="AppID" />
+    </Indexes>
+  </Table>
+  <Table Name="AppHistory" TableName="devicehistory" Description="应用历史。应用的操作历史">
+    <Columns>
+      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="AppID" DataType="Int32" Description="应用" />
+      <Column Name="Name" DataType="String" Master="True" Description="名称" />
+      <Column Name="Action" DataType="String" Description="操作" />
+      <Column Name="Success" DataType="Boolean" Description="成功" />
+      <Column Name="Version" DataType="String" Description="版本" />
+      <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
+      <Column Name="Creator" DataType="String" Description="创建者。服务端节点" />
+      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+      <Column Name="CreateIP" DataType="String" Description="创建地址" />
+      <Column Name="Remark" ColumnName="Content" DataType="String" Length="2000" Description="内容" />
+    </Columns>
+    <Indexes>
+      <Index Columns="AppID,Action" />
+      <Index Columns="CreateTime" />
+    </Indexes>
+  </Table>
+  <Table Name="AppConfig" Description="应用配置。各应用的配置数据">
+    <Columns>
+      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="AppID" DataType="Int32" Description="设备编号" />
+      <Column Name="Name" DataType="String" Master="True" Description="名称" />
+      <Column Name="Content" DataType="String" Length="5000" Description="内容。一般是json格式" />
+      <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
+      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+      <Column Name="CreateIP" DataType="String" Description="创建地址" />
+      <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
+      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+    </Columns>
+    <Indexes>
+      <Index Columns="AppID,Name" Unique="True" />
+      <Index Columns="UpdateTime" />
     </Indexes>
   </Table>
   <Table Name="Job" Description="作业">

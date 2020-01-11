@@ -28,6 +28,11 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="DLL\**" />
+    <EmbeddedResource Remove="DLL\**" />
+    <None Remove="DLL\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Build.tt" />
   </ItemGroup>
   <ItemGroup>
