@@ -63,7 +63,7 @@
       <Column Name="Success" DataType="Boolean" Description="成功" />
       <Column Name="Version" DataType="String" Description="版本" />
       <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
-      <Column Name="Creator" DataType="String" Description="创建者。服务端节点" />
+      <Column Name="Server" DataType="String" Description="服务端。客户端登录到哪个服务端，IP加端口" />
       <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
       <Column Name="CreateIP" DataType="String" Description="创建地址" />
       <Column Name="Remark" ColumnName="Content" DataType="String" Length="2000" Description="内容" />

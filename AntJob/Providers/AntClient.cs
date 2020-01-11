@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AntJob.Data;
+using NewLife;
 using NewLife.Log;
 using NewLife.Net;
 using NewLife.Reflection;
@@ -79,6 +80,7 @@ namespace AntJob.Providers
                 machine = Environment.MachineName,
                 processid = Process.GetCurrentProcess().Id,
                 version = asmx?.Version,
+                asmx?.Compile,
             };
 
             var rs = await base.InvokeWithClientAsync<Object>(client, "Login", arg);

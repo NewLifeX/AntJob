@@ -73,13 +73,13 @@ namespace AntJob.Data.Entity
         [BindColumn("CompileTime", "编译时间", "")]
         public DateTime CompileTime { get { return _CompileTime; } set { if (OnPropertyChanging(__.CompileTime, value)) { _CompileTime = value; OnPropertyChanged(__.CompileTime); } } }
 
-        private String _Creator;
-        /// <summary>创建者。服务端节点</summary>
-        [DisplayName("创建者")]
-        [Description("创建者。服务端节点")]
+        private String _Server;
+        /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
+        [DisplayName("服务端")]
+        [Description("服务端。客户端登录到哪个服务端，IP加端口")]
         [DataObjectField(false, false, true, 50)]
-        [BindColumn("Creator", "创建者。服务端节点", "")]
-        public String Creator { get { return _Creator; } set { if (OnPropertyChanging(__.Creator, value)) { _Creator = value; OnPropertyChanged(__.Creator); } } }
+        [BindColumn("Server", "服务端。客户端登录到哪个服务端，IP加端口", "")]
+        public String Server { get { return _Server; } set { if (OnPropertyChanging(__.Server, value)) { _Server = value; OnPropertyChanged(__.Server); } } }
 
         private DateTime _CreateTime;
         /// <summary>创建时间</summary>
@@ -123,7 +123,7 @@ namespace AntJob.Data.Entity
                     case __.Success : return _Success;
                     case __.Version : return _Version;
                     case __.CompileTime : return _CompileTime;
-                    case __.Creator : return _Creator;
+                    case __.Server : return _Server;
                     case __.CreateTime : return _CreateTime;
                     case __.CreateIP : return _CreateIP;
                     case __.Remark : return _Remark;
@@ -141,7 +141,7 @@ namespace AntJob.Data.Entity
                     case __.Success : _Success = value.ToBoolean(); break;
                     case __.Version : _Version = Convert.ToString(value); break;
                     case __.CompileTime : _CompileTime = value.ToDateTime(); break;
-                    case __.Creator : _Creator = Convert.ToString(value); break;
+                    case __.Server : _Server = Convert.ToString(value); break;
                     case __.CreateTime : _CreateTime = value.ToDateTime(); break;
                     case __.CreateIP : _CreateIP = Convert.ToString(value); break;
                     case __.Remark : _Remark = Convert.ToString(value); break;
@@ -176,8 +176,8 @@ namespace AntJob.Data.Entity
             /// <summary>编译时间</summary>
             public static readonly Field CompileTime = FindByName(__.CompileTime);
 
-            /// <summary>创建者。服务端节点</summary>
-            public static readonly Field Creator = FindByName(__.Creator);
+            /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
+            public static readonly Field Server = FindByName(__.Server);
 
             /// <summary>创建时间</summary>
             public static readonly Field CreateTime = FindByName(__.CreateTime);
@@ -215,8 +215,8 @@ namespace AntJob.Data.Entity
             /// <summary>编译时间</summary>
             public const String CompileTime = "CompileTime";
 
-            /// <summary>创建者。服务端节点</summary>
-            public const String Creator = "Creator";
+            /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
+            public const String Server = "Server";
 
             /// <summary>创建时间</summary>
             public const String CreateTime = "CreateTime";
@@ -255,8 +255,8 @@ namespace AntJob.Data.Entity
         /// <summary>编译时间</summary>
         DateTime CompileTime { get; set; }
 
-        /// <summary>创建者。服务端节点</summary>
-        String Creator { get; set; }
+        /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
+        String Server { get; set; }
 
         /// <summary>创建时间</summary>
         DateTime CreateTime { get; set; }

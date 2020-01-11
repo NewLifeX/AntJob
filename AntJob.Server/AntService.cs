@@ -28,7 +28,7 @@ namespace AntJob.Server
         public IApiSession Session { get; set; }
 
         /// <summary>
-        /// 传入应用名和密钥登陆，
+        /// 传入应用名和密钥登录，
         /// 返回应用名和应用显示名
         /// </summary>
         /// <param name="user">应用名</param>
@@ -44,6 +44,7 @@ namespace AntJob.Server
             var machine = ps["machine"] + "";
             var pid = ps["processid"].ToInt();
             var ver = ps["version"] + "";
+            var compile = ps["Compile"].ToDateTime();
 
             var ns = Session as INetSession;
             var ip = ns.Remote.Host;
@@ -70,14 +71,20 @@ namespace AntJob.Server
 
             // 版本和编译时间
             if (app.Version.IsNullOrEmpty() || app.Version.CompareTo(ver) < 0) app.Version = ver;
+            if (app.CompileTime < compile) app.CompileTime = compile;
 
             app.Save();
 
             // 应用上线
-            CreateOnline(app, ns, machine, pid, ver);
+            var online = CreateOnline(app, ns, machine, pid);
+            online.Version = ver;
+            online.CompileTime = compile;
+            online.Save();
 
             // 记录当前用户
             Session["App"] = app;
+
+            WriteHistory("登录", true, $"[{user}/{pass}]登录[{app}]成功");
 
             return new
             {
@@ -625,7 +632,7 @@ namespace AntJob.Server
             return olts.Select(e => e.ToModel()).ToArray();
         }
 
-        AppOnline CreateOnline(IApp app, INetSession ns, String machine, Int32 pid, String version)
+        AppOnline CreateOnline(IApp app, INetSession ns, String machine, Int32 pid)
         {
             var ip = ns.Remote.Host;
 
@@ -633,10 +640,10 @@ namespace AntJob.Server
             online.Client = $"{(ip.IsNullOrEmpty() ? machine : ip)}@{pid}";
             online.Name = machine;
             online.UpdateIP = ip;
-            online.Version = version;
+            //online.Version = version;
 
             online.Server = Local + "";
-            online.Save();
+            //online.Save();
 
             // 真正的用户
             Session["AppOnline"] = online;
@@ -670,6 +677,17 @@ namespace AntJob.Server
             online.Speed = ji.Speed;
             online.LastKey = ji.Key;
             online.SaveAsync();
+        }
+        #endregion
+
+        #region 写历史
+        void WriteHistory(String action, Boolean success, String remark)
+        {
+            var app = Session["App"] as App;
+            var ns = Session as INetSession;
+            var ip = ns.Remote.Host;
+
+            AppHistory.Create(app, action, success, remark, Local + "", ip);
         }
         #endregion
 
