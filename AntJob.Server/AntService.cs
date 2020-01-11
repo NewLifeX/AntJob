@@ -9,6 +9,7 @@ using NewLife.Data;
 using NewLife.Log;
 using NewLife.Net;
 using NewLife.Remoting;
+using NewLife.Security;
 using NewLife.Serialization;
 using NewLife.Threading;
 using XCode;
@@ -63,7 +64,9 @@ namespace AntJob.Server
             if (!app.Enable) throw new Exception("已禁用！");
 
             // 核对密码
-            if (!app.Secret.IsNullOrEmpty())
+            if (app.Secret.IsNullOrEmpty())
+                app.Secret = Rand.NextString(16);
+            else
             {
                 var pass2 = app.Secret.MD5();
                 if (pass != pass2) throw new Exception("密码错误！");
@@ -72,6 +75,8 @@ namespace AntJob.Server
             // 版本和编译时间
             if (app.Version.IsNullOrEmpty() || app.Version.CompareTo(ver) < 0) app.Version = ver;
             if (app.CompileTime < compile) app.CompileTime = compile;
+
+            var autoReg = app.ID == 0;
 
             app.Save();
 
@@ -84,13 +89,21 @@ namespace AntJob.Server
             // 记录当前用户
             Session["App"] = app;
 
-            WriteHistory("登录", true, $"[{user}/{pass}]登录[{app}]成功");
+            WriteHistory("登录", true, $"[{user}/{pass}]在[{machine}@{pid}]登录[{app}]成功");
 
-            return new
-            {
-                app.Name,
-                app.DisplayName,
-            };
+            if (autoReg)
+                return new
+                {
+                    app.Name,
+                    app.Secret,
+                    app.DisplayName,
+                };
+            else
+                return new
+                {
+                    app.Name,
+                    app.DisplayName,
+                };
         }
 
         protected virtual App CheckApp(App app, String user, String pass, String ip)
@@ -154,6 +167,8 @@ namespace AntJob.Server
                         XTrace.Log.Error(ex.Message);
                     else
                         XTrace.WriteException(ex);
+
+                    WriteHistory(filterContext.ActionName, false, ex.GetMessage());
                 }
             }
         }

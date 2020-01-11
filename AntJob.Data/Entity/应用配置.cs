@@ -26,11 +26,11 @@ namespace AntJob.Data.Entity
         public Int32 ID { get { return _ID; } set { if (OnPropertyChanging(__.ID, value)) { _ID = value; OnPropertyChanged(__.ID); } } }
 
         private Int32 _AppID;
-        /// <summary>设备编号</summary>
-        [DisplayName("设备编号")]
-        [Description("设备编号")]
+        /// <summary>应用</summary>
+        [DisplayName("应用")]
+        [Description("应用")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("AppID", "设备编号", "")]
+        [BindColumn("AppID", "应用", "")]
         public Int32 AppID { get { return _AppID; } set { if (OnPropertyChanging(__.AppID, value)) { _AppID = value; OnPropertyChanged(__.AppID); } } }
 
         private String _Name;
@@ -148,7 +148,7 @@ namespace AntJob.Data.Entity
             /// <summary>编号</summary>
             public static readonly Field ID = FindByName(__.ID);
 
-            /// <summary>设备编号</summary>
+            /// <summary>应用</summary>
             public static readonly Field AppID = FindByName(__.AppID);
 
             /// <summary>名称</summary>
@@ -184,7 +184,7 @@ namespace AntJob.Data.Entity
             /// <summary>编号</summary>
             public const String ID = "ID";
 
-            /// <summary>设备编号</summary>
+            /// <summary>应用</summary>
             public const String AppID = "AppID";
 
             /// <summary>名称</summary>
@@ -221,7 +221,7 @@ namespace AntJob.Data.Entity
         /// <summary>编号</summary>
         Int32 ID { get; set; }
 
-        /// <summary>设备编号</summary>
+        /// <summary>应用</summary>
         Int32 AppID { get; set; }
 
         /// <summary>名称</summary>

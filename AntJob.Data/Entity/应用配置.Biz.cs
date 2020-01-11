@@ -1,25 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using System.Xml.Serialization;
-using NewLife;
 using NewLife.Data;
-using NewLife.Log;
-using NewLife.Model;
-using NewLife.Reflection;
-using NewLife.Threading;
-using NewLife.Web;
 using XCode;
-using XCode.Cache;
-using XCode.Configuration;
-using XCode.DataAccessLayer;
 using XCode.Membership;
 
 namespace AntJob.Data.Entity
@@ -108,14 +93,14 @@ namespace AntJob.Data.Entity
         /// <summary>设备编号</summary>
         [XmlIgnore, IgnoreDataMember]
         //[ScriptIgnore]
-        public App App { get { return Extends.Get(nameof(App), k => App.FindByID(AppID)); } }
+        public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
 
         /// <summary>设备编号</summary>
         [XmlIgnore, IgnoreDataMember]
         //[ScriptIgnore]
         [DisplayName("设备编号")]
         [Map(__.AppID, typeof(App), "ID")]
-        public String AppName { get { return App?.Name; } }
+        public String AppName => App?.Name;
         #endregion
 
         #region 扩展查询
@@ -149,6 +134,23 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 高级查询
+        /// <summary>高级查询</summary>
+        /// <param name="appid"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="key"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static IEnumerable<AppConfig> Search(Int32 appid, DateTime start, DateTime end, String key, PageParameter p)
+        {
+            var exp = new WhereExpression();
+
+            if (appid > 0) exp &= _.AppID == appid.ToInt();
+            if (!key.IsNullOrEmpty()) exp &= _.Name.Contains(key);
+            exp &= _.CreateTime.Between(start, end);
+
+            return FindAll(exp, p);
+        }
         #endregion
 
         #region 业务操作

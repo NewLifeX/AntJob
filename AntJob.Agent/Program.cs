@@ -4,8 +4,6 @@ using AntJob.Handlers;
 using AntJob.Providers;
 using NewLife;
 using NewLife.Agent;
-using NewLife.Remoting;
-using NewLife.Threading;
 
 namespace AntJob.Agent
 {
