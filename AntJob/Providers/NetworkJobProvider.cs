@@ -13,6 +13,9 @@ namespace AntJob.Providers
     public class NetworkJobProvider : JobProvider
     {
         #region 属性
+        /// <summary>调试，打开编码日志</summary>
+        public Boolean Debug { get; set; }
+
         /// <summary>调度中心地址</summary>
         public String Server { get; set; }
 
@@ -53,6 +56,7 @@ namespace AntJob.Providers
                 UserName = AppID,
                 Password = Secret
             };
+            if (Debug) ant.EncoderLog = XTrace.Log;
             ant.Open();
 
             // 断开前一个连接

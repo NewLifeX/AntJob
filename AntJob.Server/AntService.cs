@@ -42,6 +42,7 @@ namespace AntJob.Server
             //if (pass.IsNullOrEmpty()) throw new ArgumentNullException(nameof(pass));
 
             var ps = ControllerContext.Current.Parameters;
+            var dname = ps["DisplayName"] + "";
             var machine = ps["machine"] + "";
             var pid = ps["processid"].ToInt();
             var ver = ps["version"] + "";
@@ -76,6 +77,7 @@ namespace AntJob.Server
             // 版本和编译时间
             if (app.Version.IsNullOrEmpty() || app.Version.CompareTo(ver) < 0) app.Version = ver;
             if (app.CompileTime < compile) app.CompileTime = compile;
+            if (app.DisplayName.IsNullOrEmpty()) app.DisplayName = dname;
 
             app.Save();
 

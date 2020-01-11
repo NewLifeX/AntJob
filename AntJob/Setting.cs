@@ -10,9 +10,9 @@ namespace AntJob
     public class Setting : XmlConfig<Setting>
     {
         #region 属性
-        /// <summary>调试开关。默认true</summary>
-        [Description("调试开关。默认true")]
-        public Boolean Debug { get; set; } = true;
+        /// <summary>调试开关。默认false</summary>
+        [Description("调试开关。默认false")]
+        public Boolean Debug { get; set; }
 
         /// <summary>调度中心。逗号分隔多地址，主备架构</summary>
         [Description("调度中心。逗号分隔多地址，主备架构")]

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using AntJob.Data;
 using NewLife.Log;
@@ -71,11 +73,16 @@ namespace AntJob.Providers
             if (Logined && !force) return null;
 
             var asmx = AssemblyX.Entry;
+            var title = asmx?.Asm.GetCustomAttribute<AssemblyTitleAttribute>();
+            var dis = asmx?.Asm.GetCustomAttribute<DisplayNameAttribute>();
+            var des = asmx?.Asm.GetCustomAttribute<DescriptionAttribute>();
+            var dname = title?.Title ?? dis?.DisplayName ?? des?.Description;
 
             var arg = new
             {
                 user = UserName,
                 pass = Password.IsNullOrEmpty() ? null : Password.MD5(),
+                DisplayName = dname,
                 machine = Environment.MachineName,
                 processid = Process.GetCurrentProcess().Id,
                 version = asmx?.Version,
