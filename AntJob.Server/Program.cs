@@ -20,7 +20,7 @@ namespace AntJob.Server
     {
         public MyService()
         {
-            ServiceName = "AntJob";
+            ServiceName = "AntServer";
 
             ThreadPoolX.QueueUserWorkItem(() =>
             {

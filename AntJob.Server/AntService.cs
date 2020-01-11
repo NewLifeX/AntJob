@@ -672,7 +672,11 @@ namespace AntJob.Server
             Session["AppOnline"] = online;
 
             // 下线
-            ns.OnDisposed += (s, e) => online.Delete();
+            ns.OnDisposed += (s, e) =>
+            {
+                online.Delete();
+                WriteHistory("下线", true, $"[{online.Name}]登录于{online.CreateTime}，最后活跃于{online.UpdateTime}");
+            };
 
             return online;
         }

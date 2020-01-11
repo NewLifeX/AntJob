@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <AssemblyName>AntAgent</AssemblyName>
     <TargetFrameworks>net45;netcoreapp3.1</TargetFrameworks>
-    <AssemblyTitle>蚂蚁调度代理</AssemblyTitle>
+    <AssemblyTitle>蚂蚁代理</AssemblyTitle>
     <Description>调度中心下发C#或Sql给蚂蚁代理执行</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2020</Copyright>
