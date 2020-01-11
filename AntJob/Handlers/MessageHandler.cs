@@ -5,7 +5,7 @@ using System.Linq;
 using AntJob.Data;
 using NewLife.Serialization;
 
-namespace AntJob
+namespace AntJob.Handlers
 {
     /// <summary>消息调度基类</summary>
     /// <typeparam name="TModel">消息模型类</typeparam>

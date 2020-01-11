@@ -116,12 +116,9 @@ namespace AntJob
         #endregion
 
         #region 整体调度
-        internal void Prepare(ITask task)
-        {
-            Interlocked.Increment(ref _Busy);
-        }
+        internal void Prepare(ITask task) => Interlocked.Increment(ref _Busy);
 
-        /// <summary>异步处理一项新任务</summary>
+        /// <summary>处理一项新任务</summary>
         /// <param name="task"></param>
         public void Process(ITask task)
         {
@@ -178,17 +175,11 @@ namespace AntJob
         /// <param name="messages">消息集合</param>
         /// <param name="option">消息选项</param>
         /// <returns></returns>
-        public Int32 Produce(String topic, String[] messages, MessageOption option = null)
-        {
-            return Provider.Produce(Job?.Name, topic, messages, option);
-        }
+        public Int32 Produce(String topic, String[] messages, MessageOption option = null) => Provider.Produce(Job?.Name, topic, messages, option);
 
         /// <summary>整个任务完成</summary>
         /// <param name="ctx"></param>
-        protected virtual void OnFinish(JobContext ctx)
-        {
-            Provider?.Finish(ctx);
-        }
+        protected virtual void OnFinish(JobContext ctx) => Provider?.Finish(ctx);
         #endregion
 
         #region 日志
