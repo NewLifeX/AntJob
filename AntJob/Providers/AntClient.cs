@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using AntJob.Data;
-using NewLife;
 using NewLife.Log;
 using NewLife.Net;
 using NewLife.Reflection;
@@ -76,19 +75,28 @@ namespace AntJob.Providers
             var arg = new
             {
                 user = UserName,
-                pass = Password.MD5(),
+                pass = Password.IsNullOrEmpty() ? null : Password.MD5(),
                 machine = Environment.MachineName,
                 processid = Process.GetCurrentProcess().Id,
                 version = asmx?.Version,
                 asmx?.Compile,
             };
 
-            var rs = await base.InvokeWithClientAsync<Object>(client, "Login", arg);
-            if (Setting.Current.Debug) XTrace.WriteLine("登录{0}成功！{1}", client, rs.ToJson());
+            var rs = await base.InvokeWithClientAsync<IDictionary<String, Object>>(client, "Login", arg);
+
+            var set = Setting.Current;
+            if (set.Debug) XTrace.WriteLine("登录{0}成功！{1}", client, rs.ToJson());
+
+            // 保存下发密钥
+            if (rs.TryGetValue("Secret", out var secret))
+            {
+                set.Secret = secret + "";
+                set.SaveAsync();
+            }
 
             Logined = true;
 
-            return Info = rs as IDictionary<String, Object>;
+            return Info = rs;
         }
         #endregion
 

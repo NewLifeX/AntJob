@@ -39,7 +39,7 @@ namespace AntJob.Server
         public Object Login(String user, String pass)
         {
             if (user.IsNullOrEmpty()) throw new ArgumentNullException(nameof(user));
-            if (pass.IsNullOrEmpty()) throw new ArgumentNullException(nameof(pass));
+            //if (pass.IsNullOrEmpty()) throw new ArgumentNullException(nameof(pass));
 
             var ps = ControllerContext.Current.Parameters;
             var machine = ps["machine"] + "";
@@ -53,20 +53,21 @@ namespace AntJob.Server
             WriteLog("[{0}]从[{1}]登录[{2}@{3}]", user, ns.Remote, machine, pid);
 
             // 找应用
+            var autoReg = false;
             var app = App.FindByName(user);
-            if (app == null || app.Secret.IsNullOrEmpty())
+            if (app == null || app.Secret.MD5() != pass)
             {
                 app = CheckApp(app, user, pass, ip);
                 if (app == null) throw new ArgumentOutOfRangeException(nameof(user));
+
+                autoReg = true;
             }
 
-            if (app == null) throw new Exception("应用不存在！");
+            if (app == null) throw new Exception($"应用[{user}]不存在！");
             if (!app.Enable) throw new Exception("已禁用！");
 
             // 核对密码
-            if (app.Secret.IsNullOrEmpty())
-                app.Secret = Rand.NextString(16);
-            else
+            if (!autoReg && !app.Secret.IsNullOrEmpty())
             {
                 var pass2 = app.Secret.MD5();
                 if (pass != pass2) throw new Exception("密码错误！");
@@ -75,8 +76,6 @@ namespace AntJob.Server
             // 版本和编译时间
             if (app.Version.IsNullOrEmpty() || app.Version.CompareTo(ver) < 0) app.Version = ver;
             if (app.CompileTime < compile) app.CompileTime = compile;
-
-            var autoReg = app.ID == 0;
 
             app.Save();
 
@@ -89,7 +88,7 @@ namespace AntJob.Server
             // 记录当前用户
             Session["App"] = app;
 
-            WriteHistory("登录", true, $"[{user}/{pass}]在[{machine}@{pid}]登录[{app}]成功");
+            WriteHistory(autoReg ? "注册" : "登录", true, $"[{user}/{pass}]在[{machine}@{pid}]登录[{app}]成功");
 
             if (autoReg)
                 return new
@@ -114,9 +113,18 @@ namespace AntJob.Server
             {
                 // 是否支持自动注册
                 var set = Setting.Current;
-                if (!set.AutoRegistry) return null;
+                if (!set.AutoRegistry) throw new Exception($"找不到应用[{name}]");
 
-                app = App.FindByName(name) ?? new App();
+                app = new App();
+                app.Secret = Rand.NextString(16);
+            }
+            else if (app.Secret.MD5() != pass)
+            {
+                // 是否支持自动注册
+                var set = Setting.Current;
+                if (!set.AutoRegistry) throw new Exception($"应用[{name}]申请重新激活，但服务器设置禁止自动注册");
+
+                if (app.Secret.IsNullOrEmpty()) app.Secret = Rand.NextString(16);
             }
 
             if (app.ID == 0)
