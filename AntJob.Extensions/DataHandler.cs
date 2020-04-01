@@ -11,7 +11,7 @@ namespace AntJob
     {
         #region 属性
         /// <summary>实体工厂</summary>
-        public IEntityOperate Factory { get; set; }
+        public IEntityFactory Factory { get; set; }
 
         /// <summary>附加条件</summary>
         public String Where { get; set; }

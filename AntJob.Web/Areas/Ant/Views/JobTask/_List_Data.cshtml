@@ -7,7 +7,7 @@
 @using AntJob;
 @using AntJob.Data;
 @{
-    var fact = ViewBag.Factory as IEntityOperate;
+    var fact = ViewBag.Factory as IEntityFactory;
     var page = ViewBag.Page as Pager;
     var fields = ViewBag.Fields as List<FieldItem>;
     var fk = fact.Unique;
