@@ -13,7 +13,7 @@ namespace AntJob.Agent
     }
 
     /// <summary>服务类。名字可以自定义</summary>
-    class MyService : AgentServiceBase<MyService>
+    class MyService : ServiceBase
     {
         public MyService()
         {

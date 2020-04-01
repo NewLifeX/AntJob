@@ -16,7 +16,7 @@ namespace AntJob.Server
     }
 
     /// <summary>服务类。名字可以自定义</summary>
-    class MyService : AgentServiceBase<MyService>
+    class MyService : ServiceBase
     {
         public MyService()
         {
@@ -26,13 +26,21 @@ namespace AntJob.Server
             {
                 var n = App.Meta.Count;
 
+                var set = NewLife.Setting.Current;
+                if (set.IsNew)
+                {
+                    set.DataPath = @"..\Data";
+
+                    set.Save();
+                }
+
                 var set2 = XCode.Setting.Current;
                 if (set2.IsNew)
                 {
                     set2.Debug = true;
                     set2.ShowSQL = false;
                     set2.TraceSQLTime = 3000;
-                    set2.SQLiteDbPath = @"..\Data";
+                    //set2.SQLiteDbPath = @"..\Data";
 
                     set2.Save();
                 }

@@ -187,7 +187,7 @@ namespace AntJob.Providers
             var dic = new Dictionary<String, Type>();
 
             // 反射所有任务
-            foreach (var item in typeof(Handler).GetAllSubclasses(false))
+            foreach (var item in typeof(Handler).GetAllSubclasses())
             {
                 if (item.IsAbstract) continue;
 
