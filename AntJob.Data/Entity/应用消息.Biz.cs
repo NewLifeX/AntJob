@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -60,7 +60,7 @@ namespace AntJob.Data.Entity
         /// <summary>
         /// 查询当前应用的消息数
         /// </summary>
-        /// <param name="jobid"></param>
+        /// <param name="appid"></param>
         /// <returns></returns>
         public static Int32 FindCountByAppID(Int32 appid)
         {
@@ -85,8 +85,12 @@ namespace AntJob.Data.Entity
 
         #region 高级查询
         /// <summary>高级查询</summary>
-        /// <param name="model">模型</param>
-        /// <param name="page">分页</param>
+        /// <param name="appid"></param>
+        /// <param name="jobid"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="key"></param>
+        /// <param name="p"></param>
         /// <returns></returns>
         public static IEnumerable<AppMessage> Search(Int32 appid, Int32 jobid, DateTime start, DateTime end, String key, PageParameter p)
         {
@@ -102,14 +106,15 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 业务操作
-        /// <summary>根据应用、主题、以及总数</summary>
+        /// <summary>根据应用、主题、以及时间查找一定数量消息</summary>
         /// <param name="appid"></param>
         /// <param name="topic"></param>
+        /// <param name="endTime"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public static IList<AppMessage> GetTopic(Int32 appid, String topic, DateTime time, Int32 count)
+        public static IList<AppMessage> GetTopic(Int32 appid, String topic, DateTime endTime, Int32 count)
         {
-            return FindAll(_.AppID == appid & _.Topic == topic & _.UpdateTime <= time, _.UpdateTime.Asc(), null, 0, count);
+            return FindAll(_.AppID == appid & _.Topic == topic & _.UpdateTime <= endTime, _.UpdateTime.Asc(), null, 0, count);
         }
 
         /// <summary>去重过滤</summary>

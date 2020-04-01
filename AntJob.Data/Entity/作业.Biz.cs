@@ -70,6 +70,8 @@ namespace AntJob.Data.Entity
             return 3600;
         }
 
+        /// <summary>删除</summary>
+        /// <returns></returns>
         protected override Int32 OnDelete()
         {
             var rs = base.OnDelete();
@@ -126,6 +128,9 @@ namespace AntJob.Data.Entity
             return Find(_.AppID == appid & _.Name == name);
         }
 
+        /// <summary>根据应用查询</summary>
+        /// <param name="appid"></param>
+        /// <returns></returns>
         public static IList<Job> FindAllByAppID(Int32 appid)
         {
             if (appid == 0) return new List<Job>();
@@ -162,9 +167,12 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 高级查询
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <summary>高级查询</summary>
+        /// <param name="id"></param>
+        /// <param name="appid"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="mode"></param>
         /// <param name="key"></param>
         /// <param name="p"></param>
         /// <returns></returns>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using NewLife.Data;
@@ -72,6 +72,12 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 高级查询
+        /// <summary>高级查询</summary>
+        /// <param name="category"></param>
+        /// <param name="enable"></param>
+        /// <param name="key"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public static IEnumerable<App> Search(String category, Boolean? enable, String key, PageParameter p)
         {
             var exp = new WhereExpression();

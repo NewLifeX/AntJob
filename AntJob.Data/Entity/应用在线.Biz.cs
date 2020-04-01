@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
@@ -73,6 +73,15 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 高级查询
+        /// <summary>
+        /// 高级查询
+        /// </summary>
+        /// <param name="appid"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="key"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public static IEnumerable<AppOnline> Search(Int32 appid, DateTime start, DateTime end, String key, PageParameter p)
         {
             var exp = new WhereExpression();
@@ -98,6 +107,10 @@ namespace AntJob.Data.Entity
             return FindAll(exp);
         }
 
+        /// <summary>根据应用查询</summary>
+        /// <param name="appid"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public static IList<AppOnline> SearchByAppID(Int32 appid, PageParameter p)
         {
             // 实体缓存

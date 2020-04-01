@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -74,6 +74,11 @@ namespace AntJob.Data.Entity
             return Meta.SingleCache[id];
         }
 
+        /// <summary>
+        /// 根据应用查询
+        /// </summary>
+        /// <param name="appid"></param>
+        /// <returns></returns>
         public static IList<JobTask> FindAllByAppID(Int32 appid)
         {
             if (appid == 0) return new List<JobTask>();
@@ -81,13 +86,11 @@ namespace AntJob.Data.Entity
             return FindAll(_.AppID == appid);
         }
 
-        public static IList<JobTask> FindAllByJobId(Int32 jobid)
-        {
-            if (jobid == 0) return new List<JobTask>();
-
-            return FindAll(_.JobID == jobid);
-        }
-
+        /// <summary>
+        /// 根据任务查询个数
+        /// </summary>
+        /// <param name="jobid"></param>
+        /// <returns></returns>
         public static Int32 FindCountByJobId(Int32 jobid) => (Int32)FindCount(_.JobID == jobid);
 
         /// <summary>查找作业下小于指定创建时间的最后一个任务</summary>
@@ -101,6 +104,17 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 高级查询
+        /// <summary>高级查询</summary>
+        /// <param name="id"></param>
+        /// <param name="appid"></param>
+        /// <param name="jobid"></param>
+        /// <param name="status"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="client"></param>
+        /// <param name="key"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public static IEnumerable<JobTask> Search(Int32 id, Int32 appid, Int32 jobid, JobStatus status, DateTime start, DateTime end, String client, String key, PageParameter p)
         {
             var exp = new WhereExpression();
@@ -159,7 +173,7 @@ namespace AntJob.Data.Entity
         /// <returns></returns>
         public static Int32 DeleteByID(Int32 jobid, Int64 maxid) => maxid <= 0 ? 0 : Delete(_.JobID == jobid & _.ID <= maxid);
 
-        public static Int32 DeleteByAppId(Int32 appid) => Delete(_.AppID == appid);
+        //public static Int32 DeleteByAppId(Int32 appid) => Delete(_.AppID == appid);
 
         /// <summary>转模型类</summary>
         /// <returns></returns>

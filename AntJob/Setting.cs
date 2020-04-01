@@ -1,13 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Reflection;
-using NewLife.Xml;
+using NewLife.Configuration;
 
 namespace AntJob
 {
     /// <summary>蚂蚁配置。主要用于网络型调度系统</summary>
-    [XmlConfigFile("Config/Ant.config", 15000)]
-    public class Setting : XmlConfig<Setting>
+    [Config("Ant")]
+    public class Setting : Config<Setting>
     {
         #region 属性
         /// <summary>调试开关。默认false</summary>

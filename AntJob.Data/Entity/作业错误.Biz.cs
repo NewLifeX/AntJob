@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
@@ -70,6 +70,17 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 高级查询
+        /// <summary>
+        /// 高级查询
+        /// </summary>
+        /// <param name="appid"></param>
+        /// <param name="jobid"></param>
+        /// <param name="client"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="key"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public static IEnumerable<JobError> Search(Int32 appid, Int32 jobid, String client, DateTime start, DateTime end, String key, PageParameter p)
         {
             var exp = new WhereExpression();
@@ -83,22 +94,27 @@ namespace AntJob.Data.Entity
             return FindAll(exp, p);
         }
 
-        public static IList<JobError> SearchByAppID(Int32 appid, PageParameter p)
-        {
-            if (appid == 0) return new List<JobError>();
+        //public static IList<JobError> SearchByAppID(Int32 appid, PageParameter p)
+        //{
+        //    if (appid == 0) return new List<JobError>();
 
-            return FindAll(_.AppID == appid, p);
-        }
+        //    return FindAll(_.AppID == appid, p);
+        //}
 
-        public static IList<JobError> FindAllByJobId(Int32 jobid)
-        {
-            if (jobid == 0) return new List<JobError>();
+        //public static IList<JobError> FindAllByJobId(Int32 jobid)
+        //{
+        //    if (jobid == 0) return new List<JobError>();
 
-            return FindAll(_.JobID == jobid);
-        }
+        //    return FindAll(_.JobID == jobid);
+        //}
         #endregion
 
         #region 业务操作
+        /// <summary>
+        /// 根据应用删除错误信息
+        /// </summary>
+        /// <param name="appid"></param>
+        /// <returns></returns>
         public static Int32 DeleteByAppId(Int32 appid) => Delete(_.AppID == appid);
         #endregion
     }
