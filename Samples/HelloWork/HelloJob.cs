@@ -3,12 +3,12 @@ using AntJob;
 
 namespace HelloWork
 {
-    internal class HelloJob : Job
+    internal class HelloJob : Handler
     {
         public HelloJob()
         {
             // 今天零点开始，每5分钟一次
-            var job = Model;
+            var job = Job;
             job.Start = DateTime.Today;
             job.Step = 5 * 60;
         }
