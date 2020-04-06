@@ -42,14 +42,6 @@ namespace AntJob.Data.Entity
         [BindColumn("JobID", "作业", "")]
         public Int32 JobID { get { return _JobID; } set { if (OnPropertyChanging(__.JobID, value)) { _JobID = value; OnPropertyChanged(__.JobID); } } }
 
-        private Int64 _LinkID;
-        /// <summary>关联任务。消息作业关联的生产任务</summary>
-        [DisplayName("关联任务")]
-        [Description("关联任务。消息作业关联的生产任务")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("LinkID", "关联任务。消息作业关联的生产任务", "")]
-        public Int64 LinkID { get { return _LinkID; } set { if (OnPropertyChanging(__.LinkID, value)) { _LinkID = value; OnPropertyChanged(__.LinkID); } } }
-
         private String _Client;
         /// <summary>客户端。IP加进程</summary>
         [DisplayName("客户端")]
@@ -74,14 +66,6 @@ namespace AntJob.Data.Entity
         [BindColumn("End", "结束。小于，不等于", "")]
         public DateTime End { get { return _End; } set { if (OnPropertyChanging(__.End, value)) { _End = value; OnPropertyChanged(__.End); } } }
 
-        private Int32 _Step;
-        /// <summary>步进。最大区间大小，秒</summary>
-        [DisplayName("步进")]
-        [Description("步进。最大区间大小，秒")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("Step", "步进。最大区间大小，秒", "")]
-        public Int32 Step { get { return _Step; } set { if (OnPropertyChanging(__.Step, value)) { _Step = value; OnPropertyChanged(__.Step); } } }
-
         private Int32 _BatchSize;
         /// <summary>批大小</summary>
         [DisplayName("批大小")]
@@ -89,14 +73,6 @@ namespace AntJob.Data.Entity
         [DataObjectField(false, false, false, 0)]
         [BindColumn("BatchSize", "批大小", "")]
         public Int32 BatchSize { get { return _BatchSize; } set { if (OnPropertyChanging(__.BatchSize, value)) { _BatchSize = value; OnPropertyChanged(__.BatchSize); } } }
-
-        private Int32 _Offset;
-        /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
-        [DisplayName("偏移")]
-        [Description("偏移。距离实时时间的秒数，部分业务不能跑到实时，秒")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("Offset", "偏移。距离实时时间的秒数，部分业务不能跑到实时，秒", "")]
-        public Int32 Offset { get { return _Offset; } set { if (OnPropertyChanging(__.Offset, value)) { _Offset = value; OnPropertyChanged(__.Offset); } } }
 
         private Int32 _Total;
         /// <summary>总数</summary>
@@ -240,13 +216,10 @@ namespace AntJob.Data.Entity
                     case __.ID : return _ID;
                     case __.AppID : return _AppID;
                     case __.JobID : return _JobID;
-                    case __.LinkID : return _LinkID;
                     case __.Client : return _Client;
                     case __.Start : return _Start;
                     case __.End : return _End;
-                    case __.Step : return _Step;
                     case __.BatchSize : return _BatchSize;
-                    case __.Offset : return _Offset;
                     case __.Total : return _Total;
                     case __.Success : return _Success;
                     case __.Error : return _Error;
@@ -273,13 +246,10 @@ namespace AntJob.Data.Entity
                     case __.ID : _ID = value.ToLong(); break;
                     case __.AppID : _AppID = value.ToInt(); break;
                     case __.JobID : _JobID = value.ToInt(); break;
-                    case __.LinkID : _LinkID = value.ToLong(); break;
                     case __.Client : _Client = Convert.ToString(value); break;
                     case __.Start : _Start = value.ToDateTime(); break;
                     case __.End : _End = value.ToDateTime(); break;
-                    case __.Step : _Step = value.ToInt(); break;
                     case __.BatchSize : _BatchSize = value.ToInt(); break;
-                    case __.Offset : _Offset = value.ToInt(); break;
                     case __.Total : _Total = value.ToInt(); break;
                     case __.Success : _Success = value.ToInt(); break;
                     case __.Error : _Error = value.ToInt(); break;
@@ -315,9 +285,6 @@ namespace AntJob.Data.Entity
             /// <summary>作业</summary>
             public static readonly Field JobID = FindByName(__.JobID);
 
-            /// <summary>关联任务。消息作业关联的生产任务</summary>
-            public static readonly Field LinkID = FindByName(__.LinkID);
-
             /// <summary>客户端。IP加进程</summary>
             public static readonly Field Client = FindByName(__.Client);
 
@@ -327,14 +294,8 @@ namespace AntJob.Data.Entity
             /// <summary>结束。小于，不等于</summary>
             public static readonly Field End = FindByName(__.End);
 
-            /// <summary>步进。最大区间大小，秒</summary>
-            public static readonly Field Step = FindByName(__.Step);
-
             /// <summary>批大小</summary>
             public static readonly Field BatchSize = FindByName(__.BatchSize);
-
-            /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
-            public static readonly Field Offset = FindByName(__.Offset);
 
             /// <summary>总数</summary>
             public static readonly Field Total = FindByName(__.Total);
@@ -399,9 +360,6 @@ namespace AntJob.Data.Entity
             /// <summary>作业</summary>
             public const String JobID = "JobID";
 
-            /// <summary>关联任务。消息作业关联的生产任务</summary>
-            public const String LinkID = "LinkID";
-
             /// <summary>客户端。IP加进程</summary>
             public const String Client = "Client";
 
@@ -411,14 +369,8 @@ namespace AntJob.Data.Entity
             /// <summary>结束。小于，不等于</summary>
             public const String End = "End";
 
-            /// <summary>步进。最大区间大小，秒</summary>
-            public const String Step = "Step";
-
             /// <summary>批大小</summary>
             public const String BatchSize = "BatchSize";
-
-            /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
-            public const String Offset = "Offset";
 
             /// <summary>总数</summary>
             public const String Total = "Total";
@@ -484,9 +436,6 @@ namespace AntJob.Data.Entity
         /// <summary>作业</summary>
         Int32 JobID { get; set; }
 
-        /// <summary>关联任务。消息作业关联的生产任务</summary>
-        Int64 LinkID { get; set; }
-
         /// <summary>客户端。IP加进程</summary>
         String Client { get; set; }
 
@@ -496,14 +445,8 @@ namespace AntJob.Data.Entity
         /// <summary>结束。小于，不等于</summary>
         DateTime End { get; set; }
 
-        /// <summary>步进。最大区间大小，秒</summary>
-        Int32 Step { get; set; }
-
         /// <summary>批大小</summary>
         Int32 BatchSize { get; set; }
-
-        /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
-        Int32 Offset { get; set; }
 
         /// <summary>总数</summary>
         Int32 Total { get; set; }

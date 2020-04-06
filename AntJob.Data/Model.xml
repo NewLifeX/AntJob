@@ -139,13 +139,10 @@
       <Column Name="ID" DataType="Int64" Identity="True" PrimaryKey="True" Description="编号" />
       <Column Name="AppID" DataType="Int32" Description="应用" />
       <Column Name="JobID" DataType="Int32" Description="作业" />
-      <Column Name="LinkID" DataType="Int64" Description="关联任务。消息作业关联的生产任务" />
       <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
       <Column Name="Start" DataType="DateTime" Description="开始。大于等于" />
       <Column Name="End" DataType="DateTime" Description="结束。小于，不等于" />
-      <Column Name="Step" DataType="Int32" Description="步进。最大区间大小，秒" />
       <Column Name="BatchSize" DataType="Int32" Description="批大小" />
-      <Column Name="Offset" DataType="Int32" Description="偏移。距离实时时间的秒数，部分业务不能跑到实时，秒" />
       <Column Name="Total" DataType="Int32" Description="总数" />
       <Column Name="Success" DataType="Int32" Description="成功" />
       <Column Name="Error" DataType="Int32" Description="错误" />
@@ -178,7 +175,6 @@
       <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
       <Column Name="Start" DataType="DateTime" Description="开始。大于等于" />
       <Column Name="End" DataType="DateTime" Description="结束。小于，不等于" />
-      <Column Name="Step" DataType="Int32" Description="步进。最大区间大小，秒" />
       <Column Name="BatchSize" DataType="Int32" Description="批大小" />
       <Column Name="Key" DataType="String" Description="数据键" />
       <Column Name="Data" DataType="String" Length="2000" Description="数据" />

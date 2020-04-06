@@ -75,14 +75,6 @@ namespace AntJob.Data.Entity
         [BindColumn("End", "结束。小于，不等于", "")]
         public DateTime End { get { return _End; } set { if (OnPropertyChanging(__.End, value)) { _End = value; OnPropertyChanged(__.End); } } }
 
-        private Int32 _Step;
-        /// <summary>步进。最大区间大小，秒</summary>
-        [DisplayName("步进")]
-        [Description("步进。最大区间大小，秒")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("Step", "步进。最大区间大小，秒", "")]
-        public Int32 Step { get { return _Step; } set { if (OnPropertyChanging(__.Step, value)) { _Step = value; OnPropertyChanged(__.Step); } } }
-
         private Int32 _BatchSize;
         /// <summary>批大小</summary>
         [DisplayName("批大小")]
@@ -173,7 +165,6 @@ namespace AntJob.Data.Entity
                     case __.Client : return _Client;
                     case __.Start : return _Start;
                     case __.End : return _End;
-                    case __.Step : return _Step;
                     case __.BatchSize : return _BatchSize;
                     case __.Key : return _Key;
                     case __.Data : return _Data;
@@ -197,7 +188,6 @@ namespace AntJob.Data.Entity
                     case __.Client : _Client = Convert.ToString(value); break;
                     case __.Start : _Start = value.ToDateTime(); break;
                     case __.End : _End = value.ToDateTime(); break;
-                    case __.Step : _Step = value.ToInt(); break;
                     case __.BatchSize : _BatchSize = value.ToInt(); break;
                     case __.Key : _Key = Convert.ToString(value); break;
                     case __.Data : _Data = Convert.ToString(value); break;
@@ -237,9 +227,6 @@ namespace AntJob.Data.Entity
 
             /// <summary>结束。小于，不等于</summary>
             public static readonly Field End = FindByName(__.End);
-
-            /// <summary>步进。最大区间大小，秒</summary>
-            public static readonly Field Step = FindByName(__.Step);
 
             /// <summary>批大小</summary>
             public static readonly Field BatchSize = FindByName(__.BatchSize);
@@ -295,9 +282,6 @@ namespace AntJob.Data.Entity
             /// <summary>结束。小于，不等于</summary>
             public const String End = "End";
 
-            /// <summary>步进。最大区间大小，秒</summary>
-            public const String Step = "Step";
-
             /// <summary>批大小</summary>
             public const String BatchSize = "BatchSize";
 
@@ -352,9 +336,6 @@ namespace AntJob.Data.Entity
 
         /// <summary>结束。小于，不等于</summary>
         DateTime End { get; set; }
-
-        /// <summary>步进。最大区间大小，秒</summary>
-        Int32 Step { get; set; }
 
         /// <summary>批大小</summary>
         Int32 BatchSize { get; set; }

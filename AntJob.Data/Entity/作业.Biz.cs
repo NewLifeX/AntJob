@@ -293,7 +293,6 @@ namespace AntJob.Data.Entity
                             JobID = ID,
                             Start = start,
                             End = end,
-                            Step = step,
                             BatchSize = BatchSize,
                         };
 
@@ -301,8 +300,6 @@ namespace AntJob.Data.Entity
                         ti.ProcessID = pid;
                         ti.Client = $"{ip}@{pid}";
                         ti.Status = JobStatus.就绪;
-                        //根据数据任务设置的偏移量来计算任务项的偏移量
-                        ti.Offset = Offset;
                         ti.CreateTime = DateTime.Now;
                         ti.UpdateTime = DateTime.Now;
 

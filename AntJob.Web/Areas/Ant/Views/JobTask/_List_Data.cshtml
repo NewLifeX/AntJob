@@ -24,7 +24,6 @@
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("TaskID"))">任务</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Start"))">开始</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Client"))">客户端</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Step"))">步进</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("BatchSize"))">批大小</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Total"))">总数</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Success"))">成功</a></th>
@@ -77,7 +76,6 @@
                 <td class="text-center"><a href="Job?ID=@entity.JobID">@entity.JobName</a></td>
                 <td>@entity.Start.ToFullString("")</td>
                 <td>@entity.Client</td>
-                <td class="text-right">@entity.Step.ToString("n0")</td>
                 <td class="text-right">@entity.BatchSize.ToString("n0")</td>
                 <td class="text-right">@entity.Total.ToString("n0")</td>
                 <td class="text-right" style="color:forestgreen"><b>@entity.Success.ToString("n0")</b></td>

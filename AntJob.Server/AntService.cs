@@ -524,7 +524,6 @@ namespace AntJob.Server
                 JobID = job.ID,
                 Start = task.Start,
                 End = task.End,
-                Step = task.Step,
                 BatchSize = task.BatchSize,
 
                 Server = task.Server,
