@@ -2,7 +2,7 @@
 @using AntJob.Data;
 @{
     var page = ViewBag.Page as Pager;
-    var apps = AntJob.Data.Entity.App.FindAllWithCache().Cast<IEntity>().ToList();
+    var apps = AntJob.Data.Entity.App.FindAllWithCache();
 }
 <div class="form-group">
     <label for="status" class="control-label">应用：</label>
