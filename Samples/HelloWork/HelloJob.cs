@@ -7,10 +7,10 @@ namespace HelloWork
     {
         public HelloJob()
         {
-            // 今天零点开始，每5分钟一次
+            // 今天零点开始，每10秒一次
             var job = Job;
             job.Start = DateTime.Today;
-            job.Step = 5 * 60;
+            job.Step = 10;
         }
 
         protected override Int32 Execute(JobContext ctx)
