@@ -11,9 +11,9 @@ namespace AntJob.Data.Entity
     [Serializable]
     [DataObject]
     [Description("应用历史。应用的操作历史")]
-    [BindIndex("IX_devicehistory_AppID_Action", false, "AppID,Action")]
-    [BindIndex("IX_devicehistory_CreateTime", false, "CreateTime")]
-    [BindTable("devicehistory", Description = "应用历史。应用的操作历史", ConnName = "Ant", DbType = DatabaseType.None)]
+    [BindIndex("IX_AppHistory_AppID_Action", false, "AppID,Action")]
+    [BindIndex("IX_AppHistory_CreateTime", false, "CreateTime")]
+    [BindTable("AppHistory", Description = "应用历史。应用的操作历史", ConnName = "Ant", DbType = DatabaseType.None)]
     public partial class AppHistory : IAppHistory
     {
         #region 属性
@@ -102,7 +102,7 @@ namespace AntJob.Data.Entity
         [DisplayName("内容")]
         [Description("内容")]
         [DataObjectField(false, false, true, 2000)]
-        [BindColumn("Content", "内容", "")]
+        [BindColumn("Remark", "内容", "")]
         public String Remark { get { return _Remark; } set { if (OnPropertyChanging(__.Remark, value)) { _Remark = value; OnPropertyChanged(__.Remark); } } }
         #endregion
 

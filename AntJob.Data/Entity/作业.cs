@@ -81,59 +81,35 @@ namespace AntJob.Data.Entity
         public Int32 MessageCount { get { return _MessageCount; } set { if (OnPropertyChanging(__.MessageCount, value)) { _MessageCount = value; OnPropertyChanged(__.MessageCount); } } }
 
         private DateTime _Start;
-        /// <summary>开始。大于等于</summary>
+        /// <summary>开始。大于等于，下一个任务的起点</summary>
         [DisplayName("开始")]
-        [Description("开始。大于等于")]
+        [Description("开始。大于等于，下一个任务的起点")]
         [DataObjectField(false, false, true, 0)]
-        [BindColumn("Start", "开始。大于等于", "")]
+        [BindColumn("Start", "开始。大于等于，下一个任务的起点", "")]
         public DateTime Start { get { return _Start; } set { if (OnPropertyChanging(__.Start, value)) { _Start = value; OnPropertyChanged(__.Start); } } }
 
         private DateTime _End;
-        /// <summary>结束。小于，不等于</summary>
+        /// <summary>结束。小于不等于，默认空表示无止境</summary>
         [DisplayName("结束")]
-        [Description("结束。小于，不等于")]
+        [Description("结束。小于不等于，默认空表示无止境")]
         [DataObjectField(false, false, true, 0)]
-        [BindColumn("End", "结束。小于，不等于", "")]
+        [BindColumn("End", "结束。小于不等于，默认空表示无止境", "")]
         public DateTime End { get { return _End; } set { if (OnPropertyChanging(__.End, value)) { _End = value; OnPropertyChanged(__.End); } } }
 
         private Int32 _Step;
-        /// <summary>步进。最大区间大小，秒</summary>
+        /// <summary>步进。切分任务的时间区间，秒</summary>
         [DisplayName("步进")]
-        [Description("步进。最大区间大小，秒")]
+        [Description("步进。切分任务的时间区间，秒")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("Step", "步进。最大区间大小，秒", "")]
+        [BindColumn("Step", "步进。切分任务的时间区间，秒", "")]
         public Int32 Step { get { return _Step; } set { if (OnPropertyChanging(__.Step, value)) { _Step = value; OnPropertyChanged(__.Step); } } }
 
-        private Int32 _MinStep;
-        /// <summary>最小步进。默认5秒</summary>
-        [DisplayName("最小步进")]
-        [Description("最小步进。默认5秒")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("MinStep", "最小步进。默认5秒", "")]
-        public Int32 MinStep { get { return _MinStep; } set { if (OnPropertyChanging(__.MinStep, value)) { _MinStep = value; OnPropertyChanged(__.MinStep); } } }
-
-        private Int32 _MaxStep;
-        /// <summary>最大步进。默认3600秒</summary>
-        [DisplayName("最大步进")]
-        [Description("最大步进。默认3600秒")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("MaxStep", "最大步进。默认3600秒", "")]
-        public Int32 MaxStep { get { return _MaxStep; } set { if (OnPropertyChanging(__.MaxStep, value)) { _MaxStep = value; OnPropertyChanged(__.MaxStep); } } }
-
-        private Int32 _StepRate;
-        /// <summary>步进率。动态调节步进时，不能超过该比率，百分位，默认100%</summary>
-        [DisplayName("步进率")]
-        [Description("步进率。动态调节步进时，不能超过该比率，百分位，默认100%")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("StepRate", "步进率。动态调节步进时，不能超过该比率，百分位，默认100%", "")]
-        public Int32 StepRate { get { return _StepRate; } set { if (OnPropertyChanging(__.StepRate, value)) { _StepRate = value; OnPropertyChanged(__.StepRate); } } }
-
         private Int32 _BatchSize;
-        /// <summary>批大小</summary>
+        /// <summary>批大小。在任务时间区间内分页处理，或者每个任务的消息数</summary>
         [DisplayName("批大小")]
-        [Description("批大小")]
+        [Description("批大小。在任务时间区间内分页处理，或者每个任务的消息数")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("BatchSize", "批大小", "")]
+        [BindColumn("BatchSize", "批大小。在任务时间区间内分页处理，或者每个任务的消息数", "")]
         public Int32 BatchSize { get { return _BatchSize; } set { if (OnPropertyChanging(__.BatchSize, value)) { _BatchSize = value; OnPropertyChanged(__.BatchSize); } } }
 
         private Int32 _Offset;
@@ -248,20 +224,20 @@ namespace AntJob.Data.Entity
         [BindColumn("Enable", "启用", "")]
         public Boolean Enable { get { return _Enable; } set { if (OnPropertyChanging(__.Enable, value)) { _Enable = value; OnPropertyChanged(__.Enable); } } }
 
-        private String _Description;
+        private String _Remark;
         /// <summary>内容</summary>
         [DisplayName("内容")]
         [Description("内容")]
         [DataObjectField(false, false, true, 2000)]
-        [BindColumn("Message", "内容", "")]
-        public String Description { get { return _Description; } set { if (OnPropertyChanging(__.Description, value)) { _Description = value; OnPropertyChanged(__.Description); } } }
+        [BindColumn("Remark", "内容", "")]
+        public String Remark { get { return _Remark; } set { if (OnPropertyChanging(__.Remark, value)) { _Remark = value; OnPropertyChanged(__.Remark); } } }
 
         private Int32 _CreateUserID;
-        /// <summary>创建者</summary>
-        [DisplayName("创建者")]
-        [Description("创建者")]
+        /// <summary>创建人</summary>
+        [DisplayName("创建人")]
+        [Description("创建人")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("CreateUserID", "创建者", "")]
+        [BindColumn("CreateUserID", "创建人", "")]
         public Int32 CreateUserID { get { return _CreateUserID; } set { if (OnPropertyChanging(__.CreateUserID, value)) { _CreateUserID = value; OnPropertyChanged(__.CreateUserID); } } }
 
         private String _CreateUser;
@@ -289,11 +265,11 @@ namespace AntJob.Data.Entity
         public String CreateIP { get { return _CreateIP; } set { if (OnPropertyChanging(__.CreateIP, value)) { _CreateIP = value; OnPropertyChanged(__.CreateIP); } } }
 
         private Int32 _UpdateUserID;
-        /// <summary>更新者</summary>
-        [DisplayName("更新者")]
-        [Description("更新者")]
+        /// <summary>更新人</summary>
+        [DisplayName("更新人")]
+        [Description("更新人")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("UpdateUserID", "更新者", "")]
+        [BindColumn("UpdateUserID", "更新人", "")]
         public Int32 UpdateUserID { get { return _UpdateUserID; } set { if (OnPropertyChanging(__.UpdateUserID, value)) { _UpdateUserID = value; OnPropertyChanged(__.UpdateUserID); } } }
 
         private String _UpdateUser;
@@ -342,9 +318,6 @@ namespace AntJob.Data.Entity
                     case __.Start : return _Start;
                     case __.End : return _End;
                     case __.Step : return _Step;
-                    case __.MinStep : return _MinStep;
-                    case __.MaxStep : return _MaxStep;
-                    case __.StepRate : return _StepRate;
                     case __.BatchSize : return _BatchSize;
                     case __.Offset : return _Offset;
                     case __.MaxTask : return _MaxTask;
@@ -360,7 +333,7 @@ namespace AntJob.Data.Entity
                     case __.Times : return _Times;
                     case __.Speed : return _Speed;
                     case __.Enable : return _Enable;
-                    case __.Description : return _Description;
+                    case __.Remark : return _Remark;
                     case __.CreateUserID : return _CreateUserID;
                     case __.CreateUser : return _CreateUser;
                     case __.CreateTime : return _CreateTime;
@@ -387,9 +360,6 @@ namespace AntJob.Data.Entity
                     case __.Start : _Start = value.ToDateTime(); break;
                     case __.End : _End = value.ToDateTime(); break;
                     case __.Step : _Step = value.ToInt(); break;
-                    case __.MinStep : _MinStep = value.ToInt(); break;
-                    case __.MaxStep : _MaxStep = value.ToInt(); break;
-                    case __.StepRate : _StepRate = value.ToInt(); break;
                     case __.BatchSize : _BatchSize = value.ToInt(); break;
                     case __.Offset : _Offset = value.ToInt(); break;
                     case __.MaxTask : _MaxTask = value.ToInt(); break;
@@ -405,7 +375,7 @@ namespace AntJob.Data.Entity
                     case __.Times : _Times = value.ToInt(); break;
                     case __.Speed : _Speed = value.ToInt(); break;
                     case __.Enable : _Enable = value.ToBoolean(); break;
-                    case __.Description : _Description = Convert.ToString(value); break;
+                    case __.Remark : _Remark = Convert.ToString(value); break;
                     case __.CreateUserID : _CreateUserID = value.ToInt(); break;
                     case __.CreateUser : _CreateUser = Convert.ToString(value); break;
                     case __.CreateTime : _CreateTime = value.ToDateTime(); break;
@@ -448,25 +418,16 @@ namespace AntJob.Data.Entity
             /// <summary>消息数</summary>
             public static readonly Field MessageCount = FindByName(__.MessageCount);
 
-            /// <summary>开始。大于等于</summary>
+            /// <summary>开始。大于等于，下一个任务的起点</summary>
             public static readonly Field Start = FindByName(__.Start);
 
-            /// <summary>结束。小于，不等于</summary>
+            /// <summary>结束。小于不等于，默认空表示无止境</summary>
             public static readonly Field End = FindByName(__.End);
 
-            /// <summary>步进。最大区间大小，秒</summary>
+            /// <summary>步进。切分任务的时间区间，秒</summary>
             public static readonly Field Step = FindByName(__.Step);
 
-            /// <summary>最小步进。默认5秒</summary>
-            public static readonly Field MinStep = FindByName(__.MinStep);
-
-            /// <summary>最大步进。默认3600秒</summary>
-            public static readonly Field MaxStep = FindByName(__.MaxStep);
-
-            /// <summary>步进率。动态调节步进时，不能超过该比率，百分位，默认100%</summary>
-            public static readonly Field StepRate = FindByName(__.StepRate);
-
-            /// <summary>批大小</summary>
+            /// <summary>批大小。在任务时间区间内分页处理，或者每个任务的消息数</summary>
             public static readonly Field BatchSize = FindByName(__.BatchSize);
 
             /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
@@ -512,9 +473,9 @@ namespace AntJob.Data.Entity
             public static readonly Field Enable = FindByName(__.Enable);
 
             /// <summary>内容</summary>
-            public static readonly Field Description = FindByName(__.Description);
+            public static readonly Field Remark = FindByName(__.Remark);
 
-            /// <summary>创建者</summary>
+            /// <summary>创建人</summary>
             public static readonly Field CreateUserID = FindByName(__.CreateUserID);
 
             /// <summary>创建者</summary>
@@ -526,7 +487,7 @@ namespace AntJob.Data.Entity
             /// <summary>创建地址</summary>
             public static readonly Field CreateIP = FindByName(__.CreateIP);
 
-            /// <summary>更新者</summary>
+            /// <summary>更新人</summary>
             public static readonly Field UpdateUserID = FindByName(__.UpdateUserID);
 
             /// <summary>更新者</summary>
@@ -568,25 +529,16 @@ namespace AntJob.Data.Entity
             /// <summary>消息数</summary>
             public const String MessageCount = "MessageCount";
 
-            /// <summary>开始。大于等于</summary>
+            /// <summary>开始。大于等于，下一个任务的起点</summary>
             public const String Start = "Start";
 
-            /// <summary>结束。小于，不等于</summary>
+            /// <summary>结束。小于不等于，默认空表示无止境</summary>
             public const String End = "End";
 
-            /// <summary>步进。最大区间大小，秒</summary>
+            /// <summary>步进。切分任务的时间区间，秒</summary>
             public const String Step = "Step";
 
-            /// <summary>最小步进。默认5秒</summary>
-            public const String MinStep = "MinStep";
-
-            /// <summary>最大步进。默认3600秒</summary>
-            public const String MaxStep = "MaxStep";
-
-            /// <summary>步进率。动态调节步进时，不能超过该比率，百分位，默认100%</summary>
-            public const String StepRate = "StepRate";
-
-            /// <summary>批大小</summary>
+            /// <summary>批大小。在任务时间区间内分页处理，或者每个任务的消息数</summary>
             public const String BatchSize = "BatchSize";
 
             /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
@@ -632,9 +584,9 @@ namespace AntJob.Data.Entity
             public const String Enable = "Enable";
 
             /// <summary>内容</summary>
-            public const String Description = "Description";
+            public const String Remark = "Remark";
 
-            /// <summary>创建者</summary>
+            /// <summary>创建人</summary>
             public const String CreateUserID = "CreateUserID";
 
             /// <summary>创建者</summary>
@@ -646,7 +598,7 @@ namespace AntJob.Data.Entity
             /// <summary>创建地址</summary>
             public const String CreateIP = "CreateIP";
 
-            /// <summary>更新者</summary>
+            /// <summary>更新人</summary>
             public const String UpdateUserID = "UpdateUserID";
 
             /// <summary>更新者</summary>
@@ -689,25 +641,16 @@ namespace AntJob.Data.Entity
         /// <summary>消息数</summary>
         Int32 MessageCount { get; set; }
 
-        /// <summary>开始。大于等于</summary>
+        /// <summary>开始。大于等于，下一个任务的起点</summary>
         DateTime Start { get; set; }
 
-        /// <summary>结束。小于，不等于</summary>
+        /// <summary>结束。小于不等于，默认空表示无止境</summary>
         DateTime End { get; set; }
 
-        /// <summary>步进。最大区间大小，秒</summary>
+        /// <summary>步进。切分任务的时间区间，秒</summary>
         Int32 Step { get; set; }
 
-        /// <summary>最小步进。默认5秒</summary>
-        Int32 MinStep { get; set; }
-
-        /// <summary>最大步进。默认3600秒</summary>
-        Int32 MaxStep { get; set; }
-
-        /// <summary>步进率。动态调节步进时，不能超过该比率，百分位，默认100%</summary>
-        Int32 StepRate { get; set; }
-
-        /// <summary>批大小</summary>
+        /// <summary>批大小。在任务时间区间内分页处理，或者每个任务的消息数</summary>
         Int32 BatchSize { get; set; }
 
         /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
@@ -753,9 +696,9 @@ namespace AntJob.Data.Entity
         Boolean Enable { get; set; }
 
         /// <summary>内容</summary>
-        String Description { get; set; }
+        String Remark { get; set; }
 
-        /// <summary>创建者</summary>
+        /// <summary>创建人</summary>
         Int32 CreateUserID { get; set; }
 
         /// <summary>创建者</summary>
@@ -767,7 +710,7 @@ namespace AntJob.Data.Entity
         /// <summary>创建地址</summary>
         String CreateIP { get; set; }
 
-        /// <summary>更新者</summary>
+        /// <summary>更新人</summary>
         Int32 UpdateUserID { get; set; }
 
         /// <summary>更新者</summary>

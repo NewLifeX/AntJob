@@ -68,7 +68,7 @@
                 }
                 <td class="text-center hidden-md hidden-sm hidden-xs">@entity.ID</td>
                 <td><a href="JobTask?JobID=@entity.ID">@entity.Name</a></td>
-                <td title="@entity.Description">@entity.DisplayName</td>
+                <td title="@entity.Remark">@entity.DisplayName</td>
                 @if (appid == 0)
                 {
                     <td>@entity.AppName</td>
@@ -87,17 +87,7 @@
                 <td class="text-right">
                     @if (entity.Mode != JobModes.Message)
                     {
-                        if (entity.StepRate > 0)
-                        {
-                            <span style="color:lightseagreen">
-                                @TimeSpan.FromSeconds(entity.Step)
-                            </span>
-                        }
-                        else
-                        {
-                            @TimeSpan.FromSeconds(entity.Step)
-                        }
-
+                        @TimeSpan.FromSeconds(entity.Step)
                     }
                 </td>
                 <td class="text-right">@entity.BatchSize.ToString("n0")</td>

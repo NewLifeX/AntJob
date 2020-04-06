@@ -105,11 +105,11 @@ namespace AntJob.Data.Entity
         public String Remark { get { return _Remark; } set { if (OnPropertyChanging(__.Remark, value)) { _Remark = value; OnPropertyChanged(__.Remark); } } }
 
         private Int32 _CreateUserID;
-        /// <summary>创建者</summary>
-        [DisplayName("创建者")]
-        [Description("创建者")]
+        /// <summary>创建人</summary>
+        [DisplayName("创建人")]
+        [Description("创建人")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("CreateUserID", "创建者", "")]
+        [BindColumn("CreateUserID", "创建人", "")]
         public Int32 CreateUserID { get { return _CreateUserID; } set { if (OnPropertyChanging(__.CreateUserID, value)) { _CreateUserID = value; OnPropertyChanged(__.CreateUserID); } } }
 
         private String _CreateUser;
@@ -137,11 +137,11 @@ namespace AntJob.Data.Entity
         public String CreateIP { get { return _CreateIP; } set { if (OnPropertyChanging(__.CreateIP, value)) { _CreateIP = value; OnPropertyChanged(__.CreateIP); } } }
 
         private Int32 _UpdateUserID;
-        /// <summary>更新者</summary>
-        [DisplayName("更新者")]
-        [Description("更新者")]
+        /// <summary>更新人</summary>
+        [DisplayName("更新人")]
+        [Description("更新人")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("UpdateUserID", "更新者", "")]
+        [BindColumn("UpdateUserID", "更新人", "")]
         public Int32 UpdateUserID { get { return _UpdateUserID; } set { if (OnPropertyChanging(__.UpdateUserID, value)) { _UpdateUserID = value; OnPropertyChanged(__.UpdateUserID); } } }
 
         private String _UpdateUser;
@@ -267,7 +267,7 @@ namespace AntJob.Data.Entity
             /// <summary>内容</summary>
             public static readonly Field Remark = FindByName(__.Remark);
 
-            /// <summary>创建者</summary>
+            /// <summary>创建人</summary>
             public static readonly Field CreateUserID = FindByName(__.CreateUserID);
 
             /// <summary>创建者</summary>
@@ -279,7 +279,7 @@ namespace AntJob.Data.Entity
             /// <summary>创建地址</summary>
             public static readonly Field CreateIP = FindByName(__.CreateIP);
 
-            /// <summary>更新者</summary>
+            /// <summary>更新人</summary>
             public static readonly Field UpdateUserID = FindByName(__.UpdateUserID);
 
             /// <summary>更新者</summary>
@@ -330,7 +330,7 @@ namespace AntJob.Data.Entity
             /// <summary>内容</summary>
             public const String Remark = "Remark";
 
-            /// <summary>创建者</summary>
+            /// <summary>创建人</summary>
             public const String CreateUserID = "CreateUserID";
 
             /// <summary>创建者</summary>
@@ -342,7 +342,7 @@ namespace AntJob.Data.Entity
             /// <summary>创建地址</summary>
             public const String CreateIP = "CreateIP";
 
-            /// <summary>更新者</summary>
+            /// <summary>更新人</summary>
             public const String UpdateUserID = "UpdateUserID";
 
             /// <summary>更新者</summary>
@@ -394,7 +394,7 @@ namespace AntJob.Data.Entity
         /// <summary>内容</summary>
         String Remark { get; set; }
 
-        /// <summary>创建者</summary>
+        /// <summary>创建人</summary>
         Int32 CreateUserID { get; set; }
 
         /// <summary>创建者</summary>
@@ -406,7 +406,7 @@ namespace AntJob.Data.Entity
         /// <summary>创建地址</summary>
         String CreateIP { get; set; }
 
-        /// <summary>更新者</summary>
+        /// <summary>更新人</summary>
         Int32 UpdateUserID { get; set; }
 
         /// <summary>更新者</summary>

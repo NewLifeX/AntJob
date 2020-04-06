@@ -123,11 +123,11 @@ namespace AntJob.Data.Entity
         public Int64 Error { get { return _Error; } set { if (OnPropertyChanging(__.Error, value)) { _Error = value; OnPropertyChanged(__.Error); } } }
 
         private Int64 _Cost;
-        /// <summary>耗时。总耗时，秒</summary>
+        /// <summary>耗时。执行任务总耗时，秒</summary>
         [DisplayName("耗时")]
-        [Description("耗时。总耗时，秒")]
+        [Description("耗时。执行任务总耗时，秒")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("Cost", "耗时。总耗时，秒", "")]
+        [BindColumn("Cost", "耗时。执行任务总耗时，秒", "")]
         public Int64 Cost { get { return _Cost; } set { if (OnPropertyChanging(__.Cost, value)) { _Cost = value; OnPropertyChanged(__.Cost); } } }
 
         private Int64 _Speed;
@@ -285,7 +285,7 @@ namespace AntJob.Data.Entity
             /// <summary>错误</summary>
             public static readonly Field Error = FindByName(__.Error);
 
-            /// <summary>耗时。总耗时，秒</summary>
+            /// <summary>耗时。执行任务总耗时，秒</summary>
             public static readonly Field Cost = FindByName(__.Cost);
 
             /// <summary>速度。每秒处理数</summary>
@@ -351,7 +351,7 @@ namespace AntJob.Data.Entity
             /// <summary>错误</summary>
             public const String Error = "Error";
 
-            /// <summary>耗时。总耗时，秒</summary>
+            /// <summary>耗时。执行任务总耗时，秒</summary>
             public const String Cost = "Cost";
 
             /// <summary>速度。每秒处理数</summary>
@@ -418,7 +418,7 @@ namespace AntJob.Data.Entity
         /// <summary>错误</summary>
         Int64 Error { get; set; }
 
-        /// <summary>耗时。总耗时，秒</summary>
+        /// <summary>耗时。执行任务总耗时，秒</summary>
         Int64 Cost { get; set; }
 
         /// <summary>速度。每秒处理数</summary>

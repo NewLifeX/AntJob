@@ -13,11 +13,11 @@
       <Column Name="JobCount" DataType="Int32" Description="作业数" />
       <Column Name="MessageCount" DataType="Int32" Description="消息数" />
       <Column Name="Remark" DataType="String" Length="500" Description="内容" />
-      <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
+      <Column Name="CreateUserID" DataType="Int32" Description="创建人" />
       <Column Name="CreateUser" DataType="String" Description="创建者" />
       <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
       <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
+      <Column Name="UpdateUserID" DataType="Int32" Description="更新人" />
       <Column Name="UpdateUser" DataType="String" Description="更新者" />
       <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
       <Column Name="UpdateIP" DataType="String" Description="更新地址" />
@@ -41,7 +41,7 @@
       <Column Name="Total" DataType="Int64" Description="总数" />
       <Column Name="Success" DataType="Int64" Description="成功" />
       <Column Name="Error" DataType="Int64" Description="错误" />
-      <Column Name="Cost" DataType="Int64" Description="耗时。总耗时，秒" />
+      <Column Name="Cost" DataType="Int64" Description="耗时。执行任务总耗时，秒" />
       <Column Name="Speed" DataType="Int64" Description="速度。每秒处理数" />
       <Column Name="LastKey" DataType="String" Description="最后键" />
       <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
@@ -55,7 +55,7 @@
       <Index Columns="AppID" />
     </Indexes>
   </Table>
-  <Table Name="AppHistory" TableName="devicehistory" Description="应用历史。应用的操作历史">
+  <Table Name="AppHistory" Description="应用历史。应用的操作历史">
     <Columns>
       <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
       <Column Name="AppID" DataType="Int32" Description="应用" />
@@ -67,7 +67,7 @@
       <Column Name="Server" DataType="String" Description="服务端。客户端登录到哪个服务端，IP加端口" />
       <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
       <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="Remark" ColumnName="Content" DataType="String" Length="2000" Description="内容" />
+      <Column Name="Remark" DataType="String" Length="2000" Description="内容" />
     </Columns>
     <Indexes>
       <Index Columns="AppID,Action" />
@@ -80,10 +80,10 @@
       <Column Name="AppID" DataType="Int32" Description="应用" />
       <Column Name="Name" DataType="String" Master="True" Description="名称" />
       <Column Name="Content" DataType="String" Length="5000" Description="内容。一般是json格式" />
-      <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
+      <Column Name="CreateUserID" DataType="Int32" Description="创建人" />
       <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
       <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
+      <Column Name="UpdateUserID" DataType="Int32" Description="更新人" />
       <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
       <Column Name="UpdateIP" DataType="String" Description="更新地址" />
     </Columns>
@@ -102,13 +102,10 @@
       <Column Name="Mode" DataType="Int32" Description="调度模式" Type="JobModes" />
       <Column Name="Topic" DataType="String" Description="主题。消息调度时消费的主题" />
       <Column Name="MessageCount" DataType="Int32" Description="消息数" />
-      <Column Name="Start" DataType="DateTime" Description="开始。大于等于" />
-      <Column Name="End" DataType="DateTime" Description="结束。小于，不等于" />
-      <Column Name="Step" DataType="Int32" Description="步进。最大区间大小，秒" />
-      <Column Name="MinStep" DataType="Int32" Description="最小步进。默认5秒" />
-      <Column Name="MaxStep" DataType="Int32" Description="最大步进。默认3600秒" />
-      <Column Name="StepRate" DataType="Int32" Description="步进率。动态调节步进时，不能超过该比率，百分位，默认100%" />
-      <Column Name="BatchSize" DataType="Int32" Description="批大小" />
+      <Column Name="Start" DataType="DateTime" Description="开始。大于等于，下一个任务的起点" />
+      <Column Name="End" DataType="DateTime" Description="结束。小于不等于，默认空表示无止境" />
+      <Column Name="Step" DataType="Int32" Description="步进。切分任务的时间区间，秒" />
+      <Column Name="BatchSize" DataType="Int32" Description="批大小。在任务时间区间内分页处理，或者每个任务的消息数" />
       <Column Name="Offset" DataType="Int32" Description="偏移。距离实时时间的秒数，部分业务不能跑到实时，秒" />
       <Column Name="MaxTask" DataType="Int32" Description="并行。多任务并行处理" />
       <Column Name="MaxError" DataType="Int32" Description="最大错误。连续错误达到最大错误数时停止" />
@@ -123,12 +120,12 @@
       <Column Name="Times" DataType="Int32" Description="次数" />
       <Column Name="Speed" DataType="Int32" Description="速度" />
       <Column Name="Enable" DataType="Boolean" Description="启用" />
-      <Column Name="Description" ColumnName="Message" DataType="String" Length="2000" Description="内容" />
-      <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
+      <Column Name="Remark" DataType="String" Length="2000" Description="内容" />
+      <Column Name="CreateUserID" DataType="Int32" Description="创建人" />
       <Column Name="CreateUser" DataType="String" Description="创建者" />
       <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
       <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
+      <Column Name="UpdateUserID" DataType="Int32" Description="更新人" />
       <Column Name="UpdateUser" DataType="String" Description="更新者" />
       <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
       <Column Name="UpdateIP" DataType="String" Description="更新地址" />

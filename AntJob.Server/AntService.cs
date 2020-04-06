@@ -234,14 +234,8 @@ namespace AntJob.Server
 
                 if (item.Mode > 0) jb.Mode = item.Mode;
                 if (!item.DisplayName.IsNullOrEmpty()) jb.DisplayName = item.DisplayName;
-                if (!item.Description.IsNullOrEmpty()) jb.Description = item.Description;
+                if (!item.Description.IsNullOrEmpty()) jb.Remark = item.Description;
                 if (!item.ClassName.IsNullOrEmpty()) jb.ClassName = item.ClassName;
-
-                if (jb.Mode == JobModes.Message || jb.Mode == JobModes.Alarm)
-                {
-                    jb.StepRate = 0;
-                    //jb.MaxStep = jb.MinStep = jb.Step;
-                }
 
                 if (jb.Save() != 0)
                 {
@@ -465,14 +459,6 @@ namespace AntJob.Server
             jt.Key = task.Key;
             jt.Message = task.Message;
 
-            // 动态调整步进
-            if (task.Status == JobStatus.完成)
-            {
-                AdjustStep(job, jt, Session as IExtend);
-
-                //// 更新积压数
-                //UpdateLatency(job, ji);
-            }
             // 已终结的作业，汇总统计
             if (task.Status == JobStatus.完成 || task.Status == JobStatus.错误)
             {
@@ -576,74 +562,6 @@ namespace AntJob.Server
                 //job.SaveAsync();
                 (job as IEntity).Update();
             }
-        }
-        #endregion
-
-        #region 动态步进
-        public static void AdjustStep(IJob job, JobTask ji, IExtend ext)
-        {
-            // 不许动态调节步进
-            if (job.StepRate == 0 || job.MinStep == job.MaxStep) return;
-
-            //// 向前调节步进，避免多线程时间错乱
-            //var dt = ext["Step_Last"].ToDateTime();
-            //if (dt.Year > 2000 && ji.Start <= dt) return;
-            //ext["Step_Last"] = ji.Start;
-
-            // 新步进
-            var st = 0L;
-            var near = false;
-            var adjust = false;
-
-            // 计算停止线，需要注意偏移量
-            var end = job.End;
-            if (end.Year <= 2000 || end > DateTime.Now) end = DateTime.Now.AddSeconds(-job.Offset);
-
-            // 距离目标较近时步进减半
-            if (ji.End.AddSeconds(ji.Step) > end)
-            {
-                st = ji.Step;
-                while (st > 0 && ji.End.AddSeconds(st) > end) st /= 2;
-                near = true;
-            }
-            else
-            {
-                if (ji.Total > 0)
-                {
-                    // 逼近批大小
-                    st = (Int64)ji.BatchSize * ji.Step / ji.Total;
-                    adjust = true;
-                }
-                // 踩空逻辑
-                else
-                {
-                    // 距离目标较远时加大步进
-                    //st = job.MaxStep;
-                    st = (Int32)(ji.Step * (1 + job.StepRate / 100.0));
-                }
-
-                // 步进率
-                var jstep = ji.Step;
-                var rate = jstep == 0 ? 0 : (st - jstep) * 100.0 / jstep;
-                // 变化不能超过比率
-                if (Math.Abs(rate) > job.StepRate)
-                {
-                    rate = job.StepRate;
-                    if (st < jstep) rate = -rate;
-                    st = (Int32)(jstep + rate * jstep / 100);
-                }
-            }
-
-            // 限制最大最小步进
-            if (st < job.MinStep)
-                st = job.MinStep;
-            else if (st > job.MaxStep)
-                st = job.MaxStep;
-
-            if (st == job.Step) return;
-
-            // 踩空时要求步进没有改变过
-            if (near || adjust || job.Step == ji.Step) job.Step = (Int32)st;
         }
         #endregion
 

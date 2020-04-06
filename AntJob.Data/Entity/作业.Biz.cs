@@ -51,8 +51,8 @@ namespace AntJob.Data.Entity
             }
 
             // 截断错误信息，避免过长
-            var len = _.Description.Length;
-            if (!Description.IsNullOrEmpty() && len > 0 && Description.Length > len) Description = Description.Substring(0, len);
+            var len = _.Remark.Length;
+            if (!Remark.IsNullOrEmpty() && len > 0 && Remark.Length > len) Remark = Remark.Substring(0, len);
 
             var app = App;
             if (isNew && app != null)
