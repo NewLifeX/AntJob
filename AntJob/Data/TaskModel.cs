@@ -45,11 +45,11 @@ namespace AntJob.Data
         /// <summary>状态</summary>
         public JobStatus Status { get; set; }
 
-        /// <summary>服务器</summary>
-        public String Server { get; set; }
+        ///// <summary>服务器</summary>
+        //public String Server { get; set; }
 
-        /// <summary>进程</summary>
-        public Int32 ProcessID { get; set; }
+        ///// <summary>进程</summary>
+        //public Int32 ProcessID { get; set; }
 
         /// <summary>数据</summary>
         public String Data { get; set; }

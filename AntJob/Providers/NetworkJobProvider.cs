@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using AntJob.Data;
 using NewLife;
@@ -145,8 +144,8 @@ namespace AntJob.Providers
         #endregion
 
         #region 报告状态
-        private static readonly String _MachineName = Environment.MachineName;
-        private static readonly Int32 _ProcessID = Process.GetCurrentProcess().Id;
+        //private static readonly String _MachineName = Environment.MachineName;
+        //private static readonly Int32 _ProcessID = Process.GetCurrentProcess().Id;
 
         /// <summary>报告进度，每个任务多次调用</summary>
         /// <param name="ctx">上下文</param>
@@ -164,8 +163,8 @@ namespace AntJob.Providers
             task.Total = ctx.Total;
             task.Success = ctx.Success;
 
-            task.Server = _MachineName;
-            task.ProcessID = _ProcessID;
+            //task.Server = _MachineName;
+            //task.ProcessID = _ProcessID;
 
             Report(ctx.Handler.Job, task);
         }
@@ -181,8 +180,8 @@ namespace AntJob.Providers
             task.Success = ctx.Success;
             task.Times++;
 
-            task.Server = _MachineName;
-            task.ProcessID = _ProcessID;
+            //task.Server = _MachineName;
+            //task.ProcessID = _ProcessID;
 
             // 区分正常完成还是错误终止
             if (ctx.Error != null)
