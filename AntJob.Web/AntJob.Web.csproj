@@ -9,7 +9,8 @@
     <FileVersion>1.0.2020.0110</FileVersion>
     <AssemblyVersion>1.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
-    <OutputPath>..\BinWeb</OutputPath>
+    <OutputPath>..\Bin\Web</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
@@ -29,4 +30,8 @@
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="del &quot;$(TargetDir)*.xml&quot; /q&#xD;&#xA;del &quot;$(TargetDir)*.dll.config&quot; /q" />
+  </Target>
 </Project>

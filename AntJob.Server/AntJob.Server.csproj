@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <AssemblyName>AntServer</AssemblyName>
-    <TargetFrameworks>net45;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
     <AssemblyTitle>蚂蚁调度中心</AssemblyTitle>
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累</Description>
     <Company>新生命开发团队</Company>
@@ -11,7 +11,8 @@
     <FileVersion>1.0.2020.0110</FileVersion>
     <AssemblyVersion>1.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
-    <OutputPath>..\BinServer</OutputPath>
+    <OutputPath>..\Bin\Server</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
@@ -46,4 +47,8 @@
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="del &quot;$(TargetDir)*.xml&quot; /q&#xD;&#xA;del &quot;$(TargetDir)*.dll.config&quot; /q" />
+  </Target>
 </Project>

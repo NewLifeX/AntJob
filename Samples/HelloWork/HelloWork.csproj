@@ -5,6 +5,8 @@
     <TargetFrameworks>net45;netcoreapp3.1</TargetFrameworks>
     <AssemblyVersion>1.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
+    <OutputPath>..\..\Bin\Hello</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
