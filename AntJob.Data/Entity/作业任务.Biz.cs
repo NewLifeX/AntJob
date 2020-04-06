@@ -185,8 +185,8 @@ namespace AntJob.Data.Entity
 
                 Start = Start,
                 End = End,
-                Offset = Offset,
-                Step = Step,
+                //Offset = Offset,
+                //Step = Step,
                 BatchSize = BatchSize,
 
                 Data = Data,

@@ -135,8 +135,8 @@ namespace AntJob.Providers
                 {
                     Start = start,
                     End = end,
-                    Step = job.Step,
-                    Offset = job.Offset,
+                    //Step = job.Step,
+                    //Offset = job.Offset,
                     BatchSize = job.BatchSize,
                 };
 

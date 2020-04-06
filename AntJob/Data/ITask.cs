@@ -14,11 +14,11 @@ namespace AntJob.Data
         /// <summary>结束。小于</summary>
         DateTime End { get; set; }
 
-        /// <summary>时间偏移。距离实时时间的秒数，部分业务不能跑到实时</summary>
-        Int32 Offset { get; set; }
+        ///// <summary>时间偏移。距离实时时间的秒数，部分业务不能跑到实时</summary>
+        //Int32 Offset { get; set; }
 
-        /// <summary>步进。最大区间大小，秒</summary>
-        Int32 Step { get; set; }
+        ///// <summary>步进。最大区间大小，秒</summary>
+        //Int32 Step { get; set; }
 
         /// <summary>批大小</summary>
         Int32 BatchSize { get; set; }
