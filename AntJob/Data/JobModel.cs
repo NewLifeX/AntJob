@@ -59,10 +59,7 @@ namespace AntJob.Data
         #region 构造
         /// <summary>已重载。</summary>
         /// <returns></returns>
-        public override String ToString()
-        {
-            return Name;
-        }
+        public override String ToString() => Name;
         #endregion
     }
 }

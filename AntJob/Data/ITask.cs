@@ -6,7 +6,7 @@ namespace AntJob.Data
     public interface ITask
     {
         /// <summary>任务项编号</summary>
-        Int64 ID { get; set; }
+        Int32 ID { get; set; }
 
         /// <summary>开始。大于等于</summary>
         DateTime Start { get; set; }

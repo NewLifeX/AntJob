@@ -136,7 +136,7 @@
   </Table>
   <Table Name="JobTask" Description="作业任务">
     <Columns>
-      <Column Name="ID" DataType="Int64" Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
       <Column Name="AppID" DataType="Int32" Description="应用" />
       <Column Name="JobID" DataType="Int32" Description="作业" />
       <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
@@ -171,7 +171,7 @@
       <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
       <Column Name="AppID" DataType="Int32" Description="应用" />
       <Column Name="JobID" DataType="Int32" Description="作业" />
-      <Column Name="TaskID" DataType="Int64" Description="作业项" />
+      <Column Name="TaskID" DataType="Int32" Description="作业项" />
       <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
       <Column Name="Start" DataType="DateTime" Description="开始。大于等于" />
       <Column Name="End" DataType="DateTime" Description="结束。小于，不等于" />
@@ -194,7 +194,7 @@
   </Table>
   <Table Name="AppMessage" Description="应用消息。消息调度，某些作业负责生产消息，供其它作业进行消费处理">
     <Columns>
-      <Column Name="ID" DataType="Int64" Identity="True" PrimaryKey="True" Description="编号" />
+      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
       <Column Name="AppID" DataType="Int32" Description="应用" />
       <Column Name="JobID" DataType="Int32" Description="作业。生产消息的作业" />
       <Column Name="Topic" DataType="String" Description="主题。区分作业下多种消息" />
