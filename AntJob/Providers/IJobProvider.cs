@@ -5,7 +5,7 @@ using NewLife;
 
 namespace AntJob.Providers
 {
-    /// <summary>任务提供者接口</summary>
+    /// <summary>作业提供者接口</summary>
     public interface IJobProvider
     {
         /// <summary>调度器</summary>

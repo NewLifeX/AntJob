@@ -14,13 +14,13 @@ namespace AntJob
     public class Scheduler : DisposeBase
     {
         #region 属性
-        /// <summary>调试开关。打开内部处理器日志</summary>
-        public Boolean Debug { get; set; }
+        ///// <summary>调试开关。打开内部处理器日志</summary>
+        //public Boolean Debug { get; set; }
 
-        /// <summary>作业集合</summary>
-        public List<Handler> Jobs { get; } = new List<Handler>();
+        /// <summary>处理器集合</summary>
+        public List<Handler> Handlers { get; } = new List<Handler>();
 
-        /// <summary>任务提供者</summary>
+        /// <summary>作业提供者</summary>
         public IJobProvider Provider { get; set; }
         #endregion
 
@@ -39,48 +39,37 @@ namespace AntJob
         /// <summary>开始</summary>
         public void Start()
         {
-            // 如果没有指定处理器，则全局扫描
-            var bs = Jobs.ToList();
-            if (bs.Count == 0)
-            {
-                XTrace.WriteLine("没有可用处理器");
-                return;
-            }
+            // 检查本地添加的处理器
+            var hs = Handlers;
+            if (hs.Count == 0) throw new ArgumentNullException(nameof(Handlers), "没有可用处理器");
 
-            // 启动作业提供者，获取所有作业
+            // 启动作业提供者
             var prv = Provider;
             if (prv == null) prv = Provider = new FileJobProvider();
             if (prv.Schedule == null) prv.Schedule = this;
             prv.Start();
 
+            // 获取本应用在调度中心管理的所有作业
             var jobs = prv.GetJobs();
-            if (jobs == null || jobs.Length == 0)
-            {
-                XTrace.WriteLine("没有可用作业");
-                return;
-            }
+            if (jobs == null || jobs.Length == 0) throw new Exception("调度中心没有可用作业");
 
             // 输出日志
-            var mode = $"定时{Period}秒";
-            var msg = $"启动任务调度引擎[{prv}]，作业[{bs.Count}]项，模式：{mode}";
+            var msg = $"启动任务调度引擎[{prv}]，作业[{hs.Count}]项，定时{Period}秒";
             XTrace.WriteLine(msg);
 
             // 设置日志
-            foreach (var handler in bs)
+            foreach (var handler in hs)
             {
                 handler.Schedule = this;
                 handler.Provider = prv;
 
+                // 查找作业参数，分配给处理器
                 var job = handler.Job = jobs.FirstOrDefault(e => e.Name == handler.Name);
                 if (job != null && job.Mode == 0) job.Mode = handler.Mode;
 
                 handler.Log = XTrace.Log;
                 handler.Start();
             }
-
-            //// 全部启动后再加入集合
-            //Jobs.Clear();
-            //Jobs.AddRange(bs);
 
             // 定时执行
             if (Period > 0) _timer = new TimerX(Loop, null, 100, Period * 1000, "Job") { Async = true };
@@ -94,7 +83,7 @@ namespace AntJob
 
             Provider?.Stop();
 
-            foreach (var handler in Jobs)
+            foreach (var handler in Handlers)
             {
                 handler.Stop();
             }
@@ -106,21 +95,19 @@ namespace AntJob
         {
             var prv = Provider;
 
-            // 查询所有处理器和被依赖的作业
-            var bs = Jobs;
-            //var names = bs.Select(e => e.Name).ToList();
-            //names = names.Distinct().ToList();
+            // 查询所有处理器
+            var hs = Handlers;
 
             // 拿到处理器对应的作业
             var jobs = prv.GetJobs();
             if (jobs == null) return false;
 
             // 运行时动态往集合里面加处理器，为了配合Sql+C#
-            CheckHandlers(prv, jobs, bs);
+            CheckHandlers(prv, jobs, hs);
 
             var flag = false;
             // 遍历处理器，给空闲的增加任务
-            foreach (var handler in bs)
+            foreach (var handler in hs)
             {
                 var job = jobs.FirstOrDefault(e => e.Name == handler.Name);
                 // 找不到或者已停用
@@ -140,10 +127,10 @@ namespace AntJob
                 if (!handler.Active) handler.Start();
 
                 // 如果正在处理任务数没达到最大并行度，则继续安排任务
-                if (handler.Busy < job.MaxTask)
+                var count = job.MaxTask - handler.Busy;
+                if (count > 0)
                 {
                     // 循环申请任务，喂饱处理器
-                    var count = job.MaxTask - handler.Busy;
                     var ts = handler.Acquire(null, count);
 
                     // 送给处理器处理
@@ -192,7 +179,10 @@ namespace AntJob
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        XTrace.WriteException(ex);
+                    }
                 }
             }
         }

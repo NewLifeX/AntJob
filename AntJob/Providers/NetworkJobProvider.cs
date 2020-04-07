@@ -62,7 +62,7 @@ namespace AntJob.Providers
             Ant.TryDispose();
             Ant = ant;
 
-            var bs = Schedule?.Jobs;
+            var bs = Schedule?.Handlers;
 
             //var jobs = GetJobs(ws.Select(e => e.Name).ToArray());
             var list = new List<IJob>();

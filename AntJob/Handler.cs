@@ -9,7 +9,11 @@ using NewLife.Log;
 
 namespace AntJob
 {
-    /// <summary>处理器基类</summary>
+    /// <summary>处理器基类，每个作业一个处理器</summary>
+    /// <remarks>
+    /// 每个作业一个处理器类，负责一个业务处理模块。
+    /// 例如在数据同步或数据清洗中，每张表就写一个处理器，如果一组数据表有共同特性，还可以为它们封装一个自己的处理器基类。
+    /// </remarks>
     public abstract class Handler
     {
         #region 属性
@@ -50,6 +54,7 @@ namespace AntJob
         {
             Name = GetType().Name.TrimEnd(nameof(Handler));
 
+            // 默认本月1号
             var now = DateTime.Now;
             var job = new JobModel
             {
@@ -116,6 +121,8 @@ namespace AntJob
         #endregion
 
         #region 整体调度
+        /// <summary>准备就绪，增加Busy，避免超额分配</summary>
+        /// <param name="task"></param>
         internal void Prepare(ITask task) => Interlocked.Increment(ref _Busy);
 
         /// <summary>处理一项新任务</summary>
