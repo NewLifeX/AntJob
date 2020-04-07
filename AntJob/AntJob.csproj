@@ -46,6 +46,6 @@
     <Compile Remove="StarService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="8.7.2020.405-beta" />
+    <PackageReference Include="NewLife.Core" Version="8.7.2020.403" />
   </ItemGroup>
 </Project>

@@ -12,7 +12,7 @@ namespace AntJob.Server
 {
     class Program
     {
-        static void Main(String[] args) => new MyService().Main(args);
+        static void Main(String[] args) => new MyService().Main();
     }
 
     /// <summary>服务类。名字可以自定义</summary>
