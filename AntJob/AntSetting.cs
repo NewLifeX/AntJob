@@ -7,7 +7,7 @@ namespace AntJob
 {
     /// <summary>蚂蚁配置。主要用于网络型调度系统</summary>
     [Config("Ant")]
-    public class Setting : Config<Setting>
+    public class AntSetting : Config<AntSetting>
     {
         #region 属性
         /// <summary>调试开关。默认false</summary>

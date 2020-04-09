@@ -3,11 +3,11 @@ using AntJob;
 using AntJob.Providers;
 using NewLife.Log;
 
-namespace HelloWork
+namespace HisAgent
 {
     class Program
     {
-        private static void Main(String[] args)
+        static void Main(string[] args)
         {
             XTrace.UseConsole();
 

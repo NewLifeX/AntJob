@@ -91,7 +91,7 @@ namespace AntJob.Providers
 
             var rs = await base.InvokeWithClientAsync<IDictionary<String, Object>>(client, "Login", arg);
 
-            var set = Setting.Current;
+            var set = AntSetting.Current;
             if (set.Debug) XTrace.WriteLine("登录{0}成功！{1}", client, rs.ToJson());
 
             // 保存下发密钥

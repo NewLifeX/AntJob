@@ -31,7 +31,7 @@ namespace AntJob.Agent
         /// </remarks>
         protected override void StartWork(String reason)
         {
-            var set = Setting.Current;
+            var set = AntSetting.Current;
 
             // 实例化调度器
             var sc = new Scheduler();

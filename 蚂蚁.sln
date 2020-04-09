@@ -22,14 +22,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntJob.Extensions", "AntJob
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{E842807F-C45E-44DA-8AAE-7915C1EBF2A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWork", "Samples\HelloWork\HelloWork.csproj", "{5E610811-2352-4882-ADD2-87222CCDE807}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloWork", "Samples\HelloWork\HelloWork.csproj", "{5E610811-2352-4882-ADD2-87222CCDE807}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A1EF271C-AEA8-4EA3-A76F-906B4D4A9058}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntJob.Agent", "AntJob.Agent\AntJob.Agent.csproj", "{0970FDBA-2331-4600-8DD5-A37B41AF989F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntJob.Agent", "AntJob.Agent\AntJob.Agent.csproj", "{0970FDBA-2331-4600-8DD5-A37B41AF989F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HisAgent", "Samples\HisAgent\HisAgent.csproj", "{E62006DC-E61B-42B0-A06B-ED5BF3F73D9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,12 +71,17 @@ Global
 		{0970FDBA-2331-4600-8DD5-A37B41AF989F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0970FDBA-2331-4600-8DD5-A37B41AF989F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0970FDBA-2331-4600-8DD5-A37B41AF989F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E62006DC-E61B-42B0-A06B-ED5BF3F73D9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E62006DC-E61B-42B0-A06B-ED5BF3F73D9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E62006DC-E61B-42B0-A06B-ED5BF3F73D9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E62006DC-E61B-42B0-A06B-ED5BF3F73D9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5E610811-2352-4882-ADD2-87222CCDE807} = {E842807F-C45E-44DA-8AAE-7915C1EBF2A2}
+		{E62006DC-E61B-42B0-A06B-ED5BF3F73D9E} = {E842807F-C45E-44DA-8AAE-7915C1EBF2A2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9337283C-C795-479F-A2F1-C892EBE2490C}
