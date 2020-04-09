@@ -27,6 +27,7 @@ namespace HisAgent
             // 添加作业处理器
             sc.Handlers.Add(new HelloJob());
             sc.Handlers.Add(new BuildPatient());
+            sc.Handlers.Add(new BuildWill());
 
             // 启动调度引擎，调度器内部多线程处理
             sc.Start();

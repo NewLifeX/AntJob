@@ -41,21 +41,21 @@ namespace HisData
         [BindColumn("MGROUPID", "医嘱组号", "", Master = true)]
         public Int32 Mgroupid { get => _Mgroupid; set { if (OnPropertyChanging(__.Mgroupid, value)) { _Mgroupid = value; OnPropertyChanged(__.Mgroupid); } } }
 
-        private Int32 _Kyzrq;
+        private DateTime _Kyzrq;
         /// <summary>开医嘱日期</summary>
         [DisplayName("开医嘱日期")]
         [Description("开医嘱日期")]
-        [DataObjectField(false, false, false, 0)]
+        [DataObjectField(false, false, true, 0)]
         [BindColumn("KYZRQ", "开医嘱日期", "")]
-        public Int32 Kyzrq { get => _Kyzrq; set { if (OnPropertyChanging(__.Kyzrq, value)) { _Kyzrq = value; OnPropertyChanged(__.Kyzrq); } } }
+        public DateTime Kyzrq { get => _Kyzrq; set { if (OnPropertyChanging(__.Kyzrq, value)) { _Kyzrq = value; OnPropertyChanged(__.Kyzrq); } } }
 
-        private Int32 _Tyzrq;
+        private DateTime _Tyzrq;
         /// <summary>停医嘱日期</summary>
         [DisplayName("停医嘱日期")]
         [Description("停医嘱日期")]
-        [DataObjectField(false, false, false, 0)]
+        [DataObjectField(false, false, true, 0)]
         [BindColumn("TYZRQ", "停医嘱日期", "")]
-        public Int32 Tyzrq { get => _Tyzrq; set { if (OnPropertyChanging(__.Tyzrq, value)) { _Tyzrq = value; OnPropertyChanged(__.Tyzrq); } } }
+        public DateTime Tyzrq { get => _Tyzrq; set { if (OnPropertyChanging(__.Tyzrq, value)) { _Tyzrq = value; OnPropertyChanged(__.Tyzrq); } } }
 
         private String _Kyzys;
         /// <summary>开医嘱医生</summary>
@@ -173,8 +173,8 @@ namespace HisData
                     case __.ID: _ID = value.ToInt(); break;
                     case __.Bhid: _Bhid = value.ToInt(); break;
                     case __.Mgroupid: _Mgroupid = value.ToInt(); break;
-                    case __.Kyzrq: _Kyzrq = value.ToInt(); break;
-                    case __.Tyzrq: _Tyzrq = value.ToInt(); break;
+                    case __.Kyzrq: _Kyzrq = value.ToDateTime(); break;
+                    case __.Tyzrq: _Tyzrq = value.ToDateTime(); break;
                     case __.Kyzys: _Kyzys = Convert.ToString(value); break;
                     case __.State: _State = value.ToInt(); break;
                     case __.CreateUser: _CreateUser = Convert.ToString(value); break;
@@ -308,10 +308,10 @@ namespace HisData
         Int32 Mgroupid { get; set; }
 
         /// <summary>开医嘱日期</summary>
-        Int32 Kyzrq { get; set; }
+        DateTime Kyzrq { get; set; }
 
         /// <summary>停医嘱日期</summary>
-        Int32 Tyzrq { get; set; }
+        DateTime Tyzrq { get; set; }
 
         /// <summary>开医嘱医生</summary>
         String Kyzys { get; set; }

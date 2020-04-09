@@ -12,6 +12,7 @@ namespace HisData
     [DataObject]
     [Description("病人基本信息")]
     [BindIndex("IU_ZYBH0_BHID", true, "BHID")]
+    [BindIndex("IX_ZYBH0_CreateTime", false, "CreateTime")]
     [BindTable("ZYBH0", Description = "病人基本信息", ConnName = "His", DbType = DatabaseType.None)]
     public partial class ZYBH0 : IZYBH0
     {

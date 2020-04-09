@@ -23,6 +23,7 @@
     </Columns>
     <Indexes>
       <Index Columns="BHID" Unique="True" />
+      <Index Columns="CreateTime" />
     </Indexes>
   </Table>
   <Table Name="ZYBHYZ0" Description="病人医嘱信息" IgnoreNameCase="False">
@@ -30,8 +31,8 @@
       <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
       <Column Name="Bhid" ColumnName="BHID" DataType="Int32" Description="病人ID" />
       <Column Name="Mgroupid" ColumnName="MGROUPID" DataType="Int32" Master="True" Description="医嘱组号" />
-      <Column Name="Kyzrq" ColumnName="KYZRQ" DataType="Int32" Description="开医嘱日期" />
-      <Column Name="Tyzrq" ColumnName="TYZRQ" DataType="Int32" Description="停医嘱日期" />
+      <Column Name="Kyzrq" ColumnName="KYZRQ" DataType="DateTime" Description="开医嘱日期" />
+      <Column Name="Tyzrq" ColumnName="TYZRQ" DataType="DateTime" Description="停医嘱日期" />
       <Column Name="Kyzys" ColumnName="KYZYS" DataType="String" Description="开医嘱医生" />
       <Column Name="State" ColumnName="STATE" DataType="Int32" Description="状态" />
       <Column Name="CreateUser" DataType="String" Description="创建者" />
