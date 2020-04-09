@@ -5,8 +5,8 @@
       <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
       <Column Name="Bhid" ColumnName="BHID" DataType="Int32" Master="True" Description="病人ID" />
       <Column Name="XM" DataType="String" Description="姓名" />
-      <Column Name="Ryrq" ColumnName="RYRQ" DataType="Int32" Description="入院日期" />
-      <Column Name="Cyrq" ColumnName="CYRQ" DataType="Int32" Description="出院日期" />
+      <Column Name="Ryrq" ColumnName="RYRQ" DataType="DateTime" Description="入院日期" />
+      <Column Name="Cyrq" ColumnName="CYRQ" DataType="DateTime" Description="出院日期" />
       <Column Name="Sfzh" ColumnName="SFZH" DataType="String" Description="身份证号" />
       <Column Name="FB" DataType="String" Description="费用类别" />
       <Column Name="State" ColumnName="STATE" DataType="Int32" Description="状态" />

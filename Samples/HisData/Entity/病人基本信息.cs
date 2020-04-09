@@ -40,21 +40,21 @@ namespace HisData
         [BindColumn("XM", "姓名", "")]
         public String XM { get => _XM; set { if (OnPropertyChanging(__.XM, value)) { _XM = value; OnPropertyChanged(__.XM); } } }
 
-        private Int32 _Ryrq;
+        private DateTime _Ryrq;
         /// <summary>入院日期</summary>
         [DisplayName("入院日期")]
         [Description("入院日期")]
-        [DataObjectField(false, false, false, 0)]
+        [DataObjectField(false, false, true, 0)]
         [BindColumn("RYRQ", "入院日期", "")]
-        public Int32 Ryrq { get => _Ryrq; set { if (OnPropertyChanging(__.Ryrq, value)) { _Ryrq = value; OnPropertyChanged(__.Ryrq); } } }
+        public DateTime Ryrq { get => _Ryrq; set { if (OnPropertyChanging(__.Ryrq, value)) { _Ryrq = value; OnPropertyChanged(__.Ryrq); } } }
 
-        private Int32 _Cyrq;
+        private DateTime _Cyrq;
         /// <summary>出院日期</summary>
         [DisplayName("出院日期")]
         [Description("出院日期")]
-        [DataObjectField(false, false, false, 0)]
+        [DataObjectField(false, false, true, 0)]
         [BindColumn("CYRQ", "出院日期", "")]
-        public Int32 Cyrq { get => _Cyrq; set { if (OnPropertyChanging(__.Cyrq, value)) { _Cyrq = value; OnPropertyChanged(__.Cyrq); } } }
+        public DateTime Cyrq { get => _Cyrq; set { if (OnPropertyChanging(__.Cyrq, value)) { _Cyrq = value; OnPropertyChanged(__.Cyrq); } } }
 
         private String _Sfzh;
         /// <summary>身份证号</summary>
@@ -199,8 +199,8 @@ namespace HisData
                     case __.ID: _ID = value.ToInt(); break;
                     case __.Bhid: _Bhid = value.ToInt(); break;
                     case __.XM: _XM = Convert.ToString(value); break;
-                    case __.Ryrq: _Ryrq = value.ToInt(); break;
-                    case __.Cyrq: _Cyrq = value.ToInt(); break;
+                    case __.Ryrq: _Ryrq = value.ToDateTime(); break;
+                    case __.Cyrq: _Cyrq = value.ToDateTime(); break;
                     case __.Sfzh: _Sfzh = Convert.ToString(value); break;
                     case __.FB: _FB = Convert.ToString(value); break;
                     case __.State: _State = value.ToInt(); break;
@@ -355,10 +355,10 @@ namespace HisData
         String XM { get; set; }
 
         /// <summary>入院日期</summary>
-        Int32 Ryrq { get; set; }
+        DateTime Ryrq { get; set; }
 
         /// <summary>出院日期</summary>
-        Int32 Cyrq { get; set; }
+        DateTime Cyrq { get; set; }
 
         /// <summary>身份证号</summary>
         String Sfzh { get; set; }

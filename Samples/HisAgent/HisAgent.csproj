@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,7 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\AntJob.Extensions\AntJob.Extensions.csproj" />
     <ProjectReference Include="..\..\AntJob\AntJob.csproj" />
+    <ProjectReference Include="..\HisData\HisData.csproj" />
   </ItemGroup>
 
 </Project>
