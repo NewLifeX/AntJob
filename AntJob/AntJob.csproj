@@ -5,8 +5,8 @@
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2020</Copyright>
-    <Version>1.0.2020.0110</Version>
-    <FileVersion>1.0.2020.0110</FileVersion>
+    <Version>1.0.2020.0409</Version>
+    <FileVersion>1.0.2020.0409</FileVersion>
     <AssemblyVersion>1.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin</OutputPath>
