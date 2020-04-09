@@ -24,7 +24,7 @@ namespace AntJob.Data.Entity
         [Description("编号")]
         [DataObjectField(true, true, false, 0)]
         [BindColumn("ID", "编号", "")]
-        public Int32 ID { get { return _ID; } set { if (OnPropertyChanging(__.ID, value)) { _ID = value; OnPropertyChanged(__.ID); } } }
+        public Int32 ID { get => _ID; set { if (OnPropertyChanging(__.ID, value)) { _ID = value; OnPropertyChanged(__.ID); } } }
 
         private Int32 _AppID;
         /// <summary>应用</summary>
@@ -32,7 +32,7 @@ namespace AntJob.Data.Entity
         [Description("应用")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("AppID", "应用", "")]
-        public Int32 AppID { get { return _AppID; } set { if (OnPropertyChanging(__.AppID, value)) { _AppID = value; OnPropertyChanged(__.AppID); } } }
+        public Int32 AppID { get => _AppID; set { if (OnPropertyChanging(__.AppID, value)) { _AppID = value; OnPropertyChanged(__.AppID); } } }
 
         private String _Instance;
         /// <summary>实例。IP加端口</summary>
@@ -40,7 +40,7 @@ namespace AntJob.Data.Entity
         [Description("实例。IP加端口")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Instance", "实例。IP加端口", "")]
-        public String Instance { get { return _Instance; } set { if (OnPropertyChanging(__.Instance, value)) { _Instance = value; OnPropertyChanged(__.Instance); } } }
+        public String Instance { get => _Instance; set { if (OnPropertyChanging(__.Instance, value)) { _Instance = value; OnPropertyChanged(__.Instance); } } }
 
         private String _Client;
         /// <summary>客户端。IP加进程</summary>
@@ -48,7 +48,7 @@ namespace AntJob.Data.Entity
         [Description("客户端。IP加进程")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Client", "客户端。IP加进程", "")]
-        public String Client { get { return _Client; } set { if (OnPropertyChanging(__.Client, value)) { _Client = value; OnPropertyChanged(__.Client); } } }
+        public String Client { get => _Client; set { if (OnPropertyChanging(__.Client, value)) { _Client = value; OnPropertyChanged(__.Client); } } }
 
         private String _Name;
         /// <summary>名称。机器名称</summary>
@@ -56,7 +56,7 @@ namespace AntJob.Data.Entity
         [Description("名称。机器名称")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Name", "名称。机器名称", "", Master = true)]
-        public String Name { get { return _Name; } set { if (OnPropertyChanging(__.Name, value)) { _Name = value; OnPropertyChanged(__.Name); } } }
+        public String Name { get => _Name; set { if (OnPropertyChanging(__.Name, value)) { _Name = value; OnPropertyChanged(__.Name); } } }
 
         private Int32 _ProcessId;
         /// <summary>进程。进程Id</summary>
@@ -64,7 +64,7 @@ namespace AntJob.Data.Entity
         [Description("进程。进程Id")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("ProcessId", "进程。进程Id", "")]
-        public Int32 ProcessId { get { return _ProcessId; } set { if (OnPropertyChanging(__.ProcessId, value)) { _ProcessId = value; OnPropertyChanged(__.ProcessId); } } }
+        public Int32 ProcessId { get => _ProcessId; set { if (OnPropertyChanging(__.ProcessId, value)) { _ProcessId = value; OnPropertyChanged(__.ProcessId); } } }
 
         private String _Version;
         /// <summary>版本。客户端</summary>
@@ -72,7 +72,7 @@ namespace AntJob.Data.Entity
         [Description("版本。客户端")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Version", "版本。客户端", "")]
-        public String Version { get { return _Version; } set { if (OnPropertyChanging(__.Version, value)) { _Version = value; OnPropertyChanged(__.Version); } } }
+        public String Version { get => _Version; set { if (OnPropertyChanging(__.Version, value)) { _Version = value; OnPropertyChanged(__.Version); } } }
 
         private DateTime _CompileTime;
         /// <summary>编译时间</summary>
@@ -80,7 +80,7 @@ namespace AntJob.Data.Entity
         [Description("编译时间")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("CompileTime", "编译时间", "")]
-        public DateTime CompileTime { get { return _CompileTime; } set { if (OnPropertyChanging(__.CompileTime, value)) { _CompileTime = value; OnPropertyChanged(__.CompileTime); } } }
+        public DateTime CompileTime { get => _CompileTime; set { if (OnPropertyChanging(__.CompileTime, value)) { _CompileTime = value; OnPropertyChanged(__.CompileTime); } } }
 
         private String _Server;
         /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
@@ -88,7 +88,7 @@ namespace AntJob.Data.Entity
         [Description("服务端。客户端登录到哪个服务端，IP加端口")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Server", "服务端。客户端登录到哪个服务端，IP加端口", "")]
-        public String Server { get { return _Server; } set { if (OnPropertyChanging(__.Server, value)) { _Server = value; OnPropertyChanged(__.Server); } } }
+        public String Server { get => _Server; set { if (OnPropertyChanging(__.Server, value)) { _Server = value; OnPropertyChanged(__.Server); } } }
 
         private Int32 _Tasks;
         /// <summary>任务数</summary>
@@ -96,7 +96,7 @@ namespace AntJob.Data.Entity
         [Description("任务数")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Tasks", "任务数", "")]
-        public Int32 Tasks { get { return _Tasks; } set { if (OnPropertyChanging(__.Tasks, value)) { _Tasks = value; OnPropertyChanged(__.Tasks); } } }
+        public Int32 Tasks { get => _Tasks; set { if (OnPropertyChanging(__.Tasks, value)) { _Tasks = value; OnPropertyChanged(__.Tasks); } } }
 
         private Int64 _Total;
         /// <summary>总数</summary>
@@ -104,7 +104,7 @@ namespace AntJob.Data.Entity
         [Description("总数")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Total", "总数", "")]
-        public Int64 Total { get { return _Total; } set { if (OnPropertyChanging(__.Total, value)) { _Total = value; OnPropertyChanged(__.Total); } } }
+        public Int64 Total { get => _Total; set { if (OnPropertyChanging(__.Total, value)) { _Total = value; OnPropertyChanged(__.Total); } } }
 
         private Int64 _Success;
         /// <summary>成功</summary>
@@ -112,7 +112,7 @@ namespace AntJob.Data.Entity
         [Description("成功")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Success", "成功", "")]
-        public Int64 Success { get { return _Success; } set { if (OnPropertyChanging(__.Success, value)) { _Success = value; OnPropertyChanged(__.Success); } } }
+        public Int64 Success { get => _Success; set { if (OnPropertyChanging(__.Success, value)) { _Success = value; OnPropertyChanged(__.Success); } } }
 
         private Int64 _Error;
         /// <summary>错误</summary>
@@ -120,7 +120,7 @@ namespace AntJob.Data.Entity
         [Description("错误")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Error", "错误", "")]
-        public Int64 Error { get { return _Error; } set { if (OnPropertyChanging(__.Error, value)) { _Error = value; OnPropertyChanged(__.Error); } } }
+        public Int64 Error { get => _Error; set { if (OnPropertyChanging(__.Error, value)) { _Error = value; OnPropertyChanged(__.Error); } } }
 
         private Int64 _Cost;
         /// <summary>耗时。执行任务总耗时，秒</summary>
@@ -128,7 +128,7 @@ namespace AntJob.Data.Entity
         [Description("耗时。执行任务总耗时，秒")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Cost", "耗时。执行任务总耗时，秒", "")]
-        public Int64 Cost { get { return _Cost; } set { if (OnPropertyChanging(__.Cost, value)) { _Cost = value; OnPropertyChanged(__.Cost); } } }
+        public Int64 Cost { get => _Cost; set { if (OnPropertyChanging(__.Cost, value)) { _Cost = value; OnPropertyChanged(__.Cost); } } }
 
         private Int64 _Speed;
         /// <summary>速度。每秒处理数</summary>
@@ -136,7 +136,7 @@ namespace AntJob.Data.Entity
         [Description("速度。每秒处理数")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Speed", "速度。每秒处理数", "")]
-        public Int64 Speed { get { return _Speed; } set { if (OnPropertyChanging(__.Speed, value)) { _Speed = value; OnPropertyChanged(__.Speed); } } }
+        public Int64 Speed { get => _Speed; set { if (OnPropertyChanging(__.Speed, value)) { _Speed = value; OnPropertyChanged(__.Speed); } } }
 
         private String _LastKey;
         /// <summary>最后键</summary>
@@ -144,7 +144,7 @@ namespace AntJob.Data.Entity
         [Description("最后键")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("LastKey", "最后键", "")]
-        public String LastKey { get { return _LastKey; } set { if (OnPropertyChanging(__.LastKey, value)) { _LastKey = value; OnPropertyChanged(__.LastKey); } } }
+        public String LastKey { get => _LastKey; set { if (OnPropertyChanging(__.LastKey, value)) { _LastKey = value; OnPropertyChanged(__.LastKey); } } }
 
         private DateTime _CreateTime;
         /// <summary>创建时间</summary>
@@ -152,7 +152,7 @@ namespace AntJob.Data.Entity
         [Description("创建时间")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("CreateTime", "创建时间", "")]
-        public DateTime CreateTime { get { return _CreateTime; } set { if (OnPropertyChanging(__.CreateTime, value)) { _CreateTime = value; OnPropertyChanged(__.CreateTime); } } }
+        public DateTime CreateTime { get => _CreateTime; set { if (OnPropertyChanging(__.CreateTime, value)) { _CreateTime = value; OnPropertyChanged(__.CreateTime); } } }
 
         private String _CreateIP;
         /// <summary>创建地址</summary>
@@ -160,7 +160,7 @@ namespace AntJob.Data.Entity
         [Description("创建地址")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("CreateIP", "创建地址", "")]
-        public String CreateIP { get { return _CreateIP; } set { if (OnPropertyChanging(__.CreateIP, value)) { _CreateIP = value; OnPropertyChanged(__.CreateIP); } } }
+        public String CreateIP { get => _CreateIP; set { if (OnPropertyChanging(__.CreateIP, value)) { _CreateIP = value; OnPropertyChanged(__.CreateIP); } } }
 
         private DateTime _UpdateTime;
         /// <summary>更新时间</summary>
@@ -168,7 +168,7 @@ namespace AntJob.Data.Entity
         [Description("更新时间")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("UpdateTime", "更新时间", "")]
-        public DateTime UpdateTime { get { return _UpdateTime; } set { if (OnPropertyChanging(__.UpdateTime, value)) { _UpdateTime = value; OnPropertyChanged(__.UpdateTime); } } }
+        public DateTime UpdateTime { get => _UpdateTime; set { if (OnPropertyChanging(__.UpdateTime, value)) { _UpdateTime = value; OnPropertyChanged(__.UpdateTime); } } }
 
         private String _UpdateIP;
         /// <summary>更新地址</summary>
@@ -176,7 +176,7 @@ namespace AntJob.Data.Entity
         [Description("更新地址")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("UpdateIP", "更新地址", "")]
-        public String UpdateIP { get { return _UpdateIP; } set { if (OnPropertyChanging(__.UpdateIP, value)) { _UpdateIP = value; OnPropertyChanged(__.UpdateIP); } } }
+        public String UpdateIP { get => _UpdateIP; set { if (OnPropertyChanging(__.UpdateIP, value)) { _UpdateIP = value; OnPropertyChanged(__.UpdateIP); } } }
         #endregion
 
         #region 获取/设置 字段值
@@ -189,26 +189,26 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case __.ID : return _ID;
-                    case __.AppID : return _AppID;
-                    case __.Instance : return _Instance;
-                    case __.Client : return _Client;
-                    case __.Name : return _Name;
-                    case __.ProcessId : return _ProcessId;
-                    case __.Version : return _Version;
-                    case __.CompileTime : return _CompileTime;
-                    case __.Server : return _Server;
-                    case __.Tasks : return _Tasks;
-                    case __.Total : return _Total;
-                    case __.Success : return _Success;
-                    case __.Error : return _Error;
-                    case __.Cost : return _Cost;
-                    case __.Speed : return _Speed;
-                    case __.LastKey : return _LastKey;
-                    case __.CreateTime : return _CreateTime;
-                    case __.CreateIP : return _CreateIP;
-                    case __.UpdateTime : return _UpdateTime;
-                    case __.UpdateIP : return _UpdateIP;
+                    case __.ID: return _ID;
+                    case __.AppID: return _AppID;
+                    case __.Instance: return _Instance;
+                    case __.Client: return _Client;
+                    case __.Name: return _Name;
+                    case __.ProcessId: return _ProcessId;
+                    case __.Version: return _Version;
+                    case __.CompileTime: return _CompileTime;
+                    case __.Server: return _Server;
+                    case __.Tasks: return _Tasks;
+                    case __.Total: return _Total;
+                    case __.Success: return _Success;
+                    case __.Error: return _Error;
+                    case __.Cost: return _Cost;
+                    case __.Speed: return _Speed;
+                    case __.LastKey: return _LastKey;
+                    case __.CreateTime: return _CreateTime;
+                    case __.CreateIP: return _CreateIP;
+                    case __.UpdateTime: return _UpdateTime;
+                    case __.UpdateIP: return _UpdateIP;
                     default: return base[name];
                 }
             }
@@ -216,26 +216,26 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case __.ID : _ID = value.ToInt(); break;
-                    case __.AppID : _AppID = value.ToInt(); break;
-                    case __.Instance : _Instance = Convert.ToString(value); break;
-                    case __.Client : _Client = Convert.ToString(value); break;
-                    case __.Name : _Name = Convert.ToString(value); break;
-                    case __.ProcessId : _ProcessId = value.ToInt(); break;
-                    case __.Version : _Version = Convert.ToString(value); break;
-                    case __.CompileTime : _CompileTime = value.ToDateTime(); break;
-                    case __.Server : _Server = Convert.ToString(value); break;
-                    case __.Tasks : _Tasks = value.ToInt(); break;
-                    case __.Total : _Total = value.ToLong(); break;
-                    case __.Success : _Success = value.ToLong(); break;
-                    case __.Error : _Error = value.ToLong(); break;
-                    case __.Cost : _Cost = value.ToLong(); break;
-                    case __.Speed : _Speed = value.ToLong(); break;
-                    case __.LastKey : _LastKey = Convert.ToString(value); break;
-                    case __.CreateTime : _CreateTime = value.ToDateTime(); break;
-                    case __.CreateIP : _CreateIP = Convert.ToString(value); break;
-                    case __.UpdateTime : _UpdateTime = value.ToDateTime(); break;
-                    case __.UpdateIP : _UpdateIP = Convert.ToString(value); break;
+                    case __.ID: _ID = value.ToInt(); break;
+                    case __.AppID: _AppID = value.ToInt(); break;
+                    case __.Instance: _Instance = Convert.ToString(value); break;
+                    case __.Client: _Client = Convert.ToString(value); break;
+                    case __.Name: _Name = Convert.ToString(value); break;
+                    case __.ProcessId: _ProcessId = value.ToInt(); break;
+                    case __.Version: _Version = Convert.ToString(value); break;
+                    case __.CompileTime: _CompileTime = value.ToDateTime(); break;
+                    case __.Server: _Server = Convert.ToString(value); break;
+                    case __.Tasks: _Tasks = value.ToInt(); break;
+                    case __.Total: _Total = value.ToLong(); break;
+                    case __.Success: _Success = value.ToLong(); break;
+                    case __.Error: _Error = value.ToLong(); break;
+                    case __.Cost: _Cost = value.ToLong(); break;
+                    case __.Speed: _Speed = value.ToLong(); break;
+                    case __.LastKey: _LastKey = Convert.ToString(value); break;
+                    case __.CreateTime: _CreateTime = value.ToDateTime(); break;
+                    case __.CreateIP: _CreateIP = Convert.ToString(value); break;
+                    case __.UpdateTime: _UpdateTime = value.ToDateTime(); break;
+                    case __.UpdateIP: _UpdateIP = Convert.ToString(value); break;
                     default: base[name] = value; break;
                 }
             }
@@ -306,7 +306,7 @@ namespace AntJob.Data.Entity
             /// <summary>更新地址</summary>
             public static readonly Field UpdateIP = FindByName(__.UpdateIP);
 
-            static Field FindByName(String name) { return Meta.Table.FindByName(name); }
+            static Field FindByName(String name) => Meta.Table.FindByName(name);
         }
 
         /// <summary>取得应用在线字段名称的快捷方式</summary>

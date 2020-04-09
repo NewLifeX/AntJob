@@ -23,7 +23,7 @@ namespace AntJob.Data.Entity
         [Description("编号")]
         [DataObjectField(true, true, false, 0)]
         [BindColumn("ID", "编号", "")]
-        public Int32 ID { get { return _ID; } set { if (OnPropertyChanging(__.ID, value)) { _ID = value; OnPropertyChanged(__.ID); } } }
+        public Int32 ID { get => _ID; set { if (OnPropertyChanging(__.ID, value)) { _ID = value; OnPropertyChanged(__.ID); } } }
 
         private Int32 _AppID;
         /// <summary>应用</summary>
@@ -31,7 +31,7 @@ namespace AntJob.Data.Entity
         [Description("应用")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("AppID", "应用", "")]
-        public Int32 AppID { get { return _AppID; } set { if (OnPropertyChanging(__.AppID, value)) { _AppID = value; OnPropertyChanged(__.AppID); } } }
+        public Int32 AppID { get => _AppID; set { if (OnPropertyChanging(__.AppID, value)) { _AppID = value; OnPropertyChanged(__.AppID); } } }
 
         private Int32 _JobID;
         /// <summary>作业。生产消息的作业</summary>
@@ -39,7 +39,7 @@ namespace AntJob.Data.Entity
         [Description("作业。生产消息的作业")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("JobID", "作业。生产消息的作业", "")]
-        public Int32 JobID { get { return _JobID; } set { if (OnPropertyChanging(__.JobID, value)) { _JobID = value; OnPropertyChanged(__.JobID); } } }
+        public Int32 JobID { get => _JobID; set { if (OnPropertyChanging(__.JobID, value)) { _JobID = value; OnPropertyChanged(__.JobID); } } }
 
         private String _Topic;
         /// <summary>主题。区分作业下多种消息</summary>
@@ -47,7 +47,7 @@ namespace AntJob.Data.Entity
         [Description("主题。区分作业下多种消息")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Topic", "主题。区分作业下多种消息", "")]
-        public String Topic { get { return _Topic; } set { if (OnPropertyChanging(__.Topic, value)) { _Topic = value; OnPropertyChanged(__.Topic); } } }
+        public String Topic { get => _Topic; set { if (OnPropertyChanging(__.Topic, value)) { _Topic = value; OnPropertyChanged(__.Topic); } } }
 
         private String _Data;
         /// <summary>数据。可以是Json数据，比如StatID</summary>
@@ -55,7 +55,7 @@ namespace AntJob.Data.Entity
         [Description("数据。可以是Json数据，比如StatID")]
         [DataObjectField(false, false, true, 2000)]
         [BindColumn("Data", "数据。可以是Json数据，比如StatID", "")]
-        public String Data { get { return _Data; } set { if (OnPropertyChanging(__.Data, value)) { _Data = value; OnPropertyChanged(__.Data); } } }
+        public String Data { get => _Data; set { if (OnPropertyChanging(__.Data, value)) { _Data = value; OnPropertyChanged(__.Data); } } }
 
         private DateTime _CreateTime;
         /// <summary>创建时间</summary>
@@ -63,7 +63,7 @@ namespace AntJob.Data.Entity
         [Description("创建时间")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("CreateTime", "创建时间", "")]
-        public DateTime CreateTime { get { return _CreateTime; } set { if (OnPropertyChanging(__.CreateTime, value)) { _CreateTime = value; OnPropertyChanged(__.CreateTime); } } }
+        public DateTime CreateTime { get => _CreateTime; set { if (OnPropertyChanging(__.CreateTime, value)) { _CreateTime = value; OnPropertyChanged(__.CreateTime); } } }
 
         private DateTime _UpdateTime;
         /// <summary>更新时间</summary>
@@ -71,7 +71,7 @@ namespace AntJob.Data.Entity
         [Description("更新时间")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("UpdateTime", "更新时间", "")]
-        public DateTime UpdateTime { get { return _UpdateTime; } set { if (OnPropertyChanging(__.UpdateTime, value)) { _UpdateTime = value; OnPropertyChanged(__.UpdateTime); } } }
+        public DateTime UpdateTime { get => _UpdateTime; set { if (OnPropertyChanging(__.UpdateTime, value)) { _UpdateTime = value; OnPropertyChanged(__.UpdateTime); } } }
         #endregion
 
         #region 获取/设置 字段值
@@ -84,13 +84,13 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case __.ID : return _ID;
-                    case __.AppID : return _AppID;
-                    case __.JobID : return _JobID;
-                    case __.Topic : return _Topic;
-                    case __.Data : return _Data;
-                    case __.CreateTime : return _CreateTime;
-                    case __.UpdateTime : return _UpdateTime;
+                    case __.ID: return _ID;
+                    case __.AppID: return _AppID;
+                    case __.JobID: return _JobID;
+                    case __.Topic: return _Topic;
+                    case __.Data: return _Data;
+                    case __.CreateTime: return _CreateTime;
+                    case __.UpdateTime: return _UpdateTime;
                     default: return base[name];
                 }
             }
@@ -98,13 +98,13 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case __.ID : _ID = value.ToInt(); break;
-                    case __.AppID : _AppID = value.ToInt(); break;
-                    case __.JobID : _JobID = value.ToInt(); break;
-                    case __.Topic : _Topic = Convert.ToString(value); break;
-                    case __.Data : _Data = Convert.ToString(value); break;
-                    case __.CreateTime : _CreateTime = value.ToDateTime(); break;
-                    case __.UpdateTime : _UpdateTime = value.ToDateTime(); break;
+                    case __.ID: _ID = value.ToInt(); break;
+                    case __.AppID: _AppID = value.ToInt(); break;
+                    case __.JobID: _JobID = value.ToInt(); break;
+                    case __.Topic: _Topic = Convert.ToString(value); break;
+                    case __.Data: _Data = Convert.ToString(value); break;
+                    case __.CreateTime: _CreateTime = value.ToDateTime(); break;
+                    case __.UpdateTime: _UpdateTime = value.ToDateTime(); break;
                     default: base[name] = value; break;
                 }
             }
@@ -136,7 +136,7 @@ namespace AntJob.Data.Entity
             /// <summary>更新时间</summary>
             public static readonly Field UpdateTime = FindByName(__.UpdateTime);
 
-            static Field FindByName(String name) { return Meta.Table.FindByName(name); }
+            static Field FindByName(String name) => Meta.Table.FindByName(name);
         }
 
         /// <summary>取得应用消息字段名称的快捷方式</summary>
