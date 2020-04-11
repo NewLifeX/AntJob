@@ -154,7 +154,7 @@ namespace AntJob.Providers
             // 不用上报抽取中
             if (ctx.Status == JobStatus.抽取中) return;
 
-            if (!(ctx?.Task is TaskModel task)) return;
+            if (!(ctx?.Result is TaskResult task)) return;
 
             // 区分抽取和处理
             task.Status = ctx.Status;
@@ -173,7 +173,7 @@ namespace AntJob.Providers
         /// <param name="ctx">上下文</param>
         public override void Finish(JobContext ctx)
         {
-            if (!(ctx?.Task is TaskModel task)) return;
+            if (!(ctx?.Result is TaskResult task)) return;
 
             task.Speed = ctx.Speed;
             task.Total = ctx.Total;
@@ -212,7 +212,7 @@ namespace AntJob.Providers
             Report(ctx.Handler.Job, task);
         }
 
-        private void Report(IJob job, TaskModel task)
+        private void Report(IJob job, ITaskResult task)
         {
             try
             {

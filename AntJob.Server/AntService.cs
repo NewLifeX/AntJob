@@ -432,7 +432,7 @@ namespace AntJob.Server
         /// <param name="task"></param>
         /// <returns></returns>
         [Api(nameof(Report))]
-        public Boolean Report(TaskModel task)
+        public Boolean Report(TaskResult task)
         {
             if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 

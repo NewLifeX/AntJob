@@ -135,6 +135,7 @@ namespace AntJob
             {
                 Handler = this,
                 Task = task,
+                Result = new TaskResult { ID = task.ID },
             };
 
             var sw = Stopwatch.StartNew();

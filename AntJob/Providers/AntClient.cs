@@ -146,20 +146,16 @@ namespace AntJob.Providers
 
         /// <summary>报告状态（进度、成功、错误）</summary>
         /// <param name="task"></param>
-        /// <param name="ext"></param>
         /// <returns></returns>
-        public Boolean Report(ITask task, Object ext = null)
+        public Boolean Report(ITaskResult task)
         {
-            var dic = new { task }.ToDictionary();
-            if (ext != null) dic = dic.Merge(ext);
-
             var retry = 3;
             var lastex = new Exception();
             while (retry-- > 0)
             {
                 try
                 {
-                    return Invoke<Boolean>(nameof(Report), dic);
+                    return Invoke<Boolean>(nameof(Report), task);
                 }
                 catch (Exception ex)
                 {

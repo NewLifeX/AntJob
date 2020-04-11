@@ -13,8 +13,11 @@ namespace AntJob
         /// <summary>作业</summary>
         public Handler Handler { get; set; }
 
-        /// <summary>任务</summary>
+        /// <summary>任务参数</summary>
         public ITask Task { get; set; }
+
+        /// <summary>任务结果</summary>
+        public ITaskResult Result { get; set; }
 
         /// <summary>状态</summary>
         public JobStatus Status { get; set; }
