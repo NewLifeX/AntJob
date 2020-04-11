@@ -37,6 +37,9 @@ namespace AntJob.Data.Entity
             // 如果没有脏数据，则不需要进行任何处理
             if (!HasDirty) return;
 
+            if ((Mode == JobModes.Sql || Mode == JobModes.CSharp) && Data.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(Data), $"{Mode}调度模式要求设置Data模板");
+
             // 参数默认值
             if (Step == 0) Step = 5;
             if (MaxRetain == 0) MaxRetain = 3;
@@ -302,6 +305,9 @@ namespace AntJob.Data.Entity
                         ti.Status = JobStatus.就绪;
                         ti.CreateTime = DateTime.Now;
                         ti.UpdateTime = DateTime.Now;
+
+                        // 如果有模板，则进行计算替换
+                        if (!Data.IsNullOrEmpty()) ti.Data = TemplateHelper.Build(Data, ti.Start, ti.End);
 
                         ti.Insert();
 
