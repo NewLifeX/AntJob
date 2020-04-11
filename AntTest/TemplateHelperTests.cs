@@ -64,5 +64,33 @@ insert into t1(xxx) select * from t2 where time between {Start:yyMMdd} and {End:
                ;
             Assert.Equal(rs, str);
         }
+
+        [Fact]
+        public void BuildTest4()
+        {
+            var tt = @"/*use his*/
+select * from t1 where time between '{Start}' and '{End}'
+
+/*use hist_bak*/
+delete from t2 where time between '{Start}' and '{End}';
+
+/*use hist_bak*/
+/*batchinsert t2*/
+";
+            var start = DateTime.Now;
+            var end = start.AddSeconds(30);
+
+            var str = TemplateHelper.Build(tt, start, end);
+            Assert.NotNull(str);
+            Assert.NotEmpty(str);
+            Assert.DoesNotContain("{Start}", str);
+            Assert.DoesNotContain("{End}", str);
+
+            var rs = tt
+                .Replace("{Start}", start.ToFullString())
+                .Replace("{End}", end.ToFullString())
+               ;
+            Assert.Equal(rs, str);
+        }
     }
 }

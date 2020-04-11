@@ -74,7 +74,7 @@ namespace AntJob.Data
             // 格式化字符串
             var format = "";
             var p3 = str.IndexOf(":", p1);
-            if (p3 > 0) format = str.Substring(p3 + 1, p2 - p3 - 1);
+            if (p3 > 0 && p3 < p2) format = str.Substring(p3 + 1, p2 - p3 - 1);
 
             // 左括号位置，右括号位置，格式化字符串
             return new Tuple<Int32, Int32, String>(p1, p2, format);
