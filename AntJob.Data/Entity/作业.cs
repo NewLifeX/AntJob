@@ -224,6 +224,14 @@ namespace AntJob.Data.Entity
         [BindColumn("Enable", "启用", "")]
         public Boolean Enable { get => _Enable; set { if (OnPropertyChanging(__.Enable, value)) { _Enable = value; OnPropertyChanged(__.Enable); } } }
 
+        private String _Data;
+        /// <summary>数据。Sql模板或C#模板</summary>
+        [DisplayName("数据")]
+        [Description("数据。Sql模板或C#模板")]
+        [DataObjectField(false, false, true, -1)]
+        [BindColumn("Data", "数据。Sql模板或C#模板", "")]
+        public String Data { get => _Data; set { if (OnPropertyChanging(__.Data, value)) { _Data = value; OnPropertyChanged(__.Data); } } }
+
         private String _Remark;
         /// <summary>内容</summary>
         [DisplayName("内容")]
@@ -333,6 +341,7 @@ namespace AntJob.Data.Entity
                     case __.Times: return _Times;
                     case __.Speed: return _Speed;
                     case __.Enable: return _Enable;
+                    case __.Data: return _Data;
                     case __.Remark: return _Remark;
                     case __.CreateUserID: return _CreateUserID;
                     case __.CreateUser: return _CreateUser;
@@ -375,6 +384,7 @@ namespace AntJob.Data.Entity
                     case __.Times: _Times = value.ToInt(); break;
                     case __.Speed: _Speed = value.ToInt(); break;
                     case __.Enable: _Enable = value.ToBoolean(); break;
+                    case __.Data: _Data = Convert.ToString(value); break;
                     case __.Remark: _Remark = Convert.ToString(value); break;
                     case __.CreateUserID: _CreateUserID = value.ToInt(); break;
                     case __.CreateUser: _CreateUser = Convert.ToString(value); break;
@@ -471,6 +481,9 @@ namespace AntJob.Data.Entity
 
             /// <summary>启用</summary>
             public static readonly Field Enable = FindByName(__.Enable);
+
+            /// <summary>数据。Sql模板或C#模板</summary>
+            public static readonly Field Data = FindByName(__.Data);
 
             /// <summary>内容</summary>
             public static readonly Field Remark = FindByName(__.Remark);
@@ -583,6 +596,9 @@ namespace AntJob.Data.Entity
             /// <summary>启用</summary>
             public const String Enable = "Enable";
 
+            /// <summary>数据。Sql模板或C#模板</summary>
+            public const String Data = "Data";
+
             /// <summary>内容</summary>
             public const String Remark = "Remark";
 
@@ -694,6 +710,9 @@ namespace AntJob.Data.Entity
 
         /// <summary>启用</summary>
         Boolean Enable { get; set; }
+
+        /// <summary>数据。Sql模板或C#模板</summary>
+        String Data { get; set; }
 
         /// <summary>内容</summary>
         String Remark { get; set; }

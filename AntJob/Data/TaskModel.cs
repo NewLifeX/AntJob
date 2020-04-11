@@ -57,7 +57,7 @@ namespace AntJob.Data
         /// <summary>最后键值</summary>
         public String Key { get; set; }
 
-        /// <summary>内容</summary>
+        /// <summary>消息内容。异常信息或其它任务消息</summary>
         public String Message { get; set; }
         #endregion
     }

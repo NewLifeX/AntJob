@@ -120,6 +120,7 @@
       <Column Name="Times" DataType="Int32" Description="次数" />
       <Column Name="Speed" DataType="Int32" Description="速度" />
       <Column Name="Enable" DataType="Boolean" Description="启用" />
+      <Column Name="Data" DataType="String" Length="-1" Description="数据。Sql模板或C#模板" />
       <Column Name="Remark" DataType="String" Length="2000" Description="内容" />
       <Column Name="CreateUserID" DataType="Int32" Description="创建人" />
       <Column Name="CreateUser" DataType="String" Description="创建者" />
@@ -155,8 +156,8 @@
       <Column Name="Server" DataType="String" Description="服务器" />
       <Column Name="ProcessID" DataType="Int32" Description="进程" />
       <Column Name="Key" DataType="String" Description="最后键" />
-      <Column Name="Data" DataType="String" Length="8000" Description="数据。可以是Json数据，比如StatID" />
-      <Column Name="Message" DataType="String" Length="2000" Description="备注" />
+      <Column Name="Data" DataType="String" Length="-1" Description="数据。可以是Json数据，比如StatID" />
+      <Column Name="Message" DataType="String" Length="-1" Description="消息内容。异常信息或其它任务消息" />
       <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
       <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
     </Columns>

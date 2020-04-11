@@ -174,16 +174,16 @@ namespace AntJob.Data.Entity
         /// <summary>数据。可以是Json数据，比如StatID</summary>
         [DisplayName("数据")]
         [Description("数据。可以是Json数据，比如StatID")]
-        [DataObjectField(false, false, true, 8000)]
+        [DataObjectField(false, false, true, -1)]
         [BindColumn("Data", "数据。可以是Json数据，比如StatID", "")]
         public String Data { get => _Data; set { if (OnPropertyChanging(__.Data, value)) { _Data = value; OnPropertyChanged(__.Data); } } }
 
         private String _Message;
-        /// <summary>备注</summary>
-        [DisplayName("备注")]
-        [Description("备注")]
-        [DataObjectField(false, false, true, 2000)]
-        [BindColumn("Message", "备注", "")]
+        /// <summary>消息内容。异常信息或其它任务消息</summary>
+        [DisplayName("消息内容")]
+        [Description("消息内容。异常信息或其它任务消息")]
+        [DataObjectField(false, false, true, -1)]
+        [BindColumn("Message", "消息内容。异常信息或其它任务消息", "")]
         public String Message { get => _Message; set { if (OnPropertyChanging(__.Message, value)) { _Message = value; OnPropertyChanged(__.Message); } } }
 
         private DateTime _CreateTime;
@@ -336,7 +336,7 @@ namespace AntJob.Data.Entity
             /// <summary>数据。可以是Json数据，比如StatID</summary>
             public static readonly Field Data = FindByName(__.Data);
 
-            /// <summary>备注</summary>
+            /// <summary>消息内容。异常信息或其它任务消息</summary>
             public static readonly Field Message = FindByName(__.Message);
 
             /// <summary>创建时间</summary>
@@ -411,7 +411,7 @@ namespace AntJob.Data.Entity
             /// <summary>数据。可以是Json数据，比如StatID</summary>
             public const String Data = "Data";
 
-            /// <summary>备注</summary>
+            /// <summary>消息内容。异常信息或其它任务消息</summary>
             public const String Message = "Message";
 
             /// <summary>创建时间</summary>
@@ -487,7 +487,7 @@ namespace AntJob.Data.Entity
         /// <summary>数据。可以是Json数据，比如StatID</summary>
         String Data { get; set; }
 
-        /// <summary>备注</summary>
+        /// <summary>消息内容。异常信息或其它任务消息</summary>
         String Message { get; set; }
 
         /// <summary>创建时间</summary>

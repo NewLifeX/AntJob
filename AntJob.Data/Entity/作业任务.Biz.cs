@@ -27,12 +27,12 @@ namespace AntJob.Data.Entity
             // 如果没有脏数据，则不需要进行任何处理
             if (!HasDirty) return;
 
-            var len = _.Data.Length;
-            if (len > 0 && !Data.IsNullOrEmpty() && Data.Length > len) throw new InvalidOperationException($"字段[{__.Data}]超长");
+            //var len = _.Data.Length;
+            //if (len > 0 && !Data.IsNullOrEmpty() && Data.Length > len) throw new InvalidOperationException($"字段[{__.Data}]超长");
 
-            // 截断错误信息，避免过长
-            len = _.Message.Length;
-            if (!Message.IsNullOrEmpty() && len > 0 && Message.Length > len) Message = Message.Substring(0, len);
+            //// 截断错误信息，避免过长
+            //len = _.Message.Length;
+            //if (!Message.IsNullOrEmpty() && len > 0 && Message.Length > len) Message = Message.Substring(0, len);
         }
         #endregion
 

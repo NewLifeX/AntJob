@@ -29,7 +29,7 @@ namespace AntJob.Data
         /// <summary>数据</summary>
         String Data { get; set; }
 
-        /// <summary>内容</summary>
+        /// <summary>消息内容。异常信息或其它任务消息</summary>
         String Message { get; set; }
     }
 
