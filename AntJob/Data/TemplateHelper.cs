@@ -31,7 +31,7 @@ namespace AntJob.Data
 
                 // 准备替换
                 var val = ti.Item3.IsNullOrEmpty() ? startTime.ToFullString() : startTime.ToString(ti.Item3);
-                sb.Append(str.Substring(0, ti.Item1));
+                sb.Append(str.Substring(p, ti.Item1 - p));
                 sb.Append(val);
 
                 // 移动指针
@@ -52,7 +52,7 @@ namespace AntJob.Data
 
                 // 准备替换
                 var val = ti.Item3.IsNullOrEmpty() ? endTime.ToFullString() : endTime.ToString(ti.Item3);
-                sb.Append(str.Substring(0, ti.Item1));
+                sb.Append(str.Substring(p, ti.Item1 - p));
                 sb.Append(val);
 
                 // 移动指针
