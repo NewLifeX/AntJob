@@ -65,7 +65,7 @@ namespace AntJob
             while (true)
             {
                 ctx.Data = null;
-                ctx.Entity = null;
+                //ctx.Entity = null;
                 ctx.Error = null;
 
                 // 分批抽取
@@ -133,7 +133,7 @@ namespace AntJob
             foreach (var item in ctx.Data as IEnumerable)
             {
                 //ctx.Key = item + "";
-                ctx.Entity = item;
+                //ctx.Entity = item;
 
                 if (ProcessItem(ctx, item as IEntity)) count++;
             }

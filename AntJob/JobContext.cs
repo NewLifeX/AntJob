@@ -37,8 +37,8 @@ namespace AntJob
         /// <summary>最后处理键值。由业务决定，便于分析问题</summary>
         public String Key { get; set; }
 
-        /// <summary>当前处理对象</summary>
-        public Object Entity { get; set; }
+        ///// <summary>当前处理对象</summary>
+        //public Object Entity { get; set; }
 
         /// <summary>处理异常</summary>
         public Exception Error { get; set; }

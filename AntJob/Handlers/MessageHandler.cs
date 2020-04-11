@@ -87,7 +87,7 @@ namespace AntJob.Handlers
             foreach (var item in ctx.Data as IEnumerable)
             {
                 //ctx.Key = item as String;
-                ctx.Entity = item;
+                //ctx.Entity = item;
 
                 if (ProcessItem(ctx, (TModel)item)) count++;
             }
