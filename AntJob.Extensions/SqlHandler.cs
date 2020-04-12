@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AntJob.Data;
 using XCode.DataAccessLayer;
 
-namespace AntJob.Extensions
+namespace AntJob
 {
     /// <summary>SQL语句处理器，定时执行SQL语句</summary>
     /// <remarks>

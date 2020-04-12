@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AntJob.Extensions\AntJob.Extensions.csproj" />
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using AntJob.Extensions;
 using AntJob.Handlers;
 using AntJob.Providers;
 using NewLife;
