@@ -32,7 +32,7 @@ insert into t1 (c1, c2) values(v1, v2);
 
             Assert.Equal("his", section.ConnName);
             Assert.Equal(SqlActions.Execute, section.Action);
-            Assert.Equal("insert into t1 (c1, c2) values(v1, v2);", section.Sql);
+            Assert.Equal("insert into t1 (c1, c2) values(v1, v2)", section.Sql);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ delete from t2 where time between '{Start}' and '{End}';
 
             Assert.Equal("his", section.ConnName);
             Assert.Equal(SqlActions.Execute, section.Action);
-            Assert.Equal("delete from t2 where time between '{Start}' and '{End}';", section.Sql);
+            Assert.Equal("delete from t2 where time between '{Start}' and '{End}'", section.Sql);
         }
 
         [Fact]
@@ -62,7 +62,7 @@ update t1 set c1=v1, c2=v2 where id=123;
 
             Assert.Equal("his", section.ConnName);
             Assert.Equal(SqlActions.Execute, section.Action);
-            Assert.Equal("update t1 set c1=v1, c2=v2 where id=123;", section.Sql);
+            Assert.Equal("update t1 set c1=v1, c2=v2 where id=123", section.Sql);
         }
 
         [Fact]
@@ -78,7 +78,7 @@ insert t2;
 
             Assert.Equal("his_bak", section.ConnName);
             Assert.Equal(SqlActions.Insert, section.Action);
-            Assert.Equal("insert t2;", section.Sql);
+            Assert.Equal("insert t2", section.Sql);
         }
 
         [Fact]
@@ -104,11 +104,11 @@ insert t2;
 
             Assert.Equal("his_bak", cs[1].ConnName);
             Assert.Equal(SqlActions.Execute, cs[1].Action);
-            Assert.Equal("delete from t2 where time between '{Start}' and '{End}';", cs[1].Sql);
+            Assert.Equal("delete from t2 where time between '{Start}' and '{End}'", cs[1].Sql);
 
             Assert.Equal("his_bak", cs[2].ConnName);
             Assert.Equal(SqlActions.Insert, cs[2].Action);
-            Assert.Equal("insert t2;", cs[2].Sql);
+            Assert.Equal("insert t2", cs[2].Sql);
         }
     }
 }

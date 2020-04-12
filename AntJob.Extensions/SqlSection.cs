@@ -65,7 +65,7 @@ namespace AntJob.Extensions
             if (!str.IsNullOrEmpty()) ConnName = str.Substring("use ")?.Trim();
 
             // 剩下的Sql
-            sql = sql.Substring("*/")?.Trim();
+            sql = sql.Substring("*/")?.Trim()?.Trim(';')?.Trim();
             Sql = sql;
 
             // 猜测操作
