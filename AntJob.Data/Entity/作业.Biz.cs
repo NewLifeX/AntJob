@@ -37,8 +37,8 @@ namespace AntJob.Data.Entity
             // 如果没有脏数据，则不需要进行任何处理
             if (!HasDirty) return;
 
-            if ((Mode == JobModes.Sql || Mode == JobModes.CSharp) && Data.IsNullOrEmpty())
-                throw new ArgumentNullException(nameof(Data), $"{Mode}调度模式要求设置Data模板");
+            //if ((Mode == JobModes.Sql || Mode == JobModes.CSharp) && Data.IsNullOrEmpty())
+            //    throw new ArgumentNullException(nameof(Data), $"{Mode}调度模式要求设置Data模板");
 
             // 参数默认值
             if (Step == 0) Step = 5;
