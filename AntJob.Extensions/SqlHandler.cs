@@ -1,6 +1,7 @@
 ﻿using System;
-using System.IO;
 using AntJob.Data;
+using AntJob.Extensions;
+using NewLife.Data;
 using XCode.DataAccessLayer;
 
 namespace AntJob
@@ -27,21 +28,57 @@ namespace AntJob
         /// <returns></returns>
         protected override Int32 Execute(JobContext ctx)
         {
-            var sql = ctx.Task.Data as String;
-            if (sql.IsNullOrWhiteSpace()) return -1;
+            var sqls = ctx.Task.Data as String;
+            var sections = SqlSection.ParseAll(sqls);
+            if (sections.Length == 0) return -1;
 
-            // 解析出来连接名
-            var connName = "";
-            var str = sql.Substring("/*", "*/")?.Trim();
-            if (!str.IsNullOrEmpty()) connName = str.Substring("use ")?.Trim();
-            if (connName.IsNullOrEmpty()) throw new InvalidDataException("无法解析连接名");
+            var rs = 0;
+            ctx.Total = 0;
 
-            // 剩下的Sql
-            sql = sql.Substring("*/")?.Trim();
-            if (sql.IsNullOrWhiteSpace()) return -1;
+            // 打开事务
+            foreach (var item in sections)
+            {
+                if (item.Action != SqlActions.Query) DAL.Create(item.ConnName).BeginTransaction();
+            }
+            try
+            {
+                // 按顺序执行处理Sql语句
+                DbTable dt = null;
+                foreach (var item in sections)
+                {
+                    switch (item.Action)
+                    {
+                        case SqlActions.Query:
+                            dt = item.Query();
+                            if (dt != null) ctx.Total += dt.Rows.Count;
+                            break;
+                        case SqlActions.Execute:
+                            rs += item.Execute();
+                            break;
+                        case SqlActions.Insert:
+                            rs += item.BatchInsert(dt);
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
-            var dal = DAL.Create(connName);
-            var rs = dal.Execute(sql);
+                // 提交事务
+                foreach (var item in sections)
+                {
+                    if (item.Action != SqlActions.Query) DAL.Create(item.ConnName).Commit();
+                }
+            }
+            catch
+            {
+                // 回滚事务
+                foreach (var item in sections)
+                {
+                    if (item.Action != SqlActions.Query) DAL.Create(item.ConnName).Rollback();
+                }
+
+                throw;
+            }
 
             return rs;
         }

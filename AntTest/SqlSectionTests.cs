@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AntJob.Extensions;
+﻿using AntJob.Extensions;
 using Xunit;
 
 namespace AntTest
@@ -19,7 +16,7 @@ select * from t1 where time between '{Start}' and '{End}'
             section.Parse(tt);
 
             Assert.Equal("his", section.ConnName);
-            Assert.Equal("Query", section.Action);
+            Assert.Equal(SqlActions.Query, section.Action);
             Assert.Equal("select * from t1 where time between '{Start}' and '{End}'", section.Sql);
         }
 
@@ -34,7 +31,7 @@ insert into t1 (c1, c2) values(v1, v2);
             section.Parse(tt);
 
             Assert.Equal("his", section.ConnName);
-            Assert.Equal("Execute", section.Action);
+            Assert.Equal(SqlActions.Execute, section.Action);
             Assert.Equal("insert into t1 (c1, c2) values(v1, v2);", section.Sql);
         }
 
@@ -49,7 +46,7 @@ delete from t2 where time between '{Start}' and '{End}';
             section.Parse(tt);
 
             Assert.Equal("his", section.ConnName);
-            Assert.Equal("Execute", section.Action);
+            Assert.Equal(SqlActions.Execute, section.Action);
             Assert.Equal("delete from t2 where time between '{Start}' and '{End}';", section.Sql);
         }
 
@@ -64,7 +61,7 @@ update t1 set c1=v1, c2=v2 where id=123;
             section.Parse(tt);
 
             Assert.Equal("his", section.ConnName);
-            Assert.Equal("Execute", section.Action);
+            Assert.Equal(SqlActions.Execute, section.Action);
             Assert.Equal("update t1 set c1=v1, c2=v2 where id=123;", section.Sql);
         }
 
@@ -80,12 +77,12 @@ insert t2;
             section.Parse(tt);
 
             Assert.Equal("his_bak", section.ConnName);
-            Assert.Equal("Insert", section.Action);
+            Assert.Equal(SqlActions.Insert, section.Action);
             Assert.Equal("insert t2;", section.Sql);
         }
 
         [Fact]
-        public void TestSqls()
+        public void ParseAllSqls()
         {
             var tt = @"/*use his*/
 select * from t1 where time between '{Start}' and '{End}'
@@ -102,15 +99,15 @@ insert t2;
             Assert.Equal(3, cs.Length);
 
             Assert.Equal("his", cs[0].ConnName);
-            Assert.Equal("Query", cs[0].Action);
+            Assert.Equal(SqlActions.Query, cs[0].Action);
             Assert.Equal("select * from t1 where time between '{Start}' and '{End}'", cs[0].Sql);
 
             Assert.Equal("his_bak", cs[1].ConnName);
-            Assert.Equal("Execute", cs[1].Action);
+            Assert.Equal(SqlActions.Execute, cs[1].Action);
             Assert.Equal("delete from t2 where time between '{Start}' and '{End}';", cs[1].Sql);
 
             Assert.Equal("his_bak", cs[2].ConnName);
-            Assert.Equal("Insert", cs[2].Action);
+            Assert.Equal(SqlActions.Insert, cs[2].Action);
             Assert.Equal("insert t2;", cs[2].Sql);
         }
     }
