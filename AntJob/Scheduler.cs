@@ -162,6 +162,7 @@ namespace AntJob
                     {
                         // 实例化一个处理器
                         var type = Type.GetType(job.ClassName);
+                        if (type == null) type = handlers.Where(e => e.GetType().FullName == job.ClassName)?.FirstOrDefault()?.GetType();
                         if (type != null)
                         {
                             handler = type.CreateInstance() as Handler;
