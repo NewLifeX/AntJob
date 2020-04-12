@@ -62,7 +62,8 @@ namespace AntJob.Server
 
             var svr = new ApiServer(set.Port)
             {
-                Log = XTrace.Log
+                ShowError = true,
+                Log = XTrace.Log,
             };
 
             //var ts = new AntService();
