@@ -45,10 +45,19 @@ namespace AntJob.Extensions
 
             // 两个换行隔开片段
             var ss = sqls.Split(new[] { "\r\n\r", "\r\r", "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var connName = "";
             foreach (var item in ss)
             {
                 var section = new SqlSection();
                 section.Parse(item);
+
+                // 如果当前片段未指定连接名，则使用上一个
+                if (section.ConnName.IsNullOrEmpty())
+                    section.ConnName = connName;
+                else
+                    connName = section.ConnName;
+
+                if (section.ConnName.IsNullOrEmpty()) throw new Exception("未指定连接名！");
 
                 list.Add(section);
             }

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using AntJob.Data;
 using AntJob.Extensions;
 using AntJob.Handlers;
+using AntJob.Providers;
 using NewLife.Data;
-using XCode.DataAccessLayer;
 
 namespace AntJob
 {
@@ -15,14 +17,7 @@ namespace AntJob
     {
         #region 构造
         /// <summary>实例化</summary>
-        public SqlMessage()
-        {
-            Topic = "Sql";
-            //Mode = JobModes.Message;
-
-            //var job = Job;
-            //job.BatchSize = 8;
-        }
+        public SqlMessage() => Topic = "Sql";//Mode = JobModes.Message;//var job = Job;//job.BatchSize = 8;
         #endregion
 
         /// <summary>根据解码后的消息执行任务</summary>
@@ -36,12 +31,35 @@ namespace AntJob
             // 向调度中心返回解析后的Sql语句
             ctx.Remark = sqls;
 
+            // 分解Sql语句得到片段数组
             var sections = SqlSection.ParseAll(sqls);
             if (sections.Length == 0) return -1;
 
-            var rs = SqlHandler.ExecuteSql(sections, ctx);
+            // 依次执行Sql片段数组。遇到query时，可能需要生产消息
+            var rs = SqlHandler.ExecuteSql(sections, ctx, (section, dt) => ProcessMessage(dt, ctx));
 
             return rs;
+        }
+
+        internal static void ProcessMessage(DbTable dt, JobContext ctx)
+        {
+            if (dt == null || dt.Columns == null || dt.Columns.Length == 0 || dt.Rows == null || dt.Rows.Count == 0) return;
+
+            // select id as topic_roleId, id as topic_myId from role where updatetime>='{Start}' and updatetime<'{End}'
+
+            for (var i = 0; i < dt.Columns.Length; i++)
+            {
+                var col = dt.Columns[i];
+                if (col.StartsWithIgnoreCase("topic_"))
+                {
+                    var topic = col.Substring("topic_".Length);
+                    var messages = dt.Rows.Select(e => "{0}".F(e[i])).Distinct().ToArray();
+                    if (messages.Length > 0)
+                    {
+                        ctx.Handler.Produce(topic, messages, new MessageOption { Unique = true });
+                    }
+                }
+            }
         }
     }
 }

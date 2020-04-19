@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using AntJob.Data;
 using AntJob.Extensions;
+using AntJob.Providers;
 using NewLife.Data;
 using XCode.DataAccessLayer;
 
@@ -37,7 +39,7 @@ namespace AntJob
             var sections = SqlSection.ParseAll(sqls);
             if (sections.Length == 0) return -1;
 
-            var rs = ExecuteSql(sections, ctx);
+            var rs = ExecuteSql(sections, ctx, (section, dt) => SqlMessage.ProcessMessage(dt, ctx));
 
             return rs;
         }
@@ -45,8 +47,9 @@ namespace AntJob
         /// <summary>执行Sql集合</summary>
         /// <param name="sections"></param>
         /// <param name="ctx"></param>
+        /// <param name="callback"></param>
         /// <returns></returns>
-        public static Int32 ExecuteSql(SqlSection[] sections, JobContext ctx)
+        public static Int32 ExecuteSql(SqlSection[] sections, JobContext ctx, Action<SqlSection, DbTable> callback = null)
         {
             if (sections == null || sections.Length == 0) return -1;
 
@@ -62,19 +65,23 @@ namespace AntJob
             {
                 // 按顺序执行处理Sql语句
                 DbTable dt = null;
-                foreach (var item in sections)
+                foreach (var section in sections)
                 {
-                    switch (item.Action)
+                    switch (section.Action)
                     {
                         case SqlActions.Query:
-                            dt = item.Query();
+                            dt = section.Query();
                             if (dt != null) ctx.Total += dt.Rows.Count;
+
+                            // 处理生产消息
+                            callback?.Invoke(section, dt);
+
                             break;
                         case SqlActions.Execute:
-                            rs += item.Execute();
+                            rs += section.Execute();
                             break;
                         case SqlActions.Insert:
-                            rs += item.BatchInsert(dt);
+                            rs += section.BatchInsert(dt);
                             break;
                         default:
                             break;

@@ -9,6 +9,15 @@
     var fields = ViewBag.Fields as IList<FieldItem>;
     var set = ViewBag.PageSetting as PageSetting;
 }
+<style>
+
+    .OverFlow {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 400px;
+    }
+</style>
 <table class="table table-bordered table-hover table-striped table-condensed">
     <thead>
         <tr>
@@ -20,6 +29,7 @@
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("AppID"))">应用</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("JobID"))">作业</a></th>
             <th class="text-center" title="主题。区分作业下多种资源"><a href="@Html.Raw(page.GetSortUrl("Topic"))">主题</a></th>
+            <th class="text-center">内容</th>
             <th class="text-center" style="min-width:134px;"><a href="@Html.Raw(page.GetSortUrl("CreateTime"))">创建时间</a></th>
             <th class="text-center" style="min-width:134px;"><a href="@Html.Raw(page.GetSortUrl("UpdateTime"))">更新时间</a></th>
             @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
@@ -40,6 +50,7 @@
                 <td><a href="App?ID=@entity.AppID">@entity.AppName</a></td>
                 <td><a href="Job?ID=@entity.JobID">@entity.JobName</a></td>
                 <td>@entity.Topic</td>
+                <td class="OverFlow" title="@entity.Data">@entity.Data</td>
                 <td>@entity.CreateTime.ToFullString("")</td>
                 <td>@entity.UpdateTime.ToFullString("")</td>
                 @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
