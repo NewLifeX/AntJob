@@ -35,6 +35,9 @@ namespace AntJob.Data
         /// <summary>调度模式</summary>
         JobModes Mode { get; set; }
 
+        /// <summary>消息主题</summary>
+        String Topic { get; set; }
+
         /// <summary>数据</summary>
         String Data { get; set; }
     }

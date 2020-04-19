@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AntJob.Data;
+using AntJob.Handlers;
 using AntJob.Providers;
 using NewLife;
 using NewLife.Log;
@@ -64,7 +65,7 @@ namespace AntJob
                 handler.Provider = prv;
 
                 // 查找作业参数，分配给处理器
-                var job =  jobs.FirstOrDefault(e => e.Name == handler.Name);
+                var job = jobs.FirstOrDefault(e => e.Name == handler.Name);
                 if (job != null && job.Mode == 0) job.Mode = handler.Mode;
                 handler.Job = job;
 
@@ -174,6 +175,9 @@ namespace AntJob
                                 handler.Name = job.Name;
                                 handler.Schedule = this;
                                 handler.Provider = provider;
+                               
+                                if (handler is MessageHandler messageHandler && !job.Topic.IsNullOrEmpty()) messageHandler.Topic = job.Topic;
+                               
                                 handler.Log = XTrace.Log;
                                 handler.Start();
 

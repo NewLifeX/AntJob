@@ -257,6 +257,7 @@ namespace AntJob.Data.Entity
 
                 Start = Start,
                 End = End,
+                Topic = Topic,
                 Data = Data,
 
                 Offset = Offset,

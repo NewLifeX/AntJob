@@ -17,7 +17,7 @@ namespace AntJob
     {
         #region 构造
         /// <summary>实例化</summary>
-        public SqlMessage() => Topic = "Sql";//Mode = JobModes.Message;//var job = Job;//job.BatchSize = 8;
+        public SqlMessage() => Topic = "Sql";
         #endregion
 
         /// <summary>根据解码后的消息执行任务</summary>

@@ -55,6 +55,10 @@ namespace AntJob.Data
         [XmlAttribute]
         public String Description { get; set; }
 
+        /// <summary>消息主题</summary>
+        [XmlAttribute]
+        public String Topic { get; set; }
+
         /// <summary>数据</summary>
         [XmlAttribute]
         public String Data { get; set; }
