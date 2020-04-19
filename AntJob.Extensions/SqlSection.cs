@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NewLife.Data;
+using NewLife.Model;
 using NewLife.Reflection;
 using XCode.DataAccessLayer;
 
@@ -98,7 +99,25 @@ namespace AntJob.Extensions
 
         /// <summary>执行</summary>
         /// <returns></returns>
-        public Int32 Execute() => DAL.Create(ConnName).Execute(Sql);
+        public Int32 Execute()
+        {
+            var dal = DAL.Create(ConnName);
+
+            // 解析数据表，如果目标表不存在，则返回
+            var tableName = "";
+            if (Sql.StartsWithIgnoreCase("delete "))
+                tableName = Sql.Substring(" from ", " ")?.Trim();
+            else if (Sql.StartsWithIgnoreCase("udpate "))
+                tableName = Sql.Substring("udpate ", " ")?.Trim();
+
+            if (!tableName.IsNullOrEmpty())
+            {
+                var table = dal.Tables?.FirstOrDefault(e => e.TableName.EqualIgnoreCase(tableName));
+                if (table == null) return -1;
+            }
+
+            return dal.Execute(Sql);
+        }
 
         /// <summary>批量插入</summary>
         /// <param name="dt"></param>
@@ -107,11 +126,29 @@ namespace AntJob.Extensions
         {
             var tableName = Sql.Substring(" ")?.Trim(';');
             var dal = DAL.Create(ConnName);
-            var table = dal.Tables?.FirstOrDefault(e => e.TableName.EqualIgnoreCase(tableName));
-            if (table == null) throw new Exception($"在连接[{ConnName}]中无法找到数据表[{tableName}]");
 
             // 执行反向工程，该建表就建表
-            dal.CheckDatabase();
+            //dal.CheckDatabase();
+
+            var table = dal.Tables?.FirstOrDefault(e => e.TableName.EqualIgnoreCase(tableName));
+            //if (table == null) throw new Exception($"在连接[{ConnName}]中无法找到数据表[{tableName}]");
+            if (table == null)
+            {
+                var ioc = ObjectContainer.Current;
+                table = ioc.Resolve<IDataTable>();
+                table.TableName = tableName;
+
+                for (var i = 0; i < dt.Columns.Length; i++)
+                {
+                    var dc = table.CreateColumn();
+                    dc.ColumnName = dt.Columns[i];
+                    dc.DataType = dt.Types[i];
+
+                    table.Columns.Add(dc);
+                }
+
+                dal.SetTables(table);
+            }
 
             // 选取目标表和数据集共有的字段
             tableName = dal.Db.FormatTableName(tableName);
