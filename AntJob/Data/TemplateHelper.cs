@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using NewLife.Collections;
 
 namespace AntJob.Data
@@ -78,6 +76,38 @@ namespace AntJob.Data
 
             // 左括号位置，右括号位置，格式化字符串
             return new Tuple<Int32, Int32, String>(p1, p2, format);
+        }
+
+        /// <summary>使用消息数组处理模板</summary>
+        /// <param name="template"></param>
+        /// <param name="messages"></param>
+        /// <returns></returns>
+        public static String Build(String template, String[] messages)
+        {
+            if (template.IsNullOrEmpty()) return template;
+
+            var str = template;
+            var sb = Pool.StringBuilder.Get();
+            var p = 0;
+            while (true)
+            {
+                var p1 = str.IndexOf("{Message}", p);
+                if (p1 < 0)
+                {
+                    sb.Append(str.Substring(p));
+                    break;
+                }
+
+                // 准备替换
+                var val = messages.Join();
+                sb.Append(str.Substring(p, p1 - p));
+                sb.Append(val);
+
+                // 移动指针
+                p = p1 + "{Message}".Length;
+            }
+
+            return sb.Put(true);
         }
     }
 }

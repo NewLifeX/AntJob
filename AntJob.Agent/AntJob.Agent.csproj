@@ -8,9 +8,9 @@
     <Description>调度中心下发C#或Sql给蚂蚁代理执行</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2020</Copyright>
-    <Version>1.0.2020.0111</Version>
-    <FileVersion>1.0.2020.0111</FileVersion>
-    <AssemblyVersion>1.0.*</AssemblyVersion>
+    <Version>2.0.2020.0419</Version>
+    <FileVersion>2.0.2020.0419</FileVersion>
+    <AssemblyVersion>2.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin\Agent</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

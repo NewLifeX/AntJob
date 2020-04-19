@@ -45,8 +45,9 @@ namespace AntJob.Agent
             };
 
             // 添加作业处理器
-            sc.Handlers.Add(new CSharpHandler());
+            //sc.Handlers.Add(new CSharpHandler());
             sc.Handlers.Add(new SqlHandler());
+            sc.Handlers.Add(new SqlMessage());
 
             // 启动调度引擎，调度器内部多线程处理
             sc.Start();

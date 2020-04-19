@@ -34,6 +34,9 @@ namespace AntJob.Data
 
         /// <summary>调度模式</summary>
         JobModes Mode { get; set; }
+
+        /// <summary>数据</summary>
+        String Data { get; set; }
     }
 
     public partial class JobModel : IJob { }

@@ -98,7 +98,7 @@ namespace AntJob.Providers
             if (rs.TryGetValue("Secret", out var secret))
             {
                 set.Secret = secret + "";
-                set.SaveAsync();
+                set.Save();
             }
 
             Logined = true;

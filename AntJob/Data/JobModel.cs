@@ -54,6 +54,10 @@ namespace AntJob.Data
         /// <summary>描述</summary>
         [XmlAttribute]
         public String Description { get; set; }
+
+        /// <summary>数据</summary>
+        [XmlAttribute]
+        public String Data { get; set; }
         #endregion
 
         #region 构造

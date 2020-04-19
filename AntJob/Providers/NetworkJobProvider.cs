@@ -200,9 +200,6 @@ namespace AntJob.Providers
             else
             {
                 task.Status = JobStatus.完成;
-
-                if (ctx["Message"] is String msg) task.Message = msg;
-
                 task.Cost = (Int32)(ctx.Cost / 1000);
             }
             if (task.Message.IsNullOrEmpty()) task.Message = ctx.Remark;

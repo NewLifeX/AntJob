@@ -246,6 +246,9 @@ namespace AntJob.Data.Entity
         /// <returns></returns>
         public JobModel ToModel()
         {
+            // 如果禁用，仅返回最简单的字段
+            if (!Enable) return new JobModel { Name = Name, Enable = Enable };
+
             return new JobModel
             {
                 Name = Name,
@@ -254,6 +257,8 @@ namespace AntJob.Data.Entity
 
                 Start = Start,
                 End = End,
+                Data = Data,
+
                 Offset = Offset,
                 Step = Step,
                 BatchSize = BatchSize,
@@ -306,8 +311,8 @@ namespace AntJob.Data.Entity
                         ti.CreateTime = DateTime.Now;
                         ti.UpdateTime = DateTime.Now;
 
-                        // 如果有模板，则进行计算替换
-                        if (!Data.IsNullOrEmpty()) ti.Data = TemplateHelper.Build(Data, ti.Start, ti.End);
+                        //// 如果有模板，则进行计算替换
+                        //if (!Data.IsNullOrEmpty()) ti.Data = TemplateHelper.Build(Data, ti.Start, ti.End);
 
                         ti.Insert();
 

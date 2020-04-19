@@ -28,9 +28,27 @@ namespace AntJob
         /// <returns></returns>
         protected override Int32 Execute(JobContext ctx)
         {
-            var sqls = ctx.Task.Data as String;
+            //var sqls = ctx.Task.Data as String;
+            var sqls = Job.Data;
+            sqls = TemplateHelper.Build(sqls, ctx.Task.Start, ctx.Task.End);
+            // 向调度中心返回解析后的Sql语句
+            ctx.Remark = sqls;
+
             var sections = SqlSection.ParseAll(sqls);
             if (sections.Length == 0) return -1;
+
+            var rs = ExecuteSql(sections, ctx);
+
+            return rs;
+        }
+
+        /// <summary>执行Sql集合</summary>
+        /// <param name="sections"></param>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public static Int32 ExecuteSql(SqlSection[] sections, JobContext ctx)
+        {
+            if (sections == null || sections.Length == 0) return -1;
 
             var rs = 0;
             ctx.Total = 0;

@@ -635,7 +635,7 @@ namespace AntJob.Server
         {
             var app = Session["App"] as App;
             var ns = Session as INetSession;
-            var ip = ns.Remote.Host;
+            var ip = ns.Remote?.Host;
 
             AppHistory.Create(app, action, success, remark, Local + "", ip);
         }

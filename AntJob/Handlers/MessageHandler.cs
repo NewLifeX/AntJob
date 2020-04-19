@@ -7,9 +7,8 @@ using NewLife.Serialization;
 
 namespace AntJob.Handlers
 {
-    /// <summary>消息调度基类</summary>
-    /// <typeparam name="TModel">消息模型类</typeparam>
-    public abstract class MessageHandler<TModel> : Handler
+    /// <summary>消息调度基类，消费的消息在Data中返回</summary>
+    public abstract class MessageHandler : Handler
     {
         #region 属性
         /// <summary>主题。设置后使用消费调度模式</summary>
@@ -62,18 +61,18 @@ namespace AntJob.Handlers
             var ss = ctx.Task.Data.ToJsonEntity<String[]>();
             if (ss == null || ss.Length == 0) return;
 
-            // 消息作业特殊优待字符串，不需要再次Json解码
-            if (typeof(TModel) == typeof(String))
-            {
-                ctx.Total = ss.Length;
-                ctx.Data = ss;
-            }
-            else
-            {
-                var ms = ss.Select(e => e.ToJsonEntity<TModel>()).ToList();
-                ctx.Total = ms.Count;
-                ctx.Data = ms;
-            }
+            //// 消息作业特殊优待字符串，不需要再次Json解码
+            //if (typeof(TModel) == typeof(String))
+            //{
+            ctx.Total = ss.Length;
+            ctx.Data = ss;
+            //}
+            //else
+            //{
+            //    var ms = ss.Select(e => e.ToJsonEntity<TModel>()).ToList();
+            //    ctx.Total = ms.Count;
+            //    ctx.Data = ms;
+            //}
 
             Execute(ctx);
         }
@@ -84,12 +83,12 @@ namespace AntJob.Handlers
         protected override Int32 Execute(JobContext ctx)
         {
             var count = 0;
-            foreach (var item in ctx.Data as IEnumerable)
+            foreach (String item in ctx.Data as IEnumerable)
             {
                 //ctx.Key = item as String;
                 //ctx.Entity = item;
 
-                if (ProcessItem(ctx, (TModel)item)) count++;
+                if (ProcessItem(ctx, item)) count++;
             }
 
             return count;
@@ -99,7 +98,7 @@ namespace AntJob.Handlers
         /// <param name="ctx">上下文</param>
         /// <param name="message">消息</param>
         /// <returns></returns>
-        protected virtual Boolean ProcessItem(JobContext ctx, TModel message) => true;
+        protected virtual Boolean ProcessItem(JobContext ctx, String message) => true;
         #endregion
     }
 }

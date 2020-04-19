@@ -5,9 +5,9 @@
     <Description>蚂蚁调度系统数据库结构</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2020</Copyright>
-    <Version>1.0.2020.0110</Version>
-    <FileVersion>1.0.2020.0110</FileVersion>
-    <AssemblyVersion>1.0.*</AssemblyVersion>
+    <Version>2.0.2020.0419</Version>
+    <FileVersion>2.0.2020.0419</FileVersion>
+    <AssemblyVersion>2.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin</OutputPath>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
