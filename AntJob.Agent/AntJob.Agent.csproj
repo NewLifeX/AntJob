@@ -32,7 +32,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Agent" Version="8.7.2020.403" />
+    <PackageReference Include="NewLife.Agent" Version="8.7.2020.417-beta" />
   </ItemGroup>
 
   <ItemGroup>
