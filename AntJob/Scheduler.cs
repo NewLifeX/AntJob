@@ -64,8 +64,9 @@ namespace AntJob
                 handler.Provider = prv;
 
                 // 查找作业参数，分配给处理器
-                var job = handler.Job = jobs.FirstOrDefault(e => e.Name == handler.Name);
+                var job =  jobs.FirstOrDefault(e => e.Name == handler.Name);
                 if (job != null && job.Mode == 0) job.Mode = handler.Mode;
+                handler.Job = job;
 
                 handler.Log = XTrace.Log;
                 handler.Start();

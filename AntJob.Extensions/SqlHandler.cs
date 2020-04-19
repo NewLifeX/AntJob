@@ -16,7 +16,7 @@ namespace AntJob
         /// <summary>实例化</summary>
         public SqlHandler()
         {
-            Mode = JobModes.Sql;
+            //Mode = JobModes.Sql;
 
             var job = Job;
             job.BatchSize = 8;

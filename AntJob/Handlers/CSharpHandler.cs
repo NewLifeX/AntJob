@@ -20,7 +20,7 @@ namespace AntJob.Handlers
         /// <summary>实例化</summary>
         public CSharpHandler()
         {
-            Mode = JobModes.CSharp;
+            //Mode = JobModes.CSharp;
 
             var job = Job;
             job.BatchSize = 8;

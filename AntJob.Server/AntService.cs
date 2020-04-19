@@ -301,8 +301,8 @@ namespace AntJob.Server
                         break;
                     case JobModes.Data:
                     case JobModes.Alarm:
-                    case JobModes.CSharp:
-                    case JobModes.Sql:
+                    //case JobModes.CSharp:
+                    //case JobModes.Sql:
                     default:
                         {
                             // 如果能够切片，则查询数据库后进入，避免缓存导致重复

@@ -18,12 +18,12 @@ namespace AntJob.Data
         [Description("消息调度")]
         Message = 3,
 
-        /// <summary>C#调度</summary>
-        [Description("C#调度")]
-        CSharp = 4,
+        ///// <summary>C#调度</summary>
+        //[Description("C#调度")]
+        //CSharp = 4,
 
-        /// <summary>SQL调度</summary>
-        [Description("SQL调度")]
-        Sql = 5,
+        ///// <summary>SQL调度</summary>
+        //[Description("SQL调度")]
+        //Sql = 5,
     }
 }
