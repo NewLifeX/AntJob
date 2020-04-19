@@ -36,12 +36,15 @@ namespace AntJob
             if (sections.Length == 0) return -1;
 
             // 依次执行Sql片段数组。遇到query时，可能需要生产消息
-            var rs = SqlHandler.ExecuteSql(sections, ctx, (section, dt) => ProcessMessage(dt, ctx));
+            var rs = SqlHandler.ExecuteSql(sections, ctx, (section, dt) => ProduceMessage(dt, ctx));
 
             return rs;
         }
 
-        internal static void ProcessMessage(DbTable dt, JobContext ctx)
+        /// <summary>根据查询结果生产消息</summary>
+        /// <param name="dt"></param>
+        /// <param name="ctx"></param>
+        public static void ProduceMessage(DbTable dt, JobContext ctx)
         {
             if (dt == null || dt.Columns == null || dt.Columns.Length == 0 || dt.Rows == null || dt.Rows.Count == 0) return;
 

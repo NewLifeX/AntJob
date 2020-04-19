@@ -39,7 +39,7 @@ namespace AntJob
             var sections = SqlSection.ParseAll(sqls);
             if (sections.Length == 0) return -1;
 
-            var rs = ExecuteSql(sections, ctx, (section, dt) => SqlMessage.ProcessMessage(dt, ctx));
+            var rs = ExecuteSql(sections, ctx, (section, dt) => SqlMessage.ProduceMessage(dt, ctx));
 
             return rs;
         }
