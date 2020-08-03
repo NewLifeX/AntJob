@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using AntJob.Data;
 using AntJob.Providers;
+using NewLife;
 using NewLife.Collections;
 using NewLife.Log;
 

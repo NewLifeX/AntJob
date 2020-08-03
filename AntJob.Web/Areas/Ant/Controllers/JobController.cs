@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using AntJob.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
+using NewLife;
 using NewLife.Cube;
 using NewLife.Security;
 using NewLife.Web;

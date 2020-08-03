@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using AntJob.Data;
+using NewLife;
 using NewLife.Log;
 using NewLife.Net;
 using NewLife.Reflection;

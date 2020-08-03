@@ -5,6 +5,7 @@ using AntJob.Data;
 using AntJob.Extensions;
 using AntJob.Handlers;
 using AntJob.Providers;
+using NewLife;
 using NewLife.Data;
 
 namespace AntJob
