@@ -139,6 +139,9 @@ namespace AntJob
                 Result = new TaskResult { ID = task.ID },
             };
 
+            // APM埋点
+            var span = Schedule.Tracer?.NewSpan($"job:{Name}");
+
             var sw = Stopwatch.StartNew();
             try
             {
@@ -147,12 +150,14 @@ namespace AntJob
             catch (Exception ex)
             {
                 ctx.Error = ex;
+                span?.SetError(ex, task);
 
                 XTrace.WriteException(ex);
             }
             finally
             {
                 Interlocked.Decrement(ref _Busy);
+                span?.Dispose();
             }
 
             sw.Stop();
