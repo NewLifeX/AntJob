@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
+using NewLife;
 using NewLife.Data;
 using NewLife.Serialization;
 using XCode;

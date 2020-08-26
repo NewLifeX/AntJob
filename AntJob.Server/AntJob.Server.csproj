@@ -40,9 +40,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Agent" Version="8.7.2020.601" />
-    <PackageReference Include="NewLife.Core" Version="8.8.2020.705-beta" />
-    <PackageReference Include="NewLife.XCode" Version="9.18.2020.705-beta" />
+    <PackageReference Include="NewLife.Agent" Version="8.7.2020.802" />
+    <PackageReference Include="NewLife.Core" Version="8.9.2020.825-beta8" />
+    <PackageReference Include="NewLife.XCode" Version="9.19.2020.825-beta8" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Reflection;
+using NewLife;
 using NewLife.Configuration;
 
 namespace AntJob

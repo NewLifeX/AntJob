@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NewLife;
 using NewLife.Data;
 using NewLife.Model;
 using NewLife.Reflection;
@@ -151,14 +152,14 @@ namespace AntJob.Extensions
             }
 
             // 选取目标表和数据集共有的字段
-            tableName = dal.Db.FormatTableName(tableName);
+            //tableName = dal.Db.FormatTableName(tableName);
             var columns = new List<IDataColumn>();
             foreach (var dc in table.Columns)
             {
                 if (dc.ColumnName.EqualIgnoreCase(dt.Columns)) columns.Add(dc);
             }
 
-            return dal.Session.Insert(tableName, columns.ToArray(), dt.Cast<IIndexAccessor>());
+            return dal.Session.Insert(table, columns.ToArray(), dt.Cast<IIndexAccessor>());
         }
         #endregion
     }

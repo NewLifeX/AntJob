@@ -1,4 +1,5 @@
 ﻿using System;
+using NewLife;
 using NewLife.Collections;
 
 namespace AntJob.Data

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
+using NewLife;
 using NewLife.Data;
 using XCode;
 using XCode.Cache;

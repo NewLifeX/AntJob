@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
+using NewLife;
 using NewLife.Data;
 using XCode;
 using XCode.Membership;

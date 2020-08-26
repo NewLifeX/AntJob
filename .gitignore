@@ -31,3 +31,4 @@ bld/
 /BinServer
 /BinAgent
 /Samples/HisData/Config
+/AntJob.Web/.config
