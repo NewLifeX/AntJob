@@ -23,6 +23,9 @@ namespace AntJob
 
         /// <summary>作业提供者</summary>
         public IJobProvider Provider { get; set; }
+
+        /// <summary>性能跟踪器</summary>
+        public ITracer Tracer { get; set; }
         #endregion
 
         #region 构造
