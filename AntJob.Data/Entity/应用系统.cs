@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
+using System.Web.Script.Serialization;
+using System.Xml.Serialization;
 using XCode;
 using XCode.Configuration;
 using XCode.DataAccessLayer;
@@ -13,7 +16,7 @@ namespace AntJob.Data.Entity
     [Description("应用系统。数据作业隶属于某个应用")]
     [BindIndex("IU_App_Name", true, "Name")]
     [BindTable("App", Description = "应用系统。数据作业隶属于某个应用", ConnName = "Ant", DbType = DatabaseType.None)]
-    public partial class App : IApp
+    public partial class App
     {
         #region 属性
         private Int32 _ID;
@@ -22,7 +25,7 @@ namespace AntJob.Data.Entity
         [Description("编号")]
         [DataObjectField(true, true, false, 0)]
         [BindColumn("ID", "编号", "")]
-        public Int32 ID { get => _ID; set { if (OnPropertyChanging(__.ID, value)) { _ID = value; OnPropertyChanged(__.ID); } } }
+        public Int32 ID { get => _ID; set { if (OnPropertyChanging("ID", value)) { _ID = value; OnPropertyChanged("ID"); } } }
 
         private String _Name;
         /// <summary>名称</summary>
@@ -30,7 +33,7 @@ namespace AntJob.Data.Entity
         [Description("名称")]
         [DataObjectField(false, false, false, 50)]
         [BindColumn("Name", "名称", "", Master = true)]
-        public String Name { get => _Name; set { if (OnPropertyChanging(__.Name, value)) { _Name = value; OnPropertyChanged(__.Name); } } }
+        public String Name { get => _Name; set { if (OnPropertyChanging("Name", value)) { _Name = value; OnPropertyChanged("Name"); } } }
 
         private String _DisplayName;
         /// <summary>显示名</summary>
@@ -38,7 +41,7 @@ namespace AntJob.Data.Entity
         [Description("显示名")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("DisplayName", "显示名", "")]
-        public String DisplayName { get => _DisplayName; set { if (OnPropertyChanging(__.DisplayName, value)) { _DisplayName = value; OnPropertyChanged(__.DisplayName); } } }
+        public String DisplayName { get => _DisplayName; set { if (OnPropertyChanging("DisplayName", value)) { _DisplayName = value; OnPropertyChanged("DisplayName"); } } }
 
         private String _Secret;
         /// <summary>密钥</summary>
@@ -46,7 +49,7 @@ namespace AntJob.Data.Entity
         [Description("密钥")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Secret", "密钥", "")]
-        public String Secret { get => _Secret; set { if (OnPropertyChanging(__.Secret, value)) { _Secret = value; OnPropertyChanged(__.Secret); } } }
+        public String Secret { get => _Secret; set { if (OnPropertyChanging("Secret", value)) { _Secret = value; OnPropertyChanged("Secret"); } } }
 
         private String _Category;
         /// <summary>类别</summary>
@@ -54,7 +57,7 @@ namespace AntJob.Data.Entity
         [Description("类别")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Category", "类别", "")]
-        public String Category { get => _Category; set { if (OnPropertyChanging(__.Category, value)) { _Category = value; OnPropertyChanged(__.Category); } } }
+        public String Category { get => _Category; set { if (OnPropertyChanging("Category", value)) { _Category = value; OnPropertyChanged("Category"); } } }
 
         private String _Version;
         /// <summary>版本</summary>
@@ -62,7 +65,7 @@ namespace AntJob.Data.Entity
         [Description("版本")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Version", "版本", "")]
-        public String Version { get => _Version; set { if (OnPropertyChanging(__.Version, value)) { _Version = value; OnPropertyChanged(__.Version); } } }
+        public String Version { get => _Version; set { if (OnPropertyChanging("Version", value)) { _Version = value; OnPropertyChanged("Version"); } } }
 
         private DateTime _CompileTime;
         /// <summary>编译时间</summary>
@@ -70,7 +73,7 @@ namespace AntJob.Data.Entity
         [Description("编译时间")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("CompileTime", "编译时间", "")]
-        public DateTime CompileTime { get => _CompileTime; set { if (OnPropertyChanging(__.CompileTime, value)) { _CompileTime = value; OnPropertyChanged(__.CompileTime); } } }
+        public DateTime CompileTime { get => _CompileTime; set { if (OnPropertyChanging("CompileTime", value)) { _CompileTime = value; OnPropertyChanged("CompileTime"); } } }
 
         private Boolean _Enable;
         /// <summary>启用</summary>
@@ -78,7 +81,7 @@ namespace AntJob.Data.Entity
         [Description("启用")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Enable", "启用", "")]
-        public Boolean Enable { get => _Enable; set { if (OnPropertyChanging(__.Enable, value)) { _Enable = value; OnPropertyChanged(__.Enable); } } }
+        public Boolean Enable { get => _Enable; set { if (OnPropertyChanging("Enable", value)) { _Enable = value; OnPropertyChanged("Enable"); } } }
 
         private Int32 _JobCount;
         /// <summary>作业数</summary>
@@ -86,7 +89,7 @@ namespace AntJob.Data.Entity
         [Description("作业数")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("JobCount", "作业数", "")]
-        public Int32 JobCount { get => _JobCount; set { if (OnPropertyChanging(__.JobCount, value)) { _JobCount = value; OnPropertyChanged(__.JobCount); } } }
+        public Int32 JobCount { get => _JobCount; set { if (OnPropertyChanging("JobCount", value)) { _JobCount = value; OnPropertyChanged("JobCount"); } } }
 
         private Int32 _MessageCount;
         /// <summary>消息数</summary>
@@ -94,7 +97,7 @@ namespace AntJob.Data.Entity
         [Description("消息数")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("MessageCount", "消息数", "")]
-        public Int32 MessageCount { get => _MessageCount; set { if (OnPropertyChanging(__.MessageCount, value)) { _MessageCount = value; OnPropertyChanged(__.MessageCount); } } }
+        public Int32 MessageCount { get => _MessageCount; set { if (OnPropertyChanging("MessageCount", value)) { _MessageCount = value; OnPropertyChanged("MessageCount"); } } }
 
         private String _Remark;
         /// <summary>内容</summary>
@@ -102,7 +105,7 @@ namespace AntJob.Data.Entity
         [Description("内容")]
         [DataObjectField(false, false, true, 500)]
         [BindColumn("Remark", "内容", "")]
-        public String Remark { get => _Remark; set { if (OnPropertyChanging(__.Remark, value)) { _Remark = value; OnPropertyChanged(__.Remark); } } }
+        public String Remark { get => _Remark; set { if (OnPropertyChanging("Remark", value)) { _Remark = value; OnPropertyChanged("Remark"); } } }
 
         private Int32 _CreateUserID;
         /// <summary>创建人</summary>
@@ -110,7 +113,7 @@ namespace AntJob.Data.Entity
         [Description("创建人")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("CreateUserID", "创建人", "")]
-        public Int32 CreateUserID { get => _CreateUserID; set { if (OnPropertyChanging(__.CreateUserID, value)) { _CreateUserID = value; OnPropertyChanged(__.CreateUserID); } } }
+        public Int32 CreateUserID { get => _CreateUserID; set { if (OnPropertyChanging("CreateUserID", value)) { _CreateUserID = value; OnPropertyChanged("CreateUserID"); } } }
 
         private String _CreateUser;
         /// <summary>创建者</summary>
@@ -118,7 +121,7 @@ namespace AntJob.Data.Entity
         [Description("创建者")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("CreateUser", "创建者", "")]
-        public String CreateUser { get => _CreateUser; set { if (OnPropertyChanging(__.CreateUser, value)) { _CreateUser = value; OnPropertyChanged(__.CreateUser); } } }
+        public String CreateUser { get => _CreateUser; set { if (OnPropertyChanging("CreateUser", value)) { _CreateUser = value; OnPropertyChanged("CreateUser"); } } }
 
         private DateTime _CreateTime;
         /// <summary>创建时间</summary>
@@ -126,7 +129,7 @@ namespace AntJob.Data.Entity
         [Description("创建时间")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("CreateTime", "创建时间", "")]
-        public DateTime CreateTime { get => _CreateTime; set { if (OnPropertyChanging(__.CreateTime, value)) { _CreateTime = value; OnPropertyChanged(__.CreateTime); } } }
+        public DateTime CreateTime { get => _CreateTime; set { if (OnPropertyChanging("CreateTime", value)) { _CreateTime = value; OnPropertyChanged("CreateTime"); } } }
 
         private String _CreateIP;
         /// <summary>创建地址</summary>
@@ -134,7 +137,7 @@ namespace AntJob.Data.Entity
         [Description("创建地址")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("CreateIP", "创建地址", "")]
-        public String CreateIP { get => _CreateIP; set { if (OnPropertyChanging(__.CreateIP, value)) { _CreateIP = value; OnPropertyChanged(__.CreateIP); } } }
+        public String CreateIP { get => _CreateIP; set { if (OnPropertyChanging("CreateIP", value)) { _CreateIP = value; OnPropertyChanged("CreateIP"); } } }
 
         private Int32 _UpdateUserID;
         /// <summary>更新人</summary>
@@ -142,7 +145,7 @@ namespace AntJob.Data.Entity
         [Description("更新人")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("UpdateUserID", "更新人", "")]
-        public Int32 UpdateUserID { get => _UpdateUserID; set { if (OnPropertyChanging(__.UpdateUserID, value)) { _UpdateUserID = value; OnPropertyChanged(__.UpdateUserID); } } }
+        public Int32 UpdateUserID { get => _UpdateUserID; set { if (OnPropertyChanging("UpdateUserID", value)) { _UpdateUserID = value; OnPropertyChanged("UpdateUserID"); } } }
 
         private String _UpdateUser;
         /// <summary>更新者</summary>
@@ -150,7 +153,7 @@ namespace AntJob.Data.Entity
         [Description("更新者")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("UpdateUser", "更新者", "")]
-        public String UpdateUser { get => _UpdateUser; set { if (OnPropertyChanging(__.UpdateUser, value)) { _UpdateUser = value; OnPropertyChanged(__.UpdateUser); } } }
+        public String UpdateUser { get => _UpdateUser; set { if (OnPropertyChanging("UpdateUser", value)) { _UpdateUser = value; OnPropertyChanged("UpdateUser"); } } }
 
         private DateTime _UpdateTime;
         /// <summary>更新时间</summary>
@@ -158,7 +161,7 @@ namespace AntJob.Data.Entity
         [Description("更新时间")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("UpdateTime", "更新时间", "")]
-        public DateTime UpdateTime { get => _UpdateTime; set { if (OnPropertyChanging(__.UpdateTime, value)) { _UpdateTime = value; OnPropertyChanged(__.UpdateTime); } } }
+        public DateTime UpdateTime { get => _UpdateTime; set { if (OnPropertyChanging("UpdateTime", value)) { _UpdateTime = value; OnPropertyChanged("UpdateTime"); } } }
 
         private String _UpdateIP;
         /// <summary>更新地址</summary>
@@ -166,7 +169,7 @@ namespace AntJob.Data.Entity
         [Description("更新地址")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("UpdateIP", "更新地址", "")]
-        public String UpdateIP { get => _UpdateIP; set { if (OnPropertyChanging(__.UpdateIP, value)) { _UpdateIP = value; OnPropertyChanged(__.UpdateIP); } } }
+        public String UpdateIP { get => _UpdateIP; set { if (OnPropertyChanging("UpdateIP", value)) { _UpdateIP = value; OnPropertyChanged("UpdateIP"); } } }
         #endregion
 
         #region 获取/设置 字段值
@@ -179,25 +182,25 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case __.ID: return _ID;
-                    case __.Name: return _Name;
-                    case __.DisplayName: return _DisplayName;
-                    case __.Secret: return _Secret;
-                    case __.Category: return _Category;
-                    case __.Version: return _Version;
-                    case __.CompileTime: return _CompileTime;
-                    case __.Enable: return _Enable;
-                    case __.JobCount: return _JobCount;
-                    case __.MessageCount: return _MessageCount;
-                    case __.Remark: return _Remark;
-                    case __.CreateUserID: return _CreateUserID;
-                    case __.CreateUser: return _CreateUser;
-                    case __.CreateTime: return _CreateTime;
-                    case __.CreateIP: return _CreateIP;
-                    case __.UpdateUserID: return _UpdateUserID;
-                    case __.UpdateUser: return _UpdateUser;
-                    case __.UpdateTime: return _UpdateTime;
-                    case __.UpdateIP: return _UpdateIP;
+                    case "ID": return _ID;
+                    case "Name": return _Name;
+                    case "DisplayName": return _DisplayName;
+                    case "Secret": return _Secret;
+                    case "Category": return _Category;
+                    case "Version": return _Version;
+                    case "CompileTime": return _CompileTime;
+                    case "Enable": return _Enable;
+                    case "JobCount": return _JobCount;
+                    case "MessageCount": return _MessageCount;
+                    case "Remark": return _Remark;
+                    case "CreateUserID": return _CreateUserID;
+                    case "CreateUser": return _CreateUser;
+                    case "CreateTime": return _CreateTime;
+                    case "CreateIP": return _CreateIP;
+                    case "UpdateUserID": return _UpdateUserID;
+                    case "UpdateUser": return _UpdateUser;
+                    case "UpdateTime": return _UpdateTime;
+                    case "UpdateIP": return _UpdateIP;
                     default: return base[name];
                 }
             }
@@ -205,25 +208,25 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case __.ID: _ID = value.ToInt(); break;
-                    case __.Name: _Name = Convert.ToString(value); break;
-                    case __.DisplayName: _DisplayName = Convert.ToString(value); break;
-                    case __.Secret: _Secret = Convert.ToString(value); break;
-                    case __.Category: _Category = Convert.ToString(value); break;
-                    case __.Version: _Version = Convert.ToString(value); break;
-                    case __.CompileTime: _CompileTime = value.ToDateTime(); break;
-                    case __.Enable: _Enable = value.ToBoolean(); break;
-                    case __.JobCount: _JobCount = value.ToInt(); break;
-                    case __.MessageCount: _MessageCount = value.ToInt(); break;
-                    case __.Remark: _Remark = Convert.ToString(value); break;
-                    case __.CreateUserID: _CreateUserID = value.ToInt(); break;
-                    case __.CreateUser: _CreateUser = Convert.ToString(value); break;
-                    case __.CreateTime: _CreateTime = value.ToDateTime(); break;
-                    case __.CreateIP: _CreateIP = Convert.ToString(value); break;
-                    case __.UpdateUserID: _UpdateUserID = value.ToInt(); break;
-                    case __.UpdateUser: _UpdateUser = Convert.ToString(value); break;
-                    case __.UpdateTime: _UpdateTime = value.ToDateTime(); break;
-                    case __.UpdateIP: _UpdateIP = Convert.ToString(value); break;
+                    case "ID": _ID = value.ToInt(); break;
+                    case "Name": _Name = Convert.ToString(value); break;
+                    case "DisplayName": _DisplayName = Convert.ToString(value); break;
+                    case "Secret": _Secret = Convert.ToString(value); break;
+                    case "Category": _Category = Convert.ToString(value); break;
+                    case "Version": _Version = Convert.ToString(value); break;
+                    case "CompileTime": _CompileTime = value.ToDateTime(); break;
+                    case "Enable": _Enable = value.ToBoolean(); break;
+                    case "JobCount": _JobCount = value.ToInt(); break;
+                    case "MessageCount": _MessageCount = value.ToInt(); break;
+                    case "Remark": _Remark = Convert.ToString(value); break;
+                    case "CreateUserID": _CreateUserID = value.ToInt(); break;
+                    case "CreateUser": _CreateUser = Convert.ToString(value); break;
+                    case "CreateTime": _CreateTime = value.ToDateTime(); break;
+                    case "CreateIP": _CreateIP = Convert.ToString(value); break;
+                    case "UpdateUserID": _UpdateUserID = value.ToInt(); break;
+                    case "UpdateUser": _UpdateUser = Convert.ToString(value); break;
+                    case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
+                    case "UpdateIP": _UpdateIP = Convert.ToString(value); break;
                     default: base[name] = value; break;
                 }
             }
@@ -235,61 +238,61 @@ namespace AntJob.Data.Entity
         public partial class _
         {
             /// <summary>编号</summary>
-            public static readonly Field ID = FindByName(__.ID);
+            public static readonly Field ID = FindByName("ID");
 
             /// <summary>名称</summary>
-            public static readonly Field Name = FindByName(__.Name);
+            public static readonly Field Name = FindByName("Name");
 
             /// <summary>显示名</summary>
-            public static readonly Field DisplayName = FindByName(__.DisplayName);
+            public static readonly Field DisplayName = FindByName("DisplayName");
 
             /// <summary>密钥</summary>
-            public static readonly Field Secret = FindByName(__.Secret);
+            public static readonly Field Secret = FindByName("Secret");
 
             /// <summary>类别</summary>
-            public static readonly Field Category = FindByName(__.Category);
+            public static readonly Field Category = FindByName("Category");
 
             /// <summary>版本</summary>
-            public static readonly Field Version = FindByName(__.Version);
+            public static readonly Field Version = FindByName("Version");
 
             /// <summary>编译时间</summary>
-            public static readonly Field CompileTime = FindByName(__.CompileTime);
+            public static readonly Field CompileTime = FindByName("CompileTime");
 
             /// <summary>启用</summary>
-            public static readonly Field Enable = FindByName(__.Enable);
+            public static readonly Field Enable = FindByName("Enable");
 
             /// <summary>作业数</summary>
-            public static readonly Field JobCount = FindByName(__.JobCount);
+            public static readonly Field JobCount = FindByName("JobCount");
 
             /// <summary>消息数</summary>
-            public static readonly Field MessageCount = FindByName(__.MessageCount);
+            public static readonly Field MessageCount = FindByName("MessageCount");
 
             /// <summary>内容</summary>
-            public static readonly Field Remark = FindByName(__.Remark);
+            public static readonly Field Remark = FindByName("Remark");
 
             /// <summary>创建人</summary>
-            public static readonly Field CreateUserID = FindByName(__.CreateUserID);
+            public static readonly Field CreateUserID = FindByName("CreateUserID");
 
             /// <summary>创建者</summary>
-            public static readonly Field CreateUser = FindByName(__.CreateUser);
+            public static readonly Field CreateUser = FindByName("CreateUser");
 
             /// <summary>创建时间</summary>
-            public static readonly Field CreateTime = FindByName(__.CreateTime);
+            public static readonly Field CreateTime = FindByName("CreateTime");
 
             /// <summary>创建地址</summary>
-            public static readonly Field CreateIP = FindByName(__.CreateIP);
+            public static readonly Field CreateIP = FindByName("CreateIP");
 
             /// <summary>更新人</summary>
-            public static readonly Field UpdateUserID = FindByName(__.UpdateUserID);
+            public static readonly Field UpdateUserID = FindByName("UpdateUserID");
 
             /// <summary>更新者</summary>
-            public static readonly Field UpdateUser = FindByName(__.UpdateUser);
+            public static readonly Field UpdateUser = FindByName("UpdateUser");
 
             /// <summary>更新时间</summary>
-            public static readonly Field UpdateTime = FindByName(__.UpdateTime);
+            public static readonly Field UpdateTime = FindByName("UpdateTime");
 
             /// <summary>更新地址</summary>
-            public static readonly Field UpdateIP = FindByName(__.UpdateIP);
+            public static readonly Field UpdateIP = FindByName("UpdateIP");
 
             static Field FindByName(String name) => Meta.Table.FindByName(name);
         }
@@ -354,76 +357,6 @@ namespace AntJob.Data.Entity
             /// <summary>更新地址</summary>
             public const String UpdateIP = "UpdateIP";
         }
-        #endregion
-    }
-
-    /// <summary>应用系统。数据作业隶属于某个应用接口</summary>
-    public partial interface IApp
-    {
-        #region 属性
-        /// <summary>编号</summary>
-        Int32 ID { get; set; }
-
-        /// <summary>名称</summary>
-        String Name { get; set; }
-
-        /// <summary>显示名</summary>
-        String DisplayName { get; set; }
-
-        /// <summary>密钥</summary>
-        String Secret { get; set; }
-
-        /// <summary>类别</summary>
-        String Category { get; set; }
-
-        /// <summary>版本</summary>
-        String Version { get; set; }
-
-        /// <summary>编译时间</summary>
-        DateTime CompileTime { get; set; }
-
-        /// <summary>启用</summary>
-        Boolean Enable { get; set; }
-
-        /// <summary>作业数</summary>
-        Int32 JobCount { get; set; }
-
-        /// <summary>消息数</summary>
-        Int32 MessageCount { get; set; }
-
-        /// <summary>内容</summary>
-        String Remark { get; set; }
-
-        /// <summary>创建人</summary>
-        Int32 CreateUserID { get; set; }
-
-        /// <summary>创建者</summary>
-        String CreateUser { get; set; }
-
-        /// <summary>创建时间</summary>
-        DateTime CreateTime { get; set; }
-
-        /// <summary>创建地址</summary>
-        String CreateIP { get; set; }
-
-        /// <summary>更新人</summary>
-        Int32 UpdateUserID { get; set; }
-
-        /// <summary>更新者</summary>
-        String UpdateUser { get; set; }
-
-        /// <summary>更新时间</summary>
-        DateTime UpdateTime { get; set; }
-
-        /// <summary>更新地址</summary>
-        String UpdateIP { get; set; }
-        #endregion
-
-        #region 获取/设置 字段值
-        /// <summary>获取/设置 字段值</summary>
-        /// <param name="name">字段名</param>
-        /// <returns></returns>
-        Object this[String name] { get; set; }
         #endregion
     }
 }

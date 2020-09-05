@@ -133,7 +133,7 @@ namespace AntJob.Data.Entity
         /// <param name="creator"></param>
         /// <param name="ip"></param>
         /// <returns></returns>
-        public static AppHistory Create(IApp app, String action, Boolean success, String remark, String creator, String ip)
+        public static AppHistory Create(App app, String action, Boolean success, String remark, String creator, String ip)
         {
             if (app == null) app = new App();
 

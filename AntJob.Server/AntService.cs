@@ -13,7 +13,6 @@ using NewLife.Security;
 using NewLife.Serialization;
 using NewLife.Threading;
 using XCode;
-using IJob = AntJob.Data.Entity.IJob;
 
 namespace AntJob.Server
 {
@@ -516,7 +515,7 @@ namespace AntJob.Server
             //job.Save();
         }
 
-        private JobError SetJobError(IJob job, JobTask task, IDictionary<String, Object> ps)
+        private JobError SetJobError(Job job, JobTask task, IDictionary<String, Object> ps)
         {
             var err = new JobError
             {
@@ -549,7 +548,7 @@ namespace AntJob.Server
             return err;
         }
 
-        private void CheckMaxError(IApp app, IJob job)
+        private void CheckMaxError(App app, Job job)
         {
             // 出错时判断如果超过最大错误数，则停止作业
             var maxError = job.MaxError < 1 ? 100 : job.MaxError;
@@ -577,7 +576,7 @@ namespace AntJob.Server
             return olts.Select(e => e.ToModel()).ToArray();
         }
 
-        AppOnline CreateOnline(IApp app, INetSession ns, String machine, Int32 pid)
+        AppOnline CreateOnline(App app, INetSession ns, String machine, Int32 pid)
         {
             var ip = ns.Remote.Host;
 
@@ -604,7 +603,7 @@ namespace AntJob.Server
             return online;
         }
 
-        AppOnline GetOnline(IApp app, INetSession ns)
+        AppOnline GetOnline(App app, INetSession ns)
         {
             if (Session["AppOnline"] is AppOnline online) return online;
 
@@ -617,7 +616,7 @@ namespace AntJob.Server
             return online;
         }
 
-        void UpdateOnline(IApp app, JobTask ji, INetSession ns)
+        void UpdateOnline(App app, JobTask ji, INetSession ns)
         {
             var online = GetOnline(app, ns);
             online.Total += ji.Total;

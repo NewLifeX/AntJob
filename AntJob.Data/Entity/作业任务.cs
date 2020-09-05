@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
+using System.Web.Script.Serialization;
+using System.Xml.Serialization;
 using XCode;
 using XCode.Configuration;
 using XCode.DataAccessLayer;
@@ -15,7 +18,7 @@ namespace AntJob.Data.Entity
     [BindIndex("IX_JobTask_AppID_Client_Status", false, "AppID,Client,Status")]
     [BindIndex("IX_JobTask_JobID_CreateTime", false, "JobID,CreateTime")]
     [BindTable("JobTask", Description = "作业任务", ConnName = "Ant", DbType = DatabaseType.None)]
-    public partial class JobTask : IJobTask
+    public partial class JobTask
     {
         #region 属性
         private Int32 _ID;
@@ -24,7 +27,7 @@ namespace AntJob.Data.Entity
         [Description("编号")]
         [DataObjectField(true, true, false, 0)]
         [BindColumn("ID", "编号", "")]
-        public Int32 ID { get => _ID; set { if (OnPropertyChanging(__.ID, value)) { _ID = value; OnPropertyChanged(__.ID); } } }
+        public Int32 ID { get => _ID; set { if (OnPropertyChanging("ID", value)) { _ID = value; OnPropertyChanged("ID"); } } }
 
         private Int32 _AppID;
         /// <summary>应用</summary>
@@ -32,7 +35,7 @@ namespace AntJob.Data.Entity
         [Description("应用")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("AppID", "应用", "")]
-        public Int32 AppID { get => _AppID; set { if (OnPropertyChanging(__.AppID, value)) { _AppID = value; OnPropertyChanged(__.AppID); } } }
+        public Int32 AppID { get => _AppID; set { if (OnPropertyChanging("AppID", value)) { _AppID = value; OnPropertyChanged("AppID"); } } }
 
         private Int32 _JobID;
         /// <summary>作业</summary>
@@ -40,7 +43,7 @@ namespace AntJob.Data.Entity
         [Description("作业")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("JobID", "作业", "")]
-        public Int32 JobID { get => _JobID; set { if (OnPropertyChanging(__.JobID, value)) { _JobID = value; OnPropertyChanged(__.JobID); } } }
+        public Int32 JobID { get => _JobID; set { if (OnPropertyChanging("JobID", value)) { _JobID = value; OnPropertyChanged("JobID"); } } }
 
         private String _Client;
         /// <summary>客户端。IP加进程</summary>
@@ -48,7 +51,7 @@ namespace AntJob.Data.Entity
         [Description("客户端。IP加进程")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Client", "客户端。IP加进程", "")]
-        public String Client { get => _Client; set { if (OnPropertyChanging(__.Client, value)) { _Client = value; OnPropertyChanged(__.Client); } } }
+        public String Client { get => _Client; set { if (OnPropertyChanging("Client", value)) { _Client = value; OnPropertyChanged("Client"); } } }
 
         private DateTime _Start;
         /// <summary>开始。大于等于</summary>
@@ -56,7 +59,7 @@ namespace AntJob.Data.Entity
         [Description("开始。大于等于")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("Start", "开始。大于等于", "")]
-        public DateTime Start { get => _Start; set { if (OnPropertyChanging(__.Start, value)) { _Start = value; OnPropertyChanged(__.Start); } } }
+        public DateTime Start { get => _Start; set { if (OnPropertyChanging("Start", value)) { _Start = value; OnPropertyChanged("Start"); } } }
 
         private DateTime _End;
         /// <summary>结束。小于，不等于</summary>
@@ -64,7 +67,7 @@ namespace AntJob.Data.Entity
         [Description("结束。小于，不等于")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("End", "结束。小于，不等于", "")]
-        public DateTime End { get => _End; set { if (OnPropertyChanging(__.End, value)) { _End = value; OnPropertyChanged(__.End); } } }
+        public DateTime End { get => _End; set { if (OnPropertyChanging("End", value)) { _End = value; OnPropertyChanged("End"); } } }
 
         private Int32 _BatchSize;
         /// <summary>批大小</summary>
@@ -72,7 +75,7 @@ namespace AntJob.Data.Entity
         [Description("批大小")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("BatchSize", "批大小", "")]
-        public Int32 BatchSize { get => _BatchSize; set { if (OnPropertyChanging(__.BatchSize, value)) { _BatchSize = value; OnPropertyChanged(__.BatchSize); } } }
+        public Int32 BatchSize { get => _BatchSize; set { if (OnPropertyChanging("BatchSize", value)) { _BatchSize = value; OnPropertyChanged("BatchSize"); } } }
 
         private Int32 _Total;
         /// <summary>总数</summary>
@@ -80,7 +83,7 @@ namespace AntJob.Data.Entity
         [Description("总数")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Total", "总数", "")]
-        public Int32 Total { get => _Total; set { if (OnPropertyChanging(__.Total, value)) { _Total = value; OnPropertyChanged(__.Total); } } }
+        public Int32 Total { get => _Total; set { if (OnPropertyChanging("Total", value)) { _Total = value; OnPropertyChanged("Total"); } } }
 
         private Int32 _Success;
         /// <summary>成功</summary>
@@ -88,7 +91,7 @@ namespace AntJob.Data.Entity
         [Description("成功")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Success", "成功", "")]
-        public Int32 Success { get => _Success; set { if (OnPropertyChanging(__.Success, value)) { _Success = value; OnPropertyChanged(__.Success); } } }
+        public Int32 Success { get => _Success; set { if (OnPropertyChanging("Success", value)) { _Success = value; OnPropertyChanged("Success"); } } }
 
         private Int32 _Error;
         /// <summary>错误</summary>
@@ -96,7 +99,7 @@ namespace AntJob.Data.Entity
         [Description("错误")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Error", "错误", "")]
-        public Int32 Error { get => _Error; set { if (OnPropertyChanging(__.Error, value)) { _Error = value; OnPropertyChanged(__.Error); } } }
+        public Int32 Error { get => _Error; set { if (OnPropertyChanging("Error", value)) { _Error = value; OnPropertyChanged("Error"); } } }
 
         private Int32 _Times;
         /// <summary>次数</summary>
@@ -104,7 +107,7 @@ namespace AntJob.Data.Entity
         [Description("次数")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Times", "次数", "")]
-        public Int32 Times { get => _Times; set { if (OnPropertyChanging(__.Times, value)) { _Times = value; OnPropertyChanged(__.Times); } } }
+        public Int32 Times { get => _Times; set { if (OnPropertyChanging("Times", value)) { _Times = value; OnPropertyChanged("Times"); } } }
 
         private Int32 _Speed;
         /// <summary>速度</summary>
@@ -112,7 +115,7 @@ namespace AntJob.Data.Entity
         [Description("速度")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Speed", "速度", "")]
-        public Int32 Speed { get => _Speed; set { if (OnPropertyChanging(__.Speed, value)) { _Speed = value; OnPropertyChanged(__.Speed); } } }
+        public Int32 Speed { get => _Speed; set { if (OnPropertyChanging("Speed", value)) { _Speed = value; OnPropertyChanged("Speed"); } } }
 
         private Int32 _Cost;
         /// <summary>耗时。秒</summary>
@@ -120,7 +123,7 @@ namespace AntJob.Data.Entity
         [Description("耗时。秒")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Cost", "耗时。秒", "")]
-        public Int32 Cost { get => _Cost; set { if (OnPropertyChanging(__.Cost, value)) { _Cost = value; OnPropertyChanged(__.Cost); } } }
+        public Int32 Cost { get => _Cost; set { if (OnPropertyChanging("Cost", value)) { _Cost = value; OnPropertyChanged("Cost"); } } }
 
         private Int32 _FullCost;
         /// <summary>全部耗时。秒，从任务发放到执行完成的时间</summary>
@@ -128,7 +131,7 @@ namespace AntJob.Data.Entity
         [Description("全部耗时。秒，从任务发放到执行完成的时间")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("FullCost", "全部耗时。秒，从任务发放到执行完成的时间", "")]
-        public Int32 FullCost { get => _FullCost; set { if (OnPropertyChanging(__.FullCost, value)) { _FullCost = value; OnPropertyChanged(__.FullCost); } } }
+        public Int32 FullCost { get => _FullCost; set { if (OnPropertyChanging("FullCost", value)) { _FullCost = value; OnPropertyChanged("FullCost"); } } }
 
         private JobStatus _Status;
         /// <summary>状态</summary>
@@ -136,7 +139,7 @@ namespace AntJob.Data.Entity
         [Description("状态")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("Status", "状态", "")]
-        public JobStatus Status { get => _Status; set { if (OnPropertyChanging(__.Status, value)) { _Status = value; OnPropertyChanged(__.Status); } } }
+        public JobStatus Status { get => _Status; set { if (OnPropertyChanging("Status", value)) { _Status = value; OnPropertyChanged("Status"); } } }
 
         private Int32 _MsgCount;
         /// <summary>消费消息数</summary>
@@ -144,7 +147,7 @@ namespace AntJob.Data.Entity
         [Description("消费消息数")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("MsgCount", "消费消息数", "")]
-        public Int32 MsgCount { get => _MsgCount; set { if (OnPropertyChanging(__.MsgCount, value)) { _MsgCount = value; OnPropertyChanged(__.MsgCount); } } }
+        public Int32 MsgCount { get => _MsgCount; set { if (OnPropertyChanging("MsgCount", value)) { _MsgCount = value; OnPropertyChanged("MsgCount"); } } }
 
         private String _Server;
         /// <summary>服务器</summary>
@@ -152,7 +155,7 @@ namespace AntJob.Data.Entity
         [Description("服务器")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Server", "服务器", "")]
-        public String Server { get => _Server; set { if (OnPropertyChanging(__.Server, value)) { _Server = value; OnPropertyChanged(__.Server); } } }
+        public String Server { get => _Server; set { if (OnPropertyChanging("Server", value)) { _Server = value; OnPropertyChanged("Server"); } } }
 
         private Int32 _ProcessID;
         /// <summary>进程</summary>
@@ -160,7 +163,7 @@ namespace AntJob.Data.Entity
         [Description("进程")]
         [DataObjectField(false, false, false, 0)]
         [BindColumn("ProcessID", "进程", "")]
-        public Int32 ProcessID { get => _ProcessID; set { if (OnPropertyChanging(__.ProcessID, value)) { _ProcessID = value; OnPropertyChanged(__.ProcessID); } } }
+        public Int32 ProcessID { get => _ProcessID; set { if (OnPropertyChanging("ProcessID", value)) { _ProcessID = value; OnPropertyChanged("ProcessID"); } } }
 
         private String _Key;
         /// <summary>最后键</summary>
@@ -168,7 +171,7 @@ namespace AntJob.Data.Entity
         [Description("最后键")]
         [DataObjectField(false, false, true, 50)]
         [BindColumn("Key", "最后键", "")]
-        public String Key { get => _Key; set { if (OnPropertyChanging(__.Key, value)) { _Key = value; OnPropertyChanged(__.Key); } } }
+        public String Key { get => _Key; set { if (OnPropertyChanging("Key", value)) { _Key = value; OnPropertyChanged("Key"); } } }
 
         private String _Data;
         /// <summary>数据。可以是Json数据，比如StatID</summary>
@@ -176,7 +179,7 @@ namespace AntJob.Data.Entity
         [Description("数据。可以是Json数据，比如StatID")]
         [DataObjectField(false, false, true, -1)]
         [BindColumn("Data", "数据。可以是Json数据，比如StatID", "")]
-        public String Data { get => _Data; set { if (OnPropertyChanging(__.Data, value)) { _Data = value; OnPropertyChanged(__.Data); } } }
+        public String Data { get => _Data; set { if (OnPropertyChanging("Data", value)) { _Data = value; OnPropertyChanged("Data"); } } }
 
         private String _Message;
         /// <summary>消息内容。异常信息或其它任务消息</summary>
@@ -184,7 +187,7 @@ namespace AntJob.Data.Entity
         [Description("消息内容。异常信息或其它任务消息")]
         [DataObjectField(false, false, true, -1)]
         [BindColumn("Message", "消息内容。异常信息或其它任务消息", "")]
-        public String Message { get => _Message; set { if (OnPropertyChanging(__.Message, value)) { _Message = value; OnPropertyChanged(__.Message); } } }
+        public String Message { get => _Message; set { if (OnPropertyChanging("Message", value)) { _Message = value; OnPropertyChanged("Message"); } } }
 
         private DateTime _CreateTime;
         /// <summary>创建时间</summary>
@@ -192,7 +195,7 @@ namespace AntJob.Data.Entity
         [Description("创建时间")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("CreateTime", "创建时间", "")]
-        public DateTime CreateTime { get => _CreateTime; set { if (OnPropertyChanging(__.CreateTime, value)) { _CreateTime = value; OnPropertyChanged(__.CreateTime); } } }
+        public DateTime CreateTime { get => _CreateTime; set { if (OnPropertyChanging("CreateTime", value)) { _CreateTime = value; OnPropertyChanged("CreateTime"); } } }
 
         private DateTime _UpdateTime;
         /// <summary>更新时间</summary>
@@ -200,7 +203,7 @@ namespace AntJob.Data.Entity
         [Description("更新时间")]
         [DataObjectField(false, false, true, 0)]
         [BindColumn("UpdateTime", "更新时间", "")]
-        public DateTime UpdateTime { get => _UpdateTime; set { if (OnPropertyChanging(__.UpdateTime, value)) { _UpdateTime = value; OnPropertyChanged(__.UpdateTime); } } }
+        public DateTime UpdateTime { get => _UpdateTime; set { if (OnPropertyChanging("UpdateTime", value)) { _UpdateTime = value; OnPropertyChanged("UpdateTime"); } } }
         #endregion
 
         #region 获取/设置 字段值
@@ -213,29 +216,29 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case __.ID: return _ID;
-                    case __.AppID: return _AppID;
-                    case __.JobID: return _JobID;
-                    case __.Client: return _Client;
-                    case __.Start: return _Start;
-                    case __.End: return _End;
-                    case __.BatchSize: return _BatchSize;
-                    case __.Total: return _Total;
-                    case __.Success: return _Success;
-                    case __.Error: return _Error;
-                    case __.Times: return _Times;
-                    case __.Speed: return _Speed;
-                    case __.Cost: return _Cost;
-                    case __.FullCost: return _FullCost;
-                    case __.Status: return _Status;
-                    case __.MsgCount: return _MsgCount;
-                    case __.Server: return _Server;
-                    case __.ProcessID: return _ProcessID;
-                    case __.Key: return _Key;
-                    case __.Data: return _Data;
-                    case __.Message: return _Message;
-                    case __.CreateTime: return _CreateTime;
-                    case __.UpdateTime: return _UpdateTime;
+                    case "ID": return _ID;
+                    case "AppID": return _AppID;
+                    case "JobID": return _JobID;
+                    case "Client": return _Client;
+                    case "Start": return _Start;
+                    case "End": return _End;
+                    case "BatchSize": return _BatchSize;
+                    case "Total": return _Total;
+                    case "Success": return _Success;
+                    case "Error": return _Error;
+                    case "Times": return _Times;
+                    case "Speed": return _Speed;
+                    case "Cost": return _Cost;
+                    case "FullCost": return _FullCost;
+                    case "Status": return _Status;
+                    case "MsgCount": return _MsgCount;
+                    case "Server": return _Server;
+                    case "ProcessID": return _ProcessID;
+                    case "Key": return _Key;
+                    case "Data": return _Data;
+                    case "Message": return _Message;
+                    case "CreateTime": return _CreateTime;
+                    case "UpdateTime": return _UpdateTime;
                     default: return base[name];
                 }
             }
@@ -243,29 +246,29 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case __.ID: _ID = value.ToInt(); break;
-                    case __.AppID: _AppID = value.ToInt(); break;
-                    case __.JobID: _JobID = value.ToInt(); break;
-                    case __.Client: _Client = Convert.ToString(value); break;
-                    case __.Start: _Start = value.ToDateTime(); break;
-                    case __.End: _End = value.ToDateTime(); break;
-                    case __.BatchSize: _BatchSize = value.ToInt(); break;
-                    case __.Total: _Total = value.ToInt(); break;
-                    case __.Success: _Success = value.ToInt(); break;
-                    case __.Error: _Error = value.ToInt(); break;
-                    case __.Times: _Times = value.ToInt(); break;
-                    case __.Speed: _Speed = value.ToInt(); break;
-                    case __.Cost: _Cost = value.ToInt(); break;
-                    case __.FullCost: _FullCost = value.ToInt(); break;
-                    case __.Status: _Status = (JobStatus)value; break;
-                    case __.MsgCount: _MsgCount = value.ToInt(); break;
-                    case __.Server: _Server = Convert.ToString(value); break;
-                    case __.ProcessID: _ProcessID = value.ToInt(); break;
-                    case __.Key: _Key = Convert.ToString(value); break;
-                    case __.Data: _Data = Convert.ToString(value); break;
-                    case __.Message: _Message = Convert.ToString(value); break;
-                    case __.CreateTime: _CreateTime = value.ToDateTime(); break;
-                    case __.UpdateTime: _UpdateTime = value.ToDateTime(); break;
+                    case "ID": _ID = value.ToInt(); break;
+                    case "AppID": _AppID = value.ToInt(); break;
+                    case "JobID": _JobID = value.ToInt(); break;
+                    case "Client": _Client = Convert.ToString(value); break;
+                    case "Start": _Start = value.ToDateTime(); break;
+                    case "End": _End = value.ToDateTime(); break;
+                    case "BatchSize": _BatchSize = value.ToInt(); break;
+                    case "Total": _Total = value.ToInt(); break;
+                    case "Success": _Success = value.ToInt(); break;
+                    case "Error": _Error = value.ToInt(); break;
+                    case "Times": _Times = value.ToInt(); break;
+                    case "Speed": _Speed = value.ToInt(); break;
+                    case "Cost": _Cost = value.ToInt(); break;
+                    case "FullCost": _FullCost = value.ToInt(); break;
+                    case "Status": _Status = (JobStatus)value; break;
+                    case "MsgCount": _MsgCount = value.ToInt(); break;
+                    case "Server": _Server = Convert.ToString(value); break;
+                    case "ProcessID": _ProcessID = value.ToInt(); break;
+                    case "Key": _Key = Convert.ToString(value); break;
+                    case "Data": _Data = Convert.ToString(value); break;
+                    case "Message": _Message = Convert.ToString(value); break;
+                    case "CreateTime": _CreateTime = value.ToDateTime(); break;
+                    case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
                     default: base[name] = value; break;
                 }
             }
@@ -277,73 +280,73 @@ namespace AntJob.Data.Entity
         public partial class _
         {
             /// <summary>编号</summary>
-            public static readonly Field ID = FindByName(__.ID);
+            public static readonly Field ID = FindByName("ID");
 
             /// <summary>应用</summary>
-            public static readonly Field AppID = FindByName(__.AppID);
+            public static readonly Field AppID = FindByName("AppID");
 
             /// <summary>作业</summary>
-            public static readonly Field JobID = FindByName(__.JobID);
+            public static readonly Field JobID = FindByName("JobID");
 
             /// <summary>客户端。IP加进程</summary>
-            public static readonly Field Client = FindByName(__.Client);
+            public static readonly Field Client = FindByName("Client");
 
             /// <summary>开始。大于等于</summary>
-            public static readonly Field Start = FindByName(__.Start);
+            public static readonly Field Start = FindByName("Start");
 
             /// <summary>结束。小于，不等于</summary>
-            public static readonly Field End = FindByName(__.End);
+            public static readonly Field End = FindByName("End");
 
             /// <summary>批大小</summary>
-            public static readonly Field BatchSize = FindByName(__.BatchSize);
+            public static readonly Field BatchSize = FindByName("BatchSize");
 
             /// <summary>总数</summary>
-            public static readonly Field Total = FindByName(__.Total);
+            public static readonly Field Total = FindByName("Total");
 
             /// <summary>成功</summary>
-            public static readonly Field Success = FindByName(__.Success);
+            public static readonly Field Success = FindByName("Success");
 
             /// <summary>错误</summary>
-            public static readonly Field Error = FindByName(__.Error);
+            public static readonly Field Error = FindByName("Error");
 
             /// <summary>次数</summary>
-            public static readonly Field Times = FindByName(__.Times);
+            public static readonly Field Times = FindByName("Times");
 
             /// <summary>速度</summary>
-            public static readonly Field Speed = FindByName(__.Speed);
+            public static readonly Field Speed = FindByName("Speed");
 
             /// <summary>耗时。秒</summary>
-            public static readonly Field Cost = FindByName(__.Cost);
+            public static readonly Field Cost = FindByName("Cost");
 
             /// <summary>全部耗时。秒，从任务发放到执行完成的时间</summary>
-            public static readonly Field FullCost = FindByName(__.FullCost);
+            public static readonly Field FullCost = FindByName("FullCost");
 
             /// <summary>状态</summary>
-            public static readonly Field Status = FindByName(__.Status);
+            public static readonly Field Status = FindByName("Status");
 
             /// <summary>消费消息数</summary>
-            public static readonly Field MsgCount = FindByName(__.MsgCount);
+            public static readonly Field MsgCount = FindByName("MsgCount");
 
             /// <summary>服务器</summary>
-            public static readonly Field Server = FindByName(__.Server);
+            public static readonly Field Server = FindByName("Server");
 
             /// <summary>进程</summary>
-            public static readonly Field ProcessID = FindByName(__.ProcessID);
+            public static readonly Field ProcessID = FindByName("ProcessID");
 
             /// <summary>最后键</summary>
-            public static readonly Field Key = FindByName(__.Key);
+            public static readonly Field Key = FindByName("Key");
 
             /// <summary>数据。可以是Json数据，比如StatID</summary>
-            public static readonly Field Data = FindByName(__.Data);
+            public static readonly Field Data = FindByName("Data");
 
             /// <summary>消息内容。异常信息或其它任务消息</summary>
-            public static readonly Field Message = FindByName(__.Message);
+            public static readonly Field Message = FindByName("Message");
 
             /// <summary>创建时间</summary>
-            public static readonly Field CreateTime = FindByName(__.CreateTime);
+            public static readonly Field CreateTime = FindByName("CreateTime");
 
             /// <summary>更新时间</summary>
-            public static readonly Field UpdateTime = FindByName(__.UpdateTime);
+            public static readonly Field UpdateTime = FindByName("UpdateTime");
 
             static Field FindByName(String name) => Meta.Table.FindByName(name);
         }
@@ -420,88 +423,6 @@ namespace AntJob.Data.Entity
             /// <summary>更新时间</summary>
             public const String UpdateTime = "UpdateTime";
         }
-        #endregion
-    }
-
-    /// <summary>作业任务接口</summary>
-    public partial interface IJobTask
-    {
-        #region 属性
-        /// <summary>编号</summary>
-        Int32 ID { get; set; }
-
-        /// <summary>应用</summary>
-        Int32 AppID { get; set; }
-
-        /// <summary>作业</summary>
-        Int32 JobID { get; set; }
-
-        /// <summary>客户端。IP加进程</summary>
-        String Client { get; set; }
-
-        /// <summary>开始。大于等于</summary>
-        DateTime Start { get; set; }
-
-        /// <summary>结束。小于，不等于</summary>
-        DateTime End { get; set; }
-
-        /// <summary>批大小</summary>
-        Int32 BatchSize { get; set; }
-
-        /// <summary>总数</summary>
-        Int32 Total { get; set; }
-
-        /// <summary>成功</summary>
-        Int32 Success { get; set; }
-
-        /// <summary>错误</summary>
-        Int32 Error { get; set; }
-
-        /// <summary>次数</summary>
-        Int32 Times { get; set; }
-
-        /// <summary>速度</summary>
-        Int32 Speed { get; set; }
-
-        /// <summary>耗时。秒</summary>
-        Int32 Cost { get; set; }
-
-        /// <summary>全部耗时。秒，从任务发放到执行完成的时间</summary>
-        Int32 FullCost { get; set; }
-
-        /// <summary>状态</summary>
-        JobStatus Status { get; set; }
-
-        /// <summary>消费消息数</summary>
-        Int32 MsgCount { get; set; }
-
-        /// <summary>服务器</summary>
-        String Server { get; set; }
-
-        /// <summary>进程</summary>
-        Int32 ProcessID { get; set; }
-
-        /// <summary>最后键</summary>
-        String Key { get; set; }
-
-        /// <summary>数据。可以是Json数据，比如StatID</summary>
-        String Data { get; set; }
-
-        /// <summary>消息内容。异常信息或其它任务消息</summary>
-        String Message { get; set; }
-
-        /// <summary>创建时间</summary>
-        DateTime CreateTime { get; set; }
-
-        /// <summary>更新时间</summary>
-        DateTime UpdateTime { get; set; }
-        #endregion
-
-        #region 获取/设置 字段值
-        /// <summary>获取/设置 字段值</summary>
-        /// <param name="name">字段名</param>
-        /// <returns></returns>
-        Object this[String name] { get; set; }
         #endregion
     }
 }
