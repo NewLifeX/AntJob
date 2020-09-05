@@ -94,7 +94,7 @@ namespace AntJob.Data.Entity
 
         #region 业务操作
         /// <summary>分类单对象缓存</summary>
-        static FieldCache<App> CategoryCache = new FieldCache<App>(_.Category);
+        static FieldCache<App> CategoryCache = new FieldCache<App>(__.Category);
 
         /// <summary>查询所有分类缓存</summary>
         /// <returns></returns>

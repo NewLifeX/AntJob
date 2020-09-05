@@ -117,7 +117,7 @@ namespace AntJob.Data.Entity
 
         #region 扩展操作
         /// <summary>类别名实体缓存，异步，缓存10分钟</summary>
-        static readonly FieldCache<AppHistory> ActionCache = new FieldCache<AppHistory>(_.Action);
+        static readonly FieldCache<AppHistory> ActionCache = new FieldCache<AppHistory>(__.Action);
 
         /// <summary>获取所有类别名称</summary>
         /// <returns></returns>
