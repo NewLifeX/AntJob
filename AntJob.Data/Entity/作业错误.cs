@@ -16,8 +16,6 @@ namespace AntJob.Data.Entity
     [Description("作业错误")]
     [BindIndex("IX_JobError_AppID_ID", false, "AppID,ID")]
     [BindIndex("IX_JobError_JobID_ID", false, "JobID,ID")]
-    [BindIndex("IX_JobError_Key", false, "Key")]
-    [BindIndex("IX_JobError_ErrorCode", false, "ErrorCode")]
     [BindTable("JobError", Description = "作业错误", ConnName = "Ant", DbType = DatabaseType.None)]
     public partial class JobError
     {
@@ -78,22 +76,6 @@ namespace AntJob.Data.Entity
         [BindColumn("End", "结束。小于，不等于", "")]
         public DateTime End { get => _End; set { if (OnPropertyChanging("End", value)) { _End = value; OnPropertyChanged("End"); } } }
 
-        private Int32 _BatchSize;
-        /// <summary>批大小</summary>
-        [DisplayName("批大小")]
-        [Description("批大小")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("BatchSize", "批大小", "")]
-        public Int32 BatchSize { get => _BatchSize; set { if (OnPropertyChanging("BatchSize", value)) { _BatchSize = value; OnPropertyChanged("BatchSize"); } } }
-
-        private String _Key;
-        /// <summary>数据键</summary>
-        [DisplayName("数据键")]
-        [Description("数据键")]
-        [DataObjectField(false, false, true, 50)]
-        [BindColumn("Key", "数据键", "")]
-        public String Key { get => _Key; set { if (OnPropertyChanging("Key", value)) { _Key = value; OnPropertyChanged("Key"); } } }
-
         private String _Data;
         /// <summary>数据</summary>
         [DisplayName("数据")]
@@ -117,14 +99,6 @@ namespace AntJob.Data.Entity
         [DataObjectField(false, false, false, 0)]
         [BindColumn("ProcessID", "进程", "")]
         public Int32 ProcessID { get => _ProcessID; set { if (OnPropertyChanging("ProcessID", value)) { _ProcessID = value; OnPropertyChanged("ProcessID"); } } }
-
-        private String _ErrorCode;
-        /// <summary>错误码</summary>
-        [DisplayName("错误码")]
-        [Description("错误码")]
-        [DataObjectField(false, false, true, 50)]
-        [BindColumn("ErrorCode", "错误码", "")]
-        public String ErrorCode { get => _ErrorCode; set { if (OnPropertyChanging("ErrorCode", value)) { _ErrorCode = value; OnPropertyChanged("ErrorCode"); } } }
 
         private String _Message;
         /// <summary>内容</summary>
@@ -168,12 +142,9 @@ namespace AntJob.Data.Entity
                     case "Client": return _Client;
                     case "Start": return _Start;
                     case "End": return _End;
-                    case "BatchSize": return _BatchSize;
-                    case "Key": return _Key;
                     case "Data": return _Data;
                     case "Server": return _Server;
                     case "ProcessID": return _ProcessID;
-                    case "ErrorCode": return _ErrorCode;
                     case "Message": return _Message;
                     case "CreateTime": return _CreateTime;
                     case "UpdateTime": return _UpdateTime;
@@ -191,12 +162,9 @@ namespace AntJob.Data.Entity
                     case "Client": _Client = Convert.ToString(value); break;
                     case "Start": _Start = value.ToDateTime(); break;
                     case "End": _End = value.ToDateTime(); break;
-                    case "BatchSize": _BatchSize = value.ToInt(); break;
-                    case "Key": _Key = Convert.ToString(value); break;
                     case "Data": _Data = Convert.ToString(value); break;
                     case "Server": _Server = Convert.ToString(value); break;
                     case "ProcessID": _ProcessID = value.ToInt(); break;
-                    case "ErrorCode": _ErrorCode = Convert.ToString(value); break;
                     case "Message": _Message = Convert.ToString(value); break;
                     case "CreateTime": _CreateTime = value.ToDateTime(); break;
                     case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
@@ -231,12 +199,6 @@ namespace AntJob.Data.Entity
             /// <summary>结束。小于，不等于</summary>
             public static readonly Field End = FindByName("End");
 
-            /// <summary>批大小</summary>
-            public static readonly Field BatchSize = FindByName("BatchSize");
-
-            /// <summary>数据键</summary>
-            public static readonly Field Key = FindByName("Key");
-
             /// <summary>数据</summary>
             public static readonly Field Data = FindByName("Data");
 
@@ -245,9 +207,6 @@ namespace AntJob.Data.Entity
 
             /// <summary>进程</summary>
             public static readonly Field ProcessID = FindByName("ProcessID");
-
-            /// <summary>错误码</summary>
-            public static readonly Field ErrorCode = FindByName("ErrorCode");
 
             /// <summary>内容</summary>
             public static readonly Field Message = FindByName("Message");
@@ -285,12 +244,6 @@ namespace AntJob.Data.Entity
             /// <summary>结束。小于，不等于</summary>
             public const String End = "End";
 
-            /// <summary>批大小</summary>
-            public const String BatchSize = "BatchSize";
-
-            /// <summary>数据键</summary>
-            public const String Key = "Key";
-
             /// <summary>数据</summary>
             public const String Data = "Data";
 
@@ -299,9 +252,6 @@ namespace AntJob.Data.Entity
 
             /// <summary>进程</summary>
             public const String ProcessID = "ProcessID";
-
-            /// <summary>错误码</summary>
-            public const String ErrorCode = "ErrorCode";
 
             /// <summary>内容</summary>
             public const String Message = "Message";

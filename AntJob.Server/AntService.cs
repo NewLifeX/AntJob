@@ -312,13 +312,14 @@ namespace AntJob.Server
             var next = (DateTime)(ext[nextKey] ?? DateTime.MinValue);
             if (next < now)
             {
-                var ps = ControllerContext.Current.Parameters;
-                var server = ps["server"] + "";
-                var pid = ps["pid"].ToInt();
+                //var ps = ControllerContext.Current.Parameters;
+                //var server = ps["server"] + "";
+                //var pid = ps["pid"].ToInt();
+                var online = GetOnline(app, _Net);
                 var ip = _Net.Remote.Host;
 
                 next = now.AddSeconds(60);
-                list.AddRange(jb.AcquireOld(server, ip, pid, count));
+                list.AddRange(jb.AcquireOld(online.Server, ip, online.ProcessId, count));
 
                 if (list.Count > 0)
                 {
@@ -450,9 +451,7 @@ namespace AntJob.Server
             }
             if (task.Status == JobStatus.错误)
             {
-                var ps = ControllerContext.Current.Parameters;
-
-                SetJobError(job, jt, ps);
+                SetJobError(job, jt);
 
                 jt.Error++;
                 //ji.Message = err.Message;
@@ -495,15 +494,16 @@ namespace AntJob.Server
             //job.Save();
         }
 
-        private JobError SetJobError(Job job, JobTask task, IDictionary<String, Object> ps)
+        private JobError SetJobError(Job job, JobTask task)
         {
             var err = new JobError
             {
                 AppID = job.AppID,
                 JobID = job.ID,
+                TaskID = task.ID,
                 Start = task.Start,
                 End = task.End,
-                BatchSize = task.BatchSize,
+                Data = task.Data,
 
                 Server = task.Server,
                 ProcessID = task.ProcessID,
@@ -512,12 +512,6 @@ namespace AntJob.Server
                 CreateTime = DateTime.Now,
                 UpdateTime = DateTime.Now,
             };
-            err.Key = task.Key;
-            err.Data = ps["Data"] + "";
-
-            var code = ps["ErrorCode"] + "";
-            if (code != nameof(Exception)) code = code.TrimEnd(nameof(Exception));
-            err.ErrorCode = code;
 
             var msg = task.Message;
             if (!msg.IsNullOrEmpty() && msg.Contains("Exception:")) msg = msg.Substring("Exception:").Trim();

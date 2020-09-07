@@ -166,9 +166,6 @@ namespace AntJob.Providers
             task.Total = ctx.Total;
             task.Success = ctx.Success;
 
-            //task.Server = _MachineName;
-            //task.ProcessID = _ProcessID;
-
             Report(ctx.Handler.Job, task);
         }
 
@@ -182,9 +179,6 @@ namespace AntJob.Providers
             task.Total = ctx.Total;
             task.Success = ctx.Success;
             task.Times++;
-
-            //task.Server = _MachineName;
-            //task.ProcessID = _ProcessID;
 
             // 区分正常完成还是错误终止
             if (ctx.Error != null)
