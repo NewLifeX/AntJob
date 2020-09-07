@@ -128,10 +128,11 @@ namespace AntJob.Server
 
         void IActionFilter.OnActionExecuting(ControllerContext filterContext)
         {
+            _Net = Session as INetSession;
+           
             var act = filterContext.ActionName;
             if (act == nameof(Login)) return;
 
-            _Net = Session as INetSession;
             if (Session["App"] is App app)
             {
                 _App = app;
