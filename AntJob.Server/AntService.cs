@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using AntJob.Data;
 using AntJob.Data.Entity;
+using AntJob.Models;
 using NewLife;
 using NewLife.Data;
 using NewLife.Log;
@@ -28,84 +29,61 @@ namespace AntJob.Server
         public IApiSession Session { get; set; }
 
         /// <summary>应用登录</summary>
-        /// <param name="user">应用名</param>
-        /// <param name="pass"></param>
-        /// <param name="displayName">显示名</param>
-        /// <param name="machine">机器码</param>
-        /// <param name="processId">进程Id</param>
-        /// <param name="version">版本</param>
-        /// <param name="compile">编译时间</param>
+        /// <param name="model">模型</param>
         /// <returns></returns>
         [Api(nameof(Login))]
-        public Object Login(String user, String pass, String displayName, String machine, Int32 processId, String version, DateTime compile)
+        public LoginResponse Login(LoginModel model)
         {
-            if (user.IsNullOrEmpty()) throw new ArgumentNullException(nameof(user));
-            //if (pass.IsNullOrEmpty()) throw new ArgumentNullException(nameof(pass));
-
-            //var ps = ControllerContext.Current.Parameters;
-            //var displayName = ps["DisplayName"] + "";
-            //var machine = ps["machine"] + "";
-            //var processid = ps["processid"].ToInt();
-            //var version = ps["version"] + "";
-            //var compile = ps["Compile"].ToDateTime();
+            if (model.User.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.User));
 
             var ns = Session as INetSession;
             var ip = ns.Remote.Host;
 
-            WriteLog("[{0}]从[{1}]登录[{2}@{3}]", user, ns.Remote, machine, processId);
+            WriteLog("[{0}]从[{1}]登录[{2}@{3}]", model.User, ns.Remote, model.Machine, model.ProcessId);
 
             // 找应用
             var autoReg = false;
-            var app = App.FindByName(user);
-            if (app == null || app.Secret.MD5() != pass)
+            var app = App.FindByName(model.User);
+            if (app == null || app.Secret.MD5() != model.Pass)
             {
-                app = CheckApp(app, user, pass, ip);
-                if (app == null) throw new ArgumentOutOfRangeException(nameof(user));
+                app = CheckApp(app, model.User, model.Pass, ip);
+                if (app == null) throw new ArgumentOutOfRangeException(nameof(model.User));
 
                 autoReg = true;
             }
 
-            if (app == null) throw new Exception($"应用[{user}]不存在！");
+            if (app == null) throw new Exception($"应用[{model.User}]不存在！");
             if (!app.Enable) throw new Exception("已禁用！");
 
             // 核对密码
             if (!autoReg && !app.Secret.IsNullOrEmpty())
             {
                 var pass2 = app.Secret.MD5();
-                if (pass != pass2) throw new Exception("密码错误！");
+                if (model.Pass != pass2) throw new Exception("密码错误！");
             }
 
             // 版本和编译时间
-            if (app.Version.IsNullOrEmpty() || app.Version.CompareTo(version) < 0) app.Version = version;
-            if (app.CompileTime < compile) app.CompileTime = compile;
-            if (app.DisplayName.IsNullOrEmpty()) app.DisplayName = displayName;
+            if (app.Version.IsNullOrEmpty() || app.Version.CompareTo(model.Version) < 0) app.Version = model.Version;
+            if (app.CompileTime < model.Compile) app.CompileTime = model.Compile;
+            if (app.DisplayName.IsNullOrEmpty()) app.DisplayName = model.DisplayName;
 
             app.Save();
 
             // 应用上线
-            var online = CreateOnline(app, ns, machine, processId);
-            online.Version = version;
-            online.CompileTime = compile;
+            var online = CreateOnline(app, ns, model.Machine, model.ProcessId);
+            online.Version = model.Version;
+            online.CompileTime = model.Compile;
             online.Save();
 
             // 记录当前用户
             Session["App"] = app;
 
-            WriteHistory(autoReg ? "注册" : "登录", true, $"[{user}/{pass}]在[{machine}@{processId}]登录[{app}]成功");
+            WriteHistory(autoReg ? "注册" : "登录", true, $"[{model.User}/{model.Pass}]在[{model.Machine}@{model.ProcessId}]登录[{app}]成功");
 
-            if (autoReg)
-                return new
-                {
-                    app.Name,
-                    app.Secret,
-                    app.DisplayName,
-                };
-            else
-                return new
-                {
-                    app.Name,
-                    app.DisplayName,
-                };
+            var rs = new LoginResponse { Name = app.Name, DisplayName = app.DisplayName };
+            if (autoReg) rs.Secret = app.Secret;
+
+            return rs;
         }
 
         protected virtual App CheckApp(App app, String user, String pass, String ip)

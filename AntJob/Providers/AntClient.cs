@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using AntJob.Data;
+using AntJob.Models;
 using NewLife;
 using NewLife.Log;
 using NewLife.Net;
@@ -29,7 +30,7 @@ namespace AntJob.Providers
         public Boolean Logined { get; set; }
 
         /// <summary>最后一次登录成功后的消息</summary>
-        public IDictionary<String, Object> Info { get; private set; }
+        public LoginResponse Info { get; private set; }
         #endregion
 
         #region 方法
@@ -79,26 +80,26 @@ namespace AntJob.Providers
             var des = asmx?.Asm.GetCustomAttribute<DescriptionAttribute>();
             var dname = title?.Title ?? dis?.DisplayName ?? des?.Description;
 
-            var arg = new
+            var arg = new LoginModel
             {
-                user = UserName,
-                pass = Password.IsNullOrEmpty() ? null : Password.MD5(),
+                User = UserName,
+                Pass = Password.IsNullOrEmpty() ? null : Password.MD5(),
                 DisplayName = dname,
-                machine = Environment.MachineName,
-                processid = Process.GetCurrentProcess().Id,
-                version = asmx?.Version,
-                asmx?.Compile,
+                Machine = Environment.MachineName,
+                ProcessId = Process.GetCurrentProcess().Id,
+                Version = asmx.Version,
+                Compile = asmx.Compile,
             };
 
-            var rs = await base.InvokeWithClientAsync<IDictionary<String, Object>>(client, "Login", arg);
+            var rs = await base.InvokeWithClientAsync<LoginResponse>(client, "Login", arg);
 
             var set = AntSetting.Current;
             if (set.Debug) XTrace.WriteLine("登录{0}成功！{1}", client, rs.ToJson());
 
             // 保存下发密钥
-            if (rs.TryGetValue("Secret", out var secret))
+            if (!rs.Secret.IsNullOrEmpty())
             {
-                set.Secret = secret + "";
+                set.Secret = rs.Secret;
                 set.Save();
             }
 
