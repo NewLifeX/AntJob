@@ -195,6 +195,24 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 业务操作
+        /// <summary>是否已准备就绪</summary>
+        /// <returns></returns>
+        public Boolean IsReady()
+        {
+            switch (Mode)
+            {
+                case JobModes.Data:
+                case JobModes.Alarm:
+                    return Start.Year > 2000 && Step > 0;
+                case JobModes.Message:
+                    return Topic.IsNullOrEmpty();
+                default:
+                    break;
+            }
+
+            return false;
+        }
+
         /// <summary>重置任务，让它从新开始工作</summary>
         /// <param name="days">重置到多少天之前</param>
         /// <param name="stime">开始时间（优先级低于days）</param>
