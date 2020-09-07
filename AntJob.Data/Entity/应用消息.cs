@@ -15,18 +15,17 @@ namespace AntJob.Data.Entity
     [DataObject]
     [Description("应用消息。消息调度，某些作业负责生产消息，供其它作业进行消费处理")]
     [BindIndex("IX_AppMessage_AppID_Topic_UpdateTime", false, "AppID,Topic,UpdateTime")]
-    [BindIndex("IX_AppMessage_UpdateTime", false, "UpdateTime")]
     [BindTable("AppMessage", Description = "应用消息。消息调度，某些作业负责生产消息，供其它作业进行消费处理", ConnName = "Ant", DbType = DatabaseType.None)]
     public partial class AppMessage
     {
         #region 属性
-        private Int32 _ID;
+        private Int64 _Id;
         /// <summary>编号</summary>
         [DisplayName("编号")]
         [Description("编号")]
-        [DataObjectField(true, true, false, 0)]
-        [BindColumn("ID", "编号", "")]
-        public Int32 ID { get => _ID; set { if (OnPropertyChanging("ID", value)) { _ID = value; OnPropertyChanged("ID"); } } }
+        [DataObjectField(true, false, false, 0)]
+        [BindColumn("Id", "编号", "")]
+        public Int64 Id { get => _Id; set { if (OnPropertyChanging("Id", value)) { _Id = value; OnPropertyChanged("Id"); } } }
 
         private Int32 _AppID;
         /// <summary>应用</summary>
@@ -87,7 +86,7 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case "ID": return _ID;
+                    case "Id": return _Id;
                     case "AppID": return _AppID;
                     case "JobID": return _JobID;
                     case "Topic": return _Topic;
@@ -101,7 +100,7 @@ namespace AntJob.Data.Entity
             {
                 switch (name)
                 {
-                    case "ID": _ID = value.ToInt(); break;
+                    case "Id": _Id = value.ToLong(); break;
                     case "AppID": _AppID = value.ToInt(); break;
                     case "JobID": _JobID = value.ToInt(); break;
                     case "Topic": _Topic = Convert.ToString(value); break;
@@ -119,7 +118,7 @@ namespace AntJob.Data.Entity
         public partial class _
         {
             /// <summary>编号</summary>
-            public static readonly Field ID = FindByName("ID");
+            public static readonly Field Id = FindByName("Id");
 
             /// <summary>应用</summary>
             public static readonly Field AppID = FindByName("AppID");
@@ -146,7 +145,7 @@ namespace AntJob.Data.Entity
         public partial class __
         {
             /// <summary>编号</summary>
-            public const String ID = "ID";
+            public const String Id = "Id";
 
             /// <summary>应用</summary>
             public const String AppID = "AppID";

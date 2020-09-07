@@ -358,16 +358,15 @@ namespace AntJob.Server
             var total = 0;
             var now = DateTime.Now;
             // 延迟需要基于任务开始时间，而不能用使用当前时间，防止回头跑数据时无法快速执行
-            var dTime = model.DelayTime.ToDateTime();
-            if (dTime.Year < 2000)
-                dTime = now.AddSeconds(model.DelayTime);
+            var dTime = now.AddSeconds(model.DelayTime);
 
             var jb = Job.FindByAppIDAndName(app.ID, model.Job);
-
+            var flow = AppMessage.Meta.Factory.FlowId;
             foreach (var item in messages)
             {
                 var jm = new AppMessage
                 {
+                    Id = flow.NewId(),
                     AppID = app.ID,
                     JobID = jb == null ? 0 : jb.ID,
                     Topic = model.Topic,
@@ -375,7 +374,13 @@ namespace AntJob.Server
                 };
 
                 jm.CreateTime = jm.UpdateTime = now;
-                if (model.DelayTime > 0) jm.UpdateTime = dTime;
+
+                // 雪花Id直接指定消息在未来的消费时间
+                if (model.DelayTime > 0)
+                {
+                    jm.Id = flow.NewId(dTime);
+                    jm.UpdateTime = dTime;
+                }
 
                 ms.Add(jm);
             }

@@ -25,7 +25,6 @@
             {
                 <th class="text-center" style="width:10px;"><input type="checkbox" id="chkAll" title="全选" /></th>
             }
-            <th class="text-center hidden-md hidden-sm hidden-xs"><a href="@Html.Raw(page.GetSortUrl("ID"))">编号</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("AppID"))">应用</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("JobID"))">作业</a></th>
             <th class="text-center" title="主题。区分作业下多种资源"><a href="@Html.Raw(page.GetSortUrl("Topic"))">主题</a></th>
@@ -44,9 +43,8 @@
             <tr>
                 @if (set.EnableSelect)
                 {
-                    <td class="text-center"><input type="checkbox" name="keys" value="@entity.ID" /></td>
+                    <td class="text-center"><input type="checkbox" name="keys" value="@entity.Id" /></td>
                 }
-                <td class="text-center hidden-md hidden-sm hidden-xs">@entity.ID</td>
                 <td><a href="App?ID=@entity.AppID">@entity.AppName</a></td>
                 <td><a href="Job?ID=@entity.JobID">@entity.JobName</a></td>
                 <td>@entity.Topic</td>

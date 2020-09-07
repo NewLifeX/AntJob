@@ -55,7 +55,7 @@ namespace AntJob.Data.Entity
         {
             if (id <= 0) return null;
 
-            return Find(_.ID == id);
+            return Find(_.Id == id);
         }
 
         /// <summary>
@@ -100,7 +100,9 @@ namespace AntJob.Data.Entity
             if (appid > 0) exp &= _.AppID == appid;
             if (jobid > 0) exp &= _.JobID == jobid;
             if (!key.IsNullOrEmpty()) exp &= _.Topic.Contains(key) | _.Data.Contains(key);
-            exp &= _.UpdateTime.Between(start, end);
+
+            exp &= _.Id.Between(start, end, Meta.Factory.FlowId);
+            //exp &= _.UpdateTime.Between(start, end);
 
             return FindAll(exp, p);
         }
@@ -115,7 +117,7 @@ namespace AntJob.Data.Entity
         /// <returns></returns>
         public static IList<AppMessage> GetTopic(Int32 appid, String topic, DateTime endTime, Int32 count)
         {
-            return FindAll(_.AppID == appid & _.Topic == topic & _.UpdateTime <= endTime, _.UpdateTime.Asc(), null, 0, count);
+            return FindAll(_.AppID == appid & _.Topic == topic & _.Id <= Meta.Factory.FlowId.GetId(endTime), _.Id.Asc(), null, 0, count);
         }
 
         /// <summary>去重过滤</summary>

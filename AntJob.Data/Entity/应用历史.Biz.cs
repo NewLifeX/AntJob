@@ -54,33 +54,6 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 扩展查询
-        /// <summary>根据编号查找</summary>
-        /// <param name="id">编号</param>
-        /// <returns>实体对象</returns>
-        public static AppHistory FindByID(Int32 id)
-        {
-            if (id <= 0) return null;
-
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.ID == id);
-
-            // 单对象缓存
-            return Meta.SingleCache[id];
-
-            //return Find(_.ID == id);
-        }
-
-        /// <summary>根据应用、操作查找</summary>
-        /// <param name="appid">应用</param>
-        /// <param name="action">操作</param>
-        /// <returns>实体列表</returns>
-        public static IList<AppHistory> FindAllByAppIDAndAction(Int32 appid, String action)
-        {
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.AppID == appid && e.Action == action);
-
-            return FindAll(_.AppID == appid & _.Action == action);
-        }
         #endregion
 
         #region 高级查询
@@ -104,7 +77,8 @@ namespace AntJob.Data.Entity
             if (!action.IsNullOrEmpty()) exp &= _.Action == action;
             if (success != null) exp &= _.Success == success;
 
-            exp &= _.CreateTime.Between(start, end);
+            exp &= _.Id.Between(start, end, Meta.Factory.FlowId);
+            //exp &= _.CreateTime.Between(start, end);
 
             if (!key.IsNullOrEmpty())
             {
