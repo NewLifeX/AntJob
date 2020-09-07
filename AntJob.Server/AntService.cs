@@ -129,7 +129,7 @@ namespace AntJob.Server
         void IActionFilter.OnActionExecuting(ControllerContext filterContext)
         {
             _Net = Session as INetSession;
-           
+
             var act = filterContext.ActionName;
             if (act == nameof(Login)) return;
 
@@ -215,6 +215,7 @@ namespace AntJob.Server
                 if (!item.DisplayName.IsNullOrEmpty()) jb.DisplayName = item.DisplayName;
                 if (!item.Description.IsNullOrEmpty()) jb.Remark = item.Description;
                 if (!item.ClassName.IsNullOrEmpty()) jb.ClassName = item.ClassName;
+                if (jb.Topic.IsNullOrEmpty()) jb.Topic = item.Topic;
 
                 if (jb.Save() != 0)
                 {
@@ -231,14 +232,12 @@ namespace AntJob.Server
         }
 
         /// <summary>申请作业任务</summary>
-        /// <param name="job">作业名称</param>
-        /// <param name="count">任务个数</param>
-        /// <param name="topic">主题</param>
+        /// <param name="model">模型</param>
         /// <returns></returns>
         [Api(nameof(Acquire))]
-        public ITask[] Acquire(String job, Int32 count, String topic)
+        public ITask[] Acquire(AcquireModel model)
         {
-            job = job?.Trim();
+            var job = model.Job?.Trim();
             if (job.IsNullOrEmpty()) return new TaskModel[0];
 
             var app = _App;
@@ -263,10 +262,10 @@ namespace AntJob.Server
             var list = new List<JobTask>();
 
             // 每分钟检查一下错误任务和中断任务
-            CheckErrorTask(app, jb, count, list);
+            CheckErrorTask(app, jb, model.Count, list);
 
             // 错误项不够时，增加切片
-            if (list.Count < count)
+            if (list.Count < model.Count)
             {
                 //var ps = ControllerContext.Current.Parameters;
                 var server = online.Name;
@@ -277,7 +276,7 @@ namespace AntJob.Server
                 switch (jb.Mode)
                 {
                     case JobModes.Message:
-                        list.AddRange(jb.AcquireMessage(topic, server, ip, pid, count - list.Count));
+                        list.AddRange(jb.AcquireMessage(model.Topic, server, ip, pid, model.Count - list.Count));
                         break;
                     case JobModes.Data:
                     case JobModes.Alarm:
@@ -290,7 +289,7 @@ namespace AntJob.Server
                             {
                                 // 申请任务前，不能再查数据库，那样子会导致多线程脏读，从而出现多客户端分到相同任务的情况
                                 //jb = Job.FindByKey(jb.ID);
-                                list.AddRange(jb.Acquire(server, ip, pid, count - list.Count));
+                                list.AddRange(jb.Acquire(server, ip, pid, model.Count - list.Count));
                             }
                         }
                         break;

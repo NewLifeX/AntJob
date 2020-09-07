@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AntJob.Data;
+using AntJob.Handlers;
 using NewLife;
 using NewLife.Log;
 using NewLife.Threading;
@@ -81,6 +82,8 @@ namespace AntJob.Providers
                     if (!dis.IsNullOrEmpty()) job2.DisplayName = dis;
                     var des = handler.GetType().GetDescription();
                     if (!des.IsNullOrEmpty()) job2.Description = des;
+
+                    if (handler is MessageHandler mhandler) job2.Topic = mhandler.Topic;
                 }
 
                 list.Add(job);
@@ -121,12 +124,12 @@ namespace AntJob.Providers
 
         /// <summary>申请任务</summary>
         /// <param name="job">作业</param>
-        /// <param name="data">扩展数据</param>
+        /// <param name="topic">主题</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public override ITask[] Acquire(IJob job, IDictionary<String, Object> data, Int32 count)
+        public override ITask[] Acquire(IJob job, String topic, Int32 count)
         {
-            return Ant.Acquire(job.Name, count, data);
+            return Ant.Acquire(job.Name, topic, count);
         }
 
         /// <summary>生产消息</summary>

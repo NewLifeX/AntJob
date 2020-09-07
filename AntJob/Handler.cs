@@ -108,16 +108,15 @@ namespace AntJob
         /// <remarks>
         /// 业务应用根据使用场景，可重载Acquire并返回空来阻止创建新任务
         /// </remarks>
-        /// <param name="data">扩展数据。Topic等信息</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public virtual ITask[] Acquire(IDictionary<String, Object> data, Int32 count = 1)
+        public virtual ITask[] Acquire(Int32 count)
         {
             var prv = Provider;
             var job = Job;
 
             // 循环申请任务，喂饱处理器
-            return prv.Acquire(job, data, count);
+            return prv.Acquire(job, null, count);
         }
         #endregion
 

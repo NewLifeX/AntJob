@@ -41,16 +41,15 @@ namespace AntJob.Handlers
         /// <remarks>
         /// 业务应用根据使用场景，可重载Acquire并返回空来阻止创建新任务
         /// </remarks>
-        /// <param name="data">扩展数据。Topic等信息</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public override ITask[] Acquire(IDictionary<String, Object> data, Int32 count = 1)
+        public override ITask[] Acquire(Int32 count)
         {
             // 消费模式，设置Topic值
-            if (data == null) data = new Dictionary<String, Object>();
-            if (!Topic.IsNullOrEmpty()) data[nameof(Topic)] = Topic;
+            var prv = Provider;
+            var job = Job;
 
-            return base.Acquire(data, count);
+            return prv.Acquire(job, Topic, count);
         }
 
         /// <summary>解码一批消息，处理任务</summary>

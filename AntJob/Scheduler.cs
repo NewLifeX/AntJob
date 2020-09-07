@@ -136,7 +136,7 @@ namespace AntJob
                 if (count > 0)
                 {
                     // 循环申请任务，喂饱处理器
-                    var ts = handler.Acquire(null, count);
+                    var ts = handler.Acquire(count);
 
                     // 送给处理器处理
                     for (var i = 0; i < count && ts != null && i < ts.Length; i++)
@@ -178,9 +178,9 @@ namespace AntJob
                                 handler.Name = job.Name;
                                 handler.Schedule = this;
                                 handler.Provider = provider;
-                               
+
                                 if (handler is MessageHandler messageHandler && !job.Topic.IsNullOrEmpty()) messageHandler.Topic = job.Topic;
-                               
+
                                 handler.Log = XTrace.Log;
                                 handler.Start();
 

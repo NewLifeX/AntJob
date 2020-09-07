@@ -121,16 +121,15 @@ namespace AntJob.Providers
 
         /// <summary>申请作业任务</summary>
         /// <param name="job">作业</param>
+        /// <param name="topic">主题</param>
         /// <param name="count">要申请的任务个数</param>
-        /// <param name="ext">扩展数据</param>
         /// <returns></returns>
-        public ITask[] Acquire(String job, Int32 count, Object ext = null)
+        public ITask[] Acquire(String job, String topic, Int32 count) => Invoke<TaskModel[]>(nameof(Acquire), new AcquireModel
         {
-            var dic = new { job, count }.ToDictionary();
-            if (ext != null) dic = dic.Merge(ext);
-
-            return Invoke<TaskModel[]>(nameof(Acquire), dic);
-        }
+            Job = job,
+            Topic = topic,
+            Count = count,
+        });
 
         /// <summary>生产消息</summary>
         /// <param name="job">作业</param>
