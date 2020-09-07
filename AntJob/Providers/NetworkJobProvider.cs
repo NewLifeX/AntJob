@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AntJob.Data;
 using AntJob.Handlers;
+using AntJob.Models;
 using NewLife;
 using NewLife.Log;
 using NewLife.Threading;
@@ -142,7 +143,19 @@ namespace AntJob.Providers
         {
             if (topic.IsNullOrEmpty() || messages == null || messages.Length < 1) return 0;
 
-            return Ant.Produce(job, topic, messages, option);
+            var model = new ProduceModel
+            {
+                Job = job,
+                Topic = topic,
+                Messages = messages,
+            };
+            if (option != null)
+            {
+                model.DelayTime = option.DelayTime;
+                model.Unique = option.Unique;
+            }
+
+            return Ant.Produce(model);
         }
         #endregion
 

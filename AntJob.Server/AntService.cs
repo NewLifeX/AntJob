@@ -336,25 +336,20 @@ namespace AntJob.Server
         }
 
         /// <summary>生产消息</summary>
-        /// <param name="job">作业</param>
-        /// <param name="topic">主体</param>
-        /// <param name="messages">消息集合</param>
-        /// <param name="delayTime">延迟执行间隔（实际执行时间=延迟+生产时间），单位秒</param>
-        /// <param name="unique">消息去重。避免单个消息被重复生产</param>
+        /// <param name="model">模型</param>
         /// <returns></returns>
         [Api(nameof(Produce))]
-        public Int32 Produce(String job, String topic, String[] messages, Int32 delayTime = 0, Boolean unique = false)
+        public Int32 Produce(ProduceModel model)
         {
-            if (messages == null) return 0;
-            messages = messages.Distinct().ToArray();
-            if (messages.Length == 0) return 0;
+            var messages = model?.Messages?.Distinct().ToArray();
+            if (messages == null || messages.Length == 0) return 0;
 
             var app = _App;
 
             // 去重过滤
-            if (unique)
+            if (model.Unique)
             {
-                messages = AppMessage.Filter(app.ID, topic, messages);
+                messages = AppMessage.Filter(app.ID, model.Topic, messages);
                 if (messages.Length == 0) return 0;
             }
 
@@ -363,11 +358,11 @@ namespace AntJob.Server
             var total = 0;
             var now = DateTime.Now;
             // 延迟需要基于任务开始时间，而不能用使用当前时间，防止回头跑数据时无法快速执行
-            var dTime = delayTime.ToDateTime();
+            var dTime = model.DelayTime.ToDateTime();
             if (dTime.Year < 2000)
-                dTime = now.AddSeconds(delayTime);
+                dTime = now.AddSeconds(model.DelayTime);
 
-            var jb = Job.FindByAppIDAndName(app.ID, job);
+            var jb = Job.FindByAppIDAndName(app.ID, model.Job);
 
             foreach (var item in messages)
             {
@@ -375,12 +370,12 @@ namespace AntJob.Server
                 {
                     AppID = app.ID,
                     JobID = jb == null ? 0 : jb.ID,
-                    Topic = topic,
+                    Topic = model.Topic,
                     Data = item,
                 };
 
                 jm.CreateTime = jm.UpdateTime = now;
-                if (delayTime > 0) jm.UpdateTime = dTime;
+                if (model.DelayTime > 0) jm.UpdateTime = dTime;
 
                 ms.Add(jm);
             }
@@ -392,7 +387,7 @@ namespace AntJob.Server
             if (total < 0) total = messages.Length;
             if (total > 0)
             {
-                var job2 = app.Jobs?.FirstOrDefault(e => e.Topic == topic);
+                var job2 = app.Jobs?.FirstOrDefault(e => e.Topic == model.Topic);
                 if (job2 != null)
                 {
                     job2.MessageCount += total;

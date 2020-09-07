@@ -132,18 +132,9 @@ namespace AntJob.Providers
         });
 
         /// <summary>生产消息</summary>
-        /// <param name="job">作业</param>
-        /// <param name="topic">主题</param>
-        /// <param name="messages">消息集合</param>
-        /// <param name="option">消息选项</param>
+        /// <param name="model">模型</param>
         /// <returns></returns>
-        public Int32 Produce(String job, String topic, String[] messages, MessageOption option = null)
-        {
-            var dic = new { job, topic, messages }.ToDictionary();
-            if (option != null) dic = dic.Merge(option);
-
-            return Invoke<Int32>(nameof(Produce), dic);
-        }
+        public Int32 Produce(ProduceModel model) => Invoke<Int32>(nameof(Produce), model);
 
         /// <summary>报告状态（进度、成功、错误）</summary>
         /// <param name="task"></param>
