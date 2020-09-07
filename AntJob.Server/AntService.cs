@@ -28,6 +28,9 @@ namespace AntJob.Server
         #region 登录
         public IApiSession Session { get; set; }
 
+        private App _App;
+        private INetSession _Net;
+
         /// <summary>应用登录</summary>
         /// <param name="model">模型</param>
         /// <returns></returns>
@@ -36,17 +39,14 @@ namespace AntJob.Server
         {
             if (model.User.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.User));
 
-            var ns = Session as INetSession;
-            var ip = ns.Remote.Host;
-
-            WriteLog("[{0}]从[{1}]登录[{2}@{3}]", model.User, ns.Remote, model.Machine, model.ProcessId);
+            WriteLog("[{0}]从[{1}]登录[{2}@{3}]", model.User, _Net.Remote, model.Machine, model.ProcessId);
 
             // 找应用
             var autoReg = false;
             var app = App.FindByName(model.User);
             if (app == null || app.Secret.MD5() != model.Pass)
             {
-                app = CheckApp(app, model.User, model.Pass, ip);
+                app = CheckApp(app, model.User, model.Pass, _Net.Remote.Host);
                 if (app == null) throw new ArgumentOutOfRangeException(nameof(model.User));
 
                 autoReg = true;
@@ -70,7 +70,7 @@ namespace AntJob.Server
             app.Save();
 
             // 应用上线
-            var online = CreateOnline(app, ns, model.Machine, model.ProcessId);
+            var online = CreateOnline(app, _Net, model.Machine, model.ProcessId);
             online.Version = model.Version;
             online.CompileTime = model.Compile;
             online.Save();
@@ -131,16 +131,18 @@ namespace AntJob.Server
             var act = filterContext.ActionName;
             if (act == nameof(Login)) return;
 
-            var ns = Session as INetSession;
+            _Net = Session as INetSession;
             if (Session["App"] is App app)
             {
-                var online = GetOnline(app, ns);
+                _App = app;
+
+                var online = GetOnline(app, _Net);
                 online.UpdateTime = TimerX.Now;
                 online.SaveAsync();
             }
             else
             {
-                throw new ApiException(401, "{0}未登录！不能执行{1}".F(ns.Remote, act));
+                throw new ApiException(401, "{0}未登录！不能执行{1}".F(_Net.Remote, act));
             }
         }
 
@@ -169,10 +171,7 @@ namespace AntJob.Server
         [Api(nameof(GetJobs))]
         public IJob[] GetJobs()
         {
-            var app = Session["App"] as App;
-
-            var jobs = Job.FindAllByAppID(app.ID);
-            //if (names != null && names.Length > 0) jobs = jobs.Where(e => names.Contains(e.Name)).ToList();
+            var jobs = Job.FindAllByAppID(_App.ID);
 
             return jobs.Select(e => e.ToModel()).ToArray();
         }
@@ -185,10 +184,7 @@ namespace AntJob.Server
         {
             if (jobs == null || jobs.Length == 0) return new String[0];
 
-            var app = Session["App"] as App;
-            var ns = Session as INetSession;
-
-            var myJobs = Job.FindAllByAppID(app.ID);
+            var myJobs = Job.FindAllByAppID(_App.ID);
             var list = new List<String>();
             foreach (var item in jobs)
             {
@@ -197,7 +193,7 @@ namespace AntJob.Server
                 {
                     jb = new Job
                     {
-                        AppID = app.ID,
+                        AppID = _App.ID,
                         Name = item.Name,
                         //Enable = item.Enable,
                         Start = item.Start,
@@ -218,7 +214,7 @@ namespace AntJob.Server
 
                 if (jb.Save() != 0)
                 {
-                    WriteLog("[{0}]更新作业[{1}] @[{2}]", app, item.Name, ns.Remote);
+                    WriteLog("[{0}]更新作业[{1}] @[{2}]", _App, item.Name, _Net.Remote);
 
                     // 更新作业数
                     jb.SaveAsync();
@@ -241,7 +237,8 @@ namespace AntJob.Server
             job = job?.Trim();
             if (job.IsNullOrEmpty()) return new TaskModel[0];
 
-            if (!(Session["App"] is App app)) return new TaskModel[0];
+            var app = _App;
+            if (app == null) return new TaskModel[0];
 
             // 应用停止发放作业
             app = App.FindByID(app.ID) ?? app;
@@ -257,7 +254,7 @@ namespace AntJob.Server
             if (jb == null) throw new XException($"应用[{app.ID}/{app.Name}]下未找到作业[{job}]");
             if (jb.Step == 0 || jb.Start.Year <= 2000) throw new XException("作业[{0}/{1}]未设置开始时间或步进", jb.ID, jb.Name);
 
-            var online = GetOnline(app, Session as INetSession);
+            var online = GetOnline(app, _Net);
 
             var list = new List<JobTask>();
 
@@ -271,7 +268,7 @@ namespace AntJob.Server
                 var server = online.Name;
                 var pid = online.ProcessId;
                 //var topic = ps["topic"] + "";
-                var ip = (Session as INetSession).Remote.Host;
+                var ip = _Net.Remote.Host;
 
                 switch (jb.Mode)
                 {
@@ -315,7 +312,7 @@ namespace AntJob.Server
                 var ps = ControllerContext.Current.Parameters;
                 var server = ps["server"] + "";
                 var pid = ps["pid"].ToInt();
-                var ip = (Session as INetSession).Remote.Host;
+                var ip = _Net.Remote.Host;
 
                 next = now.AddSeconds(60);
                 list.AddRange(jb.AcquireOld(server, ip, pid, count));
@@ -348,7 +345,7 @@ namespace AntJob.Server
             messages = messages.Distinct().ToArray();
             if (messages.Length == 0) return 0;
 
-            var app = Session["App"] as App;
+            var app = _App;
 
             // 去重过滤
             if (unique)
@@ -416,7 +413,7 @@ namespace AntJob.Server
             if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 
             // 判断是否有权
-            var app = Session["App"] as App;
+            var app = _App;
 
             var jt = JobTask.FindByID(task.ID);
             if (jt == null) throw new InvalidOperationException($"找不到任务[{task.ID}]");
@@ -446,7 +443,7 @@ namespace AntJob.Server
                 SetJobFinish(job, jt);
 
                 // 记录状态
-                UpdateOnline(app, jt, Session as INetSession);
+                UpdateOnline(app, jt, _Net);
             }
             if (task.Status == JobStatus.错误)
             {
@@ -549,9 +546,7 @@ namespace AntJob.Server
         [Api(nameof(GetPeers))]
         public PeerModel[] GetPeers()
         {
-            var app = Session["App"] as App;
-
-            var olts = AppOnline.FindAllByAppID(app.ID);
+            var olts = AppOnline.FindAllByAppID(_App.ID);
 
             return olts.Select(e => e.ToModel()).ToArray();
         }
@@ -610,14 +605,7 @@ namespace AntJob.Server
         #endregion
 
         #region 写历史
-        void WriteHistory(String action, Boolean success, String remark)
-        {
-            var app = Session["App"] as App;
-            var ns = Session as INetSession;
-            var ip = ns.Remote?.Host;
-
-            AppHistory.Create(app, action, success, remark, Local + "", ip);
-        }
+        void WriteHistory(String action, Boolean success, String remark) => AppHistory.Create(_App, action, success, remark, Local + "", _Net.Remote?.Host);
         #endregion
 
         #region 日志
