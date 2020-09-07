@@ -27,30 +27,32 @@ namespace AntJob.Server
         #region 登录
         public IApiSession Session { get; set; }
 
-        /// <summary>
-        /// 传入应用名和密钥登录，
-        /// 返回应用名和应用显示名
-        /// </summary>
+        /// <summary>应用登录</summary>
         /// <param name="user">应用名</param>
         /// <param name="pass"></param>
+        /// <param name="displayName">显示名</param>
+        /// <param name="machine">机器码</param>
+        /// <param name="processId">进程Id</param>
+        /// <param name="version">版本</param>
+        /// <param name="compile">编译时间</param>
         /// <returns></returns>
         [Api(nameof(Login))]
-        public Object Login(String user, String pass)
+        public Object Login(String user, String pass, String displayName, String machine, Int32 processId, String version, DateTime compile)
         {
             if (user.IsNullOrEmpty()) throw new ArgumentNullException(nameof(user));
             //if (pass.IsNullOrEmpty()) throw new ArgumentNullException(nameof(pass));
 
-            var ps = ControllerContext.Current.Parameters;
-            var dname = ps["DisplayName"] + "";
-            var machine = ps["machine"] + "";
-            var pid = ps["processid"].ToInt();
-            var ver = ps["version"] + "";
-            var compile = ps["Compile"].ToDateTime();
+            //var ps = ControllerContext.Current.Parameters;
+            //var displayName = ps["DisplayName"] + "";
+            //var machine = ps["machine"] + "";
+            //var processid = ps["processid"].ToInt();
+            //var version = ps["version"] + "";
+            //var compile = ps["Compile"].ToDateTime();
 
             var ns = Session as INetSession;
             var ip = ns.Remote.Host;
 
-            WriteLog("[{0}]从[{1}]登录[{2}@{3}]", user, ns.Remote, machine, pid);
+            WriteLog("[{0}]从[{1}]登录[{2}@{3}]", user, ns.Remote, machine, processId);
 
             // 找应用
             var autoReg = false;
@@ -74,22 +76,22 @@ namespace AntJob.Server
             }
 
             // 版本和编译时间
-            if (app.Version.IsNullOrEmpty() || app.Version.CompareTo(ver) < 0) app.Version = ver;
+            if (app.Version.IsNullOrEmpty() || app.Version.CompareTo(version) < 0) app.Version = version;
             if (app.CompileTime < compile) app.CompileTime = compile;
-            if (app.DisplayName.IsNullOrEmpty()) app.DisplayName = dname;
+            if (app.DisplayName.IsNullOrEmpty()) app.DisplayName = displayName;
 
             app.Save();
 
             // 应用上线
-            var online = CreateOnline(app, ns, machine, pid);
-            online.Version = ver;
+            var online = CreateOnline(app, ns, machine, processId);
+            online.Version = version;
             online.CompileTime = compile;
             online.Save();
 
             // 记录当前用户
             Session["App"] = app;
 
-            WriteHistory(autoReg ? "注册" : "登录", true, $"[{user}/{pass}]在[{machine}@{pid}]登录[{app}]成功");
+            WriteHistory(autoReg ? "注册" : "登录", true, $"[{user}/{pass}]在[{machine}@{processId}]登录[{app}]成功");
 
             if (autoReg)
                 return new
@@ -187,7 +189,7 @@ namespace AntJob.Server
         /// <summary>获取指定名称的作业</summary>
         /// <returns></returns>
         [Api(nameof(GetJobs))]
-        public AntJob.Data.IJob[] GetJobs()
+        public IJob[] GetJobs()
         {
             var app = Session["App"] as App;
 
@@ -252,11 +254,11 @@ namespace AntJob.Server
 
         /// <summary>申请作业任务</summary>
         /// <param name="job">作业名称</param>
-        /// <param name="count"></param>
+        /// <param name="count">任务个数</param>
         /// <param name="topic">主题</param>
         /// <returns></returns>
         [Api(nameof(Acquire))]
-        public ITask[] Acquire(String job, Int32 count)
+        public ITask[] Acquire(String job, Int32 count, String topic)
         {
             job = job?.Trim();
             if (job.IsNullOrEmpty()) return new TaskModel[0];
@@ -287,10 +289,10 @@ namespace AntJob.Server
             // 错误项不够时，增加切片
             if (list.Count < count)
             {
-                var ps = ControllerContext.Current.Parameters;
+                //var ps = ControllerContext.Current.Parameters;
                 var server = online.Name;
                 var pid = online.ProcessId;
-                var topic = ps["topic"] + "";
+                //var topic = ps["topic"] + "";
                 var ip = (Session as INetSession).Remote.Host;
 
                 switch (jb.Mode)
