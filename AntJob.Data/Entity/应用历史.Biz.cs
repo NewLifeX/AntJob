@@ -77,7 +77,7 @@ namespace AntJob.Data.Entity
             if (!action.IsNullOrEmpty()) exp &= _.Action == action;
             if (success != null) exp &= _.Success == success;
 
-            exp &= _.Id.Between(start, end, Meta.Factory.FlowId);
+            exp &= _.Id.Between(start, end, Meta.Factory.Snow);
             //exp &= _.CreateTime.Between(start, end);
 
             if (!key.IsNullOrEmpty())

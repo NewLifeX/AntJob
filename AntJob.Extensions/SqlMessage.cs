@@ -57,7 +57,7 @@ namespace AntJob
                 if (col.StartsWithIgnoreCase("topic_"))
                 {
                     var topic = col.Substring("topic_".Length);
-                    var messages = dt.Rows.Select(e => "{0}".F(e[i])).Distinct().ToArray();
+                    var messages = dt.Rows.Select(e => e[i] + "").Distinct().ToArray();
                     if (messages.Length > 0)
                     {
                         ctx.Handler.Produce(topic, messages, new MessageOption { Unique = true });

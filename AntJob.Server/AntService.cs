@@ -143,7 +143,7 @@ namespace AntJob.Server
             }
             else
             {
-                throw new ApiException(401, "{0}未登录！不能执行{1}".F(_Net.Remote, act));
+                throw new ApiException(401, $"{_Net.Remote}未登录！不能执行{act}");
             }
         }
 
@@ -361,12 +361,12 @@ namespace AntJob.Server
             var dTime = now.AddSeconds(model.DelayTime);
 
             var jb = Job.FindByAppIDAndName(app.ID, model.Job);
-            var flow = AppMessage.Meta.Factory.FlowId;
+            var snow = AppMessage.Meta.Factory.Snow;
             foreach (var item in messages)
             {
                 var jm = new AppMessage
                 {
-                    Id = flow.NewId(),
+                    Id = snow.NewId(),
                     AppID = app.ID,
                     JobID = jb == null ? 0 : jb.ID,
                     Topic = model.Topic,
@@ -378,7 +378,7 @@ namespace AntJob.Server
                 // 雪花Id直接指定消息在未来的消费时间
                 if (model.DelayTime > 0)
                 {
-                    jm.Id = flow.NewId(dTime);
+                    jm.Id = snow.NewId(dTime);
                     jm.UpdateTime = dTime;
                 }
 

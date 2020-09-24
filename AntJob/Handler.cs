@@ -81,7 +81,7 @@ namespace AntJob
 
             var msg = "开始工作";
             var job = Job;
-            if (job != null) msg += " {0} 区间（{1}, {2}） Offset={3} Step={4} MaxTask={5}".F(job.Enable, job.Start, job.End, job.Offset, job.Step, job.MaxTask);
+            if (job != null) msg += $" {job.Enable} 区间（{job.Start}, {job.End}） Offset={job.Offset} Step={job.Step} MaxTask={job.MaxTask}";
 
             WriteLog(msg);
 

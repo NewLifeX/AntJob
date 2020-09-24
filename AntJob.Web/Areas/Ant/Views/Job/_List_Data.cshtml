@@ -56,7 +56,7 @@
         {
             var st = entity.Start.ToFullString("");
             if (entity.Start.Date == DateTime.Now.Date) { st = entity.Start.ToString("HH:mm:ss"); }
-            if (entity.Mode == JobModes.Message) { st = "{0}/{1}".F(entity.Topic, entity.MessageCount); }
+            if (entity.Mode == JobModes.Message) { st = $"{entity.Topic}/{entity.MessageCount}"; }
 
             var ut = entity.UpdateTime.ToFullString("");
             if (entity.UpdateTime.Date == DateTime.Now.Date) { ut = entity.UpdateTime.ToString("HH:mm:ss"); }
