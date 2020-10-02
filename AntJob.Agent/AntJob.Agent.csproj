@@ -8,8 +8,8 @@
     <Description>调度中心下发C#或Sql给蚂蚁代理执行</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2020</Copyright>
-    <Version>2.0.2020.0419</Version>
-    <FileVersion>2.0.2020.0419</FileVersion>
+    <Version>2.0.2020.1002</Version>
+    <FileVersion>2.0.2020.1002</FileVersion>
     <AssemblyVersion>2.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin\Agent</OutputPath>
@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Agent" Version="8.7.2020.918-beta3" />
+    <PackageReference Include="NewLife.Agent" Version="8.7.2020.1002" />
   </ItemGroup>
 
   <ItemGroup>
