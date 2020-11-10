@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="3.7.2020.1002" />
+    <PackageReference Include="NewLife.Cube.Core" Version="3.7.2020.1101" />
   </ItemGroup>
 
   <ItemGroup>
