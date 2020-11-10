@@ -20,21 +20,6 @@ namespace AntJob.Data.Entity
             df.Add(__.Error);
             df.Add(__.Times);
         }
-
-        /// <summary>验证数据，通过抛出异常的方式提示验证失败。</summary>
-        /// <param name="isNew">是否插入</param>
-        public override void Valid(Boolean isNew)
-        {
-            // 如果没有脏数据，则不需要进行任何处理
-            if (!HasDirty) return;
-
-            //var len = _.Data.Length;
-            //if (len > 0 && !Data.IsNullOrEmpty() && Data.Length > len) throw new InvalidOperationException($"字段[{__.Data}]超长");
-
-            //// 截断错误信息，避免过长
-            //len = _.Message.Length;
-            //if (!Message.IsNullOrEmpty() && len > 0 && Message.Length > len) Message = Message.Substring(0, len);
-        }
         #endregion
 
         #region 扩展属性

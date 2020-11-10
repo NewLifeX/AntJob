@@ -25,18 +25,6 @@ namespace AntJob.Data.Entity
             Meta.Modules.Add<TimeModule>();
             Meta.Modules.Add<IPModule>();
         }
-
-        /// <summary>验证数据，通过抛出异常的方式提示验证失败。</summary>
-        /// <param name="isNew">是否插入</param>
-        public override void Valid(Boolean isNew)
-        {
-            // 如果没有脏数据，则不需要进行任何处理
-            if (!HasDirty) return;
-
-            // 在新插入数据或者修改了指定字段时进行修正
-            //if (isNew && !Dirtys[nameof(CreateTime)]) CreateTime = DateTime.Now;
-            //if (isNew && !Dirtys[nameof(CreateIP)]) CreateIP = ManageProvider.UserHost;
-        }
         #endregion
 
         #region 扩展属性
