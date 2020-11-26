@@ -4,6 +4,7 @@ using System.Net;
 using AntJob.Data.Entity;
 using NewLife;
 using NewLife.Agent;
+using NewLife.Caching;
 using NewLife.Log;
 using NewLife.Remoting;
 using NewLife.Threading;
@@ -74,6 +75,9 @@ namespace AntJob.Server
 
             // 本地结点
             AntService.Local = new IPEndPoint(NetHelper.MyIP(), set.Port);
+
+            // 数据缓存，也用于全局锁，支持MemoryCache和Redis
+            AntService.Cache = new MemoryCache();
 
             svr.Start();
 

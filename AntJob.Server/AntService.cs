@@ -6,6 +6,7 @@ using AntJob.Data;
 using AntJob.Data.Entity;
 using AntJob.Models;
 using NewLife;
+using NewLife.Caching;
 using NewLife.Data;
 using NewLife.Log;
 using NewLife.Net;
@@ -23,6 +24,9 @@ namespace AntJob.Server
         #region 属性
         /// <summary>本地节点</summary>
         public static EndPoint Local { get; set; }
+
+        /// <summary>数据缓存，也用于全局锁，支持MemoryCache和Redis</summary>
+        public static ICache Cache { get; set; }
         #endregion
 
         #region 登录
@@ -276,7 +280,7 @@ namespace AntJob.Server
                 switch (jb.Mode)
                 {
                     case JobModes.Message:
-                        list.AddRange(jb.AcquireMessage(model.Topic, server, ip, pid, model.Count - list.Count));
+                        list.AddRange(jb.AcquireMessage(model.Topic, server, ip, pid, model.Count - list.Count, Cache));
                         break;
                     case JobModes.Data:
                     case JobModes.Alarm:
@@ -289,7 +293,7 @@ namespace AntJob.Server
                             {
                                 // 申请任务前，不能再查数据库，那样子会导致多线程脏读，从而出现多客户端分到相同任务的情况
                                 //jb = Job.FindByKey(jb.ID);
-                                list.AddRange(jb.Acquire(server, ip, pid, model.Count - list.Count));
+                                list.AddRange(jb.Acquire(server, ip, pid, model.Count - list.Count, Cache));
                             }
                         }
                         break;
@@ -319,7 +323,7 @@ namespace AntJob.Server
                 var ip = _Net.Remote.Host;
 
                 next = now.AddSeconds(60);
-                list.AddRange(jb.AcquireOld(online.Server, ip, online.ProcessId, count));
+                list.AddRange(jb.AcquireOld(online.Server, ip, online.ProcessId, count, Cache));
 
                 if (list.Count > 0)
                 {

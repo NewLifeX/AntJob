@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
 using NewLife;
+using NewLife.Caching;
 using NewLife.Data;
 using NewLife.Serialization;
 using XCode;
@@ -295,8 +297,9 @@ namespace AntJob.Data.Entity
         /// <param name="ip">申请任务的IP</param>
         /// <param name="pid">申请任务的服务端进程ID</param>
         /// <param name="count">要申请的任务个数</param>
+        /// <param name="cache">用于设置全局锁的缓存对象</param>
         /// <returns></returns>
-        public IList<JobTask> Acquire(String server, String ip, Int32 pid, Int32 count)
+        public IList<JobTask> Acquire(String server, String ip, Int32 pid, Int32 count, ICache cache)
         {
             var list = new List<JobTask>();
 
@@ -305,55 +308,55 @@ namespace AntJob.Data.Entity
             var step = Step;
             if (step <= 0) step = 30;
 
-            lock (this)
+            // 全局锁，确保单个作业只有一个线程在分配作业
+            using var ck = cache.AcquireLock($"Job:{ID}", 5_000);
+
+            using var ts = Meta.CreateTrans();
+            var start = Start;
+            for (var i = 0; i < count; i++)
             {
-                using var ts = Meta.CreateTrans();
-                var start = Start;
-                for (var i = 0; i < count; i++)
+                if (!TrySplit(start, step, out var end)) break;
+
+                // 创建新的分片
+                var ti = new JobTask
                 {
-                    if (!TrySplit(start, step, out var end)) break;
+                    AppID = AppID,
+                    JobID = ID,
+                    Start = start,
+                    End = end,
+                    BatchSize = BatchSize,
+                };
 
-                    // 创建新的分片
-                    var ti = new JobTask
-                    {
-                        AppID = AppID,
-                        JobID = ID,
-                        Start = start,
-                        End = end,
-                        BatchSize = BatchSize,
-                    };
+                ti.Server = server;
+                ti.ProcessID = pid;
+                ti.Client = $"{ip}@{pid}";
+                ti.Status = JobStatus.就绪;
+                ti.CreateTime = DateTime.Now;
+                ti.UpdateTime = DateTime.Now;
 
-                    ti.Server = server;
-                    ti.ProcessID = pid;
-                    ti.Client = $"{ip}@{pid}";
-                    ti.Status = JobStatus.就绪;
-                    ti.CreateTime = DateTime.Now;
-                    ti.UpdateTime = DateTime.Now;
+                //// 如果有模板，则进行计算替换
+                //if (!Data.IsNullOrEmpty()) ti.Data = TemplateHelper.Build(Data, ti.Start, ti.End);
 
-                    //// 如果有模板，则进行计算替换
-                    //if (!Data.IsNullOrEmpty()) ti.Data = TemplateHelper.Build(Data, ti.Start, ti.End);
+                ti.Insert();
 
-                    ti.Insert();
+                // 更新任务
+                Start = end;
+                start = end;
 
-                    // 更新任务
-                    Start = end;
-                    start = end;
-
-                    list.Add(ti);
-                }
-
-                if (list.Count > 0)
-                {
-                    // 任务需要ID，不能批量插入优化
-                    //list.Insert(null);
-
-                    UpdateTime = DateTime.Now;
-                    Save();
-                    ts.Commit();
-                }
-
-                return list;
+                list.Add(ti);
             }
+
+            if (list.Count > 0)
+            {
+                // 任务需要ID，不能批量插入优化
+                //list.Insert(null);
+
+                UpdateTime = DateTime.Now;
+                Save();
+                ts.Commit();
+            }
+
+            return list;
         }
 
         /// <summary>尝试分割时间片</summary>
@@ -397,47 +400,48 @@ namespace AntJob.Data.Entity
         /// <param name="ip">申请任务的IP</param>
         /// <param name="pid">申请任务的服务端进程ID</param>
         /// <param name="count">要申请的任务个数</param>
+        /// <param name="cache">用于设置全局锁的缓存对象</param>
         /// <returns></returns>
-        public IList<JobTask> AcquireOld(String server, String ip, Int32 pid, Int32 count)
+        public IList<JobTask> AcquireOld(String server, String ip, Int32 pid, Int32 count, ICache cache)
         {
-            lock (this)
+            // 全局锁，确保单个作业只有一个线程在分配作业
+            using var ck = cache.AcquireLock($"Job:{ID}", 5_000);
+
+            using var ts = Meta.CreateTrans();
+            var list = new List<JobTask>();
+
+            // 查找历史错误任务
+            if (ErrorDelay > 0)
             {
-                using var ts = Meta.CreateTrans();
-                var list = new List<JobTask>();
-
-                // 查找历史错误任务
-                if (ErrorDelay > 0)
-                {
-                    var dt = DateTime.Now.AddSeconds(-ErrorDelay);
-                    var list2 = JobTask.Search(ID, dt, MaxRetry, new[] { JobStatus.错误, JobStatus.取消 }, count);
-                    if (list2.Count > 0) list.AddRange(list2);
-                }
-
-                // 查找历史中断任务，持续10分钟仍然未完成
-                if (MaxTime > 0 && list.Count < count)
-                {
-                    var dt = DateTime.Now.AddSeconds(-MaxTime);
-                    var list2 = JobTask.Search(ID, dt, MaxRetry, new[] { JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中 }, count - list.Count);
-                    if (list2.Count > 0) list.AddRange(list2);
-                }
-                if (list.Count > 0)
-                {
-                    foreach (var ti in list)
-                    {
-                        ti.Server = server;
-                        ti.ProcessID = pid;
-                        ti.Client = $"{ip}@{pid}";
-                        //ti.Status = JobStatus.就绪;
-                        ti.CreateTime = DateTime.Now;
-                        ti.UpdateTime = DateTime.Now;
-                    }
-                    list.Save();
-                }
-
-                ts.Commit();
-
-                return list;
+                var dt = DateTime.Now.AddSeconds(-ErrorDelay);
+                var list2 = JobTask.Search(ID, dt, MaxRetry, new[] { JobStatus.错误, JobStatus.取消 }, count);
+                if (list2.Count > 0) list.AddRange(list2);
             }
+
+            // 查找历史中断任务，持续10分钟仍然未完成
+            if (MaxTime > 0 && list.Count < count)
+            {
+                var dt = DateTime.Now.AddSeconds(-MaxTime);
+                var list2 = JobTask.Search(ID, dt, MaxRetry, new[] { JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中 }, count - list.Count);
+                if (list2.Count > 0) list.AddRange(list2);
+            }
+            if (list.Count > 0)
+            {
+                foreach (var ti in list)
+                {
+                    ti.Server = server;
+                    ti.ProcessID = pid;
+                    ti.Client = $"{ip}@{pid}";
+                    //ti.Status = JobStatus.就绪;
+                    ti.CreateTime = DateTime.Now;
+                    ti.UpdateTime = DateTime.Now;
+                }
+                list.Save();
+            }
+
+            ts.Commit();
+
+            return list;
         }
 
         /// <summary>申请任务分片</summary>
@@ -446,8 +450,9 @@ namespace AntJob.Data.Entity
         /// <param name="ip">申请任务的IP</param>
         /// <param name="pid">申请任务的服务端进程ID</param>
         /// <param name="count">要申请的任务个数</param>
+        /// <param name="cache">用于设置全局锁的缓存对象</param>
         /// <returns></returns>
-        public IList<JobTask> AcquireMessage(String topic, String server, String ip, Int32 pid, Int32 count)
+        public IList<JobTask> AcquireMessage(String topic, String server, String ip, Int32 pid, Int32 count, ICache cache)
         {
             // 消费消息时，保存主题
             if (Topic != topic)
@@ -464,70 +469,70 @@ namespace AntJob.Data.Entity
             var now = DateTime.Now;
             if (MessageCount == 0 && UpdateTime.AddMinutes(2) > now) return list;
 
-            lock (this)
+            // 全局锁，确保单个作业只有一个线程在分配作业
+            using var ck = cache.AcquireLock($"Job:{ID}", 5_000);
+
+            using var ts = Meta.CreateTrans();
+            var size = BatchSize;
+            if (size == 0) size = 1;
+
+            // 消费消息。请求任务数量=空闲线程*批大小
+            var msgs = AppMessage.GetTopic(AppID, topic, now, count * size);
+            if (msgs.Count > 0)
             {
-                using var ts = Meta.CreateTrans();
-                var size = BatchSize;
-                if (size == 0) size = 1;
-
-                // 消费消息。请求任务数量=空闲线程*批大小
-                var msgs = AppMessage.GetTopic(AppID, topic, now, count * size);
-                if (msgs.Count > 0)
+                for (var i = 0; i < msgs.Count;)
                 {
-                    for (var i = 0; i < msgs.Count;)
+                    var msgList = msgs.Skip(i).Take(size).ToList();
+                    if (msgList.Count == 0) break;
+
+                    i += msgList.Count;
+
+                    // 创建新的分片
+                    var ti = new JobTask
                     {
-                        var msgList = msgs.Skip(i).Take(size).ToList();
-                        if (msgList.Count == 0) break;
+                        AppID = AppID,
+                        JobID = ID,
+                        Data = msgList.Select(e => e.Data).ToJson(),
+                        MsgCount = msgList.Count,
 
-                        i += msgList.Count;
+                        BatchSize = size,
+                    };
 
-                        // 创建新的分片
-                        var ti = new JobTask
-                        {
-                            AppID = AppID,
-                            JobID = ID,
-                            Data = msgList.Select(e => e.Data).ToJson(),
-                            MsgCount = msgList.Count,
+                    ti.Server = server;
+                    ti.ProcessID = pid;
+                    ti.Client = $"{ip}@{pid}";
+                    ti.Status = JobStatus.就绪;
+                    ti.CreateTime = DateTime.Now;
+                    ti.UpdateTime = DateTime.Now;
 
-                            BatchSize = size,
-                        };
+                    ti.Insert();
 
-                        ti.Server = server;
-                        ti.ProcessID = pid;
-                        ti.Client = $"{ip}@{pid}";
-                        ti.Status = JobStatus.就绪;
-                        ti.CreateTime = DateTime.Now;
-                        ti.UpdateTime = DateTime.Now;
-
-                        ti.Insert();
-
-                        list.Add(ti);
-                    }
-
-                    // 批量删除消息
-                    msgs.Delete();
+                    list.Add(ti);
                 }
 
-                // 更新作业下的消息数
-                MessageCount = AppMessage.FindCountByAppIDAndTopic(AppID, topic);
-                UpdateTime = now;
-                Save();
-
-                // 消费完成后，更新应用的消息数
-                if (MessageCount == 0)
-                {
-                    var app = App;
-                    if (app != null)
-                    {
-                        app.MessageCount = AppMessage.FindCountByAppID(ID);
-                        app.SaveAsync();
-                    }
-                }
-
-                ts.Commit();
-
-                return list;
+                // 批量删除消息
+                msgs.Delete();
             }
+
+            // 更新作业下的消息数
+            MessageCount = AppMessage.FindCountByAppIDAndTopic(AppID, topic);
+            UpdateTime = now;
+            Save();
+
+            // 消费完成后，更新应用的消息数
+            if (MessageCount == 0)
+            {
+                var app = App;
+                if (app != null)
+                {
+                    app.MessageCount = AppMessage.FindCountByAppID(ID);
+                    app.SaveAsync();
+                }
+            }
+
+            ts.Commit();
+
+            return list;
         }
         #endregion
     }
