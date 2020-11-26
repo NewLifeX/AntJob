@@ -3,6 +3,7 @@
 namespace AntJob.Data
 {
     /// <summary>作业模式</summary>
+    /// <remarks>定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</remarks>
     //[Description("作业模式")]
     public enum JobModes
     {

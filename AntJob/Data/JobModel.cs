@@ -4,6 +4,7 @@ using System.Xml.Serialization;
 namespace AntJob.Data
 {
     /// <summary>作业模型</summary>
+    /// <remarks>定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</remarks>
     public partial class JobModel
     {
         #region 属性
@@ -43,7 +44,7 @@ namespace AntJob.Data
         [XmlAttribute]
         public Int32 MaxTask { get; set; }
 
-        /// <summary>调度模式</summary>
+        /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
         [XmlAttribute]
         public JobModes Mode { get; set; }
 

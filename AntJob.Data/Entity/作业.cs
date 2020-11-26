@@ -60,11 +60,11 @@ namespace AntJob.Data.Entity
         public String DisplayName { get => _DisplayName; set { if (OnPropertyChanging("DisplayName", value)) { _DisplayName = value; OnPropertyChanged("DisplayName"); } } }
 
         private JobModes _Mode;
-        /// <summary>调度模式</summary>
+        /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
         [DisplayName("调度模式")]
-        [Description("调度模式")]
+        [Description("调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("Mode", "调度模式", "")]
+        [BindColumn("Mode", "调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑", "")]
         public JobModes Mode { get => _Mode; set { if (OnPropertyChanging("Mode", value)) { _Mode = value; OnPropertyChanged("Mode"); } } }
 
         private String _Topic;
@@ -422,7 +422,7 @@ namespace AntJob.Data.Entity
             /// <summary>显示名</summary>
             public static readonly Field DisplayName = FindByName("DisplayName");
 
-            /// <summary>调度模式</summary>
+            /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
             public static readonly Field Mode = FindByName("Mode");
 
             /// <summary>主题。消息调度时消费的主题</summary>
@@ -536,7 +536,7 @@ namespace AntJob.Data.Entity
             /// <summary>显示名</summary>
             public const String DisplayName = "DisplayName";
 
-            /// <summary>调度模式</summary>
+            /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
             public const String Mode = "Mode";
 
             /// <summary>主题。消息调度时消费的主题</summary>

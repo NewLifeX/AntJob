@@ -98,7 +98,7 @@
       <Column Name="Name" DataType="String" Master="True" Description="名称" />
       <Column Name="ClassName" DataType="String" Description="类名。支持该作业的处理器实现" />
       <Column Name="DisplayName" DataType="String" Description="显示名" />
-      <Column Name="Mode" DataType="Int32" Description="调度模式" Type="JobModes" />
+      <Column Name="Mode" DataType="Int32" Description="调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑" Type="JobModes" />
       <Column Name="Topic" DataType="String" Description="主题。消息调度时消费的主题" />
       <Column Name="MessageCount" DataType="Int32" Description="消息数" />
       <Column Name="Start" DataType="DateTime" Description="开始。大于等于，下一个任务的起点" />

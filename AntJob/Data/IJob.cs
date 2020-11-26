@@ -32,7 +32,7 @@ namespace AntJob.Data
         /// <summary>并行度。最大同时执行任务数</summary>
         Int32 MaxTask { get; set; }
 
-        /// <summary>调度模式</summary>
+        /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
         JobModes Mode { get; set; }
 
         /// <summary>消息主题</summary>

@@ -8,6 +8,9 @@ using XCode.Configuration;
 namespace AntJob
 {
     /// <summary>从数据库抽取数据</summary>
+    /// <remarks>
+    /// 定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑。
+    /// </remarks>
     public abstract class DataHandler : Handler
     {
         #region 属性
