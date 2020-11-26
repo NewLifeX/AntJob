@@ -307,54 +307,52 @@ namespace AntJob.Data.Entity
 
             lock (this)
             {
-                using (var ts = Meta.CreateTrans())
+                using var ts = Meta.CreateTrans();
+                var start = Start;
+                for (var i = 0; i < count; i++)
                 {
-                    var start = Start;
-                    for (var i = 0; i < count; i++)
+                    if (!TrySplit(start, step, out var end)) break;
+
+                    // 创建新的分片
+                    var ti = new JobTask
                     {
-                        if (!TrySplit(start, step, out var end)) break;
+                        AppID = AppID,
+                        JobID = ID,
+                        Start = start,
+                        End = end,
+                        BatchSize = BatchSize,
+                    };
 
-                        // 创建新的分片
-                        var ti = new JobTask
-                        {
-                            AppID = AppID,
-                            JobID = ID,
-                            Start = start,
-                            End = end,
-                            BatchSize = BatchSize,
-                        };
+                    ti.Server = server;
+                    ti.ProcessID = pid;
+                    ti.Client = $"{ip}@{pid}";
+                    ti.Status = JobStatus.就绪;
+                    ti.CreateTime = DateTime.Now;
+                    ti.UpdateTime = DateTime.Now;
 
-                        ti.Server = server;
-                        ti.ProcessID = pid;
-                        ti.Client = $"{ip}@{pid}";
-                        ti.Status = JobStatus.就绪;
-                        ti.CreateTime = DateTime.Now;
-                        ti.UpdateTime = DateTime.Now;
+                    //// 如果有模板，则进行计算替换
+                    //if (!Data.IsNullOrEmpty()) ti.Data = TemplateHelper.Build(Data, ti.Start, ti.End);
 
-                        //// 如果有模板，则进行计算替换
-                        //if (!Data.IsNullOrEmpty()) ti.Data = TemplateHelper.Build(Data, ti.Start, ti.End);
+                    ti.Insert();
 
-                        ti.Insert();
+                    // 更新任务
+                    Start = end;
+                    start = end;
 
-                        // 更新任务
-                        Start = end;
-                        start = end;
-
-                        list.Add(ti);
-                    }
-
-                    if (list.Count > 0)
-                    {
-                        // 任务需要ID，不能批量插入优化
-                        //list.Insert(null);
-
-                        UpdateTime = DateTime.Now;
-                        Save();
-                        ts.Commit();
-                    }
-
-                    return list;
+                    list.Add(ti);
                 }
+
+                if (list.Count > 0)
+                {
+                    // 任务需要ID，不能批量插入优化
+                    //list.Insert(null);
+
+                    UpdateTime = DateTime.Now;
+                    Save();
+                    ts.Commit();
+                }
+
+                return list;
             }
         }
 
@@ -367,9 +365,8 @@ namespace AntJob.Data.Entity
         {
             // 当前时间减去偏移量，作为当前时间。数据抽取不许超过该时间
             var now = DateTime.Now.AddSeconds(-Offset);
-            // 每毫秒有10000个滴答
-            var sec = now.Ticks / 1_000_0000;
-            now = new DateTime(sec * 1_000_0000);
+            // 去掉毫秒
+            now = now.Trim();
 
             end = DateTime.MinValue;
 
@@ -405,43 +402,41 @@ namespace AntJob.Data.Entity
         {
             lock (this)
             {
-                using (var ts = Meta.CreateTrans())
+                using var ts = Meta.CreateTrans();
+                var list = new List<JobTask>();
+
+                // 查找历史错误任务
+                if (ErrorDelay > 0)
                 {
-                    var list = new List<JobTask>();
-
-                    // 查找历史错误任务
-                    if (ErrorDelay > 0)
-                    {
-                        var dt = DateTime.Now.AddSeconds(-ErrorDelay);
-                        var list2 = JobTask.Search(ID, dt, MaxRetry, new[] { JobStatus.错误, JobStatus.取消 }, count);
-                        if (list2.Count > 0) list.AddRange(list2);
-                    }
-
-                    // 查找历史中断任务，持续10分钟仍然未完成
-                    if (MaxTime > 0 && list.Count < count)
-                    {
-                        var dt = DateTime.Now.AddSeconds(-MaxTime);
-                        var list2 = JobTask.Search(ID, dt, MaxRetry, new[] { JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中 }, count - list.Count);
-                        if (list2.Count > 0) list.AddRange(list2);
-                    }
-                    if (list.Count > 0)
-                    {
-                        foreach (var ti in list)
-                        {
-                            ti.Server = server;
-                            ti.ProcessID = pid;
-                            ti.Client = $"{ip}@{pid}";
-                            //ti.Status = JobStatus.就绪;
-                            ti.CreateTime = DateTime.Now;
-                            ti.UpdateTime = DateTime.Now;
-                        }
-                        list.Save();
-                    }
-
-                    ts.Commit();
-
-                    return list;
+                    var dt = DateTime.Now.AddSeconds(-ErrorDelay);
+                    var list2 = JobTask.Search(ID, dt, MaxRetry, new[] { JobStatus.错误, JobStatus.取消 }, count);
+                    if (list2.Count > 0) list.AddRange(list2);
                 }
+
+                // 查找历史中断任务，持续10分钟仍然未完成
+                if (MaxTime > 0 && list.Count < count)
+                {
+                    var dt = DateTime.Now.AddSeconds(-MaxTime);
+                    var list2 = JobTask.Search(ID, dt, MaxRetry, new[] { JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中 }, count - list.Count);
+                    if (list2.Count > 0) list.AddRange(list2);
+                }
+                if (list.Count > 0)
+                {
+                    foreach (var ti in list)
+                    {
+                        ti.Server = server;
+                        ti.ProcessID = pid;
+                        ti.Client = $"{ip}@{pid}";
+                        //ti.Status = JobStatus.就绪;
+                        ti.CreateTime = DateTime.Now;
+                        ti.UpdateTime = DateTime.Now;
+                    }
+                    list.Save();
+                }
+
+                ts.Commit();
+
+                return list;
             }
         }
 
@@ -471,69 +466,67 @@ namespace AntJob.Data.Entity
 
             lock (this)
             {
-                using (var ts = Meta.CreateTrans())
+                using var ts = Meta.CreateTrans();
+                var size = BatchSize;
+                if (size == 0) size = 1;
+
+                // 消费消息。请求任务数量=空闲线程*批大小
+                var msgs = AppMessage.GetTopic(AppID, topic, now, count * size);
+                if (msgs.Count > 0)
                 {
-                    var size = BatchSize;
-                    if (size == 0) size = 1;
-
-                    // 消费消息。请求任务数量=空闲线程*批大小
-                    var msgs = AppMessage.GetTopic(AppID, topic, now, count * size);
-                    if (msgs.Count > 0)
+                    for (var i = 0; i < msgs.Count;)
                     {
-                        for (var i = 0; i < msgs.Count;)
+                        var msgList = msgs.Skip(i).Take(size).ToList();
+                        if (msgList.Count == 0) break;
+
+                        i += msgList.Count;
+
+                        // 创建新的分片
+                        var ti = new JobTask
                         {
-                            var msgList = msgs.Skip(i).Take(size).ToList();
-                            if (msgList.Count == 0) break;
+                            AppID = AppID,
+                            JobID = ID,
+                            Data = msgList.Select(e => e.Data).ToJson(),
+                            MsgCount = msgList.Count,
 
-                            i += msgList.Count;
+                            BatchSize = size,
+                        };
 
-                            // 创建新的分片
-                            var ti = new JobTask
-                            {
-                                AppID = AppID,
-                                JobID = ID,
-                                Data = msgList.Select(e => e.Data).ToJson(),
-                                MsgCount = msgList.Count,
+                        ti.Server = server;
+                        ti.ProcessID = pid;
+                        ti.Client = $"{ip}@{pid}";
+                        ti.Status = JobStatus.就绪;
+                        ti.CreateTime = DateTime.Now;
+                        ti.UpdateTime = DateTime.Now;
 
-                                BatchSize = size,
-                            };
+                        ti.Insert();
 
-                            ti.Server = server;
-                            ti.ProcessID = pid;
-                            ti.Client = $"{ip}@{pid}";
-                            ti.Status = JobStatus.就绪;
-                            ti.CreateTime = DateTime.Now;
-                            ti.UpdateTime = DateTime.Now;
-
-                            ti.Insert();
-
-                            list.Add(ti);
-                        }
-
-                        // 批量删除消息
-                        msgs.Delete();
+                        list.Add(ti);
                     }
 
-                    // 更新作业下的消息数
-                    MessageCount = AppMessage.FindCountByAppIDAndTopic(AppID, topic);
-                    UpdateTime = now;
-                    Save();
-
-                    // 消费完成后，更新应用的消息数
-                    if (MessageCount == 0)
-                    {
-                        var app = App;
-                        if (app != null)
-                        {
-                            app.MessageCount = AppMessage.FindCountByAppID(ID);
-                            app.SaveAsync();
-                        }
-                    }
-
-                    ts.Commit();
-
-                    return list;
+                    // 批量删除消息
+                    msgs.Delete();
                 }
+
+                // 更新作业下的消息数
+                MessageCount = AppMessage.FindCountByAppIDAndTopic(AppID, topic);
+                UpdateTime = now;
+                Save();
+
+                // 消费完成后，更新应用的消息数
+                if (MessageCount == 0)
+                {
+                    var app = App;
+                    if (app != null)
+                    {
+                        app.MessageCount = AppMessage.FindCountByAppID(ID);
+                        app.SaveAsync();
+                    }
+                }
+
+                ts.Commit();
+
+                return list;
             }
         }
         #endregion
