@@ -29,7 +29,7 @@ namespace HisWeb
             }
 
             app.UseRouting();
-            app.UseCube();
+            app.UseCube(env);
 
             app.UseEndpoints(endpoints =>
             {
