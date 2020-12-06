@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using AntJob;
 using HisData;
 using NewLife.Security;
@@ -6,6 +7,8 @@ using XCode;
 
 namespace HisAgent
 {
+    [DisplayName("生产遗嘱")]
+    [Description("根据病人生成其对应的遗嘱")]
     class BuildWill : DataHandler
     {
         public BuildWill()

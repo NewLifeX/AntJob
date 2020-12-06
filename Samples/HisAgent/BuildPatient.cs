@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using AntJob;
 using HisData;
 using NewLife.Security;
@@ -7,6 +8,8 @@ using XCode;
 
 namespace HisAgent
 {
+    [DisplayName("生产病人")]
+    [Description("定时生成一批随机病人")]
     internal class BuildPatient : Handler
     {
         public BuildPatient()

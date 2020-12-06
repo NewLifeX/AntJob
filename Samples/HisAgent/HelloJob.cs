@@ -1,8 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using AntJob;
 
 namespace HisAgent
 {
+    [DisplayName("定时欢迎")]
+    [Description("简单的定时任务")]
     internal class HelloJob : Handler
     {
         public HelloJob()
