@@ -34,7 +34,7 @@ namespace AntJob
         /// <summary>实例化数据库处理器</summary>
         public DataHandler()
         {
-            //SupportPage = true;
+            Mode = JobModes.Data;
         }
         #endregion
 
