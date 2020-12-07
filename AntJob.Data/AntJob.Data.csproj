@@ -48,8 +48,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="8.10.2020.1204" />
-    <PackageReference Include="NewLife.XCode" Version="10.0.2020.1204" />
+    <PackageReference Include="NewLife.Core" Version="8.10.2020.1207-beta1" />
+    <PackageReference Include="NewLife.XCode" Version="10.0.2020.1207-beta1" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />

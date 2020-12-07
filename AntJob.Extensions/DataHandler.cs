@@ -20,7 +20,7 @@ namespace AntJob
         /// <summary>附加条件</summary>
         public String Where { get; set; }
 
-        /// <summary>时间字段</summary>
+        /// <summary>时间字段 或 雪花Id</summary>
         public FieldItem Field { get; set; }
 
         /// <summary>排序</summary>
@@ -46,6 +46,12 @@ namespace AntJob
 
             if (Factory == null) throw new ArgumentNullException(nameof(Factory));
 
+            // 自动识别雪花Id字段
+            if (Field == null)
+            {
+                var pks = Factory.Table.PrimaryKeys;
+                if (pks != null && pks.Length == 1 && pks[0].Type == typeof(Int64)) Field = pks[0];
+            }
             if (Field == null) Field = Factory.MasterTime;
             if (Field == null) throw new ArgumentNullException(nameof(Field));
 
@@ -115,8 +121,19 @@ namespace AntJob
             // 分批获取数据，如果没有取到，则结束
             var fi = Field;
             var exp = new WhereExpression();
-            if (start > DateTime.MinValue && start < DateTime.MaxValue) exp &= fi >= start;
-            if (end > DateTime.MinValue && end < DateTime.MaxValue) exp &= fi < end;
+            if (fi.Type == typeof(DateTime))
+            {
+                if (start > DateTime.MinValue && start < DateTime.MaxValue) exp &= fi >= start;
+                if (end > DateTime.MinValue && end < DateTime.MaxValue) exp &= fi < end;
+            }
+            else if (fi.Type == typeof(Int64))
+            {
+                var snow = Factory.Snow;
+                if (start > DateTime.MinValue && start < DateTime.MaxValue) exp &= fi >= snow.GetId(start);
+                if (end > DateTime.MinValue && end < DateTime.MaxValue) exp &= fi < snow.GetId(end);
+            }
+            else
+                throw new NotSupportedException($"不支持抽取[{fi.Type.FullName}]类型的字段数据！");
 
             if (!Where.IsNullOrEmpty()) exp &= Where;
 

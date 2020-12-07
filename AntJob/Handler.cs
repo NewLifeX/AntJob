@@ -141,7 +141,8 @@ namespace AntJob
             };
 
             // APM埋点
-            var span = Schedule.Tracer?.NewSpan($"job:{Name}");
+            var span = Schedule.Tracer?.NewSpan($"job:{Name}", task.Data ?? $"({task.Start}, {task.End})");
+            ctx.Remark = span.ToString();
 
             var sw = Stopwatch.StartNew();
             try
