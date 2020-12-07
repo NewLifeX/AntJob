@@ -32,10 +32,7 @@ namespace AntJob
 
         #region 构造
         /// <summary>实例化数据库处理器</summary>
-        public DataHandler()
-        {
-            Mode = JobModes.Data;
-        }
+        public DataHandler() => Mode = JobModes.Data;
         #endregion
 
         #region 方法

@@ -128,10 +128,7 @@ namespace AntJob.Providers
         /// <param name="topic">主题</param>
         /// <param name="count">要申请的任务个数</param>
         /// <returns></returns>
-        public override ITask[] Acquire(IJob job, String topic, Int32 count)
-        {
-            return Ant.Acquire(job.Name, topic, count);
-        }
+        public override ITask[] Acquire(IJob job, String topic, Int32 count) => Ant.Acquire(job.Name, topic, count);
 
         /// <summary>生产消息</summary>
         /// <param name="job">作业</param>
@@ -170,7 +167,7 @@ namespace AntJob.Providers
             // 不用上报抽取中
             if (ctx.Status == JobStatus.抽取中) return;
 
-            if (!(ctx?.Result is TaskResult task)) return;
+            if (ctx?.Result is not TaskResult task) return;
 
             // 区分抽取和处理
             task.Status = ctx.Status;
@@ -186,7 +183,7 @@ namespace AntJob.Providers
         /// <param name="ctx">上下文</param>
         public override void Finish(JobContext ctx)
         {
-            if (!(ctx?.Result is TaskResult task)) return;
+            if (ctx?.Result is not TaskResult task) return;
 
             task.Speed = ctx.Speed;
             task.Total = ctx.Total;
