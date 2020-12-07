@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using NewLife;
 using NewLife.Cube;
 using NewLife.Web;
+using XCode;
 using XCode.Membership;
 
 namespace AntJob.Web.Areas.Ant.Controllers
@@ -115,6 +116,38 @@ namespace AntJob.Web.Areas.Ant.Controllers
                 }
             }
             return JsonRefresh("操作成功！");
+        }
+
+        protected override Boolean Valid(App entity, DataObjectMethodType type, Boolean post)
+        {
+            if (!post) return base.Valid(entity, type, post);
+
+            var act = type switch
+            {
+                DataObjectMethodType.Update => "修改",
+                DataObjectMethodType.Insert => "添加",
+                DataObjectMethodType.Delete => "删除",
+                _ => type + "",
+            };
+
+            // 必须提前写修改日志，否则修改后脏数据失效，保存的日志为空
+            if (type == DataObjectMethodType.Update && (entity as IEntity).HasDirty)
+                LogProvider.Provider.WriteLog(act, entity);
+
+            var err = "";
+            try
+            {
+                return base.Valid(entity, type, post);
+            }
+            catch (Exception ex)
+            {
+                err = ex.Message;
+                throw;
+            }
+            finally
+            {
+                LogProvider.Provider.WriteLog(act, entity, err);
+            }
         }
     }
 }
