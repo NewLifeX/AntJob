@@ -81,7 +81,7 @@ namespace AntJob
                             rs += section.Execute();
                             break;
                         case SqlActions.Insert:
-                            rs += section.BatchInsert(dt);
+                            if (dt.Rows.Count > 0) rs += section.BatchInsert(dt);
                             break;
                         default:
                             break;
