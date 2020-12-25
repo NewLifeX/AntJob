@@ -3,10 +3,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Xml.Serialization;
 using NewLife;
 using NewLife.Caching;
 using NewLife.Data;
+using NewLife.Log;
 using NewLife.Serialization;
 using XCode;
 using XCode.Membership;
@@ -292,6 +294,9 @@ namespace AntJob.Data.Entity
         #endregion
 
         #region 申请任务
+        /// <summary>用于表示切片批次的序号</summary>
+        private static Int32 _idxBatch;
+
         /// <summary>申请任务分片</summary>
         /// <param name="server">申请任务的服务端</param>
         /// <param name="ip">申请任务的IP</param>
@@ -328,7 +333,7 @@ namespace AntJob.Data.Entity
                 };
 
                 ti.Server = server;
-                ti.ProcessID = pid;
+                ti.ProcessID = Interlocked.Increment(ref _idxBatch);
                 ti.Client = $"{ip}@{pid}";
                 ti.Status = JobStatus.就绪;
                 ti.CreateTime = DateTime.Now;
@@ -336,6 +341,15 @@ namespace AntJob.Data.Entity
 
                 //// 如果有模板，则进行计算替换
                 //if (!Data.IsNullOrEmpty()) ti.Data = TemplateHelper.Build(Data, ti.Start, ti.End);
+
+                // 重复切片判断
+                var key = $"Job:{ID}:{start:yyyyMMddHHmmss}";
+                if (!cache.Add(key, ti, 30_000))
+                {
+                    var ti2 = cache.Get<JobTask>(key);
+                    XTrace.WriteLine("[{0}]重复切片：{1}", key, ti2?.ToJson());
+                    break;
+                }
 
                 ti.Insert();
 
@@ -430,7 +444,7 @@ namespace AntJob.Data.Entity
                 foreach (var ti in list)
                 {
                     ti.Server = server;
-                    ti.ProcessID = pid;
+                    ti.ProcessID = Interlocked.Increment(ref _idxBatch);
                     ti.Client = $"{ip}@{pid}";
                     //ti.Status = JobStatus.就绪;
                     ti.CreateTime = DateTime.Now;
@@ -499,7 +513,7 @@ namespace AntJob.Data.Entity
                     };
 
                     ti.Server = server;
-                    ti.ProcessID = pid;
+                    ti.ProcessID = Interlocked.Increment(ref _idxBatch);
                     ti.Client = $"{ip}@{pid}";
                     ti.Status = JobStatus.就绪;
                     ti.CreateTime = DateTime.Now;

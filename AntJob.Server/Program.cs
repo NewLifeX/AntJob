@@ -77,10 +77,10 @@ namespace AntJob.Server
             AntService.Local = new IPEndPoint(NetHelper.MyIP(), set.Port);
 
             // 数据缓存，也用于全局锁，支持MemoryCache和Redis
-            if (!set.RedisLock.IsNullOrEmpty())
+            if (!set.RedisCache.IsNullOrEmpty())
             {
                 var redis = new Redis { Timeout = 5_000 + 1_000 };
-                redis.Init(set.RedisLock);
+                redis.Init(set.RedisCache);
                 AntService.Cache = redis;
             }
             else
