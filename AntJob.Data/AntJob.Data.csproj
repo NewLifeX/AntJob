@@ -48,7 +48,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="10.0.2020.1223-beta2" />
+    <PackageReference Include="NewLife.XCode" Version="10.0.2021.101" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
