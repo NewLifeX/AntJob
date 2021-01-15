@@ -5,6 +5,6 @@
 }
 <div class="form-group">
     <label for="status" class="control-label">状态：</label>
-    @Html.ForDropDownList("status", System.EnumHelper.GetDescriptions(typeof(JobStatus)), page["status"], "全部", true)
+    @Html.ForDropDownList("status", EnumHelper.GetDescriptions(typeof(JobStatus)), page["status"], "全部", true)
 </div>
 @await Html.PartialAsync("_DateRange")
