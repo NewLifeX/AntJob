@@ -345,7 +345,7 @@ namespace AntJob.Server
         [Api(nameof(Produce))]
         public Int32 Produce(ProduceModel model)
         {
-            var messages = model?.Messages?.Distinct().ToArray();
+            var messages = model?.Messages?.Where(e => !e.IsNullOrEmpty()).Distinct().ToArray();
             if (messages == null || messages.Length == 0) return 0;
 
             var app = _App;
@@ -353,8 +353,22 @@ namespace AntJob.Server
             // 去重过滤
             if (model.Unique)
             {
-                messages = AppMessage.Filter(app.ID, model.Topic, messages);
-                if (messages.Length == 0) return 0;
+                // 如果消息较短，采用缓存做去重过滤
+                if (messages.All(e => e.Length < 64))
+                {
+                    var msgs = new List<String>();
+                    foreach (var item in messages)
+                    {
+                        var key = $"{app.ID}:{model.Topic}:{item}";
+                        if (Cache.Add(key, "1", 2 * 3600)) msgs.Add(item);
+                    }
+                    messages = msgs.ToArray();
+                }
+                else
+                {
+                    messages = AppMessage.Filter(app.ID, model.Topic, messages);
+                    if (messages.Length == 0) return 0;
+                }
             }
 
             var ms = new List<AppMessage>();

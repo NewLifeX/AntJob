@@ -521,6 +521,9 @@ namespace AntJob.Data.Entity
 
                     ti.Insert();
 
+                    // 从去重缓存去掉
+                    cache.Remove(msgList.Select(e => $"{AppID}:{Topic}:{e}").ToArray());
+
                     list.Add(ti);
                 }
 
