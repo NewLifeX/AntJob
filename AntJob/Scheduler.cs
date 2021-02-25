@@ -6,6 +6,7 @@ using AntJob.Handlers;
 using AntJob.Providers;
 using NewLife;
 using NewLife.Log;
+using NewLife.Model;
 using NewLife.Reflection;
 using NewLife.Threading;
 
@@ -37,6 +38,16 @@ namespace AntJob
 
             Stop();
         }
+        #endregion
+
+        #region 处理器
+        /// <summary>添加处理器</summary>
+        /// <param name="handler"></param>
+        public void AddHandler(Handler handler) => Handlers.Add(handler);
+
+        /// <summary>按类型添加处理器，支持依赖注入</summary>
+        /// <typeparam name="T"></typeparam>
+        public void AddHandler<T>() where T : Handler => Handlers.Add(ObjectContainer.Provider.GetService(typeof(T)) as Handler);
         #endregion
 
         #region 核心方法
@@ -206,7 +217,8 @@ namespace AntJob
         public Int32 Period { get; set; } = 5;
 
         private TimerX _timer;
-        void Loop(Object state)
+
+        private void Loop(Object state)
         {
             // 任务调度
             var rs = Process();
