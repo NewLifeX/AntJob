@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using AntJob.Data;
 using AntJob.Extensions;
-using AntJob.Providers;
 using NewLife.Data;
 using XCode.DataAccessLayer;
 

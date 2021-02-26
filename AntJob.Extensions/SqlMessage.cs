@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using AntJob.Data;
 using AntJob.Extensions;
 using AntJob.Handlers;
