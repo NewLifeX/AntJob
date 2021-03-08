@@ -16,9 +16,6 @@ namespace AntJob
     public class Scheduler : DisposeBase
     {
         #region 属性
-        ///// <summary>调试开关。打开内部处理器日志</summary>
-        //public Boolean Debug { get; set; }
-
         /// <summary>处理器集合</summary>
         public List<Handler> Handlers { get; } = new List<Handler>();
 
@@ -47,7 +44,14 @@ namespace AntJob
 
         /// <summary>按类型添加处理器，支持依赖注入</summary>
         /// <typeparam name="T"></typeparam>
-        public void AddHandler<T>() where T : Handler => Handlers.Add(ObjectContainer.Provider.GetService(typeof(T)) as Handler);
+        public void AddHandler<T>() where T : Handler
+        {
+            var services = ObjectContainer.Current;
+            var prv = ObjectContainer.Provider;
+            services.AddTransient<T>();
+
+            Handlers.Add(prv.GetService<T>());
+        }
         #endregion
 
         #region 核心方法
