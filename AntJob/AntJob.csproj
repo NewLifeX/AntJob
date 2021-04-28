@@ -5,9 +5,9 @@
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2021</Copyright>
-    <Version>2.3.2021.0308</Version>
-    <FileVersion>2.3.2021.0308</FileVersion>
-    <AssemblyVersion>2.3.*</AssemblyVersion>
+    <Version>2.4.2021.0428-rc1</Version>
+    <FileVersion>2.4.2021.0428</FileVersion>
+    <AssemblyVersion>2.4.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin</OutputPath>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
@@ -21,7 +21,7 @@
     <RepositoryUrl>https://github.com/NewLifeX/AntJob</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>新生命团队;X组件;NewLife;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes>支持APM性能跟踪</PackageReleaseNotes>
+    <PackageReleaseNotes>修正RPC粘包处理问题</PackageReleaseNotes>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
