@@ -270,7 +270,8 @@ namespace AntJob.Data.Entity
         public JobModel ToModel()
         {
             // 如果禁用，仅返回最简单的字段
-            if (!Enable) return new JobModel { Name = Name, Enable = Enable };
+            // 缺少开始时间赋值，会导致客户端启动校验失败，Job没有启用的状态下服务器报错无法正常启动
+            if (!Enable) return new JobModel { Name = Name, Enable = Enable, Start = Start };
 
             return new JobModel
             {
