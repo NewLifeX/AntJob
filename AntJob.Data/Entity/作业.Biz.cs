@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -117,11 +116,12 @@ namespace AntJob.Data.Entity
         {
             if (id <= 0) return null;
 
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.ID == id);
+            //// 实体缓存
+            //if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.ID == id);
 
             // 单对象缓存
             return Meta.SingleCache[id];
+            //return Find(_.ID == id);
         }
 
         /// <summary>根据应用、名称查找</summary>
@@ -130,8 +130,8 @@ namespace AntJob.Data.Entity
         /// <returns>实体对象</returns>
         public static Job FindByAppIDAndName(Int32 appid, String name)
         {
-            // 实体缓存
-            if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.AppID == appid && e.Name == name);
+            //// 实体缓存
+            //if (Meta.Session.Count < 1000) return Meta.Cache.Find(e => e.AppID == appid && e.Name == name);
 
             return Find(_.AppID == appid & _.Name == name);
         }
@@ -314,8 +314,8 @@ namespace AntJob.Data.Entity
             var step = Step;
             if (step <= 0) step = 30;
 
-            // 全局锁，确保单个作业只有一个线程在分配作业
-            using var ck = cache.AcquireLock($"Job:{ID}", 5_000);
+            //// 全局锁，确保单个作业只有一个线程在分配作业
+            //using var ck = cache.AcquireLock($"Job:{ID}", 5_000);
 
             using var ts = Meta.CreateTrans();
             var start = Start;
@@ -349,16 +349,18 @@ namespace AntJob.Data.Entity
                 {
                     var ti2 = cache.Get<JobTask>(key);
                     XTrace.WriteLine("[{0}]重复切片：{1}", key, ti2?.ToJson());
-                    break;
+                    using var span = DefaultTracer.Instance?.NewSpan($"antjob:AcquireDuplicate", ti2);
                 }
+                else
+                {
+                    ti.Insert();
 
-                ti.Insert();
+                    list.Add(ti);
+                }
 
                 // 更新任务
                 Start = end;
                 start = end;
-
-                list.Add(ti);
             }
 
             if (list.Count > 0)
@@ -419,8 +421,8 @@ namespace AntJob.Data.Entity
         /// <returns></returns>
         public IList<JobTask> AcquireOld(String server, String ip, Int32 pid, Int32 count, ICache cache)
         {
-            // 全局锁，确保单个作业只有一个线程在分配作业
-            using var ck = cache.AcquireLock($"Job:{ID}", 5_000);
+            //// 全局锁，确保单个作业只有一个线程在分配作业
+            //using var ck = cache.AcquireLock($"Job:{ID}", 5_000);
 
             using var ts = Meta.CreateTrans();
             var list = new List<JobTask>();
@@ -484,8 +486,8 @@ namespace AntJob.Data.Entity
             var now = DateTime.Now;
             if (MessageCount == 0 && UpdateTime.AddMinutes(2) > now) return list;
 
-            // 全局锁，确保单个作业只有一个线程在分配作业
-            using var ck = cache.AcquireLock($"Job:{ID}", 5_000);
+            //// 全局锁，确保单个作业只有一个线程在分配作业
+            //using var ck = cache.AcquireLock($"Job:{ID}", 5_000);
 
             using var ts = Meta.CreateTrans();
             var size = BatchSize;

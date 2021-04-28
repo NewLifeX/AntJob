@@ -250,11 +250,14 @@ namespace AntJob.Server
             // 应用停止发放作业
             app = App.FindByID(app.ID) ?? app;
             if (!app.Enable) return new TaskModel[0];
+            var jb = app.Jobs.FirstOrDefault(e => e.Name == job);
+
+            // 全局锁，确保单个作业只有一个线程在分配作业
+            using var ck = Cache.AcquireLock($"Job:{jb.ID}", 15_000);
 
             // 找到作业。为了确保能够快速拿到新的作业参数，这里做二次查询
-            var jb = app.Jobs.FirstOrDefault(e => e.Name == job);
             if (jb != null)
-                jb = Job.FindByID(jb.ID);
+                jb = Job.Find(Job._.ID == jb.ID);
             else
                 jb = Job.FindByAppIDAndName(app.ID, job);
 
