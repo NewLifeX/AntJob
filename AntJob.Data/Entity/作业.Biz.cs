@@ -345,7 +345,7 @@ namespace AntJob.Data.Entity
 
                 // 重复切片判断
                 var key = $"Job:{ID}:{start:yyyyMMddHHmmss}";
-                if (!cache.Add(key, ti, 30_000))
+                if (!cache.Add(key, ti, 30))
                 {
                     var ti2 = cache.Get<JobTask>(key);
                     XTrace.WriteLine("[{0}]重复切片：{1}", key, ti2?.ToJson());
