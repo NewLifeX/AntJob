@@ -84,19 +84,19 @@ namespace AntJob.Data.Entity
         public Int32 MessageCount { get => _MessageCount; set { if (OnPropertyChanging("MessageCount", value)) { _MessageCount = value; OnPropertyChanged("MessageCount"); } } }
 
         private DateTime _Start;
-        /// <summary>开始。大于等于，下一个任务的起点</summary>
+        /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
         [DisplayName("开始")]
-        [Description("开始。大于等于，下一个任务的起点")]
+        [Description("开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用")]
         [DataObjectField(false, false, true, 0)]
-        [BindColumn("Start", "开始。大于等于，下一个任务的起点", "")]
+        [BindColumn("Start", "开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用", "")]
         public DateTime Start { get => _Start; set { if (OnPropertyChanging("Start", value)) { _Start = value; OnPropertyChanged("Start"); } } }
 
         private DateTime _End;
-        /// <summary>结束。小于不等于，默认空表示无止境</summary>
+        /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用</summary>
         [DisplayName("结束")]
-        [Description("结束。小于不等于，默认空表示无止境")]
+        [Description("结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用")]
         [DataObjectField(false, false, true, 0)]
-        [BindColumn("End", "结束。小于不等于，默认空表示无止境", "")]
+        [BindColumn("End", "结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用", "")]
         public DateTime End { get => _End; set { if (OnPropertyChanging("End", value)) { _End = value; OnPropertyChanged("End"); } } }
 
         private Int32 _Step;
@@ -108,27 +108,27 @@ namespace AntJob.Data.Entity
         public Int32 Step { get => _Step; set { if (OnPropertyChanging("Step", value)) { _Step = value; OnPropertyChanged("Step"); } } }
 
         private Int32 _BatchSize;
-        /// <summary>批大小。在任务时间区间内分页处理，或者每个任务的消息数</summary>
+        /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
         [DisplayName("批大小")]
-        [Description("批大小。在任务时间区间内分页处理，或者每个任务的消息数")]
+        [Description("批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("BatchSize", "批大小。在任务时间区间内分页处理，或者每个任务的消息数", "")]
+        [BindColumn("BatchSize", "批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用", "")]
         public Int32 BatchSize { get => _BatchSize; set { if (OnPropertyChanging("BatchSize", value)) { _BatchSize = value; OnPropertyChanged("BatchSize"); } } }
 
         private Int32 _Offset;
-        /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
+        /// <summary>偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒</summary>
         [DisplayName("偏移")]
-        [Description("偏移。距离实时时间的秒数，部分业务不能跑到实时，秒")]
+        [Description("偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("Offset", "偏移。距离实时时间的秒数，部分业务不能跑到实时，秒", "")]
+        [BindColumn("Offset", "偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒", "")]
         public Int32 Offset { get => _Offset; set { if (OnPropertyChanging("Offset", value)) { _Offset = value; OnPropertyChanged("Offset"); } } }
 
         private Int32 _MaxTask;
-        /// <summary>并行。多任务并行处理</summary>
-        [DisplayName("并行")]
-        [Description("并行。多任务并行处理")]
+        /// <summary>并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度</summary>
+        [DisplayName("并行度")]
+        [Description("并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("MaxTask", "并行。多任务并行处理", "")]
+        [BindColumn("MaxTask", "并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度", "")]
         public Int32 MaxTask { get => _MaxTask; set { if (OnPropertyChanging("MaxTask", value)) { _MaxTask = value; OnPropertyChanged("MaxTask"); } } }
 
         private Int32 _MaxError;
@@ -180,19 +180,19 @@ namespace AntJob.Data.Entity
         public Int32 ErrorDelay { get => _ErrorDelay; set { if (OnPropertyChanging("ErrorDelay", value)) { _ErrorDelay = value; OnPropertyChanged("ErrorDelay"); } } }
 
         private Int64 _Total;
-        /// <summary>总数</summary>
+        /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
         [DisplayName("总数")]
-        [Description("总数")]
+        [Description("总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("Total", "总数", "")]
+        [BindColumn("Total", "总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1", "")]
         public Int64 Total { get => _Total; set { if (OnPropertyChanging("Total", value)) { _Total = value; OnPropertyChanged("Total"); } } }
 
         private Int64 _Success;
-        /// <summary>成功</summary>
+        /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
         [DisplayName("成功")]
-        [Description("成功")]
+        [Description("成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("Success", "成功", "")]
+        [BindColumn("Success", "成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数", "")]
         public Int64 Success { get => _Success; set { if (OnPropertyChanging("Success", value)) { _Success = value; OnPropertyChanged("Success"); } } }
 
         private Int32 _Error;
@@ -431,22 +431,22 @@ namespace AntJob.Data.Entity
             /// <summary>消息数</summary>
             public static readonly Field MessageCount = FindByName("MessageCount");
 
-            /// <summary>开始。大于等于，下一个任务的起点</summary>
+            /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
             public static readonly Field Start = FindByName("Start");
 
-            /// <summary>结束。小于不等于，默认空表示无止境</summary>
+            /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用</summary>
             public static readonly Field End = FindByName("End");
 
             /// <summary>步进。切分任务的时间区间，秒</summary>
             public static readonly Field Step = FindByName("Step");
 
-            /// <summary>批大小。在任务时间区间内分页处理，或者每个任务的消息数</summary>
+            /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
             public static readonly Field BatchSize = FindByName("BatchSize");
 
-            /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
+            /// <summary>偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒</summary>
             public static readonly Field Offset = FindByName("Offset");
 
-            /// <summary>并行。多任务并行处理</summary>
+            /// <summary>并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度</summary>
             public static readonly Field MaxTask = FindByName("MaxTask");
 
             /// <summary>最大错误。连续错误达到最大错误数时停止</summary>
@@ -467,10 +467,10 @@ namespace AntJob.Data.Entity
             /// <summary>错误延迟。默认60秒，出错延迟后重新发放</summary>
             public static readonly Field ErrorDelay = FindByName("ErrorDelay");
 
-            /// <summary>总数</summary>
+            /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
             public static readonly Field Total = FindByName("Total");
 
-            /// <summary>成功</summary>
+            /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
             public static readonly Field Success = FindByName("Success");
 
             /// <summary>错误</summary>
@@ -545,22 +545,22 @@ namespace AntJob.Data.Entity
             /// <summary>消息数</summary>
             public const String MessageCount = "MessageCount";
 
-            /// <summary>开始。大于等于，下一个任务的起点</summary>
+            /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
             public const String Start = "Start";
 
-            /// <summary>结束。小于不等于，默认空表示无止境</summary>
+            /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用</summary>
             public const String End = "End";
 
             /// <summary>步进。切分任务的时间区间，秒</summary>
             public const String Step = "Step";
 
-            /// <summary>批大小。在任务时间区间内分页处理，或者每个任务的消息数</summary>
+            /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
             public const String BatchSize = "BatchSize";
 
-            /// <summary>偏移。距离实时时间的秒数，部分业务不能跑到实时，秒</summary>
+            /// <summary>偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒</summary>
             public const String Offset = "Offset";
 
-            /// <summary>并行。多任务并行处理</summary>
+            /// <summary>并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度</summary>
             public const String MaxTask = "MaxTask";
 
             /// <summary>最大错误。连续错误达到最大错误数时停止</summary>
@@ -581,10 +581,10 @@ namespace AntJob.Data.Entity
             /// <summary>错误延迟。默认60秒，出错延迟后重新发放</summary>
             public const String ErrorDelay = "ErrorDelay";
 
-            /// <summary>总数</summary>
+            /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
             public const String Total = "Total";
 
-            /// <summary>成功</summary>
+            /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
             public const String Success = "Success";
 
             /// <summary>错误</summary>
