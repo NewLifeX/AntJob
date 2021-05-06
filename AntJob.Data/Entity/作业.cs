@@ -39,7 +39,7 @@ namespace AntJob.Data.Entity
         /// <summary>名称</summary>
         [DisplayName("名称")]
         [Description("名称")]
-        [DataObjectField(false, false, true, 50)]
+        [DataObjectField(false, false, true, 100)]
         [BindColumn("Name", "名称", "", Master = true)]
         public String Name { get => _Name; set { if (OnPropertyChanging("Name", value)) { _Name = value; OnPropertyChanged("Name"); } } }
 
