@@ -211,8 +211,8 @@ namespace AntJob.Server
                         MaxError = 100,
                     };
 
-                    // 为了降低进入门槛，在客户端设置了充足条件时，直接启动
-                    if (jb.IsReady()) jb.Enable = true;
+                    //// 为了降低进入门槛，在客户端设置了充足条件时，直接启动
+                    //if (jb.IsReady()) jb.Enable = true;
                 }
 
                 if (item.Mode > 0) jb.Mode = item.Mode;
