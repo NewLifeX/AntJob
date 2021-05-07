@@ -39,7 +39,7 @@ namespace AntJob.Data.Entity
         /// <summary>名称</summary>
         [DisplayName("名称")]
         [Description("名称")]
-        [DataObjectField(false, false, true, 50)]
+        [DataObjectField(false, false, true, 100)]
         [BindColumn("Name", "名称", "", Master = true)]
         public String Name { get => _Name; set { if (OnPropertyChanging("Name", value)) { _Name = value; OnPropertyChanged("Name"); } } }
 
@@ -47,7 +47,7 @@ namespace AntJob.Data.Entity
         /// <summary>类名。支持该作业的处理器实现</summary>
         [DisplayName("类名")]
         [Description("类名。支持该作业的处理器实现")]
-        [DataObjectField(false, false, true, 50)]
+        [DataObjectField(false, false, true, 100)]
         [BindColumn("ClassName", "类名。支持该作业的处理器实现", "")]
         public String ClassName { get => _ClassName; set { if (OnPropertyChanging("ClassName", value)) { _ClassName = value; OnPropertyChanged("ClassName"); } } }
 

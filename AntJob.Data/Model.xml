@@ -95,8 +95,8 @@
     <Columns>
       <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
       <Column Name="AppID" DataType="Int32" Description="应用" />
-      <Column Name="Name" DataType="String" Master="True" Description="名称" />
-      <Column Name="ClassName" DataType="String" Description="类名。支持该作业的处理器实现" />
+      <Column Name="Name" DataType="String" Master="True" Length="100" Description="名称" />
+      <Column Name="ClassName" DataType="String" Length="100" Description="类名。支持该作业的处理器实现" />
       <Column Name="DisplayName" DataType="String" Description="显示名" />
       <Column Name="Mode" DataType="Int32" Description="调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑" Type="JobModes" />
       <Column Name="Topic" DataType="String" Description="主题。消息调度时消费的主题" />

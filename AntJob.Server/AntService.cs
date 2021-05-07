@@ -200,7 +200,7 @@ namespace AntJob.Server
                     {
                         AppID = _App.ID,
                         Name = item.Name,
-                        //Enable = item.Enable,
+                        Enable = item.Enable,
                         Start = item.Start,
                         End = item.End,
                         Offset = item.Offset,
