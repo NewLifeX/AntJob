@@ -22,16 +22,17 @@
             }
             <th class="text-center hidden-md hidden-sm hidden-xs"><a href="@Html.Raw(page.GetSortUrl("ID"))">编号</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("TaskID"))">任务</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Start"))">开始</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Client"))">客户端</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("BatchSize"))">批大小</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Total"))">总数</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Success"))">成功</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Error"))">错误</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Times"))">次数</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Speed"))">速度</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Cost"))">耗时</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("FullCost"))">全耗时</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Start"))" title="@JobTask._.Start.Description">开始</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("End"))" title="@JobTask._.End.Description">结束</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Client"))" title="@JobTask._.Client.Description">客户端</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("BatchSize"))" title="@JobTask._.BatchSize.Description">批大小</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Total"))" title="@JobTask._.Total.Description">总数</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Success"))" title="@JobTask._.Success.Description">成功</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Error"))" title="@JobTask._.Error.Description">错误</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Times"))" title="@JobTask._.Times.Description">次数</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Speed"))" title="@JobTask._.Speed.Description">速度</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Cost"))" title="@JobTask._.Cost.Description">耗时</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("FullCost"))" title="@JobTask._.FullCost.Description">全耗时</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Status"))">状态</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Key"))">最后键</a></th>
             <th class="text-center" style="min-width:134px;"><a href="@Html.Raw(page.GetSortUrl("UpdateTime"))">更新时间</a></th>
@@ -75,6 +76,7 @@
                 <td class="text-center hidden-md hidden-sm hidden-xs">@entity.ID</td>
                 <td class="text-center"><a href="Job?ID=@entity.JobID">@entity.JobName</a></td>
                 <td>@entity.Start.ToFullString("")</td>
+                <td>@entity.End.ToString("HH:mm:ss")</td>
                 <td>@entity.Client</td>
                 <td class="text-right">@entity.BatchSize.ToString("n0")</td>
                 <td class="text-right">@entity.Total.ToString("n0")</td>

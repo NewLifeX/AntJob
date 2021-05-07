@@ -8,6 +8,7 @@ using NewLife.Caching;
 using NewLife.Log;
 using NewLife.Remoting;
 using NewLife.Threading;
+using Stardust;
 
 namespace AntJob.Server
 {
@@ -51,6 +52,7 @@ namespace AntJob.Server
             AddMenu('t', "数据测试", Test);
         }
 
+        private StarFactory _star;
         private ApiServer _server;
         /// <summary>服务启动</summary>
         /// <remarks>
@@ -59,10 +61,13 @@ namespace AntJob.Server
         /// </remarks>
         protected override void StartWork(String reason)
         {
+            _star = new StarFactory(null, null, null);
+
             var set = Setting.Current;
 
             var svr = new ApiServer(set.Port)
             {
+                Tracer = _star.Tracer,
                 ShowError = true,
                 Log = XTrace.Log,
             };

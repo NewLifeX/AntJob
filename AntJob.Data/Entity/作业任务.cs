@@ -54,43 +54,43 @@ namespace AntJob.Data.Entity
         public String Client { get => _Client; set { if (OnPropertyChanging("Client", value)) { _Client = value; OnPropertyChanged("Client"); } } }
 
         private DateTime _Start;
-        /// <summary>开始。大于等于</summary>
+        /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
         [DisplayName("开始")]
-        [Description("开始。大于等于")]
+        [Description("开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用")]
         [DataObjectField(false, false, true, 0)]
-        [BindColumn("Start", "开始。大于等于", "")]
+        [BindColumn("Start", "开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用", "")]
         public DateTime Start { get => _Start; set { if (OnPropertyChanging("Start", value)) { _Start = value; OnPropertyChanged("Start"); } } }
 
         private DateTime _End;
-        /// <summary>结束。小于，不等于</summary>
+        /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
         [DisplayName("结束")]
-        [Description("结束。小于，不等于")]
+        [Description("结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用")]
         [DataObjectField(false, false, true, 0)]
-        [BindColumn("End", "结束。小于，不等于", "")]
+        [BindColumn("End", "结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用", "")]
         public DateTime End { get => _End; set { if (OnPropertyChanging("End", value)) { _End = value; OnPropertyChanged("End"); } } }
 
         private Int32 _BatchSize;
-        /// <summary>批大小</summary>
+        /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
         [DisplayName("批大小")]
-        [Description("批大小")]
+        [Description("批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("BatchSize", "批大小", "")]
+        [BindColumn("BatchSize", "批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用", "")]
         public Int32 BatchSize { get => _BatchSize; set { if (OnPropertyChanging("BatchSize", value)) { _BatchSize = value; OnPropertyChanged("BatchSize"); } } }
 
         private Int32 _Total;
-        /// <summary>总数</summary>
+        /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
         [DisplayName("总数")]
-        [Description("总数")]
+        [Description("总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("Total", "总数", "")]
+        [BindColumn("Total", "总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1", "")]
         public Int32 Total { get => _Total; set { if (OnPropertyChanging("Total", value)) { _Total = value; OnPropertyChanged("Total"); } } }
 
         private Int32 _Success;
-        /// <summary>成功</summary>
+        /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
         [DisplayName("成功")]
-        [Description("成功")]
+        [Description("成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("Success", "成功", "")]
+        [BindColumn("Success", "成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数", "")]
         public Int32 Success { get => _Success; set { if (OnPropertyChanging("Success", value)) { _Success = value; OnPropertyChanged("Success"); } } }
 
         private Int32 _Error;
@@ -110,19 +110,19 @@ namespace AntJob.Data.Entity
         public Int32 Times { get => _Times; set { if (OnPropertyChanging("Times", value)) { _Times = value; OnPropertyChanged("Times"); } } }
 
         private Int32 _Speed;
-        /// <summary>速度</summary>
+        /// <summary>速度。每秒处理数，执行端计算</summary>
         [DisplayName("速度")]
-        [Description("速度")]
+        [Description("速度。每秒处理数，执行端计算")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("Speed", "速度", "")]
+        [BindColumn("Speed", "速度。每秒处理数，执行端计算", "")]
         public Int32 Speed { get => _Speed; set { if (OnPropertyChanging("Speed", value)) { _Speed = value; OnPropertyChanged("Speed"); } } }
 
         private Int32 _Cost;
-        /// <summary>耗时。秒</summary>
+        /// <summary>耗时。秒，执行端计算的执行时间</summary>
         [DisplayName("耗时")]
-        [Description("耗时。秒")]
+        [Description("耗时。秒，执行端计算的执行时间")]
         [DataObjectField(false, false, false, 0)]
-        [BindColumn("Cost", "耗时。秒", "")]
+        [BindColumn("Cost", "耗时。秒，执行端计算的执行时间", "")]
         public Int32 Cost { get => _Cost; set { if (OnPropertyChanging("Cost", value)) { _Cost = value; OnPropertyChanged("Cost"); } } }
 
         private Int32 _FullCost;
@@ -166,11 +166,11 @@ namespace AntJob.Data.Entity
         public Int32 ProcessID { get => _ProcessID; set { if (OnPropertyChanging("ProcessID", value)) { _ProcessID = value; OnPropertyChanged("ProcessID"); } } }
 
         private String _Key;
-        /// <summary>最后键</summary>
+        /// <summary>最后键。Handler内记录作为样本的数据</summary>
         [DisplayName("最后键")]
-        [Description("最后键")]
+        [Description("最后键。Handler内记录作为样本的数据")]
         [DataObjectField(false, false, true, 50)]
-        [BindColumn("Key", "最后键", "")]
+        [BindColumn("Key", "最后键。Handler内记录作为样本的数据", "")]
         public String Key { get => _Key; set { if (OnPropertyChanging("Key", value)) { _Key = value; OnPropertyChanged("Key"); } } }
 
         private String _Data;
@@ -182,11 +182,11 @@ namespace AntJob.Data.Entity
         public String Data { get => _Data; set { if (OnPropertyChanging("Data", value)) { _Data = value; OnPropertyChanged("Data"); } } }
 
         private String _Message;
-        /// <summary>消息内容。异常信息或其它任务消息</summary>
+        /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
         [DisplayName("消息内容")]
-        [Description("消息内容。异常信息或其它任务消息")]
+        [Description("消息内容。Handler内记录的异常信息或其它任务消息")]
         [DataObjectField(false, false, true, -1)]
-        [BindColumn("Message", "消息内容。异常信息或其它任务消息", "")]
+        [BindColumn("Message", "消息内容。Handler内记录的异常信息或其它任务消息", "")]
         public String Message { get => _Message; set { if (OnPropertyChanging("Message", value)) { _Message = value; OnPropertyChanged("Message"); } } }
 
         private DateTime _CreateTime;
@@ -291,19 +291,19 @@ namespace AntJob.Data.Entity
             /// <summary>客户端。IP加进程</summary>
             public static readonly Field Client = FindByName("Client");
 
-            /// <summary>开始。大于等于</summary>
+            /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
             public static readonly Field Start = FindByName("Start");
 
-            /// <summary>结束。小于，不等于</summary>
+            /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
             public static readonly Field End = FindByName("End");
 
-            /// <summary>批大小</summary>
+            /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
             public static readonly Field BatchSize = FindByName("BatchSize");
 
-            /// <summary>总数</summary>
+            /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
             public static readonly Field Total = FindByName("Total");
 
-            /// <summary>成功</summary>
+            /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
             public static readonly Field Success = FindByName("Success");
 
             /// <summary>错误</summary>
@@ -312,10 +312,10 @@ namespace AntJob.Data.Entity
             /// <summary>次数</summary>
             public static readonly Field Times = FindByName("Times");
 
-            /// <summary>速度</summary>
+            /// <summary>速度。每秒处理数，执行端计算</summary>
             public static readonly Field Speed = FindByName("Speed");
 
-            /// <summary>耗时。秒</summary>
+            /// <summary>耗时。秒，执行端计算的执行时间</summary>
             public static readonly Field Cost = FindByName("Cost");
 
             /// <summary>全部耗时。秒，从任务发放到执行完成的时间</summary>
@@ -333,13 +333,13 @@ namespace AntJob.Data.Entity
             /// <summary>进程</summary>
             public static readonly Field ProcessID = FindByName("ProcessID");
 
-            /// <summary>最后键</summary>
+            /// <summary>最后键。Handler内记录作为样本的数据</summary>
             public static readonly Field Key = FindByName("Key");
 
             /// <summary>数据。可以是Json数据，比如StatID</summary>
             public static readonly Field Data = FindByName("Data");
 
-            /// <summary>消息内容。异常信息或其它任务消息</summary>
+            /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
             public static readonly Field Message = FindByName("Message");
 
             /// <summary>创建时间</summary>
@@ -366,19 +366,19 @@ namespace AntJob.Data.Entity
             /// <summary>客户端。IP加进程</summary>
             public const String Client = "Client";
 
-            /// <summary>开始。大于等于</summary>
+            /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
             public const String Start = "Start";
 
-            /// <summary>结束。小于，不等于</summary>
+            /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
             public const String End = "End";
 
-            /// <summary>批大小</summary>
+            /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
             public const String BatchSize = "BatchSize";
 
-            /// <summary>总数</summary>
+            /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
             public const String Total = "Total";
 
-            /// <summary>成功</summary>
+            /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
             public const String Success = "Success";
 
             /// <summary>错误</summary>
@@ -387,10 +387,10 @@ namespace AntJob.Data.Entity
             /// <summary>次数</summary>
             public const String Times = "Times";
 
-            /// <summary>速度</summary>
+            /// <summary>速度。每秒处理数，执行端计算</summary>
             public const String Speed = "Speed";
 
-            /// <summary>耗时。秒</summary>
+            /// <summary>耗时。秒，执行端计算的执行时间</summary>
             public const String Cost = "Cost";
 
             /// <summary>全部耗时。秒，从任务发放到执行完成的时间</summary>
@@ -408,13 +408,13 @@ namespace AntJob.Data.Entity
             /// <summary>进程</summary>
             public const String ProcessID = "ProcessID";
 
-            /// <summary>最后键</summary>
+            /// <summary>最后键。Handler内记录作为样本的数据</summary>
             public const String Key = "Key";
 
             /// <summary>数据。可以是Json数据，比如StatID</summary>
             public const String Data = "Data";
 
-            /// <summary>消息内容。异常信息或其它任务消息</summary>
+            /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
             public const String Message = "Message";
 
             /// <summary>创建时间</summary>
