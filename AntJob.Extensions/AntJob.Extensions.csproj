@@ -40,7 +40,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="10.1.2021.505" />
+    <PackageReference Include="NewLife.XCode" Version="10.2.2021.708" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
