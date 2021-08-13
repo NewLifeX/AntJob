@@ -61,13 +61,16 @@ namespace AntJob.Server
         /// </remarks>
         protected override void StartWork(String reason)
         {
-            _star = new StarFactory(null, null, null);
+
+            //星尘配置
+            //_star = new StarFactory(null, null, null);
 
             var set = Setting.Current;
 
             var svr = new ApiServer(set.Port)
             {
-                Tracer = _star.Tracer,
+                //星尘配置
+                //Tracer = _star.Tracer,
                 ShowError = true,
                 Log = XTrace.Log,
             };
