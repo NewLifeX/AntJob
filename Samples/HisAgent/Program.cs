@@ -1,6 +1,8 @@
 ﻿using System;
 using AntJob;
 using AntJob.Providers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NewLife.Log;
 
 namespace HisAgent
@@ -11,29 +13,23 @@ namespace HisAgent
         {
             XTrace.UseConsole();
 
-            var set = AntSetting.Current;
+            CreateHostBuilder(args).Build().Run();
+        }
 
-            // 实例化调度器
-            var sc = new Scheduler();
+        /// <summary></summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+          Host.CreateDefaultBuilder(args)
+            .ConfigureServices((hostContext, services) => ConfigureServices(services));
 
-            // 使用分布式调度引擎替换默认的本地文件调度
-            sc.Provider = new NetworkJobProvider
-            {
-                Server = set.Server,
-                AppID = set.AppID,
-                Secret = set.Secret,
-            };
-
-            // 添加作业处理器
-            sc.AddHandler<HelloJob>();
-            sc.AddHandler<BuildPatient>();
-            sc.AddHandler<BuildWill>();
-
-            // 启动调度引擎，调度器内部多线程处理
-            sc.Start();
-
-            Console.WriteLine("OK!");
-            Console.ReadKey();
+        /// <summary></summary>
+        /// <param name="hostBuilderContext"></param>
+        /// <param name="services"></param>
+        public static void ConfigureServices(IServiceCollection services)
+        {
+            // 添加后台调度服务
+            services.AddHostedService<JobHost>();
         }
     }
 }
