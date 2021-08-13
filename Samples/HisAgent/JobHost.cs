@@ -14,34 +14,21 @@ namespace HisAgent
 {
     public class JobHost : BackgroundService
     {
-        private readonly IConfigProvider _config;
-        private readonly ITracer _tracer;
+        //private readonly IConfigProvider _config;
+        //private readonly ITracer _tracer;
         private Scheduler _scheduler;
 
-        public JobHost(IConfigProvider config, ITracer tracer, ILog log)
+        public JobHost()
         {
-            _config = config;
-            _tracer = tracer;
-            // 设置日志
-            XTrace.Log = log;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var set = AntSetting.Current;
 
-            var server = _config["antServer"];
-            if (!server.IsNullOrEmpty())
-            {
-                set.Server = server;
-                set.Save();
-            }
-
             // 实例化调度器
             var sc = new Scheduler
             {
-                Tracer = _tracer,
-
                 // 使用分布式调度引擎替换默认的本地文件调度
                 Provider = new NetworkJobProvider
                 {
