@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
+using System.Threading;
 using AntJob.Data.Entity;
 using NewLife;
-using NewLife.Agent;
 using NewLife.Caching;
 using NewLife.Log;
 using NewLife.Remoting;
@@ -14,70 +14,25 @@ namespace AntJob.Server
 {
     class Program
     {
-        static void Main(String[] args) => new MyService().Main(args);
-    }
-
-    /// <summary>服务类。名字可以自定义</summary>
-    class MyService : ServiceBase
-    {
-        public MyService()
+        static void Main(String[] args)
         {
-            ServiceName = "AntServer";
+            // 启用控制台日志，拦截所有异常
+            XTrace.UseConsole();
 
-            ThreadPoolX.QueueUserWorkItem(() =>
-            {
-                var n = App.Meta.Count;
-
-                var set = NewLife.Setting.Current;
-                if (set.IsNew)
-                {
-                    set.DataPath = @"..\Data";
-
-                    set.Save();
-                }
-
-                var set2 = XCode.Setting.Current;
-                if (set2.IsNew)
-                {
-                    set2.Debug = true;
-                    set2.ShowSQL = false;
-                    set2.TraceSQLTime = 3000;
-                    //set2.SQLiteDbPath = @"..\Data";
-
-                    set2.Save();
-                }
-            });
-
-            // 注册菜单，在控制台菜单中按 t 可以执行Test函数，主要用于临时处理数据
-            AddMenu('t', "数据测试", Test);
-        }
-
-        private StarFactory _star;
-        private ApiServer _server;
-        /// <summary>服务启动</summary>
-        /// <remarks>
-        /// 安装Windows服务后，服务启动会执行一次该方法。
-        /// 控制台菜单按5进入循环调试也会执行该方法。
-        /// </remarks>
-        protected override void StartWork(String reason)
-        {
-
-            //星尘配置
-            //_star = new StarFactory(null, null, null);
+            // 配置星尘。自动读取配置文件 config/star.config 中的服务器地址、应用标识、密钥
+            var star = new StarFactory(null, null, null);
+            if (star.Server.IsNullOrEmpty()) star = null;
 
             var set = Setting.Current;
 
-            var svr = new ApiServer(set.Port)
+            var server = new ApiServer(set.Port)
             {
-                //星尘配置
-                //Tracer = _star.Tracer,
+                Tracer = star?.Tracer,
                 ShowError = true,
                 Log = XTrace.Log,
             };
 
-            //var ts = new AntService();
-            //svr.Register(ts, null);
-            svr.Register<AntService>();
+            server.Register<AntService>();
 
             AntService.Log = XTrace.Log;
 
@@ -96,41 +51,38 @@ namespace AntJob.Server
                 AntService.Cache = new MemoryCache();
             }
 
-            svr.Start();
-
-            _server = svr;
+            server.Start();
 
             _clearOnlineTimer = new TimerX(ClearOnline, null, 1000, 10 * 1000);
             _clearItemTimer = new TimerX(ClearItems, null, 10_000, 3600_000) { Async = true };
 
-            base.StartWork(reason);
+            // 友好退出
+            //ObjectContainer.Current.BuildHost().Run();
+            Thread.Sleep(-1);
         }
 
-        /// <summary>服务停止</summary>
-        /// <remarks>
-        /// 安装Windows服务后，服务停止会执行该方法。
-        /// 控制台菜单按5进入循环调试，任意键结束时也会执行该方法。
-        /// </remarks>
-        protected override void StopWork(String reason)
+        static void InitData()
         {
-            base.StopWork(reason);
+            var n = App.Meta.Count;
 
-            _server.TryDispose();
-            _server = null;
+            var set = NewLife.Setting.Current;
+            if (set.IsNew)
+            {
+                set.DataPath = @"..\Data";
 
-            _clearOnlineTimer.TryDispose();
-            _clearOnlineTimer = null;
+                set.Save();
+            }
 
-            _clearItemTimer.TryDispose();
-            _clearItemTimer = null;
-        }
+            var set2 = XCode.Setting.Current;
+            if (set2.IsNew)
+            {
+                set2.Debug = true;
+                set2.ShowSQL = false;
+                set2.TraceSQLTime = 3000;
+                //set2.SQLiteDbPath = @"..\Data";
 
-        /// <summary>数据测试，菜单t，默认文件调度</summary>
-        public void Test()
-        {
-            Job.Meta.Session.Dal.Db.ShowSQL = true;
-
-            ClearItems(null);
+                set2.Save();
+            }
         }
 
         #region 清理过时
