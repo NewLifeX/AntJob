@@ -5,8 +5,8 @@
     <Description>蚂蚁调度系统数据库结构</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2020</Copyright>
-    <Version>2.0.2020.1201</Version>
-    <FileVersion>2.0.2020.1201</FileVersion>
+    <Version>2.0.2021.1001</Version>
+    <FileVersion>2.0.2021.1001</FileVersion>
     <AssemblyVersion>2.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin</OutputPath>
@@ -48,7 +48,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="10.2.2021.708" />
+    <PackageReference Include="NewLife.XCode" Version="10.2.2021.1001" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />

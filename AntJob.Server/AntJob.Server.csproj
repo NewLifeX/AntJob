@@ -7,8 +7,8 @@
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2021</Copyright>
-    <Version>2.5.2021.0813</Version>
-    <FileVersion>2.5.2021.0813</FileVersion>
+    <Version>2.5.2021.1001</Version>
+    <FileVersion>2.5.2021.1001</FileVersion>
     <AssemblyVersion>2.5.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin\Server</OutputPath>
@@ -40,7 +40,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Stardust" Version="1.5.2021.505" />
+    <PackageReference Include="NewLife.Stardust" Version="1.5.2021.1001" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
