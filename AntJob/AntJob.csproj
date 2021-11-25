@@ -5,8 +5,8 @@
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2021</Copyright>
-    <Version>2.4.2021.1001</Version>
-    <FileVersion>2.4.2021.1001</FileVersion>
+    <Version>2.4.2021.1126</Version>
+    <FileVersion>2.4.2021.1126</FileVersion>
     <AssemblyVersion>2.4.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin</OutputPath>
@@ -44,6 +44,6 @@
     <Compile Remove="StarService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="8.11.2021.1001" />
+    <PackageReference Include="NewLife.Core" Version="8.11.2021.1124-beta1" />
   </ItemGroup>
 </Project>
