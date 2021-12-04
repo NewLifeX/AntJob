@@ -23,8 +23,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="4.1.2021.1125-beta1" />
-    <PackageReference Include="NewLife.Stardust" Version="1.5.2021.1109" />
+    <PackageReference Include="NewLife.Cube.Core" Version="4.2.2021.1204" />
+    <PackageReference Include="NewLife.Stardust" Version="1.5.2021.1204" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
