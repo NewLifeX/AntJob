@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyVersion>1.0.*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\..\Bin\HisWeb</OutputPath>
@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="4.3.2021.1225" />
+    <PackageReference Include="NewLife.Cube.Core" Version="5.0.2022.101" />
   </ItemGroup>
 
   <ItemGroup>

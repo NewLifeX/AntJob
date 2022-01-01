@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="10.3.2021.1225" />
+    <PackageReference Include="NewLife.XCode" Version="11.0.2022.101" />
   </ItemGroup>
 
   <ItemGroup>

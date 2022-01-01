@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <AssemblyTitle>蚂蚁数据</AssemblyTitle>
     <Description>蚂蚁调度系统数据库结构</Description>
     <Company>新生命开发团队</Company>
@@ -15,17 +15,6 @@
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
     <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <DefineConstants>$(DefineConstants);NETSTANDARD2_0;__CORE__</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='net45' or '$(TargetFramework)'=='net40'">
-    <DefineConstants>$(DefineConstants);__WIN__</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Config\**" />
@@ -48,10 +37,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="10.3.2021.1225" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    <PackageReference Include="NewLife.XCode" Version="11.0.2022.101" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Build.log">

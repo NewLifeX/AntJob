@@ -18,17 +18,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-    <DefineConstants>$(DefineConstants);NETSTANDARD2_0;__CORE__</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
-    <DefineConstants>$(DefineConstants);__WIN__</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
   <ItemGroup>
     <None Remove="appsettings.json" />
   </ItemGroup>
@@ -40,7 +29,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Stardust" Version="1.5.2021.1225" />
+    <PackageReference Include="NewLife.Stardust" Version="2.0.2022.101" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
