@@ -1,4 +1,16 @@
-﻿# 蚂蚁调度AntJob-分布式任务调度系统
+﻿# NewLife.AntJob - 蚂蚁调度
+
+![GitHub top language](https://img.shields.io/github/languages/top/newlifex/newlife.antjob?logo=github)
+![GitHub License](https://img.shields.io/github/license/newlifex/newlife.antjob?logo=github)
+![Nuget Downloads](https://img.shields.io/nuget/dt/newlife.antjob?logo=nuget)
+![Nuget](https://img.shields.io/nuget/v/newlife.antjob?logo=nuget)
+![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/newlife.antjob?label=dev%20nuget&logo=nuget)
+
+![Nuget Downloads](https://img.shields.io/nuget/dt/newlife.antjob.extensions?logo=nuget)
+![Nuget](https://img.shields.io/nuget/v/newlife.antjob.extensions?logo=nuget)
+![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/newlife.antjob.extensions?label=dev%20nuget&logo=nuget)
+
+# 蚂蚁调度AntJob-分布式任务调度系统
 
 分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累！面向中小企业大数据分析场景。  
 
