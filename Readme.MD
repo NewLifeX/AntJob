@@ -1,7 +1,7 @@
 ﻿# NewLife.AntJob - 蚂蚁调度
 
-![GitHub top language](https://img.shields.io/github/languages/top/newlifex/newlife.antjob?logo=github)
-![GitHub License](https://img.shields.io/github/license/newlifex/newlife.antjob?logo=github)
+![GitHub top language](https://img.shields.io/github/languages/top/newlifex/antjob?logo=github)
+![GitHub License](https://img.shields.io/github/license/newlifex/antjob?logo=github)
 ![Nuget Downloads](https://img.shields.io/nuget/dt/newlife.antjob?logo=nuget)
 ![Nuget](https://img.shields.io/nuget/v/newlife.antjob?logo=nuget)
 ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/newlife.antjob?label=dev%20nuget&logo=nuget)
