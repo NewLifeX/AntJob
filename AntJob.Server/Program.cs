@@ -20,14 +20,14 @@ namespace AntJob.Server
             XTrace.UseConsole();
 
             // 配置星尘。自动读取配置文件 config/star.config 中的服务器地址、应用标识、密钥
-            var star = new StarFactory(null, null, null);
-            if (star.Server.IsNullOrEmpty()) star = null;
+            //var star = new StarFactory(null, null, null);
+            //if (star.Server.IsNullOrEmpty()) star = null;
 
             var set = Setting.Current;
 
             var server = new ApiServer(set.Port)
             {
-                Tracer = star?.Tracer,
+                //Tracer = star?.Tracer,
                 ShowError = true,
                 Log = XTrace.Log,
             };
@@ -57,7 +57,7 @@ namespace AntJob.Server
             _clearItemTimer = new TimerX(ClearItems, null, 10_000, 3600_000) { Async = true };
 
             // 友好退出
-            //ObjectContainer.Current.BuildHost().Run();
+            //ObjectContainer.Current.BuildHost().Run();u
             Thread.Sleep(-1);
         }
 
