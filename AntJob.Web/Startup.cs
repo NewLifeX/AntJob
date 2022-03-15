@@ -14,11 +14,11 @@ namespace AntJob.Web
         public void ConfigureServices(IServiceCollection services)
         {
             #region 星尘配置内容
-            var star = new StarFactory(null, null, null);
+            //var star = new StarFactory(null, null, null);
 
-            services.AddSingleton(star);
-            services.AddSingleton(star.Tracer);
-            services.AddSingleton(star.Config);
+            //services.AddSingleton(star);
+            //services.AddSingleton(star.Tracer);
+            //services.AddSingleton(star.Config);
             #endregion
 
             services.AddControllersWithViews();
