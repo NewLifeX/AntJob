@@ -15,8 +15,4 @@
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="del &quot;$(TargetDir)*.xml&quot; /q&#xD;&#xA;del &quot;$(TargetDir)*.dll.config&quot; /q" />
-  </Target>
-
 </Project>
