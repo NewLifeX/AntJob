@@ -31,12 +31,6 @@
     <None Remove="Build.tt" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Build.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Build.log</LastGenOutput>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="NewLife.XCode" Version="11.0.2022.401" />
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NewLife.Cube;
+using XCode;
 
 namespace AntJob.Web
 {
@@ -12,13 +13,8 @@ namespace AntJob.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            #region 星尘配置内容
-            //var star = new StarFactory(null, null, null);
-
-            //services.AddSingleton(star);
-            //services.AddSingleton(star.Tracer);
-            //services.AddSingleton(star.Config);
-            #endregion
+            // 配置星尘。借助StarAgent，或者读取配置文件 config/star.config 中的服务器地址
+            var star = services.AddStardust(null);
 
             services.AddControllersWithViews();
             services.AddCube();
@@ -26,6 +22,12 @@ namespace AntJob.Web
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // 预热数据层，执行反向工程建表等操作
+            EntityFactory.InitConnection("Membership");
+            EntityFactory.InitConnection("Log");
+            EntityFactory.InitConnection("Cube");
+            EntityFactory.InitConnection("Ant");
+
             // 使用Cube前添加自己的管道
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
@@ -46,6 +48,9 @@ namespace AntJob.Web
                     "{controller=CubeHome}/{action=Index}/{id?}"
                     );
             });
+
+            // 启用星尘注册中心，向注册中心注册服务，服务消费者将自动更新服务端地址列表
+            app.RegisterService("Ant.Web", null, "dev");
         }
     }
 }

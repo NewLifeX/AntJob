@@ -260,7 +260,7 @@ namespace AntJob.Data.Entity
                     case "Speed": _Speed = value.ToInt(); break;
                     case "Cost": _Cost = value.ToInt(); break;
                     case "FullCost": _FullCost = value.ToInt(); break;
-                    case "Status": _Status = (JobStatus)value; break;
+                    case "Status": _Status = (JobStatus)value.ToInt(); break;
                     case "MsgCount": _MsgCount = value.ToInt(); break;
                     case "Server": _Server = Convert.ToString(value); break;
                     case "ProcessID": _ProcessID = value.ToInt(); break;

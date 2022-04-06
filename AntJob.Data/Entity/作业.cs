@@ -366,7 +366,7 @@ namespace AntJob.Data.Entity
                     case "Name": _Name = Convert.ToString(value); break;
                     case "ClassName": _ClassName = Convert.ToString(value); break;
                     case "DisplayName": _DisplayName = Convert.ToString(value); break;
-                    case "Mode": _Mode = (JobModes)value; break;
+                    case "Mode": _Mode = (JobModes)value.ToInt(); break;
                     case "Topic": _Topic = Convert.ToString(value); break;
                     case "MessageCount": _MessageCount = value.ToInt(); break;
                     case "Start": _Start = value.ToDateTime(); break;
