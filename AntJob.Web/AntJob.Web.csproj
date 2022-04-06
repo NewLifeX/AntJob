@@ -18,7 +18,7 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="5.0.2022.304" />
+    <PackageReference Include="NewLife.Cube.Core" Version="5.0.2022.401" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />

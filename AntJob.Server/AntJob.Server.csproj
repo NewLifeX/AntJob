@@ -29,7 +29,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Stardust" Version="2.0.2022.309" />
+    <PackageReference Include="NewLife.Stardust" Version="2.0.2022.404" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />

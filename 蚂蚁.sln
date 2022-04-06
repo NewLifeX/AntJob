@@ -1,11 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28729.10
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Others", "Others", "{0EA980BB-BB15-41A3-B75B-537BC42E985B}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflows\publish-beta.yml = .github\workflows\publish-beta.yml
+		.github\workflows\publish.yml = .github\workflows\publish.yml
 		Readme.MD = Readme.MD
+		.github\workflows\test.yml = .github\workflows\test.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", "{3B87711E-FF90-470B-A429-CFDF3B9B1F5F}"
@@ -37,7 +40,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HisWeb", "Samples\HisWeb\Hi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTest", "UnitTest", "{26660D0A-8724-4434-88D1-5EE861A68309}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntTest", "AntTest\AntTest.csproj", "{A13E58D2-A185-4945-98B7-B6B0951A19D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntTest", "AntTest\AntTest.csproj", "{A13E58D2-A185-4945-98B7-B6B0951A19D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
