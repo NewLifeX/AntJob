@@ -18,7 +18,7 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.0.2022.404" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.1.2022.501" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
