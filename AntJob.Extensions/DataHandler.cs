@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using AntJob.Data;
 using NewLife;
 using XCode;
@@ -7,9 +6,44 @@ using XCode.Configuration;
 
 namespace AntJob
 {
-    /// <summary>从数据库抽取数据</summary>
+    /// <summary>数据处理作业（泛型）</summary>
     /// <remarks>
     /// 定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑。
+    /// 任务切片条件：StartTime + Step + Offset &lt;= Now
+    /// </remarks>
+    /// <typeparam name="TEntity"></typeparam>
+    public abstract class DataHandler<TEntity> : DataHandler where TEntity : Entity<TEntity>, new()
+    {
+        /// <summary>实例化数据处理作业</summary>
+        public DataHandler() => Factory = Entity<TEntity>.Meta.Factory;
+
+        #region 数据处理
+        /// <summary>处理一批数据</summary>
+        /// <param name="ctx">上下文</param>
+        /// <returns></returns>
+        protected override Int32 Execute(JobContext ctx)
+        {
+            var count = 0;
+            foreach (var item in ctx.Data as IEnumerable)
+            {
+                if (ProcessItem(ctx, item as TEntity)) count++;
+            }
+
+            return count;
+        }
+
+        /// <summary>处理一个数据对象</summary>
+        /// <param name="ctx">上下文</param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        protected virtual Boolean ProcessItem(JobContext ctx, TEntity entity) => true;
+        #endregion
+    }
+
+    /// <summary>数据处理作业</summary>
+    /// <remarks>
+    /// 定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑。
+    /// 任务切片条件：StartTime + Step + Offset &lt;= Now
     /// </remarks>
     public abstract class DataHandler : Handler
     {
@@ -150,9 +184,6 @@ namespace AntJob
             var count = 0;
             foreach (var item in ctx.Data as IEnumerable)
             {
-                //ctx.Key = item + "";
-                //ctx.Entity = item;
-
                 if (ProcessItem(ctx, item as IEntity)) count++;
             }
 
