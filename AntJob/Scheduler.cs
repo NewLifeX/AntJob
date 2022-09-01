@@ -170,7 +170,7 @@ namespace AntJob
                         handler.Prepare(ts[i]);
 
                         // 使用线程池调度，避免Task排队影响使用
-                        ThreadPoolX.QueueUserWorkItem(handler.Process, ts[i]);
+                        ThreadPool.QueueUserWorkItem(s => handler.Process(s as ITask), ts[i]);
                     }
 
                     if (ts != null && ts.Length > 0) flag = true;
