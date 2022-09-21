@@ -1,17 +1,23 @@
 ﻿using System.Diagnostics;
 using System.Net;
 using AntJob.Data.Entity;
+using Microsoft.Win32;
 using NewLife;
 using NewLife.Caching;
 using NewLife.Log;
 using NewLife.Remoting;
 using NewLife.Threading;
+using Stardust.Registry;
 
 namespace AntJob.Server;
 
 public class Worker : IHostedService
 {
-    public Task StartAsync(CancellationToken cancellationToken)
+    private readonly IRegistry _registry;
+
+    public Worker(IRegistry registry) => _registry = registry;
+
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         var set = Setting.Current;
 
@@ -46,7 +52,8 @@ public class Worker : IHostedService
         _clearOnlineTimer = new TimerX(ClearOnline, null, 1000, 10 * 1000);
         _clearItemTimer = new TimerX(ClearItems, null, 10_000, 3600_000) { Async = true };
 
-        return Task.CompletedTask;
+        // 启用星尘注册中心，向注册中心注册服务，服务消费者将自动更新服务端地址列表
+        await _registry.RegisterAsync("Ant.Server", $"tcp://*:{server.Port}");
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -57,7 +64,7 @@ public class Worker : IHostedService
         return Task.CompletedTask;
     }
 
-    static void InitData()
+    private static void InitData()
     {
         var n = App.Meta.Count;
 
