@@ -19,7 +19,11 @@
     <DefineConstants>TRACE</DefineConstants>
     <LangVersion>latest</LangVersion>
     <IsPackable>true</IsPackable>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="favicon.ico" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NewLife.Cube.Core" Version="5.5.2022.920-beta1504" />
     <PackageReference Include="NewLife.Stardust.Extensions" Version="2.3.2022.917-beta1649" />
