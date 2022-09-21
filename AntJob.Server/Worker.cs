@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
 using AntJob.Data.Entity;
-using Microsoft.Win32;
 using NewLife;
 using NewLife.Caching;
 using NewLife.Log;
@@ -15,7 +14,7 @@ public class Worker : IHostedService
 {
     private readonly IRegistry _registry;
 
-    public Worker(IRegistry registry) => _registry = registry;
+    public Worker(IServiceProvider provider) => _registry = provider.GetService<IRegistry>();
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -53,7 +52,7 @@ public class Worker : IHostedService
         _clearItemTimer = new TimerX(ClearItems, null, 10_000, 3600_000) { Async = true };
 
         // 启用星尘注册中心，向注册中心注册服务，服务消费者将自动更新服务端地址列表
-        await _registry.RegisterAsync("Ant.Server", $"tcp://*:{server.Port}");
+        await _registry?.RegisterAsync("Ant.Server", $"tcp://*:{server.Port}");
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
