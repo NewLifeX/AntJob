@@ -19,7 +19,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NewLife.Redis" Version="5.0.2022.901" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.3.2022.901" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.3.2022.917-beta1649" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
