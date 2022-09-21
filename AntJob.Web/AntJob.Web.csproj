@@ -18,6 +18,7 @@
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
     <LangVersion>latest</LangVersion>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NewLife.Cube.Core" Version="5.5.2022.920-beta1504" />
