@@ -74,7 +74,7 @@ public class Scheduler : DisposeBase
             var registry = ServiceProvider?.GetService<IRegistry>();
             if (registry != null)
             {
-                var svrs = registry.ResolveAddressAsync("Ant.Server").Result;
+                var svrs = registry.ResolveAddressAsync("AntServer").Result;
 
                 if (svrs != null && svrs.Length > 0) network.Server = svrs.Join();
             }

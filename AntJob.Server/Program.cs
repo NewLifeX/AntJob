@@ -1,5 +1,6 @@
 ﻿using AntJob.Server;
 using NewLife.Log;
+using XCode;
 
 
 // 启用控制台日志，拦截所有异常
@@ -13,6 +14,9 @@ var host = Host.CreateDefaultBuilder(args)
 
         // 注册后台服务
         services.AddHostedService<Worker>();
+
+        // 预热数据层，执行反向工程建表等操作
+        EntityFactory.InitConnection("Ant");
     })
     .Build();
 
