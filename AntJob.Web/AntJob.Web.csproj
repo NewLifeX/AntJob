@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <AssemblyName>AntWeb</AssemblyName>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <AssemblyTitle>蚂蚁调度控制台</AssemblyTitle>
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累</Description>
     <Company>新生命开发团队</Company>
@@ -25,8 +25,8 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="5.5.2022.1010-beta0936" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.3.2022.1007-beta1303" />
+    <PackageReference Include="NewLife.Cube.Core" Version="5.5.2022.1101" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.4.2022.1101" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
