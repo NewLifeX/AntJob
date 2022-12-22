@@ -25,6 +25,18 @@ namespace AntJob.Data.Entity
             Meta.Modules.Add<TimeModule>();
             Meta.Modules.Add<IPModule>();
         }
+
+        /// <summary>
+        /// 验证数据
+        /// </summary>
+        /// <param name="isNew"></param>
+        public override void Valid(Boolean isNew)
+        {
+            var len = _.Remark.Length;
+            if (len > 0 && !Remark.IsNullOrEmpty() && Remark.Length > len) Remark = Remark[..len];
+
+            base.Valid(isNew);
+        }
         #endregion
 
         #region 扩展属性
