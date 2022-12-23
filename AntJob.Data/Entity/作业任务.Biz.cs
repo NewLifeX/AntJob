@@ -56,8 +56,9 @@ namespace AntJob.Data.Entity
         {
             if (id <= 0) return null;
 
-            // 单对象缓存
-            return Meta.SingleCache[id];
+            //// 单对象缓存
+            //return Meta.SingleCache[id];
+            return Find(_.ID == id);
         }
 
         /// <summary>
