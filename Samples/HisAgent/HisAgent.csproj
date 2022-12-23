@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.5.2022.1201" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.5.2022.1220-beta0113" />
   </ItemGroup>
 
   <ItemGroup>
