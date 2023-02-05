@@ -5,7 +5,7 @@
     <AssemblyTitle>蚂蚁数据调度SDK</AssemblyTitle>
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累。</Description>
     <Company>新生命开发团队</Company>
-    <Copyright>©2002-2022 NewLife</Copyright>
+    <Copyright>©2002-2023 NewLife</Copyright>
     <VersionPrefix>3.2</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
@@ -43,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="11.5.2022.1223-beta0407" />
+    <PackageReference Include="NewLife.XCode" Version="11.5.2023.203" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob\AntJob.csproj" />

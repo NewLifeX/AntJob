@@ -25,8 +25,8 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="5.5.2022.1217-beta0141" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.5.2022.1220-beta0113" />
+    <PackageReference Include="NewLife.Cube.Core" Version="5.5.2023.205" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.6.2023.203" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />

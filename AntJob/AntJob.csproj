@@ -5,7 +5,7 @@
     <AssemblyTitle>蚂蚁调度SDK</AssemblyTitle>
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累。</Description>
     <Company>新生命开发团队</Company>
-    <Copyright>©2002-2022 NewLife</Copyright>
+    <Copyright>©2002-2023 NewLife</Copyright>
     <VersionPrefix>3.2</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
@@ -45,9 +45,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="10.1.2022.1220-beta0114" />
-    <PackageReference Include="NewLife.Remoting" Version="2.0.2022.1223-beta0408" />
-    <PackageReference Include="NewLife.Stardust" Version="2.5.2022.1220-beta0113" />
+    <PackageReference Include="NewLife.Core" Version="10.1.2023.203" />
+    <PackageReference Include="NewLife.Remoting" Version="2.0.2023.203" />
+    <PackageReference Include="NewLife.Stardust" Version="2.6.2023.203" />
   </ItemGroup>
   
   <ItemGroup>
