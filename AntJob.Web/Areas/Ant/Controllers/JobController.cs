@@ -28,7 +28,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
             list.RemoveField("UpdateUserID");
             list.RemoveField("UpdateIP");
 
-            MenuOrder = 80;
+            //MenuOrder = 80;
         }
 
         public JobController() => PageSetting.EnableAdd = false;

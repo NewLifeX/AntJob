@@ -6,6 +6,6 @@ namespace HisWeb.Areas.His.Controllers
     [HisArea]
     public class ZYYFQLDController : EntityController<ZYYFQLD>
     {
-        static ZYYFQLDController() => MenuOrder = 70;
+        //static ZYYFQLDController() => MenuOrder = 70;
     }
 }

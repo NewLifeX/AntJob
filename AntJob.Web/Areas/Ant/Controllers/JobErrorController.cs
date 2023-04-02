@@ -13,7 +13,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
     [DisplayName("作业错误")]
     public class JobErrorController : EntityController<JobError>
     {
-        static JobErrorController() => MenuOrder = 60;
+        //static JobErrorController() => MenuOrder = 60;
 
         /// <summary>搜索数据集</summary>
         /// <param name="p"></param>

@@ -18,7 +18,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
     {
         static JobTaskController()
         {
-            MenuOrder = 70;
+            //MenuOrder = 70;
 
             JobTask.Meta.Modules.Add<TimeModule>();
         }

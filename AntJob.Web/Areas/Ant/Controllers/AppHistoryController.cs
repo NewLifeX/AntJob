@@ -14,7 +14,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
     {
         static AppHistoryController()
         {
-            MenuOrder = 85;
+            //MenuOrder = 85;
 
             AppOnline.Meta.Table.DataTable.InsertOnly = true;
         }

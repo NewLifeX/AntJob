@@ -6,6 +6,6 @@ namespace HisWeb.Areas.His.Controllers
     [HisArea]
     public class ZDSFController : EntityController<ZDSF>
     {
-        static ZDSFController() => MenuOrder = 60;
+        //static ZDSFController() => MenuOrder = 60;
     }
 }

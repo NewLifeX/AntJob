@@ -13,7 +13,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
     [DisplayName("应用消息")]
     public class AppMessageController : EntityController<AppMessage>
     {
-        static AppMessageController() => MenuOrder = 49;
+        //static AppMessageController() => MenuOrder = 49;
 
         /// <summary>搜索数据集</summary>
         /// <param name="p"></param>

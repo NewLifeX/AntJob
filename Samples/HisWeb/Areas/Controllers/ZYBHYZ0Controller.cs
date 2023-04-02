@@ -6,6 +6,6 @@ namespace HisWeb.Areas.His.Controllers
     [HisArea]
     public class ZYBHYZ0Controller : EntityController<ZYBHYZ0>
     {
-        static ZYBHYZ0Controller() => MenuOrder = 90;
+        //static ZYBHYZ0Controller() => MenuOrder = 90;
     }
 }

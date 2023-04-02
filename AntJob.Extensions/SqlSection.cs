@@ -159,7 +159,7 @@ namespace AntJob.Extensions
                 if (dc.ColumnName.EqualIgnoreCase(dt.Columns)) columns.Add(dc);
             }
 
-            return dal.Session.Insert(table, columns.ToArray(), dt.Cast<IExtend>());
+            return dal.Session.Insert(table, columns.ToArray(), dt.Cast<IModel>());
         }
         #endregion
     }

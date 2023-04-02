@@ -15,7 +15,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
     {
         static AppOnlineController()
         {
-            MenuOrder = 90;
+            //MenuOrder = 90;
 
             AppOnline.Meta.Table.DataTable.InsertOnly = true;
         }

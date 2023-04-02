@@ -19,7 +19,7 @@ namespace AntJob.Web.Areas.Ant.Controllers
     {
         static AppController()
         {
-            MenuOrder = 100;
+            //MenuOrder = 100;
 
             App.Meta.Modules.Add<UserModule>();
             App.Meta.Modules.Add<TimeModule>();
