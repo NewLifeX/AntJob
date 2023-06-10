@@ -22,8 +22,8 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Redis" Version="5.3.2023.401" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.6.2023.301" />
+    <PackageReference Include="NewLife.Redis" Version="5.4.2023.606-beta1138" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.9.2023.609-beta1408" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
