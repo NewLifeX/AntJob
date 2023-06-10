@@ -4,6 +4,7 @@ using AntJob.Data.Entity;
 using NewLife;
 using NewLife.Caching;
 using NewLife.Log;
+using NewLife.Model;
 using NewLife.Remoting;
 using NewLife.Threading;
 using Stardust.Registry;
@@ -14,37 +15,44 @@ namespace AntJob.Server;
 public class Worker : IHostedService
 {
     private readonly IRegistry _registry;
+    private readonly ICacheProvider _cacheProvider;
+    private readonly IServiceProvider _provider;
+    private readonly ITracer _tracer;
 
-    public Worker(IServiceProvider provider) => _registry = provider.GetService<IRegistry>();
+    public Worker(ICacheProvider cacheProvider, IServiceProvider provider, ITracer tracer)
+    {
+        _cacheProvider = cacheProvider;
+        _provider = provider;
+        _tracer = tracer;
+        _registry = provider.GetService<IRegistry>();
+    }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         var set = Setting.Current;
 
+        // 实例化RPC服务端，指定端口，指定ServiceProvider，用于依赖注入获取接口服务层
         var server = new ApiServer(set.Port)
         {
-            //Tracer = star?.Tracer,
+            ServiceProvider = _provider,
             ShowError = true,
+
+            Tracer = _tracer,
             Log = XTrace.Log,
         };
 
         server.Register<AntService>();
 
-        AntService.Log = XTrace.Log;
-
         // 本地结点
         AntService.Local = new IPEndPoint(NetHelper.MyIP(), set.Port);
 
         // 数据缓存，也用于全局锁，支持MemoryCache和Redis
-        if (!set.RedisCache.IsNullOrEmpty())
+        if (_cacheProvider.Cache is not FullRedis && !set.RedisCache.IsNullOrEmpty())
         {
             var redis = new Redis { Timeout = 5_000 + 1_000 };
             redis.Init(set.RedisCache);
-            AntService.Cache = redis;
-        }
-        else
-        {
-            AntService.Cache = new MemoryCache();
+
+            _cacheProvider.Cache = redis;
         }
 
         server.Start();

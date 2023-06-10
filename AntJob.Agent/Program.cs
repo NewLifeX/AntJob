@@ -37,4 +37,5 @@ scheduler.AddHandler<SqlMessage>();
 scheduler.Start();
 
 // 友好退出
-services.BuildHost().Run();
+var host = services.BuildHost();
+await host.RunAsync();
