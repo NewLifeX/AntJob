@@ -7,6 +7,7 @@ using NewLife.Log;
 using NewLife.Remoting;
 using NewLife.Threading;
 using Stardust.Registry;
+using XCode;
 
 namespace AntJob.Server;
 
@@ -75,7 +76,7 @@ public class Worker : IHostedService
             set.Save();
         }
 
-        var set2 = XCode.Setting.Current;
+        var set2 = XCodeSetting.Current;
         if (set2.IsNew)
         {
             set2.Debug = true;

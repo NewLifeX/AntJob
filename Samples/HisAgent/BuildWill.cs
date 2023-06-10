@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using AntJob;
+using AntJob.Extensions;
 using HisData;
 using NewLife.Security;
 using XCode;

@@ -63,20 +63,27 @@ public class Scheduler : DisposeBase
         var hs = Handlers;
         if (hs.Count == 0) throw new ArgumentNullException(nameof(Handlers), "没有可用处理器");
 
+        // 埋点
+        using var span = Tracer?.NewSpan("job:SchedulerStart");
+
         // 启动作业提供者
         var prv = Provider;
         prv ??= Provider = new FileJobProvider();
         prv.Schedule ??= this;
 
-        // 从注册中心获取包
-        if (prv is NetworkJobProvider network && network.Server.IsNullOrEmpty())
+        if (prv is NetworkJobProvider network)
         {
-            var registry = ServiceProvider?.GetService<IRegistry>();
-            if (registry != null)
-            {
-                var svrs = registry.ResolveAddressAsync("AntServer").Result;
+            network.Tracer ??= Tracer;
 
-                if (svrs != null && svrs.Length > 0) network.Server = svrs.Join();
+            if (network.Server.IsNullOrEmpty())
+            {
+                // 从注册中心获取包
+                var registry = ServiceProvider?.GetService<IRegistry>();
+                if (registry != null)
+                {
+                    var svrs = registry.ResolveAddressAsync("AntServer").Result;
+                    if (svrs != null && svrs.Length > 0) network.Server = svrs.Join();
+                }
             }
         }
 
@@ -112,6 +119,8 @@ public class Scheduler : DisposeBase
     /// <summary>停止</summary>
     public void Stop()
     {
+        using var span = Tracer?.NewSpan("job:SchedulerStop");
+
         _timer.TryDispose();
         _timer = null;
 
@@ -119,7 +128,7 @@ public class Scheduler : DisposeBase
 
         foreach (var handler in Handlers)
         {
-            handler.Stop();
+            handler.Stop("SchedulerStop");
         }
     }
 
@@ -147,7 +156,7 @@ public class Scheduler : DisposeBase
             // 找不到或者已停用
             if (job == null || !job.Enable)
             {
-                if (handler.Active) handler.Stop();
+                if (handler.Active) handler.Stop("ConfigChanged");
                 continue;
             }
 
@@ -201,12 +210,13 @@ public class Scheduler : DisposeBase
             var handler = handlers.FirstOrDefault(e => e.Name == job.Name);
             if (handler == null && job.Enable && !job.ClassName.IsNullOrEmpty())
             {
+                using var span = Tracer?.NewSpan($"job:NewHandler", job);
+
                 XTrace.WriteLine("发现未知作业[{0}]@[{1}]", job.Name, job.ClassName);
                 try
                 {
                     // 实例化一个处理器
-                    var type = Type.GetType(job.ClassName);
-                    if (type == null) type = handlers.Where(e => e.GetType().FullName == job.ClassName)?.FirstOrDefault()?.GetType();
+                    var type = Type.GetType(job.ClassName) ?? (handlers.Where(e => e.GetType().FullName == job.ClassName)?.FirstOrDefault()?.GetType());
                     if (type != null)
                     {
                         handler = type.CreateInstance() as Handler;
@@ -221,6 +231,7 @@ public class Scheduler : DisposeBase
                             if (handler is MessageHandler messageHandler && !job.Topic.IsNullOrEmpty()) messageHandler.Topic = job.Topic;
 
                             handler.Log = XTrace.Log;
+                            handler.Tracer = Tracer;
                             handler.Start();
 
                             handlers.Add(handler);
@@ -229,6 +240,7 @@ public class Scheduler : DisposeBase
                 }
                 catch (Exception ex)
                 {
+                    span?.SetError(ex, null);
                     XTrace.WriteException(ex);
                 }
             }
