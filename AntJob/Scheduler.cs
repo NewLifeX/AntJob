@@ -75,7 +75,8 @@ public class Scheduler : DisposeBase
         {
             network.Tracer ??= Tracer;
 
-            if (network.Server.IsNullOrEmpty())
+            // 从注册中心获取服务端地址，优先于本地配置文件
+            if (network.Server.IsNullOrEmpty() || network.Server.EqualIgnoreCase(AntSetting.Current.Server))
             {
                 // 从注册中心获取包
                 var registry = ServiceProvider?.GetService<IRegistry>();
