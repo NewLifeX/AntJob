@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <AssemblyName>AntAgent</AssemblyName>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyTitle>蚂蚁代理</AssemblyTitle>
     <Description>调度中心下发C#或Sql给蚂蚁代理执行</Description>
     <Company>新生命开发团队</Company>
