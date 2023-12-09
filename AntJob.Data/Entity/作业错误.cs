@@ -13,13 +13,13 @@ using XCode.DataAccessLayer;
 
 namespace AntJob.Data.Entity;
 
-/// <summary>作业错误</summary>
+/// <summary>作业错误。计算作业在执行过程中所发生的错误</summary>
 [Serializable]
 [DataObject]
-[Description("作业错误")]
+[Description("作业错误。计算作业在执行过程中所发生的错误")]
 [BindIndex("IX_JobError_AppID_ID", false, "AppID,ID")]
 [BindIndex("IX_JobError_JobID_ID", false, "JobID,ID")]
-[BindTable("JobError", Description = "作业错误", ConnName = "Ant", DbType = DatabaseType.None)]
+[BindTable("JobError", Description = "作业错误。计算作业在执行过程中所发生的错误", ConnName = "Ant", DbType = DatabaseType.None)]
 public partial class JobError
 {
     #region 属性
@@ -111,16 +111,45 @@ public partial class JobError
     [BindColumn("Message", "内容", "")]
     public String Message { get => _Message; set { if (OnPropertyChanging("Message", value)) { _Message = value; OnPropertyChanged("Message"); } } }
 
+    private String _TraceId;
+    /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+    [Category("扩展")]
+    [DisplayName("追踪")]
+    [Description("追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链")]
+    [DataObjectField(false, false, true, 200)]
+    [BindColumn("TraceId", "追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链", "")]
+    public String TraceId { get => _TraceId; set { if (OnPropertyChanging("TraceId", value)) { _TraceId = value; OnPropertyChanged("TraceId"); } } }
+
+    private String _CreateIP;
+    /// <summary>创建地址</summary>
+    [Category("扩展")]
+    [DisplayName("创建地址")]
+    [Description("创建地址")]
+    [DataObjectField(false, false, true, 50)]
+    [BindColumn("CreateIP", "创建地址", "")]
+    public String CreateIP { get => _CreateIP; set { if (OnPropertyChanging("CreateIP", value)) { _CreateIP = value; OnPropertyChanged("CreateIP"); } } }
+
     private DateTime _CreateTime;
     /// <summary>创建时间</summary>
+    [Category("扩展")]
     [DisplayName("创建时间")]
     [Description("创建时间")]
     [DataObjectField(false, false, true, 0)]
     [BindColumn("CreateTime", "创建时间", "")]
     public DateTime CreateTime { get => _CreateTime; set { if (OnPropertyChanging("CreateTime", value)) { _CreateTime = value; OnPropertyChanged("CreateTime"); } } }
 
+    private String _UpdateIP;
+    /// <summary>更新地址</summary>
+    [Category("扩展")]
+    [DisplayName("更新地址")]
+    [Description("更新地址")]
+    [DataObjectField(false, false, true, 50)]
+    [BindColumn("UpdateIP", "更新地址", "")]
+    public String UpdateIP { get => _UpdateIP; set { if (OnPropertyChanging("UpdateIP", value)) { _UpdateIP = value; OnPropertyChanged("UpdateIP"); } } }
+
     private DateTime _UpdateTime;
     /// <summary>更新时间</summary>
+    [Category("扩展")]
     [DisplayName("更新时间")]
     [Description("更新时间")]
     [DataObjectField(false, false, true, 0)]
@@ -147,7 +176,10 @@ public partial class JobError
             "Server" => _Server,
             "ProcessID" => _ProcessID,
             "Message" => _Message,
+            "TraceId" => _TraceId,
+            "CreateIP" => _CreateIP,
             "CreateTime" => _CreateTime,
+            "UpdateIP" => _UpdateIP,
             "UpdateTime" => _UpdateTime,
             _ => base[name]
         };
@@ -166,7 +198,10 @@ public partial class JobError
                 case "Server": _Server = Convert.ToString(value); break;
                 case "ProcessID": _ProcessID = value.ToInt(); break;
                 case "Message": _Message = Convert.ToString(value); break;
+                case "TraceId": _TraceId = Convert.ToString(value); break;
+                case "CreateIP": _CreateIP = Convert.ToString(value); break;
                 case "CreateTime": _CreateTime = value.ToDateTime(); break;
+                case "UpdateIP": _UpdateIP = Convert.ToString(value); break;
                 case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
                 default: base[name] = value; break;
             }
@@ -175,6 +210,30 @@ public partial class JobError
     #endregion
 
     #region 关联映射
+    /// <summary>应用</summary>
+    [XmlIgnore, IgnoreDataMember, ScriptIgnore]
+    public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
+
+    /// <summary>应用</summary>
+    [Map(nameof(AppID), typeof(App), "ID")]
+    public String AppName => App?.ToString();
+
+    /// <summary>作业</summary>
+    [XmlIgnore, IgnoreDataMember, ScriptIgnore]
+    public Job Job => Extends.Get(nameof(Job), k => Job.FindByID(JobID));
+
+    /// <summary>作业</summary>
+    [Map(nameof(JobID), typeof(Job), "ID")]
+    public String JobName => Job?.ToString();
+
+    /// <summary>作业项</summary>
+    [XmlIgnore, IgnoreDataMember, ScriptIgnore]
+    public JobTask Task => Extends.Get(nameof(Task), k => JobTask.FindByID(TaskID));
+
+    /// <summary>作业项</summary>
+    [Map(nameof(TaskID), typeof(JobTask), "ID")]
+    public String TaskStart => Task?.ToString();
+
     #endregion
 
     #region 字段名
@@ -214,8 +273,17 @@ public partial class JobError
         /// <summary>内容</summary>
         public static readonly Field Message = FindByName("Message");
 
+        /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+        public static readonly Field TraceId = FindByName("TraceId");
+
+        /// <summary>创建地址</summary>
+        public static readonly Field CreateIP = FindByName("CreateIP");
+
         /// <summary>创建时间</summary>
         public static readonly Field CreateTime = FindByName("CreateTime");
+
+        /// <summary>更新地址</summary>
+        public static readonly Field UpdateIP = FindByName("UpdateIP");
 
         /// <summary>更新时间</summary>
         public static readonly Field UpdateTime = FindByName("UpdateTime");
@@ -259,8 +327,17 @@ public partial class JobError
         /// <summary>内容</summary>
         public const String Message = "Message";
 
+        /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+        public const String TraceId = "TraceId";
+
+        /// <summary>创建地址</summary>
+        public const String CreateIP = "CreateIP";
+
         /// <summary>创建时间</summary>
         public const String CreateTime = "CreateTime";
+
+        /// <summary>更新地址</summary>
+        public const String UpdateIP = "UpdateIP";
 
         /// <summary>更新时间</summary>
         public const String UpdateTime = "UpdateTime";

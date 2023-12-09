@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
-using System.Xml.Serialization;
 using NewLife;
 using NewLife.Caching;
 using NewLife.Data;
@@ -95,17 +93,17 @@ public partial class Job : EntityBase<Job>
     #endregion
 
     #region 扩展属性
-    /// <summary>应用</summary>
-    [XmlIgnore]
-    //[ScriptIgnore]
-    public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
+    ///// <summary>应用</summary>
+    //[XmlIgnore]
+    ////[ScriptIgnore]
+    //public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
 
-    /// <summary>应用</summary>
-    [XmlIgnore]
-    //[ScriptIgnore]
-    [DisplayName("应用")]
-    [Map(__.AppID)]
-    public String AppName => App?.Name;
+    ///// <summary>应用</summary>
+    //[XmlIgnore]
+    ////[ScriptIgnore]
+    //[DisplayName("应用")]
+    //[Map(__.AppID)]
+    //public String AppName => App?.Name;
     #endregion
 
     #region 扩展查询

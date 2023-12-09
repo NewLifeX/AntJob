@@ -13,14 +13,14 @@ using XCode.DataAccessLayer;
 
 namespace AntJob.Data.Entity;
 
-/// <summary>应用在线。各应用多实例在线</summary>
+/// <summary>应用在线。各个数据计算应用多实例在线</summary>
 [Serializable]
 [DataObject]
-[Description("应用在线。各应用多实例在线")]
+[Description("应用在线。各个数据计算应用多实例在线")]
 [BindIndex("IU_AppOnline_Instance", true, "Instance")]
 [BindIndex("IX_AppOnline_Client", false, "Client")]
 [BindIndex("IX_AppOnline_AppID", false, "AppID")]
-[BindTable("AppOnline", Description = "应用在线。各应用多实例在线", ConnName = "Ant", DbType = DatabaseType.None)]
+[BindTable("AppOnline", Description = "应用在线。各个数据计算应用多实例在线", ConnName = "Ant", DbType = DatabaseType.None)]
 public partial class AppOnline
 {
     #region 属性
@@ -152,8 +152,18 @@ public partial class AppOnline
     [BindColumn("LastKey", "最后键", "")]
     public String LastKey { get => _LastKey; set { if (OnPropertyChanging("LastKey", value)) { _LastKey = value; OnPropertyChanged("LastKey"); } } }
 
+    private String _TraceId;
+    /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+    [Category("扩展")]
+    [DisplayName("追踪")]
+    [Description("追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链")]
+    [DataObjectField(false, false, true, 200)]
+    [BindColumn("TraceId", "追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链", "")]
+    public String TraceId { get => _TraceId; set { if (OnPropertyChanging("TraceId", value)) { _TraceId = value; OnPropertyChanged("TraceId"); } } }
+
     private DateTime _CreateTime;
     /// <summary>创建时间</summary>
+    [Category("扩展")]
     [DisplayName("创建时间")]
     [Description("创建时间")]
     [DataObjectField(false, false, true, 0)]
@@ -162,6 +172,7 @@ public partial class AppOnline
 
     private String _CreateIP;
     /// <summary>创建地址</summary>
+    [Category("扩展")]
     [DisplayName("创建地址")]
     [Description("创建地址")]
     [DataObjectField(false, false, true, 50)]
@@ -170,6 +181,7 @@ public partial class AppOnline
 
     private DateTime _UpdateTime;
     /// <summary>更新时间</summary>
+    [Category("扩展")]
     [DisplayName("更新时间")]
     [Description("更新时间")]
     [DataObjectField(false, false, true, 0)]
@@ -178,6 +190,7 @@ public partial class AppOnline
 
     private String _UpdateIP;
     /// <summary>更新地址</summary>
+    [Category("扩展")]
     [DisplayName("更新地址")]
     [Description("更新地址")]
     [DataObjectField(false, false, true, 50)]
@@ -209,6 +222,7 @@ public partial class AppOnline
             "Cost" => _Cost,
             "Speed" => _Speed,
             "LastKey" => _LastKey,
+            "TraceId" => _TraceId,
             "CreateTime" => _CreateTime,
             "CreateIP" => _CreateIP,
             "UpdateTime" => _UpdateTime,
@@ -235,6 +249,7 @@ public partial class AppOnline
                 case "Cost": _Cost = value.ToLong(); break;
                 case "Speed": _Speed = value.ToLong(); break;
                 case "LastKey": _LastKey = Convert.ToString(value); break;
+                case "TraceId": _TraceId = Convert.ToString(value); break;
                 case "CreateTime": _CreateTime = value.ToDateTime(); break;
                 case "CreateIP": _CreateIP = Convert.ToString(value); break;
                 case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
@@ -246,6 +261,14 @@ public partial class AppOnline
     #endregion
 
     #region 关联映射
+    /// <summary>应用</summary>
+    [XmlIgnore, IgnoreDataMember, ScriptIgnore]
+    public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
+
+    /// <summary>应用</summary>
+    [Map(nameof(AppID), typeof(App), "ID")]
+    public String AppName => App?.ToString();
+
     #endregion
 
     #region 字段名
@@ -299,6 +322,9 @@ public partial class AppOnline
 
         /// <summary>最后键</summary>
         public static readonly Field LastKey = FindByName("LastKey");
+
+        /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+        public static readonly Field TraceId = FindByName("TraceId");
 
         /// <summary>创建时间</summary>
         public static readonly Field CreateTime = FindByName("CreateTime");
@@ -365,6 +391,9 @@ public partial class AppOnline
 
         /// <summary>最后键</summary>
         public const String LastKey = "LastKey";
+
+        /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+        public const String TraceId = "TraceId";
 
         /// <summary>创建时间</summary>
         public const String CreateTime = "CreateTime";

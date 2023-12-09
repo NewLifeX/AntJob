@@ -13,12 +13,12 @@ using XCode.DataAccessLayer;
 
 namespace AntJob.Data.Entity;
 
-/// <summary>应用系统。数据作业隶属于某个应用</summary>
+/// <summary>应用系统。管理数据计算作业的应用模块，计算作业隶属于某个应用</summary>
 [Serializable]
 [DataObject]
-[Description("应用系统。数据作业隶属于某个应用")]
+[Description("应用系统。管理数据计算作业的应用模块，计算作业隶属于某个应用")]
 [BindIndex("IU_App_Name", true, "Name")]
-[BindTable("App", Description = "应用系统。数据作业隶属于某个应用", ConnName = "Ant", DbType = DatabaseType.None)]
+[BindTable("App", Description = "应用系统。管理数据计算作业的应用模块，计算作业隶属于某个应用", ConnName = "Ant", DbType = DatabaseType.None)]
 public partial class App
 {
     #region 属性
@@ -102,16 +102,9 @@ public partial class App
     [BindColumn("MessageCount", "消息数", "")]
     public Int32 MessageCount { get => _MessageCount; set { if (OnPropertyChanging("MessageCount", value)) { _MessageCount = value; OnPropertyChanged("MessageCount"); } } }
 
-    private String _Remark;
-    /// <summary>内容</summary>
-    [DisplayName("内容")]
-    [Description("内容")]
-    [DataObjectField(false, false, true, 500)]
-    [BindColumn("Remark", "内容", "")]
-    public String Remark { get => _Remark; set { if (OnPropertyChanging("Remark", value)) { _Remark = value; OnPropertyChanged("Remark"); } } }
-
     private Int32 _CreateUserID;
     /// <summary>创建人</summary>
+    [Category("扩展")]
     [DisplayName("创建人")]
     [Description("创建人")]
     [DataObjectField(false, false, false, 0)]
@@ -120,6 +113,7 @@ public partial class App
 
     private String _CreateUser;
     /// <summary>创建者</summary>
+    [Category("扩展")]
     [DisplayName("创建者")]
     [Description("创建者")]
     [DataObjectField(false, false, true, 50)]
@@ -128,6 +122,7 @@ public partial class App
 
     private DateTime _CreateTime;
     /// <summary>创建时间</summary>
+    [Category("扩展")]
     [DisplayName("创建时间")]
     [Description("创建时间")]
     [DataObjectField(false, false, true, 0)]
@@ -136,6 +131,7 @@ public partial class App
 
     private String _CreateIP;
     /// <summary>创建地址</summary>
+    [Category("扩展")]
     [DisplayName("创建地址")]
     [Description("创建地址")]
     [DataObjectField(false, false, true, 50)]
@@ -144,6 +140,7 @@ public partial class App
 
     private Int32 _UpdateUserID;
     /// <summary>更新人</summary>
+    [Category("扩展")]
     [DisplayName("更新人")]
     [Description("更新人")]
     [DataObjectField(false, false, false, 0)]
@@ -152,6 +149,7 @@ public partial class App
 
     private String _UpdateUser;
     /// <summary>更新者</summary>
+    [Category("扩展")]
     [DisplayName("更新者")]
     [Description("更新者")]
     [DataObjectField(false, false, true, 50)]
@@ -160,6 +158,7 @@ public partial class App
 
     private DateTime _UpdateTime;
     /// <summary>更新时间</summary>
+    [Category("扩展")]
     [DisplayName("更新时间")]
     [Description("更新时间")]
     [DataObjectField(false, false, true, 0)]
@@ -168,11 +167,21 @@ public partial class App
 
     private String _UpdateIP;
     /// <summary>更新地址</summary>
+    [Category("扩展")]
     [DisplayName("更新地址")]
     [Description("更新地址")]
     [DataObjectField(false, false, true, 50)]
     [BindColumn("UpdateIP", "更新地址", "")]
     public String UpdateIP { get => _UpdateIP; set { if (OnPropertyChanging("UpdateIP", value)) { _UpdateIP = value; OnPropertyChanged("UpdateIP"); } } }
+
+    private String _Remark;
+    /// <summary>备注</summary>
+    [Category("扩展")]
+    [DisplayName("备注")]
+    [Description("备注")]
+    [DataObjectField(false, false, true, 500)]
+    [BindColumn("Remark", "备注", "")]
+    public String Remark { get => _Remark; set { if (OnPropertyChanging("Remark", value)) { _Remark = value; OnPropertyChanged("Remark"); } } }
     #endregion
 
     #region 获取/设置 字段值
@@ -193,7 +202,6 @@ public partial class App
             "Enable" => _Enable,
             "JobCount" => _JobCount,
             "MessageCount" => _MessageCount,
-            "Remark" => _Remark,
             "CreateUserID" => _CreateUserID,
             "CreateUser" => _CreateUser,
             "CreateTime" => _CreateTime,
@@ -202,6 +210,7 @@ public partial class App
             "UpdateUser" => _UpdateUser,
             "UpdateTime" => _UpdateTime,
             "UpdateIP" => _UpdateIP,
+            "Remark" => _Remark,
             _ => base[name]
         };
         set
@@ -218,7 +227,6 @@ public partial class App
                 case "Enable": _Enable = value.ToBoolean(); break;
                 case "JobCount": _JobCount = value.ToInt(); break;
                 case "MessageCount": _MessageCount = value.ToInt(); break;
-                case "Remark": _Remark = Convert.ToString(value); break;
                 case "CreateUserID": _CreateUserID = value.ToInt(); break;
                 case "CreateUser": _CreateUser = Convert.ToString(value); break;
                 case "CreateTime": _CreateTime = value.ToDateTime(); break;
@@ -227,6 +235,7 @@ public partial class App
                 case "UpdateUser": _UpdateUser = Convert.ToString(value); break;
                 case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
                 case "UpdateIP": _UpdateIP = Convert.ToString(value); break;
+                case "Remark": _Remark = Convert.ToString(value); break;
                 default: base[name] = value; break;
             }
         }
@@ -270,9 +279,6 @@ public partial class App
         /// <summary>消息数</summary>
         public static readonly Field MessageCount = FindByName("MessageCount");
 
-        /// <summary>内容</summary>
-        public static readonly Field Remark = FindByName("Remark");
-
         /// <summary>创建人</summary>
         public static readonly Field CreateUserID = FindByName("CreateUserID");
 
@@ -296,6 +302,9 @@ public partial class App
 
         /// <summary>更新地址</summary>
         public static readonly Field UpdateIP = FindByName("UpdateIP");
+
+        /// <summary>备注</summary>
+        public static readonly Field Remark = FindByName("Remark");
 
         static Field FindByName(String name) => Meta.Table.FindByName(name);
     }
@@ -333,9 +342,6 @@ public partial class App
         /// <summary>消息数</summary>
         public const String MessageCount = "MessageCount";
 
-        /// <summary>内容</summary>
-        public const String Remark = "Remark";
-
         /// <summary>创建人</summary>
         public const String CreateUserID = "CreateUserID";
 
@@ -359,6 +365,9 @@ public partial class App
 
         /// <summary>更新地址</summary>
         public const String UpdateIP = "UpdateIP";
+
+        /// <summary>备注</summary>
+        public const String Remark = "Remark";
     }
     #endregion
 }

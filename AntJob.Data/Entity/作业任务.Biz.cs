@@ -1,93 +1,96 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Xml.Serialization;
 using NewLife;
 using NewLife.Data;
 using XCode;
+using XCode.Membership;
 
-namespace AntJob.Data.Entity
+namespace AntJob.Data.Entity;
+
+/// <summary>作业任务</summary>
+public partial class JobTask : EntityBase<JobTask>
 {
-    /// <summary>作业任务</summary>
-    public partial class JobTask : EntityBase<JobTask>
+    #region 对象操作
+    static JobTask()
     {
-        #region 对象操作
-        static JobTask()
-        {
-            // 累加字段
-            var df = Meta.Factory.AdditionalFields;
-            df.Add(__.Error);
-            df.Add(__.Times);
-        }
-        #endregion
+        // 累加字段
+        var df = Meta.Factory.AdditionalFields;
+        df.Add(__.Error);
+        df.Add(__.Times);
 
-        #region 扩展属性
-        /// <summary>应用</summary>
-        [XmlIgnore]
-        //[ScriptIgnore]
-        public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
+        Meta.Modules.Add<IPModule>();
+        Meta.Modules.Add<TimeModule>();
+        Meta.Modules.Add<TraceModule>();
+    }
+    #endregion
 
-        /// <summary>应用</summary>
-        [XmlIgnore]
-        //[ScriptIgnore]
-        [DisplayName("应用")]
-        [Map(__.AppID)]
-        public String AppName => App?.Name;
+    #region 扩展属性
+    ///// <summary>应用</summary>
+    //[XmlIgnore]
+    ////[ScriptIgnore]
+    //public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
 
-        /// <summary>作业</summary>
-        [XmlIgnore]
-        //[ScriptIgnore]
-        public Job Job => Extends.Get(nameof(Job), k => Job.FindByID(JobID));
+    ///// <summary>应用</summary>
+    //[XmlIgnore]
+    ////[ScriptIgnore]
+    //[DisplayName("应用")]
+    //[Map(__.AppID)]
+    //public String AppName => App?.Name;
 
-        /// <summary>作业</summary>
-        [XmlIgnore]
-        //[ScriptIgnore]
-        [DisplayName("作业")]
-        [Map(__.JobID)]
-        public String JobName => Job?.Name;
-        #endregion
+    ///// <summary>作业</summary>
+    //[XmlIgnore]
+    ////[ScriptIgnore]
+    //public Job Job => Extends.Get(nameof(Job), k => Job.FindByID(JobID));
 
-        #region 扩展查询
-        /// <summary>根据编号查找</summary>
-        /// <param name="id">编号</param>
-        /// <returns>实体对象</returns>
-        public static JobTask FindByID(Int64 id)
-        {
-            if (id <= 0) return null;
+    ///// <summary>作业</summary>
+    //[XmlIgnore]
+    ////[ScriptIgnore]
+    //[DisplayName("作业")]
+    //[Map(__.JobID)]
+    //public String JobName => Job?.Name;
+    #endregion
 
-            //// 单对象缓存
-            //return Meta.SingleCache[id];
-            return Find(_.ID == id);
-        }
+    #region 扩展查询
+    /// <summary>根据编号查找</summary>
+    /// <param name="id">编号</param>
+    /// <returns>实体对象</returns>
+    public static JobTask FindByID(Int64 id)
+    {
+        if (id <= 0) return null;
 
-        /// <summary>
-        /// 根据应用查询
-        /// </summary>
-        /// <param name="appid"></param>
-        /// <returns></returns>
-        public static IList<JobTask> FindAllByAppID(Int32 appid)
-        {
-            if (appid == 0) return new List<JobTask>();
+        //// 单对象缓存
+        //return Meta.SingleCache[id];
+        return Find(_.ID == id);
+    }
 
-            return FindAll(_.AppID == appid);
-        }
+    /// <summary>
+    /// 根据应用查询
+    /// </summary>
+    /// <param name="appid"></param>
+    /// <returns></returns>
+    public static IList<JobTask> FindAllByAppID(Int32 appid)
+    {
+        if (appid == 0) return new List<JobTask>();
 
-        /// <summary>
-        /// 根据任务查询个数
-        /// </summary>
-        /// <param name="jobid"></param>
-        /// <returns></returns>
-        public static Int32 FindCountByJobId(Int32 jobid) => (Int32)FindCount(_.JobID == jobid);
+        return FindAll(_.AppID == appid);
+    }
 
-        /// <summary>查找作业下小于指定创建时间的最后一个任务</summary>
-        /// <param name="jobid"></param>
-        /// <param name="createTime"></param>
-        /// <returns></returns>
-        public static JobTask FindLastByJobId(Int32 jobid, DateTime createTime)
-        {
-            return FindAll(_.JobID == jobid & _.CreateTime < createTime, _.CreateTime.Desc(), null, 0, 1).FirstOrDefault();
-        }
+    /// <summary>
+    /// 根据任务查询个数
+    /// </summary>
+    /// <param name="jobid"></param>
+    /// <returns></returns>
+    public static Int32 FindCountByJobId(Int32 jobid) => (Int32)FindCount(_.JobID == jobid);
+
+    /// <summary>查找作业下小于指定创建时间的最后一个任务</summary>
+    /// <param name="jobid"></param>
+    /// <param name="createTime"></param>
+    /// <returns></returns>
+    public static JobTask FindLastByJobId(Int32 jobid, DateTime createTime)
+    {
+        return FindAll(_.JobID == jobid & _.CreateTime < createTime, _.CreateTime.Desc(), null, 0, 1).FirstOrDefault();
+    }
 
     /// <summary>根据作业、状态、开始查找</summary>
     /// <param name="jobId">作业</param>
@@ -114,97 +117,96 @@ namespace AntJob.Data.Entity
 
         return FindAll(_.AppID == appId & _.Client == client & _.Status == status);
     }
-        #endregion
+    #endregion
 
-        #region 高级查询
-        /// <summary>高级查询</summary>
-        /// <param name="id"></param>
-        /// <param name="appid"></param>
-        /// <param name="jobid"></param>
-        /// <param name="status"></param>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        /// <param name="client"></param>
-        /// <param name="key"></param>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        public static IEnumerable<JobTask> Search(Int32 id, Int32 appid, Int32 jobid, JobStatus status, DateTime start, DateTime end, String client, String key, PageParameter p)
-        {
-            var exp = new WhereExpression();
+    #region 高级查询
+    /// <summary>高级查询</summary>
+    /// <param name="id"></param>
+    /// <param name="appid"></param>
+    /// <param name="jobid"></param>
+    /// <param name="status"></param>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <param name="client"></param>
+    /// <param name="key"></param>
+    /// <param name="p"></param>
+    /// <returns></returns>
+    public static IEnumerable<JobTask> Search(Int32 id, Int32 appid, Int32 jobid, JobStatus status, DateTime start, DateTime end, String client, String key, PageParameter p)
+    {
+        var exp = new WhereExpression();
 
-            if (id > 0) exp &= _.ID == id;
-            if (appid > 0) exp &= _.AppID == appid;
-            if (jobid > 0) exp &= _.JobID == jobid;
-            if (status >= JobStatus.就绪) exp &= _.Status == status;
-            if (!client.IsNullOrEmpty()) exp &= _.Client == client;
-            if (!key.IsNullOrEmpty()) exp &= _.Data.Contains(key) | _.Message.Contains(key) | _.Key == key;
-            exp &= _.Start.Between(start, end);
+        if (id > 0) exp &= _.ID == id;
+        if (appid > 0) exp &= _.AppID == appid;
+        if (jobid > 0) exp &= _.JobID == jobid;
+        if (status >= JobStatus.就绪) exp &= _.Status == status;
+        if (!client.IsNullOrEmpty()) exp &= _.Client == client;
+        if (!key.IsNullOrEmpty()) exp &= _.Data.Contains(key) | _.Message.Contains(key) | _.Key == key;
+        exp &= _.Start.Between(start, end);
 
-            return FindAll(exp, p);
-        }
-
-        /// <summary>获取该任务下特定状态的任务项</summary>
-        /// <param name="taskid"></param>
-        /// <param name="end"></param>
-        /// <param name="maxRetry"></param>
-        /// <param name="stats"></param>
-        /// <param name="count">要申请的任务个数</param>
-        /// <returns></returns>
-        public static IList<JobTask> Search(Int32 taskid, DateTime end, Int32 maxRetry, JobStatus[] stats, Int32 count)
-        {
-            var exp = new WhereExpression();
-            if (taskid > 0) exp &= _.JobID == taskid;
-            if (maxRetry > 0) exp &= _.Times < maxRetry;
-            exp &= _.Status.In(stats);
-            exp &= _.UpdateTime >= DateTime.Now.AddDays(-7);
-            if (end > DateTime.MinValue)
-            {
-                exp &= _.UpdateTime < end;
-            }
-
-            // 限制任务的错误次数，避免无限执行
-            exp &= _.Error < 32;
-
-            return FindAll(exp, _.ID.Asc(), null, 0, count);
-        }
-        #endregion
-
-        #region 业务操作
-        /// <summary>重置</summary>
-        public void Reset()
-        {
-            Total = 0;
-            Success = 0;
-            Status = JobStatus.就绪;
-
-            Save();
-        }
-
-        /// <summary>删除该ID及以前的作业项</summary>
-        /// <param name="jobid"></param>
-        /// <param name="maxid"></param>
-        /// <returns></returns>
-        public static Int32 DeleteByID(Int32 jobid, Int64 maxid) => maxid <= 0 ? 0 : Delete(_.JobID == jobid & _.ID <= maxid);
-
-        //public static Int32 DeleteByAppId(Int32 appid) => Delete(_.AppID == appid);
-
-        /// <summary>转模型类</summary>
-        /// <returns></returns>
-        public TaskModel ToModel()
-        {
-            return new TaskModel
-            {
-                ID = ID,
-
-                Start = Start,
-                End = End,
-                //Offset = Offset,
-                //Step = Step,
-                BatchSize = BatchSize,
-
-                Data = Data,
-            };
-        }
-        #endregion
+        return FindAll(exp, p);
     }
+
+    /// <summary>获取该任务下特定状态的任务项</summary>
+    /// <param name="taskid"></param>
+    /// <param name="end"></param>
+    /// <param name="maxRetry"></param>
+    /// <param name="stats"></param>
+    /// <param name="count">要申请的任务个数</param>
+    /// <returns></returns>
+    public static IList<JobTask> Search(Int32 taskid, DateTime end, Int32 maxRetry, JobStatus[] stats, Int32 count)
+    {
+        var exp = new WhereExpression();
+        if (taskid > 0) exp &= _.JobID == taskid;
+        if (maxRetry > 0) exp &= _.Times < maxRetry;
+        exp &= _.Status.In(stats);
+        exp &= _.UpdateTime >= DateTime.Now.AddDays(-7);
+        if (end > DateTime.MinValue)
+        {
+            exp &= _.UpdateTime < end;
+        }
+
+        // 限制任务的错误次数，避免无限执行
+        exp &= _.Error < 32;
+
+        return FindAll(exp, _.ID.Asc(), null, 0, count);
+    }
+    #endregion
+
+    #region 业务操作
+    /// <summary>重置</summary>
+    public void Reset()
+    {
+        Total = 0;
+        Success = 0;
+        Status = JobStatus.就绪;
+
+        Save();
+    }
+
+    /// <summary>删除该ID及以前的作业项</summary>
+    /// <param name="jobid"></param>
+    /// <param name="maxid"></param>
+    /// <returns></returns>
+    public static Int32 DeleteByID(Int32 jobid, Int64 maxid) => maxid <= 0 ? 0 : Delete(_.JobID == jobid & _.ID <= maxid);
+
+    //public static Int32 DeleteByAppId(Int32 appid) => Delete(_.AppID == appid);
+
+    /// <summary>转模型类</summary>
+    /// <returns></returns>
+    public TaskModel ToModel()
+    {
+        return new TaskModel
+        {
+            ID = ID,
+
+            Start = Start,
+            End = End,
+            //Offset = Offset,
+            //Step = Step,
+            BatchSize = BatchSize,
+
+            Data = Data,
+        };
+    }
+    #endregion
 }

@@ -13,12 +13,12 @@ using XCode.DataAccessLayer;
 
 namespace AntJob.Data.Entity;
 
-/// <summary>作业</summary>
+/// <summary>作业。数据计算逻辑的主要单元，每个作业即是一个业务逻辑，各个作业之前存在依赖关系</summary>
 [Serializable]
 [DataObject]
-[Description("作业")]
+[Description("作业。数据计算逻辑的主要单元，每个作业即是一个业务逻辑，各个作业之前存在依赖关系")]
 [BindIndex("IU_Job_AppID_Name", true, "AppID,Name")]
-[BindTable("Job", Description = "作业", ConnName = "Ant", DbType = DatabaseType.None)]
+[BindTable("Job", Description = "作业。数据计算逻辑的主要单元，每个作业即是一个业务逻辑，各个作业之前存在依赖关系", ConnName = "Ant", DbType = DatabaseType.None)]
 public partial class Job
 {
     #region 属性
@@ -238,16 +238,9 @@ public partial class Job
     [BindColumn("Data", "数据。Sql模板或C#模板", "")]
     public String Data { get => _Data; set { if (OnPropertyChanging("Data", value)) { _Data = value; OnPropertyChanged("Data"); } } }
 
-    private String _Remark;
-    /// <summary>内容</summary>
-    [DisplayName("内容")]
-    [Description("内容")]
-    [DataObjectField(false, false, true, 2000)]
-    [BindColumn("Remark", "内容", "")]
-    public String Remark { get => _Remark; set { if (OnPropertyChanging("Remark", value)) { _Remark = value; OnPropertyChanged("Remark"); } } }
-
     private Int32 _CreateUserID;
     /// <summary>创建人</summary>
+    [Category("扩展")]
     [DisplayName("创建人")]
     [Description("创建人")]
     [DataObjectField(false, false, false, 0)]
@@ -256,6 +249,7 @@ public partial class Job
 
     private String _CreateUser;
     /// <summary>创建者</summary>
+    [Category("扩展")]
     [DisplayName("创建者")]
     [Description("创建者")]
     [DataObjectField(false, false, true, 50)]
@@ -264,6 +258,7 @@ public partial class Job
 
     private DateTime _CreateTime;
     /// <summary>创建时间</summary>
+    [Category("扩展")]
     [DisplayName("创建时间")]
     [Description("创建时间")]
     [DataObjectField(false, false, true, 0)]
@@ -272,6 +267,7 @@ public partial class Job
 
     private String _CreateIP;
     /// <summary>创建地址</summary>
+    [Category("扩展")]
     [DisplayName("创建地址")]
     [Description("创建地址")]
     [DataObjectField(false, false, true, 50)]
@@ -280,6 +276,7 @@ public partial class Job
 
     private Int32 _UpdateUserID;
     /// <summary>更新人</summary>
+    [Category("扩展")]
     [DisplayName("更新人")]
     [Description("更新人")]
     [DataObjectField(false, false, false, 0)]
@@ -288,6 +285,7 @@ public partial class Job
 
     private String _UpdateUser;
     /// <summary>更新者</summary>
+    [Category("扩展")]
     [DisplayName("更新者")]
     [Description("更新者")]
     [DataObjectField(false, false, true, 50)]
@@ -296,6 +294,7 @@ public partial class Job
 
     private DateTime _UpdateTime;
     /// <summary>更新时间</summary>
+    [Category("扩展")]
     [DisplayName("更新时间")]
     [Description("更新时间")]
     [DataObjectField(false, false, true, 0)]
@@ -304,11 +303,21 @@ public partial class Job
 
     private String _UpdateIP;
     /// <summary>更新地址</summary>
+    [Category("扩展")]
     [DisplayName("更新地址")]
     [Description("更新地址")]
     [DataObjectField(false, false, true, 50)]
     [BindColumn("UpdateIP", "更新地址", "")]
     public String UpdateIP { get => _UpdateIP; set { if (OnPropertyChanging("UpdateIP", value)) { _UpdateIP = value; OnPropertyChanged("UpdateIP"); } } }
+
+    private String _Remark;
+    /// <summary>备注</summary>
+    [Category("扩展")]
+    [DisplayName("备注")]
+    [Description("备注")]
+    [DataObjectField(false, false, true, 2000)]
+    [BindColumn("Remark", "备注", "")]
+    public String Remark { get => _Remark; set { if (OnPropertyChanging("Remark", value)) { _Remark = value; OnPropertyChanged("Remark"); } } }
     #endregion
 
     #region 获取/设置 字段值
@@ -346,7 +355,6 @@ public partial class Job
             "Speed" => _Speed,
             "Enable" => _Enable,
             "Data" => _Data,
-            "Remark" => _Remark,
             "CreateUserID" => _CreateUserID,
             "CreateUser" => _CreateUser,
             "CreateTime" => _CreateTime,
@@ -355,6 +363,7 @@ public partial class Job
             "UpdateUser" => _UpdateUser,
             "UpdateTime" => _UpdateTime,
             "UpdateIP" => _UpdateIP,
+            "Remark" => _Remark,
             _ => base[name]
         };
         set
@@ -388,7 +397,6 @@ public partial class Job
                 case "Speed": _Speed = value.ToInt(); break;
                 case "Enable": _Enable = value.ToBoolean(); break;
                 case "Data": _Data = Convert.ToString(value); break;
-                case "Remark": _Remark = Convert.ToString(value); break;
                 case "CreateUserID": _CreateUserID = value.ToInt(); break;
                 case "CreateUser": _CreateUser = Convert.ToString(value); break;
                 case "CreateTime": _CreateTime = value.ToDateTime(); break;
@@ -397,6 +405,7 @@ public partial class Job
                 case "UpdateUser": _UpdateUser = Convert.ToString(value); break;
                 case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
                 case "UpdateIP": _UpdateIP = Convert.ToString(value); break;
+                case "Remark": _Remark = Convert.ToString(value); break;
                 default: base[name] = value; break;
             }
         }
@@ -404,6 +413,14 @@ public partial class Job
     #endregion
 
     #region 关联映射
+    /// <summary>应用</summary>
+    [XmlIgnore, IgnoreDataMember, ScriptIgnore]
+    public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
+
+    /// <summary>应用</summary>
+    [Map(nameof(AppID), typeof(App), "ID")]
+    public String AppName => App?.ToString();
+
     #endregion
 
     #region 字段名
@@ -491,9 +508,6 @@ public partial class Job
         /// <summary>数据。Sql模板或C#模板</summary>
         public static readonly Field Data = FindByName("Data");
 
-        /// <summary>内容</summary>
-        public static readonly Field Remark = FindByName("Remark");
-
         /// <summary>创建人</summary>
         public static readonly Field CreateUserID = FindByName("CreateUserID");
 
@@ -517,6 +531,9 @@ public partial class Job
 
         /// <summary>更新地址</summary>
         public static readonly Field UpdateIP = FindByName("UpdateIP");
+
+        /// <summary>备注</summary>
+        public static readonly Field Remark = FindByName("Remark");
 
         static Field FindByName(String name) => Meta.Table.FindByName(name);
     }
@@ -605,9 +622,6 @@ public partial class Job
         /// <summary>数据。Sql模板或C#模板</summary>
         public const String Data = "Data";
 
-        /// <summary>内容</summary>
-        public const String Remark = "Remark";
-
         /// <summary>创建人</summary>
         public const String CreateUserID = "CreateUserID";
 
@@ -631,6 +645,9 @@ public partial class Job
 
         /// <summary>更新地址</summary>
         public const String UpdateIP = "UpdateIP";
+
+        /// <summary>备注</summary>
+        public const String Remark = "Remark";
     }
     #endregion
 }

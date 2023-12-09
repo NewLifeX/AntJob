@@ -13,12 +13,12 @@ using XCode.DataAccessLayer;
 
 namespace AntJob.Data.Entity;
 
-/// <summary>应用历史。应用的操作历史</summary>
+/// <summary>应用历史。数据计算应用的操作历史</summary>
 [Serializable]
 [DataObject]
-[Description("应用历史。应用的操作历史")]
+[Description("应用历史。数据计算应用的操作历史")]
 [BindIndex("IX_AppHistory_AppID_Action", false, "AppID,Action")]
-[BindTable("AppHistory", Description = "应用历史。应用的操作历史", ConnName = "Ant", DbType = DatabaseType.None)]
+[BindTable("AppHistory", Description = "应用历史。数据计算应用的操作历史", ConnName = "Ant", DbType = DatabaseType.None)]
 public partial class AppHistory
 {
     #region 属性
@@ -86,8 +86,18 @@ public partial class AppHistory
     [BindColumn("Server", "服务端。客户端登录到哪个服务端，IP加端口", "")]
     public String Server { get => _Server; set { if (OnPropertyChanging("Server", value)) { _Server = value; OnPropertyChanged("Server"); } } }
 
+    private String _TraceId;
+    /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+    [Category("扩展")]
+    [DisplayName("追踪")]
+    [Description("追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链")]
+    [DataObjectField(false, false, true, 200)]
+    [BindColumn("TraceId", "追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链", "")]
+    public String TraceId { get => _TraceId; set { if (OnPropertyChanging("TraceId", value)) { _TraceId = value; OnPropertyChanged("TraceId"); } } }
+
     private DateTime _CreateTime;
     /// <summary>创建时间</summary>
+    [Category("扩展")]
     [DisplayName("创建时间")]
     [Description("创建时间")]
     [DataObjectField(false, false, true, 0)]
@@ -96,6 +106,7 @@ public partial class AppHistory
 
     private String _CreateIP;
     /// <summary>创建地址</summary>
+    [Category("扩展")]
     [DisplayName("创建地址")]
     [Description("创建地址")]
     [DataObjectField(false, false, true, 50)]
@@ -104,6 +115,7 @@ public partial class AppHistory
 
     private String _Remark;
     /// <summary>内容</summary>
+    [Category("扩展")]
     [DisplayName("内容")]
     [Description("内容")]
     [DataObjectField(false, false, true, 2000)]
@@ -127,6 +139,7 @@ public partial class AppHistory
             "Version" => _Version,
             "CompileTime" => _CompileTime,
             "Server" => _Server,
+            "TraceId" => _TraceId,
             "CreateTime" => _CreateTime,
             "CreateIP" => _CreateIP,
             "Remark" => _Remark,
@@ -144,6 +157,7 @@ public partial class AppHistory
                 case "Version": _Version = Convert.ToString(value); break;
                 case "CompileTime": _CompileTime = value.ToDateTime(); break;
                 case "Server": _Server = Convert.ToString(value); break;
+                case "TraceId": _TraceId = Convert.ToString(value); break;
                 case "CreateTime": _CreateTime = value.ToDateTime(); break;
                 case "CreateIP": _CreateIP = Convert.ToString(value); break;
                 case "Remark": _Remark = Convert.ToString(value); break;
@@ -154,6 +168,14 @@ public partial class AppHistory
     #endregion
 
     #region 关联映射
+    /// <summary>应用</summary>
+    [XmlIgnore, IgnoreDataMember, ScriptIgnore]
+    public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
+
+    /// <summary>应用</summary>
+    [Map(nameof(AppID), typeof(App), "ID")]
+    public String AppName => App?.ToString();
+
     #endregion
 
     #region 字段名
@@ -183,6 +205,9 @@ public partial class AppHistory
 
         /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
         public static readonly Field Server = FindByName("Server");
+
+        /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+        public static readonly Field TraceId = FindByName("TraceId");
 
         /// <summary>创建时间</summary>
         public static readonly Field CreateTime = FindByName("CreateTime");
@@ -222,6 +247,9 @@ public partial class AppHistory
 
         /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
         public const String Server = "Server";
+
+        /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+        public const String TraceId = "TraceId";
 
         /// <summary>创建时间</summary>
         public const String CreateTime = "CreateTime";

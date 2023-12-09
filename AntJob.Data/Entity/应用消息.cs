@@ -62,16 +62,45 @@ public partial class AppMessage
     [BindColumn("Data", "数据。可以是Json数据，比如StatID", "")]
     public String Data { get => _Data; set { if (OnPropertyChanging("Data", value)) { _Data = value; OnPropertyChanged("Data"); } } }
 
+    private String _TraceId;
+    /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+    [Category("扩展")]
+    [DisplayName("追踪")]
+    [Description("追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链")]
+    [DataObjectField(false, false, true, 200)]
+    [BindColumn("TraceId", "追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链", "")]
+    public String TraceId { get => _TraceId; set { if (OnPropertyChanging("TraceId", value)) { _TraceId = value; OnPropertyChanged("TraceId"); } } }
+
+    private String _CreateIP;
+    /// <summary>创建地址</summary>
+    [Category("扩展")]
+    [DisplayName("创建地址")]
+    [Description("创建地址")]
+    [DataObjectField(false, false, true, 50)]
+    [BindColumn("CreateIP", "创建地址", "")]
+    public String CreateIP { get => _CreateIP; set { if (OnPropertyChanging("CreateIP", value)) { _CreateIP = value; OnPropertyChanged("CreateIP"); } } }
+
     private DateTime _CreateTime;
     /// <summary>创建时间</summary>
+    [Category("扩展")]
     [DisplayName("创建时间")]
     [Description("创建时间")]
     [DataObjectField(false, false, true, 0)]
     [BindColumn("CreateTime", "创建时间", "")]
     public DateTime CreateTime { get => _CreateTime; set { if (OnPropertyChanging("CreateTime", value)) { _CreateTime = value; OnPropertyChanged("CreateTime"); } } }
 
+    private String _UpdateIP;
+    /// <summary>更新地址</summary>
+    [Category("扩展")]
+    [DisplayName("更新地址")]
+    [Description("更新地址")]
+    [DataObjectField(false, false, true, 50)]
+    [BindColumn("UpdateIP", "更新地址", "")]
+    public String UpdateIP { get => _UpdateIP; set { if (OnPropertyChanging("UpdateIP", value)) { _UpdateIP = value; OnPropertyChanged("UpdateIP"); } } }
+
     private DateTime _UpdateTime;
     /// <summary>更新时间</summary>
+    [Category("扩展")]
     [DisplayName("更新时间")]
     [Description("更新时间")]
     [DataObjectField(false, false, true, 0)]
@@ -92,7 +121,10 @@ public partial class AppMessage
             "JobID" => _JobID,
             "Topic" => _Topic,
             "Data" => _Data,
+            "TraceId" => _TraceId,
+            "CreateIP" => _CreateIP,
             "CreateTime" => _CreateTime,
+            "UpdateIP" => _UpdateIP,
             "UpdateTime" => _UpdateTime,
             _ => base[name]
         };
@@ -105,7 +137,10 @@ public partial class AppMessage
                 case "JobID": _JobID = value.ToInt(); break;
                 case "Topic": _Topic = Convert.ToString(value); break;
                 case "Data": _Data = Convert.ToString(value); break;
+                case "TraceId": _TraceId = Convert.ToString(value); break;
+                case "CreateIP": _CreateIP = Convert.ToString(value); break;
                 case "CreateTime": _CreateTime = value.ToDateTime(); break;
+                case "UpdateIP": _UpdateIP = Convert.ToString(value); break;
                 case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
                 default: base[name] = value; break;
             }
@@ -114,6 +149,22 @@ public partial class AppMessage
     #endregion
 
     #region 关联映射
+    /// <summary>应用</summary>
+    [XmlIgnore, IgnoreDataMember, ScriptIgnore]
+    public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
+
+    /// <summary>应用</summary>
+    [Map(nameof(AppID), typeof(App), "ID")]
+    public String AppName => App?.ToString();
+
+    /// <summary>作业</summary>
+    [XmlIgnore, IgnoreDataMember, ScriptIgnore]
+    public Job Job => Extends.Get(nameof(Job), k => Job.FindByID(JobID));
+
+    /// <summary>作业</summary>
+    [Map(nameof(JobID), typeof(Job), "ID")]
+    public String JobName => Job?.ToString();
+
     #endregion
 
     #region 字段名
@@ -135,8 +186,17 @@ public partial class AppMessage
         /// <summary>数据。可以是Json数据，比如StatID</summary>
         public static readonly Field Data = FindByName("Data");
 
+        /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+        public static readonly Field TraceId = FindByName("TraceId");
+
+        /// <summary>创建地址</summary>
+        public static readonly Field CreateIP = FindByName("CreateIP");
+
         /// <summary>创建时间</summary>
         public static readonly Field CreateTime = FindByName("CreateTime");
+
+        /// <summary>更新地址</summary>
+        public static readonly Field UpdateIP = FindByName("UpdateIP");
 
         /// <summary>更新时间</summary>
         public static readonly Field UpdateTime = FindByName("UpdateTime");
@@ -162,8 +222,17 @@ public partial class AppMessage
         /// <summary>数据。可以是Json数据，比如StatID</summary>
         public const String Data = "Data";
 
+        /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
+        public const String TraceId = "TraceId";
+
+        /// <summary>创建地址</summary>
+        public const String CreateIP = "CreateIP";
+
         /// <summary>创建时间</summary>
         public const String CreateTime = "CreateTime";
+
+        /// <summary>更新地址</summary>
+        public const String UpdateIP = "UpdateIP";
 
         /// <summary>更新时间</summary>
         public const String UpdateTime = "UpdateTime";

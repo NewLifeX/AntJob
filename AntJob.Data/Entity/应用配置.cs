@@ -13,13 +13,13 @@ using XCode.DataAccessLayer;
 
 namespace AntJob.Data.Entity;
 
-/// <summary>应用配置。各应用的配置数据</summary>
+/// <summary>应用配置。数据计算应用的配置数据</summary>
 [Serializable]
 [DataObject]
-[Description("应用配置。各应用的配置数据")]
+[Description("应用配置。数据计算应用的配置数据")]
 [BindIndex("IU_AppConfig_AppID_Name", true, "AppID,Name")]
 [BindIndex("IX_AppConfig_UpdateTime", false, "UpdateTime")]
-[BindTable("AppConfig", Description = "应用配置。各应用的配置数据", ConnName = "Ant", DbType = DatabaseType.None)]
+[BindTable("AppConfig", Description = "应用配置。数据计算应用的配置数据", ConnName = "Ant", DbType = DatabaseType.None)]
 public partial class AppConfig
 {
     #region 属性
@@ -57,6 +57,7 @@ public partial class AppConfig
 
     private Int32 _CreateUserID;
     /// <summary>创建人</summary>
+    [Category("扩展")]
     [DisplayName("创建人")]
     [Description("创建人")]
     [DataObjectField(false, false, false, 0)]
@@ -65,6 +66,7 @@ public partial class AppConfig
 
     private DateTime _CreateTime;
     /// <summary>创建时间</summary>
+    [Category("扩展")]
     [DisplayName("创建时间")]
     [Description("创建时间")]
     [DataObjectField(false, false, true, 0)]
@@ -73,6 +75,7 @@ public partial class AppConfig
 
     private String _CreateIP;
     /// <summary>创建地址</summary>
+    [Category("扩展")]
     [DisplayName("创建地址")]
     [Description("创建地址")]
     [DataObjectField(false, false, true, 50)]
@@ -81,6 +84,7 @@ public partial class AppConfig
 
     private Int32 _UpdateUserID;
     /// <summary>更新人</summary>
+    [Category("扩展")]
     [DisplayName("更新人")]
     [Description("更新人")]
     [DataObjectField(false, false, false, 0)]
@@ -89,6 +93,7 @@ public partial class AppConfig
 
     private DateTime _UpdateTime;
     /// <summary>更新时间</summary>
+    [Category("扩展")]
     [DisplayName("更新时间")]
     [Description("更新时间")]
     [DataObjectField(false, false, true, 0)]
@@ -97,6 +102,7 @@ public partial class AppConfig
 
     private String _UpdateIP;
     /// <summary>更新地址</summary>
+    [Category("扩展")]
     [DisplayName("更新地址")]
     [Description("更新地址")]
     [DataObjectField(false, false, true, 50)]
@@ -145,6 +151,14 @@ public partial class AppConfig
     #endregion
 
     #region 关联映射
+    /// <summary>应用</summary>
+    [XmlIgnore, IgnoreDataMember, ScriptIgnore]
+    public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
+
+    /// <summary>应用</summary>
+    [Map(nameof(AppID), typeof(App), "ID")]
+    public String AppName => App?.ToString();
+
     #endregion
 
     #region 字段名
