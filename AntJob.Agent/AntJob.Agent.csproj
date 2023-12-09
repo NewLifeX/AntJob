@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Stardust" Version="2.9.2023.1103" />
+    <PackageReference Include="NewLife.Stardust" Version="2.9.2023.1201" />
   </ItemGroup>
 
   <ItemGroup>

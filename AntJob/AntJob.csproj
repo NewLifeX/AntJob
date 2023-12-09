@@ -38,16 +38,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="10.6.2023.1101" />
-    <PackageReference Include="NewLife.Remoting" Version="2.5.2023.1102" />
-    <PackageReference Include="NewLife.Stardust" Version="2.9.2023.1103" />
+    <PackageReference Include="NewLife.Core" Version="10.6.2023.1201" />
+    <PackageReference Include="NewLife.Remoting" Version="2.7.2023.1201" />
+    <PackageReference Include="NewLife.Stardust" Version="2.9.2023.1201" />
   </ItemGroup>
   
   <ItemGroup>
