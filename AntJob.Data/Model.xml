@@ -1,204 +1,244 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Tables xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="http://www.newlifex.com http://www.newlifex.com/Model2022.xsd" Output="Entity" NameSpace="AntJob.Data.Entity" ConnName="Ant" BaseClass="EntityBase" Version="11.0.2022.0405" Document="https://www.yuque.com/smartstone/xcode/model" xmlns="http://www.newlifex.com/Model2022.xsd">
-  <Table Name="App" Description="应用系统。数据作业隶属于某个应用">
-    <Columns>
-      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="Name" DataType="String" Master="True" Nullable="False" Description="名称" />
-      <Column Name="DisplayName" DataType="String" Description="显示名" />
-      <Column Name="Secret" DataType="String" Description="密钥" />
-      <Column Name="Category" DataType="String" Description="类别" />
-      <Column Name="Version" DataType="String" Description="版本" />
-      <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
-      <Column Name="Enable" DataType="Boolean" Description="启用" />
-      <Column Name="JobCount" DataType="Int32" Description="作业数" />
-      <Column Name="MessageCount" DataType="Int32" Description="消息数" />
-      <Column Name="Remark" DataType="String" Length="500" Description="内容" />
-      <Column Name="CreateUserID" DataType="Int32" Description="创建人" />
-      <Column Name="CreateUser" DataType="String" Description="创建者" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateUserID" DataType="Int32" Description="更新人" />
-      <Column Name="UpdateUser" DataType="String" Description="更新者" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
-    </Columns>
-    <Indexes>
-      <Index Columns="Name" Unique="True" />
-    </Indexes>
-  </Table>
-  <Table Name="AppOnline" Description="应用在线。各应用多实例在线">
-    <Columns>
-      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="AppID" DataType="Int32" Description="应用" />
-      <Column Name="Instance" DataType="String" Description="实例。IP加端口" />
-      <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
-      <Column Name="Name" DataType="String" Master="True" Description="名称。机器名称" />
-      <Column Name="ProcessId" DataType="Int32" Description="进程。进程Id" />
-      <Column Name="Version" DataType="String" Description="版本。客户端" />
-      <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
-      <Column Name="Server" DataType="String" Description="服务端。客户端登录到哪个服务端，IP加端口" />
-      <Column Name="Tasks" DataType="Int32" Description="任务数" />
-      <Column Name="Total" DataType="Int64" Description="总数" />
-      <Column Name="Success" DataType="Int64" Description="成功" />
-      <Column Name="Error" DataType="Int64" Description="错误" />
-      <Column Name="Cost" DataType="Int64" Description="耗时。执行任务总耗时，秒" />
-      <Column Name="Speed" DataType="Int64" Description="速度。每秒处理数" />
-      <Column Name="LastKey" DataType="String" Description="最后键" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
-    </Columns>
-    <Indexes>
-      <Index Columns="Instance" Unique="True" />
-      <Index Columns="Client" />
-      <Index Columns="AppID" />
-    </Indexes>
-  </Table>
-  <Table Name="AppHistory" Description="应用历史。应用的操作历史">
-    <Columns>
-      <Column Name="Id" DataType="Int64" PrimaryKey="True" Description="编号" />
-      <Column Name="AppID" DataType="Int32" Description="应用" />
-      <Column Name="Name" DataType="String" Master="True" Description="名称" />
-      <Column Name="Action" DataType="String" Description="操作" />
-      <Column Name="Success" DataType="Boolean" Description="成功" />
-      <Column Name="Version" DataType="String" Description="版本" />
-      <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
-      <Column Name="Server" DataType="String" Description="服务端。客户端登录到哪个服务端，IP加端口" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="Remark" DataType="String" Length="2000" Description="内容" />
-    </Columns>
-    <Indexes>
-      <Index Columns="AppID,Action" />
-    </Indexes>
-  </Table>
-  <Table Name="AppConfig" Description="应用配置。各应用的配置数据">
-    <Columns>
-      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="AppID" DataType="Int32" Description="应用" />
-      <Column Name="Name" DataType="String" Master="True" Description="名称" />
-      <Column Name="Content" DataType="String" Length="5000" Description="内容。一般是json格式" />
-      <Column Name="CreateUserID" DataType="Int32" Description="创建人" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateUserID" DataType="Int32" Description="更新人" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
-    </Columns>
-    <Indexes>
-      <Index Columns="AppID,Name" Unique="True" />
-      <Index Columns="UpdateTime" />
-    </Indexes>
-  </Table>
-  <Table Name="Job" Description="作业">
-    <Columns>
-      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="AppID" DataType="Int32" Description="应用" />
-      <Column Name="Name" DataType="String" Master="True" Length="100" Description="名称" />
-      <Column Name="ClassName" DataType="String" Length="100" Description="类名。支持该作业的处理器实现" />
-      <Column Name="DisplayName" DataType="String" Description="显示名" />
-      <Column Name="Mode" DataType="Int32" Description="调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑" Type="JobModes" />
-      <Column Name="Topic" DataType="String" Description="主题。消息调度时消费的主题" />
-      <Column Name="MessageCount" DataType="Int32" Description="消息数" />
-      <Column Name="Start" DataType="DateTime" Description="开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
-      <Column Name="End" DataType="DateTime" Description="结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用" />
-      <Column Name="Step" DataType="Int32" Description="步进。切分任务的时间区间，秒" />
-      <Column Name="BatchSize" DataType="Int32" Description="批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用" />
-      <Column Name="Offset" DataType="Int32" Description="偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒" />
-      <Column Name="MaxTask" DataType="Int32" Description="并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度" />
-      <Column Name="MaxError" DataType="Int32" Description="最大错误。连续错误达到最大错误数时停止" />
-      <Column Name="MaxRetry" DataType="Int32" Description="最大重试。默认10次，超过该次数后将不再重试" />
-      <Column Name="MaxTime" DataType="Int32" Description="最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器" />
-      <Column Name="MaxRetain" DataType="Int32" Description="保留。任务项保留天数，超过天数的任务项将被删除，默认3天" />
-      <Column Name="MaxIdle" DataType="Int32" Description="最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警" />
-      <Column Name="ErrorDelay" DataType="Int32" Description="错误延迟。默认60秒，出错延迟后重新发放" />
-      <Column Name="Total" DataType="Int64" Description="总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1" />
-      <Column Name="Success" DataType="Int64" Description="成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数" />
-      <Column Name="Error" DataType="Int32" Description="错误" />
-      <Column Name="Times" DataType="Int32" Description="次数" />
-      <Column Name="Speed" DataType="Int32" Description="速度" />
-      <Column Name="Enable" DataType="Boolean" Description="启用" />
-      <Column Name="Data" DataType="String" Length="-1" Description="数据。Sql模板或C#模板" />
-      <Column Name="Remark" DataType="String" Length="2000" Description="内容" />
-      <Column Name="CreateUserID" DataType="Int32" Description="创建人" />
-      <Column Name="CreateUser" DataType="String" Description="创建者" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateUserID" DataType="Int32" Description="更新人" />
-      <Column Name="UpdateUser" DataType="String" Description="更新者" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
-    </Columns>
-    <Indexes>
-      <Index Columns="AppID,Name" Unique="True" />
-    </Indexes>
-  </Table>
-  <Table Name="JobTask" Description="作业任务">
-    <Columns>
-      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="AppID" DataType="Int32" Description="应用" />
-      <Column Name="JobID" DataType="Int32" Description="作业" />
-      <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
-      <Column Name="Start" DataType="DateTime" Description="开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
-      <Column Name="End" DataType="DateTime" Description="结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
-      <Column Name="BatchSize" DataType="Int32" Description="批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用" />
-      <Column Name="Total" DataType="Int32" Description="总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1" />
-      <Column Name="Success" DataType="Int32" Description="成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数" />
-      <Column Name="Error" DataType="Int32" Description="错误" />
-      <Column Name="Times" DataType="Int32" Description="次数" />
-      <Column Name="Speed" DataType="Int32" Description="速度。每秒处理数，执行端计算" />
-      <Column Name="Cost" DataType="Int32" Description="耗时。秒，执行端计算的执行时间" />
-      <Column Name="FullCost" DataType="Int32" Description="全部耗时。秒，从任务发放到执行完成的时间" />
-      <Column Name="Status" DataType="Int32" Description="状态" Type="JobStatus" />
-      <Column Name="MsgCount" DataType="Int32" Description="消费消息数" />
-      <Column Name="Server" DataType="String" Description="服务器" />
-      <Column Name="ProcessID" DataType="Int32" Description="进程" />
-      <Column Name="Key" DataType="String" Description="最后键。Handler内记录作为样本的数据" />
-      <Column Name="Data" DataType="String" Length="-1" Description="数据。可以是Json数据，比如StatID" />
-      <Column Name="Message" DataType="String" Length="-1" Description="消息内容。Handler内记录的异常信息或其它任务消息" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-    </Columns>
-    <Indexes>
-      <Index Columns="JobID,Status,Start" />
-      <Index Columns="AppID,Client,Status" />
-      <Index Columns="JobID,CreateTime" />
-    </Indexes>
-  </Table>
-  <Table Name="JobError" Description="作业错误">
-    <Columns>
-      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="AppID" DataType="Int32" Description="应用" />
-      <Column Name="JobID" DataType="Int32" Description="作业" />
-      <Column Name="TaskID" DataType="Int32" Description="作业项" />
-      <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
-      <Column Name="Start" DataType="DateTime" Description="开始。大于等于" />
-      <Column Name="End" DataType="DateTime" Description="结束。小于，不等于" />
-      <Column Name="Data" DataType="String" Length="2000" Description="数据" />
-      <Column Name="Server" DataType="String" Description="服务器" />
-      <Column Name="ProcessID" DataType="Int32" Description="进程" />
-      <Column Name="Message" DataType="String" Length="2000" Description="内容" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-    </Columns>
-    <Indexes>
-      <Index Columns="AppID,ID" />
-      <Index Columns="JobID,ID" />
-    </Indexes>
-  </Table>
-  <Table Name="AppMessage" Description="应用消息。消息调度，某些作业负责生产消息，供其它作业进行消费处理">
-    <Columns>
-      <Column Name="Id" DataType="Int64" PrimaryKey="True" Description="编号" />
-      <Column Name="AppID" DataType="Int32" Description="应用" />
-      <Column Name="JobID" DataType="Int32" Description="作业。生产消息的作业" />
-      <Column Name="Topic" DataType="String" Description="主题。区分作业下多种消息" />
-      <Column Name="Data" DataType="String" Length="2000" Description="数据。可以是Json数据，比如StatID" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-    </Columns>
-    <Indexes>
-      <Index Columns="AppID,Topic,UpdateTime" />
-    </Indexes>
-  </Table>
-</Tables>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<EntityModel xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="https://newlifex.com https://newlifex.com/Model202309.xsd" Version="11.0.2022.0405" Document="https://newlifex.com/xcode/model" xmlns="https://newlifex.com/Model202309.xsd">
+  <Option>
+    <!--类名模板。其中{name}替换为Table.Name，如{name}Model/I{name}Dto等-->
+    <ClassNameTemplate />
+    <!--显示名模板。其中{displayName}替换为Table.DisplayName-->
+    <DisplayNameTemplate />
+    <!--基类。可能包含基类和接口，其中{name}替换为Table.Name-->
+    <BaseClass>Entity</BaseClass>
+    <!--命名空间-->
+    <Namespace>AntJob.Data.Entity</Namespace>
+    <!--输出目录-->
+    <Output>Entity</Output>
+    <!--是否使用中文文件名。默认false-->
+    <ChineseFileName>False</ChineseFileName>
+    <!--用于生成Copy函数的参数类型。例如{name}或I{name}-->
+    <ModelNameForCopy />
+    <!--带有索引器。实现IModel接口-->
+    <HasIModel>False</HasIModel>
+    <!--可为null上下文。生成String?等-->
+    <Nullable>False</Nullable>
+    <!--数据库连接名-->
+    <ConnName>Ant</ConnName>
+    <!--模型类模版。设置后生成模型类，用于接口数据传输，例如{name}Model-->
+    <ModelClass />
+    <!--模型类输出目录。默认当前目录的Models子目录-->
+    <ModelsOutput>.\Models\</ModelsOutput>
+    <!--模型接口模版。设置后生成模型接口，用于约束模型类和实体类，例如I{name}-->
+    <ModelInterface />
+    <!--模型接口输出目录。默认当前目录的Interfaces子目录-->
+    <InterfacesOutput>.\Interfaces\</InterfacesOutput>
+    <!--用户实体转为模型类的模型类。例如{name}或{name}DTO-->
+    <ModelNameForToModel />
+    <!--命名格式。Default/Upper/Lower/Underline-->
+    <NameFormat>Default</NameFormat>
+    <!--魔方区域显示名-->
+    <DisplayName />
+    <!--魔方控制器输出目录-->
+    <CubeOutput />
+  </Option>
+  <Tables>
+    <Table Name="App" Description="应用系统。数据作业隶属于某个应用">
+      <Columns>
+        <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+        <Column Name="Name" DataType="String" Master="True" Nullable="False" Description="名称" />
+        <Column Name="DisplayName" DataType="String" Description="显示名" />
+        <Column Name="Secret" DataType="String" Description="密钥" />
+        <Column Name="Category" DataType="String" Description="类别" />
+        <Column Name="Version" DataType="String" Description="版本" />
+        <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
+        <Column Name="Enable" DataType="Boolean" Description="启用" />
+        <Column Name="JobCount" DataType="Int32" Description="作业数" />
+        <Column Name="MessageCount" DataType="Int32" Description="消息数" />
+        <Column Name="Remark" DataType="String" Length="500" Description="内容" />
+        <Column Name="CreateUserID" DataType="Int32" Description="创建人" />
+        <Column Name="CreateUser" DataType="String" Description="创建者" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="CreateIP" DataType="String" Description="创建地址" />
+        <Column Name="UpdateUserID" DataType="Int32" Description="更新人" />
+        <Column Name="UpdateUser" DataType="String" Description="更新者" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+        <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+      </Columns>
+      <Indexes>
+        <Index Columns="Name" Unique="True" />
+      </Indexes>
+    </Table>
+    <Table Name="AppOnline" Description="应用在线。各应用多实例在线">
+      <Columns>
+        <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+        <Column Name="AppID" DataType="Int32" Description="应用" />
+        <Column Name="Instance" DataType="String" Description="实例。IP加端口" />
+        <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
+        <Column Name="Name" DataType="String" Master="True" Description="名称。机器名称" />
+        <Column Name="ProcessId" DataType="Int32" Description="进程。进程Id" />
+        <Column Name="Version" DataType="String" Description="版本。客户端" />
+        <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
+        <Column Name="Server" DataType="String" Description="服务端。客户端登录到哪个服务端，IP加端口" />
+        <Column Name="Tasks" DataType="Int32" Description="任务数" />
+        <Column Name="Total" DataType="Int64" Description="总数" />
+        <Column Name="Success" DataType="Int64" Description="成功" />
+        <Column Name="Error" DataType="Int64" Description="错误" />
+        <Column Name="Cost" DataType="Int64" Description="耗时。执行任务总耗时，秒" />
+        <Column Name="Speed" DataType="Int64" Description="速度。每秒处理数" />
+        <Column Name="LastKey" DataType="String" Description="最后键" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="CreateIP" DataType="String" Description="创建地址" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+        <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+      </Columns>
+      <Indexes>
+        <Index Columns="Instance" Unique="True" />
+        <Index Columns="Client" />
+        <Index Columns="AppID" />
+      </Indexes>
+    </Table>
+    <Table Name="AppHistory" Description="应用历史。应用的操作历史">
+      <Columns>
+        <Column Name="Id" DataType="Int64" PrimaryKey="True" Description="编号" />
+        <Column Name="AppID" DataType="Int32" Description="应用" />
+        <Column Name="Name" DataType="String" Master="True" Description="名称" />
+        <Column Name="Action" DataType="String" Description="操作" />
+        <Column Name="Success" DataType="Boolean" Description="成功" />
+        <Column Name="Version" DataType="String" Description="版本" />
+        <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
+        <Column Name="Server" DataType="String" Description="服务端。客户端登录到哪个服务端，IP加端口" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="CreateIP" DataType="String" Description="创建地址" />
+        <Column Name="Remark" DataType="String" Length="2000" Description="内容" />
+      </Columns>
+      <Indexes>
+        <Index Columns="AppID,Action" />
+      </Indexes>
+    </Table>
+    <Table Name="AppConfig" Description="应用配置。各应用的配置数据">
+      <Columns>
+        <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+        <Column Name="AppID" DataType="Int32" Description="应用" />
+        <Column Name="Name" DataType="String" Master="True" Description="名称" />
+        <Column Name="Content" DataType="String" Length="5000" Description="内容。一般是json格式" />
+        <Column Name="CreateUserID" DataType="Int32" Description="创建人" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="CreateIP" DataType="String" Description="创建地址" />
+        <Column Name="UpdateUserID" DataType="Int32" Description="更新人" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+        <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+      </Columns>
+      <Indexes>
+        <Index Columns="AppID,Name" Unique="True" />
+        <Index Columns="UpdateTime" />
+      </Indexes>
+    </Table>
+    <Table Name="Job" Description="作业">
+      <Columns>
+        <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+        <Column Name="AppID" DataType="Int32" Description="应用" />
+        <Column Name="Name" DataType="String" Master="True" Length="100" Description="名称" />
+        <Column Name="ClassName" DataType="String" Length="100" Description="类名。支持该作业的处理器实现" />
+        <Column Name="DisplayName" DataType="String" Description="显示名" />
+        <Column Name="Mode" DataType="Int32" Description="调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑" Type="JobModes" />
+        <Column Name="Topic" DataType="String" Description="主题。消息调度时消费的主题" />
+        <Column Name="MessageCount" DataType="Int32" Description="消息数" />
+        <Column Name="Start" DataType="DateTime" Description="开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
+        <Column Name="End" DataType="DateTime" Description="结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用" />
+        <Column Name="Step" DataType="Int32" Description="步进。切分任务的时间区间，秒" />
+        <Column Name="BatchSize" DataType="Int32" Description="批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用" />
+        <Column Name="Offset" DataType="Int32" Description="偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒" />
+        <Column Name="MaxTask" DataType="Int32" Description="并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度" />
+        <Column Name="MaxError" DataType="Int32" Description="最大错误。连续错误达到最大错误数时停止" />
+        <Column Name="MaxRetry" DataType="Int32" Description="最大重试。默认10次，超过该次数后将不再重试" />
+        <Column Name="MaxTime" DataType="Int32" Description="最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器" />
+        <Column Name="MaxRetain" DataType="Int32" Description="保留。任务项保留天数，超过天数的任务项将被删除，默认3天" />
+        <Column Name="MaxIdle" DataType="Int32" Description="最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警" />
+        <Column Name="ErrorDelay" DataType="Int32" Description="错误延迟。默认60秒，出错延迟后重新发放" />
+        <Column Name="Total" DataType="Int64" Description="总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1" />
+        <Column Name="Success" DataType="Int64" Description="成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数" />
+        <Column Name="Error" DataType="Int32" Description="错误" />
+        <Column Name="Times" DataType="Int32" Description="次数" />
+        <Column Name="Speed" DataType="Int32" Description="速度" />
+        <Column Name="Enable" DataType="Boolean" Description="启用" />
+        <Column Name="Data" DataType="String" Length="-1" Description="数据。Sql模板或C#模板" />
+        <Column Name="Remark" DataType="String" Length="2000" Description="内容" />
+        <Column Name="CreateUserID" DataType="Int32" Description="创建人" />
+        <Column Name="CreateUser" DataType="String" Description="创建者" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="CreateIP" DataType="String" Description="创建地址" />
+        <Column Name="UpdateUserID" DataType="Int32" Description="更新人" />
+        <Column Name="UpdateUser" DataType="String" Description="更新者" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+        <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+      </Columns>
+      <Indexes>
+        <Index Columns="AppID,Name" Unique="True" />
+      </Indexes>
+    </Table>
+    <Table Name="JobTask" Description="作业任务">
+      <Columns>
+        <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+        <Column Name="AppID" DataType="Int32" Description="应用" />
+        <Column Name="JobID" DataType="Int32" Description="作业" />
+        <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
+        <Column Name="Start" DataType="DateTime" Description="开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
+        <Column Name="End" DataType="DateTime" Description="结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
+        <Column Name="BatchSize" DataType="Int32" Description="批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用" />
+        <Column Name="Total" DataType="Int32" Description="总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1" />
+        <Column Name="Success" DataType="Int32" Description="成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数" />
+        <Column Name="Error" DataType="Int32" Description="错误" />
+        <Column Name="Times" DataType="Int32" Description="次数" />
+        <Column Name="Speed" DataType="Int32" Description="速度。每秒处理数，执行端计算" />
+        <Column Name="Cost" DataType="Int32" Description="耗时。秒，执行端计算的执行时间" />
+        <Column Name="FullCost" DataType="Int32" Description="全部耗时。秒，从任务发放到执行完成的时间" />
+        <Column Name="Status" DataType="Int32" Description="状态" Type="JobStatus" />
+        <Column Name="MsgCount" DataType="Int32" Description="消费消息数" />
+        <Column Name="Server" DataType="String" Description="服务器" />
+        <Column Name="ProcessID" DataType="Int32" Description="进程" />
+        <Column Name="Key" DataType="String" Description="最后键。Handler内记录作为样本的数据" />
+        <Column Name="Data" DataType="String" Length="-1" Description="数据。可以是Json数据，比如StatID" />
+        <Column Name="Message" DataType="String" Length="-1" Description="消息内容。Handler内记录的异常信息或其它任务消息" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+      </Columns>
+      <Indexes>
+        <Index Columns="JobID,Status,Start" />
+        <Index Columns="AppID,Client,Status" />
+        <Index Columns="JobID,CreateTime" />
+      </Indexes>
+    </Table>
+    <Table Name="JobError" Description="作业错误">
+      <Columns>
+        <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+        <Column Name="AppID" DataType="Int32" Description="应用" />
+        <Column Name="JobID" DataType="Int32" Description="作业" />
+        <Column Name="TaskID" DataType="Int32" Description="作业项" />
+        <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
+        <Column Name="Start" DataType="DateTime" Description="开始。大于等于" />
+        <Column Name="End" DataType="DateTime" Description="结束。小于，不等于" />
+        <Column Name="Data" DataType="String" Length="2000" Description="数据" />
+        <Column Name="Server" DataType="String" Description="服务器" />
+        <Column Name="ProcessID" DataType="Int32" Description="进程" />
+        <Column Name="Message" DataType="String" Length="2000" Description="内容" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+      </Columns>
+      <Indexes>
+        <Index Columns="AppID,ID" />
+        <Index Columns="JobID,ID" />
+      </Indexes>
+    </Table>
+    <Table Name="AppMessage" Description="应用消息。消息调度，某些作业负责生产消息，供其它作业进行消费处理">
+      <Columns>
+        <Column Name="Id" DataType="Int64" PrimaryKey="True" Description="编号" />
+        <Column Name="AppID" DataType="Int32" Description="应用" />
+        <Column Name="JobID" DataType="Int32" Description="作业。生产消息的作业" />
+        <Column Name="Topic" DataType="String" Description="主题。区分作业下多种消息" />
+        <Column Name="Data" DataType="String" Length="2000" Description="数据。可以是Json数据，比如StatID" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+      </Columns>
+      <Indexes>
+        <Index Columns="AppID,Topic,UpdateTime" />
+      </Indexes>
+    </Table>
+  </Tables>
+</EntityModel>

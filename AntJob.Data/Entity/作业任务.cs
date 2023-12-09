@@ -1,428 +1,430 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Web.Script.Serialization;
 using System.Xml.Serialization;
+using NewLife;
+using NewLife.Data;
 using XCode;
+using XCode.Cache;
 using XCode.Configuration;
 using XCode.DataAccessLayer;
 
-namespace AntJob.Data.Entity
+namespace AntJob.Data.Entity;
+
+/// <summary>作业任务</summary>
+[Serializable]
+[DataObject]
+[Description("作业任务")]
+[BindIndex("IX_JobTask_JobID_Status_Start", false, "JobID,Status,Start")]
+[BindIndex("IX_JobTask_AppID_Client_Status", false, "AppID,Client,Status")]
+[BindIndex("IX_JobTask_JobID_CreateTime", false, "JobID,CreateTime")]
+[BindTable("JobTask", Description = "作业任务", ConnName = "Ant", DbType = DatabaseType.None)]
+public partial class JobTask
 {
-    /// <summary>作业任务</summary>
-    [Serializable]
-    [DataObject]
-    [Description("作业任务")]
-    [BindIndex("IX_JobTask_JobID_Status_Start", false, "JobID,Status,Start")]
-    [BindIndex("IX_JobTask_AppID_Client_Status", false, "AppID,Client,Status")]
-    [BindIndex("IX_JobTask_JobID_CreateTime", false, "JobID,CreateTime")]
-    [BindTable("JobTask", Description = "作业任务", ConnName = "Ant", DbType = DatabaseType.None)]
-    public partial class JobTask
+    #region 属性
+    private Int32 _ID;
+    /// <summary>编号</summary>
+    [DisplayName("编号")]
+    [Description("编号")]
+    [DataObjectField(true, true, false, 0)]
+    [BindColumn("ID", "编号", "")]
+    public Int32 ID { get => _ID; set { if (OnPropertyChanging("ID", value)) { _ID = value; OnPropertyChanged("ID"); } } }
+
+    private Int32 _AppID;
+    /// <summary>应用</summary>
+    [DisplayName("应用")]
+    [Description("应用")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("AppID", "应用", "")]
+    public Int32 AppID { get => _AppID; set { if (OnPropertyChanging("AppID", value)) { _AppID = value; OnPropertyChanged("AppID"); } } }
+
+    private Int32 _JobID;
+    /// <summary>作业</summary>
+    [DisplayName("作业")]
+    [Description("作业")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("JobID", "作业", "")]
+    public Int32 JobID { get => _JobID; set { if (OnPropertyChanging("JobID", value)) { _JobID = value; OnPropertyChanged("JobID"); } } }
+
+    private String _Client;
+    /// <summary>客户端。IP加进程</summary>
+    [DisplayName("客户端")]
+    [Description("客户端。IP加进程")]
+    [DataObjectField(false, false, true, 50)]
+    [BindColumn("Client", "客户端。IP加进程", "")]
+    public String Client { get => _Client; set { if (OnPropertyChanging("Client", value)) { _Client = value; OnPropertyChanged("Client"); } } }
+
+    private DateTime _Start;
+    /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
+    [DisplayName("开始")]
+    [Description("开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用")]
+    [DataObjectField(false, false, true, 0)]
+    [BindColumn("Start", "开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用", "")]
+    public DateTime Start { get => _Start; set { if (OnPropertyChanging("Start", value)) { _Start = value; OnPropertyChanged("Start"); } } }
+
+    private DateTime _End;
+    /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
+    [DisplayName("结束")]
+    [Description("结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用")]
+    [DataObjectField(false, false, true, 0)]
+    [BindColumn("End", "结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用", "")]
+    public DateTime End { get => _End; set { if (OnPropertyChanging("End", value)) { _End = value; OnPropertyChanged("End"); } } }
+
+    private Int32 _BatchSize;
+    /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
+    [DisplayName("批大小")]
+    [Description("批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("BatchSize", "批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用", "")]
+    public Int32 BatchSize { get => _BatchSize; set { if (OnPropertyChanging("BatchSize", value)) { _BatchSize = value; OnPropertyChanged("BatchSize"); } } }
+
+    private Int32 _Total;
+    /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
+    [DisplayName("总数")]
+    [Description("总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("Total", "总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1", "")]
+    public Int32 Total { get => _Total; set { if (OnPropertyChanging("Total", value)) { _Total = value; OnPropertyChanged("Total"); } } }
+
+    private Int32 _Success;
+    /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
+    [DisplayName("成功")]
+    [Description("成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("Success", "成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数", "")]
+    public Int32 Success { get => _Success; set { if (OnPropertyChanging("Success", value)) { _Success = value; OnPropertyChanged("Success"); } } }
+
+    private Int32 _Error;
+    /// <summary>错误</summary>
+    [DisplayName("错误")]
+    [Description("错误")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("Error", "错误", "")]
+    public Int32 Error { get => _Error; set { if (OnPropertyChanging("Error", value)) { _Error = value; OnPropertyChanged("Error"); } } }
+
+    private Int32 _Times;
+    /// <summary>次数</summary>
+    [DisplayName("次数")]
+    [Description("次数")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("Times", "次数", "")]
+    public Int32 Times { get => _Times; set { if (OnPropertyChanging("Times", value)) { _Times = value; OnPropertyChanged("Times"); } } }
+
+    private Int32 _Speed;
+    /// <summary>速度。每秒处理数，执行端计算</summary>
+    [DisplayName("速度")]
+    [Description("速度。每秒处理数，执行端计算")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("Speed", "速度。每秒处理数，执行端计算", "")]
+    public Int32 Speed { get => _Speed; set { if (OnPropertyChanging("Speed", value)) { _Speed = value; OnPropertyChanged("Speed"); } } }
+
+    private Int32 _Cost;
+    /// <summary>耗时。秒，执行端计算的执行时间</summary>
+    [DisplayName("耗时")]
+    [Description("耗时。秒，执行端计算的执行时间")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("Cost", "耗时。秒，执行端计算的执行时间", "")]
+    public Int32 Cost { get => _Cost; set { if (OnPropertyChanging("Cost", value)) { _Cost = value; OnPropertyChanged("Cost"); } } }
+
+    private Int32 _FullCost;
+    /// <summary>全部耗时。秒，从任务发放到执行完成的时间</summary>
+    [DisplayName("全部耗时")]
+    [Description("全部耗时。秒，从任务发放到执行完成的时间")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("FullCost", "全部耗时。秒，从任务发放到执行完成的时间", "")]
+    public Int32 FullCost { get => _FullCost; set { if (OnPropertyChanging("FullCost", value)) { _FullCost = value; OnPropertyChanged("FullCost"); } } }
+
+    private JobStatus _Status;
+    /// <summary>状态</summary>
+    [DisplayName("状态")]
+    [Description("状态")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("Status", "状态", "")]
+    public JobStatus Status { get => _Status; set { if (OnPropertyChanging("Status", value)) { _Status = value; OnPropertyChanged("Status"); } } }
+
+    private Int32 _MsgCount;
+    /// <summary>消费消息数</summary>
+    [DisplayName("消费消息数")]
+    [Description("消费消息数")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("MsgCount", "消费消息数", "")]
+    public Int32 MsgCount { get => _MsgCount; set { if (OnPropertyChanging("MsgCount", value)) { _MsgCount = value; OnPropertyChanged("MsgCount"); } } }
+
+    private String _Server;
+    /// <summary>服务器</summary>
+    [DisplayName("服务器")]
+    [Description("服务器")]
+    [DataObjectField(false, false, true, 50)]
+    [BindColumn("Server", "服务器", "")]
+    public String Server { get => _Server; set { if (OnPropertyChanging("Server", value)) { _Server = value; OnPropertyChanged("Server"); } } }
+
+    private Int32 _ProcessID;
+    /// <summary>进程</summary>
+    [DisplayName("进程")]
+    [Description("进程")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("ProcessID", "进程", "")]
+    public Int32 ProcessID { get => _ProcessID; set { if (OnPropertyChanging("ProcessID", value)) { _ProcessID = value; OnPropertyChanged("ProcessID"); } } }
+
+    private String _Key;
+    /// <summary>最后键。Handler内记录作为样本的数据</summary>
+    [DisplayName("最后键")]
+    [Description("最后键。Handler内记录作为样本的数据")]
+    [DataObjectField(false, false, true, 50)]
+    [BindColumn("Key", "最后键。Handler内记录作为样本的数据", "")]
+    public String Key { get => _Key; set { if (OnPropertyChanging("Key", value)) { _Key = value; OnPropertyChanged("Key"); } } }
+
+    private String _Data;
+    /// <summary>数据。可以是Json数据，比如StatID</summary>
+    [DisplayName("数据")]
+    [Description("数据。可以是Json数据，比如StatID")]
+    [DataObjectField(false, false, true, -1)]
+    [BindColumn("Data", "数据。可以是Json数据，比如StatID", "")]
+    public String Data { get => _Data; set { if (OnPropertyChanging("Data", value)) { _Data = value; OnPropertyChanged("Data"); } } }
+
+    private String _Message;
+    /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
+    [DisplayName("消息内容")]
+    [Description("消息内容。Handler内记录的异常信息或其它任务消息")]
+    [DataObjectField(false, false, true, -1)]
+    [BindColumn("Message", "消息内容。Handler内记录的异常信息或其它任务消息", "")]
+    public String Message { get => _Message; set { if (OnPropertyChanging("Message", value)) { _Message = value; OnPropertyChanged("Message"); } } }
+
+    private DateTime _CreateTime;
+    /// <summary>创建时间</summary>
+    [DisplayName("创建时间")]
+    [Description("创建时间")]
+    [DataObjectField(false, false, true, 0)]
+    [BindColumn("CreateTime", "创建时间", "")]
+    public DateTime CreateTime { get => _CreateTime; set { if (OnPropertyChanging("CreateTime", value)) { _CreateTime = value; OnPropertyChanged("CreateTime"); } } }
+
+    private DateTime _UpdateTime;
+    /// <summary>更新时间</summary>
+    [DisplayName("更新时间")]
+    [Description("更新时间")]
+    [DataObjectField(false, false, true, 0)]
+    [BindColumn("UpdateTime", "更新时间", "")]
+    public DateTime UpdateTime { get => _UpdateTime; set { if (OnPropertyChanging("UpdateTime", value)) { _UpdateTime = value; OnPropertyChanged("UpdateTime"); } } }
+    #endregion
+
+    #region 获取/设置 字段值
+    /// <summary>获取/设置 字段值</summary>
+    /// <param name="name">字段名</param>
+    /// <returns></returns>
+    public override Object this[String name]
     {
-        #region 属性
-        private Int32 _ID;
-        /// <summary>编号</summary>
-        [DisplayName("编号")]
-        [Description("编号")]
-        [DataObjectField(true, true, false, 0)]
-        [BindColumn("ID", "编号", "")]
-        public Int32 ID { get => _ID; set { if (OnPropertyChanging("ID", value)) { _ID = value; OnPropertyChanged("ID"); } } }
-
-        private Int32 _AppID;
-        /// <summary>应用</summary>
-        [DisplayName("应用")]
-        [Description("应用")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("AppID", "应用", "")]
-        public Int32 AppID { get => _AppID; set { if (OnPropertyChanging("AppID", value)) { _AppID = value; OnPropertyChanged("AppID"); } } }
-
-        private Int32 _JobID;
-        /// <summary>作业</summary>
-        [DisplayName("作业")]
-        [Description("作业")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("JobID", "作业", "")]
-        public Int32 JobID { get => _JobID; set { if (OnPropertyChanging("JobID", value)) { _JobID = value; OnPropertyChanged("JobID"); } } }
-
-        private String _Client;
-        /// <summary>客户端。IP加进程</summary>
-        [DisplayName("客户端")]
-        [Description("客户端。IP加进程")]
-        [DataObjectField(false, false, true, 50)]
-        [BindColumn("Client", "客户端。IP加进程", "")]
-        public String Client { get => _Client; set { if (OnPropertyChanging("Client", value)) { _Client = value; OnPropertyChanged("Client"); } } }
-
-        private DateTime _Start;
-        /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
-        [DisplayName("开始")]
-        [Description("开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用")]
-        [DataObjectField(false, false, true, 0)]
-        [BindColumn("Start", "开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用", "")]
-        public DateTime Start { get => _Start; set { if (OnPropertyChanging("Start", value)) { _Start = value; OnPropertyChanged("Start"); } } }
-
-        private DateTime _End;
-        /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
-        [DisplayName("结束")]
-        [Description("结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用")]
-        [DataObjectField(false, false, true, 0)]
-        [BindColumn("End", "结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用", "")]
-        public DateTime End { get => _End; set { if (OnPropertyChanging("End", value)) { _End = value; OnPropertyChanged("End"); } } }
-
-        private Int32 _BatchSize;
-        /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
-        [DisplayName("批大小")]
-        [Description("批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("BatchSize", "批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用", "")]
-        public Int32 BatchSize { get => _BatchSize; set { if (OnPropertyChanging("BatchSize", value)) { _BatchSize = value; OnPropertyChanged("BatchSize"); } } }
-
-        private Int32 _Total;
-        /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
-        [DisplayName("总数")]
-        [Description("总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("Total", "总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1", "")]
-        public Int32 Total { get => _Total; set { if (OnPropertyChanging("Total", value)) { _Total = value; OnPropertyChanged("Total"); } } }
-
-        private Int32 _Success;
-        /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
-        [DisplayName("成功")]
-        [Description("成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("Success", "成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数", "")]
-        public Int32 Success { get => _Success; set { if (OnPropertyChanging("Success", value)) { _Success = value; OnPropertyChanged("Success"); } } }
-
-        private Int32 _Error;
-        /// <summary>错误</summary>
-        [DisplayName("错误")]
-        [Description("错误")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("Error", "错误", "")]
-        public Int32 Error { get => _Error; set { if (OnPropertyChanging("Error", value)) { _Error = value; OnPropertyChanged("Error"); } } }
-
-        private Int32 _Times;
-        /// <summary>次数</summary>
-        [DisplayName("次数")]
-        [Description("次数")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("Times", "次数", "")]
-        public Int32 Times { get => _Times; set { if (OnPropertyChanging("Times", value)) { _Times = value; OnPropertyChanged("Times"); } } }
-
-        private Int32 _Speed;
-        /// <summary>速度。每秒处理数，执行端计算</summary>
-        [DisplayName("速度")]
-        [Description("速度。每秒处理数，执行端计算")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("Speed", "速度。每秒处理数，执行端计算", "")]
-        public Int32 Speed { get => _Speed; set { if (OnPropertyChanging("Speed", value)) { _Speed = value; OnPropertyChanged("Speed"); } } }
-
-        private Int32 _Cost;
-        /// <summary>耗时。秒，执行端计算的执行时间</summary>
-        [DisplayName("耗时")]
-        [Description("耗时。秒，执行端计算的执行时间")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("Cost", "耗时。秒，执行端计算的执行时间", "")]
-        public Int32 Cost { get => _Cost; set { if (OnPropertyChanging("Cost", value)) { _Cost = value; OnPropertyChanged("Cost"); } } }
-
-        private Int32 _FullCost;
-        /// <summary>全部耗时。秒，从任务发放到执行完成的时间</summary>
-        [DisplayName("全部耗时")]
-        [Description("全部耗时。秒，从任务发放到执行完成的时间")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("FullCost", "全部耗时。秒，从任务发放到执行完成的时间", "")]
-        public Int32 FullCost { get => _FullCost; set { if (OnPropertyChanging("FullCost", value)) { _FullCost = value; OnPropertyChanged("FullCost"); } } }
-
-        private JobStatus _Status;
-        /// <summary>状态</summary>
-        [DisplayName("状态")]
-        [Description("状态")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("Status", "状态", "")]
-        public JobStatus Status { get => _Status; set { if (OnPropertyChanging("Status", value)) { _Status = value; OnPropertyChanged("Status"); } } }
-
-        private Int32 _MsgCount;
-        /// <summary>消费消息数</summary>
-        [DisplayName("消费消息数")]
-        [Description("消费消息数")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("MsgCount", "消费消息数", "")]
-        public Int32 MsgCount { get => _MsgCount; set { if (OnPropertyChanging("MsgCount", value)) { _MsgCount = value; OnPropertyChanged("MsgCount"); } } }
-
-        private String _Server;
-        /// <summary>服务器</summary>
-        [DisplayName("服务器")]
-        [Description("服务器")]
-        [DataObjectField(false, false, true, 50)]
-        [BindColumn("Server", "服务器", "")]
-        public String Server { get => _Server; set { if (OnPropertyChanging("Server", value)) { _Server = value; OnPropertyChanged("Server"); } } }
-
-        private Int32 _ProcessID;
-        /// <summary>进程</summary>
-        [DisplayName("进程")]
-        [Description("进程")]
-        [DataObjectField(false, false, false, 0)]
-        [BindColumn("ProcessID", "进程", "")]
-        public Int32 ProcessID { get => _ProcessID; set { if (OnPropertyChanging("ProcessID", value)) { _ProcessID = value; OnPropertyChanged("ProcessID"); } } }
-
-        private String _Key;
-        /// <summary>最后键。Handler内记录作为样本的数据</summary>
-        [DisplayName("最后键")]
-        [Description("最后键。Handler内记录作为样本的数据")]
-        [DataObjectField(false, false, true, 50)]
-        [BindColumn("Key", "最后键。Handler内记录作为样本的数据", "")]
-        public String Key { get => _Key; set { if (OnPropertyChanging("Key", value)) { _Key = value; OnPropertyChanged("Key"); } } }
-
-        private String _Data;
-        /// <summary>数据。可以是Json数据，比如StatID</summary>
-        [DisplayName("数据")]
-        [Description("数据。可以是Json数据，比如StatID")]
-        [DataObjectField(false, false, true, -1)]
-        [BindColumn("Data", "数据。可以是Json数据，比如StatID", "")]
-        public String Data { get => _Data; set { if (OnPropertyChanging("Data", value)) { _Data = value; OnPropertyChanged("Data"); } } }
-
-        private String _Message;
-        /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
-        [DisplayName("消息内容")]
-        [Description("消息内容。Handler内记录的异常信息或其它任务消息")]
-        [DataObjectField(false, false, true, -1)]
-        [BindColumn("Message", "消息内容。Handler内记录的异常信息或其它任务消息", "")]
-        public String Message { get => _Message; set { if (OnPropertyChanging("Message", value)) { _Message = value; OnPropertyChanged("Message"); } } }
-
-        private DateTime _CreateTime;
-        /// <summary>创建时间</summary>
-        [DisplayName("创建时间")]
-        [Description("创建时间")]
-        [DataObjectField(false, false, true, 0)]
-        [BindColumn("CreateTime", "创建时间", "")]
-        public DateTime CreateTime { get => _CreateTime; set { if (OnPropertyChanging("CreateTime", value)) { _CreateTime = value; OnPropertyChanged("CreateTime"); } } }
-
-        private DateTime _UpdateTime;
-        /// <summary>更新时间</summary>
-        [DisplayName("更新时间")]
-        [Description("更新时间")]
-        [DataObjectField(false, false, true, 0)]
-        [BindColumn("UpdateTime", "更新时间", "")]
-        public DateTime UpdateTime { get => _UpdateTime; set { if (OnPropertyChanging("UpdateTime", value)) { _UpdateTime = value; OnPropertyChanged("UpdateTime"); } } }
-        #endregion
-
-        #region 获取/设置 字段值
-        /// <summary>获取/设置 字段值</summary>
-        /// <param name="name">字段名</param>
-        /// <returns></returns>
-        public override Object this[String name]
+        get => name switch
         {
-            get
+            "ID" => _ID,
+            "AppID" => _AppID,
+            "JobID" => _JobID,
+            "Client" => _Client,
+            "Start" => _Start,
+            "End" => _End,
+            "BatchSize" => _BatchSize,
+            "Total" => _Total,
+            "Success" => _Success,
+            "Error" => _Error,
+            "Times" => _Times,
+            "Speed" => _Speed,
+            "Cost" => _Cost,
+            "FullCost" => _FullCost,
+            "Status" => _Status,
+            "MsgCount" => _MsgCount,
+            "Server" => _Server,
+            "ProcessID" => _ProcessID,
+            "Key" => _Key,
+            "Data" => _Data,
+            "Message" => _Message,
+            "CreateTime" => _CreateTime,
+            "UpdateTime" => _UpdateTime,
+            _ => base[name]
+        };
+        set
+        {
+            switch (name)
             {
-                switch (name)
-                {
-                    case "ID": return _ID;
-                    case "AppID": return _AppID;
-                    case "JobID": return _JobID;
-                    case "Client": return _Client;
-                    case "Start": return _Start;
-                    case "End": return _End;
-                    case "BatchSize": return _BatchSize;
-                    case "Total": return _Total;
-                    case "Success": return _Success;
-                    case "Error": return _Error;
-                    case "Times": return _Times;
-                    case "Speed": return _Speed;
-                    case "Cost": return _Cost;
-                    case "FullCost": return _FullCost;
-                    case "Status": return _Status;
-                    case "MsgCount": return _MsgCount;
-                    case "Server": return _Server;
-                    case "ProcessID": return _ProcessID;
-                    case "Key": return _Key;
-                    case "Data": return _Data;
-                    case "Message": return _Message;
-                    case "CreateTime": return _CreateTime;
-                    case "UpdateTime": return _UpdateTime;
-                    default: return base[name];
-                }
-            }
-            set
-            {
-                switch (name)
-                {
-                    case "ID": _ID = value.ToInt(); break;
-                    case "AppID": _AppID = value.ToInt(); break;
-                    case "JobID": _JobID = value.ToInt(); break;
-                    case "Client": _Client = Convert.ToString(value); break;
-                    case "Start": _Start = value.ToDateTime(); break;
-                    case "End": _End = value.ToDateTime(); break;
-                    case "BatchSize": _BatchSize = value.ToInt(); break;
-                    case "Total": _Total = value.ToInt(); break;
-                    case "Success": _Success = value.ToInt(); break;
-                    case "Error": _Error = value.ToInt(); break;
-                    case "Times": _Times = value.ToInt(); break;
-                    case "Speed": _Speed = value.ToInt(); break;
-                    case "Cost": _Cost = value.ToInt(); break;
-                    case "FullCost": _FullCost = value.ToInt(); break;
-                    case "Status": _Status = (JobStatus)value.ToInt(); break;
-                    case "MsgCount": _MsgCount = value.ToInt(); break;
-                    case "Server": _Server = Convert.ToString(value); break;
-                    case "ProcessID": _ProcessID = value.ToInt(); break;
-                    case "Key": _Key = Convert.ToString(value); break;
-                    case "Data": _Data = Convert.ToString(value); break;
-                    case "Message": _Message = Convert.ToString(value); break;
-                    case "CreateTime": _CreateTime = value.ToDateTime(); break;
-                    case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
-                    default: base[name] = value; break;
-                }
+                case "ID": _ID = value.ToInt(); break;
+                case "AppID": _AppID = value.ToInt(); break;
+                case "JobID": _JobID = value.ToInt(); break;
+                case "Client": _Client = Convert.ToString(value); break;
+                case "Start": _Start = value.ToDateTime(); break;
+                case "End": _End = value.ToDateTime(); break;
+                case "BatchSize": _BatchSize = value.ToInt(); break;
+                case "Total": _Total = value.ToInt(); break;
+                case "Success": _Success = value.ToInt(); break;
+                case "Error": _Error = value.ToInt(); break;
+                case "Times": _Times = value.ToInt(); break;
+                case "Speed": _Speed = value.ToInt(); break;
+                case "Cost": _Cost = value.ToInt(); break;
+                case "FullCost": _FullCost = value.ToInt(); break;
+                case "Status": _Status = (JobStatus)value.ToInt(); break;
+                case "MsgCount": _MsgCount = value.ToInt(); break;
+                case "Server": _Server = Convert.ToString(value); break;
+                case "ProcessID": _ProcessID = value.ToInt(); break;
+                case "Key": _Key = Convert.ToString(value); break;
+                case "Data": _Data = Convert.ToString(value); break;
+                case "Message": _Message = Convert.ToString(value); break;
+                case "CreateTime": _CreateTime = value.ToDateTime(); break;
+                case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
+                default: base[name] = value; break;
             }
         }
-        #endregion
-
-        #region 字段名
-        /// <summary>取得作业任务字段信息的快捷方式</summary>
-        public partial class _
-        {
-            /// <summary>编号</summary>
-            public static readonly Field ID = FindByName("ID");
-
-            /// <summary>应用</summary>
-            public static readonly Field AppID = FindByName("AppID");
-
-            /// <summary>作业</summary>
-            public static readonly Field JobID = FindByName("JobID");
-
-            /// <summary>客户端。IP加进程</summary>
-            public static readonly Field Client = FindByName("Client");
-
-            /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
-            public static readonly Field Start = FindByName("Start");
-
-            /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
-            public static readonly Field End = FindByName("End");
-
-            /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
-            public static readonly Field BatchSize = FindByName("BatchSize");
-
-            /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
-            public static readonly Field Total = FindByName("Total");
-
-            /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
-            public static readonly Field Success = FindByName("Success");
-
-            /// <summary>错误</summary>
-            public static readonly Field Error = FindByName("Error");
-
-            /// <summary>次数</summary>
-            public static readonly Field Times = FindByName("Times");
-
-            /// <summary>速度。每秒处理数，执行端计算</summary>
-            public static readonly Field Speed = FindByName("Speed");
-
-            /// <summary>耗时。秒，执行端计算的执行时间</summary>
-            public static readonly Field Cost = FindByName("Cost");
-
-            /// <summary>全部耗时。秒，从任务发放到执行完成的时间</summary>
-            public static readonly Field FullCost = FindByName("FullCost");
-
-            /// <summary>状态</summary>
-            public static readonly Field Status = FindByName("Status");
-
-            /// <summary>消费消息数</summary>
-            public static readonly Field MsgCount = FindByName("MsgCount");
-
-            /// <summary>服务器</summary>
-            public static readonly Field Server = FindByName("Server");
-
-            /// <summary>进程</summary>
-            public static readonly Field ProcessID = FindByName("ProcessID");
-
-            /// <summary>最后键。Handler内记录作为样本的数据</summary>
-            public static readonly Field Key = FindByName("Key");
-
-            /// <summary>数据。可以是Json数据，比如StatID</summary>
-            public static readonly Field Data = FindByName("Data");
-
-            /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
-            public static readonly Field Message = FindByName("Message");
-
-            /// <summary>创建时间</summary>
-            public static readonly Field CreateTime = FindByName("CreateTime");
-
-            /// <summary>更新时间</summary>
-            public static readonly Field UpdateTime = FindByName("UpdateTime");
-
-            static Field FindByName(String name) => Meta.Table.FindByName(name);
-        }
-
-        /// <summary>取得作业任务字段名称的快捷方式</summary>
-        public partial class __
-        {
-            /// <summary>编号</summary>
-            public const String ID = "ID";
-
-            /// <summary>应用</summary>
-            public const String AppID = "AppID";
-
-            /// <summary>作业</summary>
-            public const String JobID = "JobID";
-
-            /// <summary>客户端。IP加进程</summary>
-            public const String Client = "Client";
-
-            /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
-            public const String Start = "Start";
-
-            /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
-            public const String End = "End";
-
-            /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
-            public const String BatchSize = "BatchSize";
-
-            /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
-            public const String Total = "Total";
-
-            /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
-            public const String Success = "Success";
-
-            /// <summary>错误</summary>
-            public const String Error = "Error";
-
-            /// <summary>次数</summary>
-            public const String Times = "Times";
-
-            /// <summary>速度。每秒处理数，执行端计算</summary>
-            public const String Speed = "Speed";
-
-            /// <summary>耗时。秒，执行端计算的执行时间</summary>
-            public const String Cost = "Cost";
-
-            /// <summary>全部耗时。秒，从任务发放到执行完成的时间</summary>
-            public const String FullCost = "FullCost";
-
-            /// <summary>状态</summary>
-            public const String Status = "Status";
-
-            /// <summary>消费消息数</summary>
-            public const String MsgCount = "MsgCount";
-
-            /// <summary>服务器</summary>
-            public const String Server = "Server";
-
-            /// <summary>进程</summary>
-            public const String ProcessID = "ProcessID";
-
-            /// <summary>最后键。Handler内记录作为样本的数据</summary>
-            public const String Key = "Key";
-
-            /// <summary>数据。可以是Json数据，比如StatID</summary>
-            public const String Data = "Data";
-
-            /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
-            public const String Message = "Message";
-
-            /// <summary>创建时间</summary>
-            public const String CreateTime = "CreateTime";
-
-            /// <summary>更新时间</summary>
-            public const String UpdateTime = "UpdateTime";
-        }
-        #endregion
     }
+    #endregion
+
+    #region 关联映射
+    #endregion
+
+    #region 字段名
+    /// <summary>取得作业任务字段信息的快捷方式</summary>
+    public partial class _
+    {
+        /// <summary>编号</summary>
+        public static readonly Field ID = FindByName("ID");
+
+        /// <summary>应用</summary>
+        public static readonly Field AppID = FindByName("AppID");
+
+        /// <summary>作业</summary>
+        public static readonly Field JobID = FindByName("JobID");
+
+        /// <summary>客户端。IP加进程</summary>
+        public static readonly Field Client = FindByName("Client");
+
+        /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
+        public static readonly Field Start = FindByName("Start");
+
+        /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
+        public static readonly Field End = FindByName("End");
+
+        /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
+        public static readonly Field BatchSize = FindByName("BatchSize");
+
+        /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
+        public static readonly Field Total = FindByName("Total");
+
+        /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
+        public static readonly Field Success = FindByName("Success");
+
+        /// <summary>错误</summary>
+        public static readonly Field Error = FindByName("Error");
+
+        /// <summary>次数</summary>
+        public static readonly Field Times = FindByName("Times");
+
+        /// <summary>速度。每秒处理数，执行端计算</summary>
+        public static readonly Field Speed = FindByName("Speed");
+
+        /// <summary>耗时。秒，执行端计算的执行时间</summary>
+        public static readonly Field Cost = FindByName("Cost");
+
+        /// <summary>全部耗时。秒，从任务发放到执行完成的时间</summary>
+        public static readonly Field FullCost = FindByName("FullCost");
+
+        /// <summary>状态</summary>
+        public static readonly Field Status = FindByName("Status");
+
+        /// <summary>消费消息数</summary>
+        public static readonly Field MsgCount = FindByName("MsgCount");
+
+        /// <summary>服务器</summary>
+        public static readonly Field Server = FindByName("Server");
+
+        /// <summary>进程</summary>
+        public static readonly Field ProcessID = FindByName("ProcessID");
+
+        /// <summary>最后键。Handler内记录作为样本的数据</summary>
+        public static readonly Field Key = FindByName("Key");
+
+        /// <summary>数据。可以是Json数据，比如StatID</summary>
+        public static readonly Field Data = FindByName("Data");
+
+        /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
+        public static readonly Field Message = FindByName("Message");
+
+        /// <summary>创建时间</summary>
+        public static readonly Field CreateTime = FindByName("CreateTime");
+
+        /// <summary>更新时间</summary>
+        public static readonly Field UpdateTime = FindByName("UpdateTime");
+
+        static Field FindByName(String name) => Meta.Table.FindByName(name);
+    }
+
+    /// <summary>取得作业任务字段名称的快捷方式</summary>
+    public partial class __
+    {
+        /// <summary>编号</summary>
+        public const String ID = "ID";
+
+        /// <summary>应用</summary>
+        public const String AppID = "AppID";
+
+        /// <summary>作业</summary>
+        public const String JobID = "JobID";
+
+        /// <summary>客户端。IP加进程</summary>
+        public const String Client = "Client";
+
+        /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
+        public const String Start = "Start";
+
+        /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
+        public const String End = "End";
+
+        /// <summary>批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用</summary>
+        public const String BatchSize = "BatchSize";
+
+        /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
+        public const String Total = "Total";
+
+        /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
+        public const String Success = "Success";
+
+        /// <summary>错误</summary>
+        public const String Error = "Error";
+
+        /// <summary>次数</summary>
+        public const String Times = "Times";
+
+        /// <summary>速度。每秒处理数，执行端计算</summary>
+        public const String Speed = "Speed";
+
+        /// <summary>耗时。秒，执行端计算的执行时间</summary>
+        public const String Cost = "Cost";
+
+        /// <summary>全部耗时。秒，从任务发放到执行完成的时间</summary>
+        public const String FullCost = "FullCost";
+
+        /// <summary>状态</summary>
+        public const String Status = "Status";
+
+        /// <summary>消费消息数</summary>
+        public const String MsgCount = "MsgCount";
+
+        /// <summary>服务器</summary>
+        public const String Server = "Server";
+
+        /// <summary>进程</summary>
+        public const String ProcessID = "ProcessID";
+
+        /// <summary>最后键。Handler内记录作为样本的数据</summary>
+        public const String Key = "Key";
+
+        /// <summary>数据。可以是Json数据，比如StatID</summary>
+        public const String Data = "Data";
+
+        /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
+        public const String Message = "Message";
+
+        /// <summary>创建时间</summary>
+        public const String CreateTime = "CreateTime";
+
+        /// <summary>更新时间</summary>
+        public const String UpdateTime = "UpdateTime";
+    }
+    #endregion
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -88,6 +88,32 @@ namespace AntJob.Data.Entity
         {
             return FindAll(_.JobID == jobid & _.CreateTime < createTime, _.CreateTime.Desc(), null, 0, 1).FirstOrDefault();
         }
+
+    /// <summary>根据作业、状态、开始查找</summary>
+    /// <param name="jobId">作业</param>
+    /// <param name="status">状态</param>
+    /// <param name="start">开始</param>
+    /// <returns>实体列表</returns>
+    public static IList<JobTask> FindAllByJobIDAndStatusAndStart(Int32 jobId, JobStatus status, DateTime start)
+    {
+        // 实体缓存
+        if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.JobID == jobId && e.Status == status && e.Start == start);
+
+        return FindAll(_.JobID == jobId & _.Status == status & _.Start == start);
+    }
+
+    /// <summary>根据应用、客户端、状态查找</summary>
+    /// <param name="appId">应用</param>
+    /// <param name="client">客户端</param>
+    /// <param name="status">状态</param>
+    /// <returns>实体列表</returns>
+    public static IList<JobTask> FindAllByAppIDAndClientAndStatus(Int32 appId, String client, JobStatus status)
+    {
+        // 实体缓存
+        if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.AppID == appId && e.Client.EqualIgnoreCase(client) && e.Status == status);
+
+        return FindAll(_.AppID == appId & _.Client == client & _.Status == status);
+    }
         #endregion
 
         #region 高级查询

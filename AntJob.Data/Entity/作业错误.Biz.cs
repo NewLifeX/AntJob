@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Serialization;
@@ -68,6 +68,32 @@ namespace AntJob.Data.Entity
 
             return Find(_.ID == id);
         }
+
+    /// <summary>根据应用查找</summary>
+    /// <param name="appId">应用</param>
+    /// <returns>实体列表</returns>
+    public static IList<JobError> FindAllByAppID(Int32 appId)
+    {
+        if (appId <= 0) return new List<JobError>();
+
+        // 实体缓存
+        if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.AppID == appId);
+
+        return FindAll(_.AppID == appId);
+    }
+
+    /// <summary>根据作业查找</summary>
+    /// <param name="jobId">作业</param>
+    /// <returns>实体列表</returns>
+    public static IList<JobError> FindAllByJobID(Int32 jobId)
+    {
+        if (jobId <= 0) return new List<JobError>();
+
+        // 实体缓存
+        if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.JobID == jobId);
+
+        return FindAll(_.JobID == jobId);
+    }
         #endregion
 
         #region 高级查询
