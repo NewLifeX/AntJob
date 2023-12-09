@@ -83,7 +83,7 @@ public abstract class Handler
 
         var msg = "开始工作";
         var job = Job;
-        if (job != null) msg += $" {job.Enable} 区间（{job.Start}, {job.End}） Offset={job.Offset} Step={job.Step} MaxTask={job.MaxTask}";
+        if (job != null) msg += $" {job.Enable} 区间（{job.Start.ToFullString("")}, {job.End.ToFullString("")}） Offset={job.Offset} Step={job.Step} MaxTask={job.MaxTask}";
 
         using var span = Tracer?.NewSpan($"job:{Name}:Start", msg);
         WriteLog(msg);

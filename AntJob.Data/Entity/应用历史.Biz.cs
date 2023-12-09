@@ -134,7 +134,7 @@ public partial class AppHistory : EntityBase<AppHistory>
     /// <returns></returns>
     public static AppHistory Create(App app, String action, Boolean success, String remark, String creator, String ip)
     {
-        if (app == null) app = new App();
+        app ??= new App();
 
         var hi = new AppHistory
         {

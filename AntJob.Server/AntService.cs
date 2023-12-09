@@ -78,7 +78,7 @@ class AntService : IApi, IActionFilter
                 else
                     XTrace.WriteException(ex);
 
-                WriteHistory(filterContext.ActionName, false, ex.GetMessage());
+                WriteHistory(null, filterContext.ActionName, false, ex.GetMessage());
             }
         }
     }
@@ -132,7 +132,7 @@ class AntService : IApi, IActionFilter
         // 记录当前用户
         Session["App"] = app;
 
-        WriteHistory(autoReg ? "注册" : "登录", true, $"[{model.User}/{model.Pass}]在[{model.Machine}@{model.ProcessId}]登录[{app}]成功");
+        WriteHistory(app, autoReg ? "注册" : "登录", true, $"[{model.User}/{model.Pass}]在[{model.Machine}@{model.ProcessId}]登录[{app}]成功");
 
         var rs = new LoginResponse { Name = app.Name, DisplayName = app.DisplayName };
         if (autoReg) rs.Secret = app.Secret;
@@ -593,7 +593,7 @@ class AntService : IApi, IActionFilter
         ns.OnDisposed += (s, e) =>
         {
             online.Delete();
-            WriteHistory("下线", true, $"[{online.Name}]登录于{online.CreateTime}，最后活跃于{online.UpdateTime}");
+            WriteHistory(online.App, "下线", true, $"[{online.Name}]登录于{online.CreateTime}，最后活跃于{online.UpdateTime}");
         };
 
         return online;
@@ -626,6 +626,6 @@ class AntService : IApi, IActionFilter
     #endregion
 
     #region 写历史
-    void WriteHistory(String action, Boolean success, String remark) => AppHistory.Create(_App, action, success, remark, Local + "", _Net.Remote?.Host);
+    void WriteHistory(App app, String action, Boolean success, String remark) => AppHistory.Create(app ?? _App, action, success, remark, Local + "", _Net.Remote?.Host);
     #endregion
 }
