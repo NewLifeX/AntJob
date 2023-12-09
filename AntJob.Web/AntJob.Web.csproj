@@ -22,6 +22,12 @@
     <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="Areas\Ant\Views\AppHistory\_List_Data.cshtml" />
+    <Content Remove="Areas\Ant\Views\AppMessage\_List_Data.cshtml" />
+    <Content Remove="Areas\Ant\Views\AppOnline\_List_Data.cshtml" />
+    <Content Remove="Areas\Ant\Views\JobError\_List_Data.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -31,5 +37,8 @@
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Areas\Ant\Views\AppOnline\" />
   </ItemGroup>
 </Project>

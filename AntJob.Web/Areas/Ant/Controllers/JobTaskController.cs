@@ -6,72 +6,74 @@ using AntJob.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using NewLife;
 using NewLife.Cube;
+using NewLife.Cube.Extensions;
 using NewLife.Web;
 using XCode.Membership;
 
-namespace AntJob.Web.Areas.Ant.Controllers
+namespace AntJob.Web.Areas.Ant.Controllers;
+
+/// <summary>作业任务</summary>
+[AntArea]
+[DisplayName("作业任务")]
+public class JobTaskController : EntityController<JobTask>
 {
-    /// <summary>作业任务</summary>
-    [AntArea]
-    [DisplayName("作业任务")]
-    public class JobTaskController : EntityController<JobTask>
+    static JobTaskController()
     {
-        static JobTaskController()
-        {
-            //MenuOrder = 70;
+        //MenuOrder = 70;
 
-            JobTask.Meta.Modules.Add<TimeModule>();
+        JobTask.Meta.Modules.Add<TimeModule>();
+
+        ListFields.TraceUrl();
+    }
+
+    /// <summary>搜索数据集</summary>
+    /// <param name="p"></param>
+    /// <returns></returns>
+    protected override IEnumerable<JobTask> Search(Pager p)
+    {
+        var id = p["id"].ToInt(-1);
+        var jobid = p["JobID"].ToInt(-1);
+        var appid = p["AppID"].ToInt(-1);
+        var status = (JobStatus)p["Status"].ToInt(-1);
+        var start = p["dtStart"].ToDateTime();
+        var end = p["dtEnd"].ToDateTime();
+        var client = p["Client"];
+
+        return JobTask.Search(id, appid, jobid, status, start, end, client, p["q"], p);
+    }
+
+    /// <summary>修改状态</summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [EntityAuthorize(PermissionFlags.Update)]
+    public ActionResult Set(Int32 id = 0)
+    {
+        if (id > 0)
+        {
+            var dt = JobTask.FindByID(id);
+            if (dt == null) throw new ArgumentNullException(nameof(id), "找不到任务 " + id);
+
+            dt.Status = JobStatus.取消;
+            if (dt.Times >= 10) dt.Times = 0;
+
+            dt.Save();
         }
-
-        /// <summary>搜索数据集</summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        protected override IEnumerable<JobTask> Search(Pager p)
+        else
         {
-            var id = p["id"].ToInt(-1);
-            var jobid = p["JobID"].ToInt(-1);
-            var appid = p["AppID"].ToInt(-1);
-            var status = (JobStatus)p["Status"].ToInt(-1);
-            var start = p["dtStart"].ToDateTime();
-            var end = p["dtEnd"].ToDateTime();
-            var client = p["Client"];
+            var ids = GetRequest("keys").SplitAsInt();
 
-            return JobTask.Search(id, appid, jobid, status, start, end, client, p["q"], p);
-        }
-
-        /// <summary>修改状态</summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [EntityAuthorize(PermissionFlags.Update)]
-        public ActionResult Set(Int32 id = 0)
-        {
-            if (id > 0)
+            foreach (var item in ids)
             {
-                var dt = JobTask.FindByID(id);
-                if (dt == null) throw new ArgumentNullException(nameof(id), "找不到任务 " + id);
-
-                dt.Status = JobStatus.取消;
-                if (dt.Times >= 10) dt.Times = 0;
-
-                dt.Save();
-            }
-            else
-            {
-                var ids = GetRequest("keys").SplitAsInt();
-
-                foreach (var item in ids)
+                var dt = JobTask.FindByID(item);
+                if (dt != null)
                 {
-                    var dt = JobTask.FindByID(item);
-                    if (dt != null)
-                    {
-                        dt.Status = JobStatus.取消;
-                        if (dt.Times >= 10) dt.Times = 0;
+                    dt.Status = JobStatus.取消;
+                    if (dt.Times >= 10) dt.Times = 0;
 
-                        dt.Save();
-                    }
+                    dt.Save();
                 }
             }
-            return JsonRefresh("操作成功！");
         }
+        return JsonRefresh("操作成功！");
     }
 }

@@ -1,5 +1,6 @@
 ﻿@model IList<AntJob.Data.Entity.JobTask>
 @using NewLife;
+@using NewLife.Cube.Extensions
 @using NewLife.Web;
 @using XCode;
 @using XCode.Configuration;
@@ -35,6 +36,7 @@
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("FullCost"))" title="@JobTask._.FullCost.Description">全耗时</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Status"))">状态</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Key"))">最后键</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("TraceId"))">追踪</a></th>
             <th class="text-center" style="min-width:134px;"><a href="@Html.Raw(page.GetSortUrl("UpdateTime"))">更新时间</a></th>
             @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
             {
@@ -88,6 +90,12 @@
                 <td class="text-right">@TimeSpan.FromSeconds(entity.FullCost)</td>
                 <td class="text-center @cls">@entity.Status</td>
                 <td>@entity.Key</td>
+                <td>
+                    @if (!entity.TraceId.IsNullOrEmpty())
+                    {
+                        <a href="@StarHelper.BuildUrl(entity.TraceId)">追踪</a>
+                    }
+                </td>
                 <td>@entity.UpdateTime.ToFullString("")</td>
                 @if (this.Has(PermissionFlags.Detail, PermissionFlags.Update, PermissionFlags.Delete))
                 {
