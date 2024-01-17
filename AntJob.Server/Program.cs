@@ -1,4 +1,5 @@
 ﻿using AntJob.Server;
+using AntJob.Server.Services;
 using NewLife;
 using NewLife.Caching;
 using NewLife.Caching.Services;
@@ -34,6 +35,8 @@ if (set2.IsNew)
 // 分布式缓存，锚定配置中心RedisCache，若无配置则使用本地MemoryCache
 // 集群部署时，务必使用RedisCache，内部将使用Redis实现分布式锁
 services.AddSingleton<ICacheProvider, RedisCacheProvider>();
+services.AddSingleton<AppService>();
+services.AddSingleton<JobService>();
 
 // 预热数据层，执行反向工程建表等操作
 EntityFactory.InitConnection("Ant");

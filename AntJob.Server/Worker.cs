@@ -29,7 +29,7 @@ public class Worker : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        var set = Setting.Current;
+        var set = AntJobSetting.Current;
 
         // 实例化RPC服务端，指定端口，指定ServiceProvider，用于依赖注入获取接口服务层
         var server = new ApiServer(set.Port)

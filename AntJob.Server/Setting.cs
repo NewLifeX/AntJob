@@ -5,7 +5,7 @@ namespace AntJob.Server;
 
 /// <summary>配置</summary>
 [Config("AntJob")]
-public class Setting : Config<Setting>
+public class AntJobSetting : Config<AntJobSetting>
 {
     #region 属性
     /// <summary>调试开关。默认true</summary>

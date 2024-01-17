@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AntJob.Server.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +25,9 @@ public class Startup
             set.BackupPath = "../Backup";
             set.Save();
         }
+
+        services.AddSingleton<AppService>();
+        services.AddSingleton<JobService>();
 
         services.AddControllersWithViews();
         services.AddCube();
