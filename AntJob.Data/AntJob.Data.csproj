@@ -4,8 +4,8 @@
     <AssemblyTitle>蚂蚁数据</AssemblyTitle>
     <Description>蚂蚁调度系统数据库结构</Description>
     <Company>新生命开发团队</Company>
-    <Copyright>版权所有(C) 新生命开发团队 2020</Copyright>
-    <VersionPrefix>2.0</VersionPrefix>
+    <Copyright>版权所有(C) 新生命开发团队 2024</Copyright>
+    <VersionPrefix>3.4</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(Version)</FileVersion>

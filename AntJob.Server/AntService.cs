@@ -58,7 +58,8 @@ class AntService : IApi, IActionFilter
         {
             _App = app;
 
-            var online = GetOnline(app, _Net);
+            var ip = _Net.Remote.Host;
+            var online = _appService.GetOnline(app, ip);
             online.UpdateTime = TimerX.Now;
             online.SaveAsync();
         }
@@ -81,7 +82,9 @@ class AntService : IApi, IActionFilter
                 else
                     XTrace.WriteException(ex);
 
-                WriteHistory(null, filterContext.ActionName, false, ex.GetMessage());
+                _Net = Session as INetSession;
+                var ip = _Net.Remote.Host;
+                _appService.WriteHistory(_App, filterContext.ActionName, false, ex.GetMessage(), ip);
             }
         }
     }
@@ -136,39 +139,8 @@ class AntService : IApi, IActionFilter
         var job = model.Job?.Trim();
         if (job.IsNullOrEmpty()) return new TaskModel[0];
 
-        return _jobService.Acquire(_App, model);
-    }
-
-    private void CheckErrorTask(App app, Job jb, Int32 count, List<JobTask> list)
-    {
-        // 每分钟检查一下错误任务和中断任务
-        var nextKey = $"_NextAcquireOld_{jb.ID}";
-        var now = TimerX.Now;
-        var ext = Session as IExtend;
-        var next = (DateTime)(ext[nextKey] ?? DateTime.MinValue);
-        if (next < now)
-        {
-            //var ps = ControllerContext.Current.Parameters;
-            //var server = ps["server"] + "";
-            //var pid = ps["pid"].ToInt();
-            var online = GetOnline(app, _Net);
-            var ip = _Net.Remote.Host;
-
-            next = now.AddSeconds(60);
-            list.AddRange(jb.AcquireOld(online.Server, ip, online.ProcessId, count, _cacheProvider.Cache));
-
-            if (list.Count > 0)
-            {
-                // 既然有数据，待会还来
-                next = now;
-
-                var n1 = list.Count(e => e.Status == JobStatus.错误 || e.Status == JobStatus.取消);
-                var n2 = list.Count(e => e.Status == JobStatus.就绪 || e.Status == JobStatus.抽取中 || e.Status == JobStatus.处理中);
-                _log.Info("作业[{0}/{1}]准备处理[{2}]个错误和[{3}]超时任务 [{4}]", app, jb.Name, n1, n2, list.Join(",", e => e.ID + ""));
-            }
-            else
-                ext[nextKey] = next;
-        }
+        var ip = _Net.Remote.Host;
+        return _jobService.Acquire(_App, model, ip);
     }
 
     /// <summary>生产消息</summary>
@@ -191,7 +163,8 @@ class AntService : IApi, IActionFilter
     {
         if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 
-        return _jobService.Report(_App, task);
+        var ip = _Net.Remote.Host;
+        return _jobService.Report(_App, task, ip);
     }
     #endregion
 }

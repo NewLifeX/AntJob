@@ -9,6 +9,11 @@ using NewLife.Log;
 using NewLife.Net;
 using NewLife.Security;
 using AntJob.Models;
+using NewLife.Data;
+using NewLife.Remoting;
+using NewLife.Web;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace AntJob.Server.Services;
 
@@ -64,13 +69,10 @@ public class AppService
         app.Save();
 
         // 应用上线
-        var online = CreateOnline(app, _Net, model.Machine, model.ProcessId);
+        var online = CreateOnline(app, ip, model.Machine, model.ProcessId);
         online.Version = model.Version;
         online.CompileTime = model.Compile;
         online.Save();
-
-        //// 记录当前用户
-        //Session["App"] = app;
 
         WriteHistory(app, autoReg ? "注册" : "登录", true, $"[{model.User}/{model.Pass}]在[{model.Machine}@{model.ProcessId}]登录[{app}]成功");
 
@@ -133,49 +135,34 @@ public class AppService
         return olts.Select(e => e.ToModel()).ToArray();
     }
 
-    AppOnline CreateOnline(App app, INetSession ns, String machine, Int32 pid)
+    AppOnline CreateOnline(App app, String ip, String machine, Int32 pid)
     {
-        var ip = ns.Remote.Host;
-
-        var online = GetOnline(app, ns);
+        var online = GetOnline(app, ip);
         online.Client = $"{(ip.IsNullOrEmpty() ? machine : ip)}@{pid}";
         online.Name = machine;
         online.ProcessId = pid;
         online.UpdateIP = ip;
         //online.Version = version;
 
-        online.Server = Local + "";
+        online.Server = Environment.MachineName;
         //online.Save();
-
-        // 真正的用户
-        Session["AppOnline"] = online;
-
-        // 下线
-        ns.OnDisposed += (s, e) =>
-        {
-            online.Delete();
-            WriteHistory(online.App, "下线", true, $"[{online.Name}]登录于{online.CreateTime}，最后活跃于{online.UpdateTime}");
-        };
 
         return online;
     }
 
-    public AppOnline GetOnline(App app, INetSession ns)
+    public AppOnline GetOnline(App app, String ip)
     {
-        if (Session["AppOnline"] is AppOnline online) return online;
-
-        var ip = ns.Remote.Host;
-        var ins = ns.Remote.EndPoint + "";
-        online = AppOnline.FindByInstance(ins) ?? new AppOnline { CreateIP = ip };
+        var ins = $"{app.Name}@{ip}";
+        var online = AppOnline.FindByInstance(ins) ?? new AppOnline { CreateIP = ip };
         online.AppID = app.ID;
         online.Instance = ins;
 
         return online;
     }
 
-    public void UpdateOnline(App app, JobTask ji, INetSession ns)
+    public void UpdateOnline(App app, JobTask ji, String ip)
     {
-        var online = GetOnline(app, ns);
+        var online = GetOnline(app, ip);
         online.Total += ji.Total;
         online.Success += ji.Success;
         online.Error += ji.Error;
@@ -187,6 +174,77 @@ public class AppService
     #endregion
 
     #region 写历史
-    public void WriteHistory(App app, String action, Boolean success, String remark) => AppHistory.Create(app, action, success, remark, Local + "", _Net.Remote?.Host);
+    public void WriteHistory(App app, String action, Boolean success, String remark, String ip = null) =>
+        AppHistory.Create(app, action, success, remark, Environment.MachineName, ip);
+    #endregion
+
+    #region 辅助
+    public TokenModel IssueToken(String name, AntJobSetting set)
+    {
+        // 颁发令牌
+        var ss = set.TokenSecret.Split(':');
+        var jwt = new JwtBuilder
+        {
+            Issuer = Assembly.GetEntryAssembly().GetName().Name,
+            Subject = name,
+            Id = Rand.NextString(8),
+            Expire = DateTime.Now.AddSeconds(set.TokenExpire),
+
+            Algorithm = ss[0],
+            Secret = ss[1],
+        };
+
+        return new TokenModel
+        {
+            AccessToken = jwt.Encode(null),
+            TokenType = jwt.Type ?? "JWT",
+            ExpireIn = set.TokenExpire,
+            RefreshToken = jwt.Encode(null),
+        };
+    }
+
+    public (App, Exception) DecodeToken(String token, String tokenSecret)
+    {
+        if (token.IsNullOrEmpty()) throw new ArgumentNullException(nameof(token));
+        //if (token.IsNullOrEmpty()) throw new ApiException(401, $"节点未登录[ip={UserHost}]");
+
+        // 解码令牌
+        var ss = tokenSecret.Split(':');
+        var jwt = new JwtBuilder
+        {
+            Algorithm = ss[0],
+            Secret = ss[1],
+        };
+
+        var rs = jwt.TryDecode(token, out var message);
+        var app = App.FindByName(jwt.Subject);
+
+        Exception ex = null;
+        if (!rs || app == null)
+        {
+            if (app != null)
+                ex = new ApiException(403, $"[{app.Name}/{app.DisplayName}]非法访问 {message}");
+            else
+                ex = new ApiException(403, $"[{jwt.Subject}]非法访问 {message}");
+        }
+
+        return (app, ex);
+    }
+
+    public TokenModel ValidAndIssueToken(String deviceCode, String token, AntJobSetting set)
+    {
+        if (token.IsNullOrEmpty()) return null;
+        //var set = Setting.Current;
+
+        // 令牌有效期检查，10分钟内过期者，重新颁发令牌
+        var ss = set.TokenSecret.Split(':');
+        var jwt = new JwtBuilder
+        {
+            Algorithm = ss[0],
+            Secret = ss[1],
+        };
+        var rs = jwt.TryDecode(token, out var message);
+        return !rs || jwt == null ? null : DateTime.Now.AddMinutes(10) > jwt.Expire ? IssueToken(deviceCode, set) : null;
+    }
     #endregion
 }

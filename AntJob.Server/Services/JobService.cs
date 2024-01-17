@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AntJob.Data;
+﻿using AntJob.Data;
 using AntJob.Data.Entity;
 using AntJob.Models;
 using NewLife;
@@ -87,7 +84,7 @@ public class JobService
     /// <summary>申请作业任务</summary>
     /// <param name="model">模型</param>
     /// <returns></returns>
-    public ITask[] Acquire(App app, AcquireModel model)
+    public ITask[] Acquire(App app, AcquireModel model, String ip)
     {
         var job = model.Job?.Trim();
         if (job.IsNullOrEmpty()) return new TaskModel[0];
@@ -111,12 +108,12 @@ public class JobService
         if (jb == null) throw new XException($"应用[{app.ID}/{app.Name}]下未找到作业[{job}]");
         if (jb.Step == 0 || jb.Start.Year <= 2000) throw new XException("作业[{0}/{1}]未设置开始时间或步进", jb.ID, jb.Name);
 
-        var online = _appService.GetOnline(app, _Net);
+        var online = _appService.GetOnline(app, ip);
 
         var list = new List<JobTask>();
 
         // 每分钟检查一下错误任务和中断任务
-        CheckErrorTask(app, jb, model.Count, list);
+        CheckErrorTask(app, jb, model.Count, list, ip);
 
         // 错误项不够时，增加切片
         if (list.Count < model.Count)
@@ -125,7 +122,6 @@ public class JobService
             var server = online.Name;
             var pid = online.ProcessId;
             //var topic = ps["topic"] + "";
-            var ip = _Net.Remote.Host;
 
             switch (jb.Mode)
             {
@@ -157,20 +153,15 @@ public class JobService
         return list.Select(e => e.ToModel()).ToArray();
     }
 
-    private void CheckErrorTask(App app, Job jb, Int32 count, List<JobTask> list)
+    private void CheckErrorTask(App app, Job jb, Int32 count, List<JobTask> list, String ip)
     {
         // 每分钟检查一下错误任务和中断任务
-        var nextKey = $"_NextAcquireOld_{jb.ID}";
+        var nextKey = $"antjob:NextAcquireOld_{jb.ID}";
         var now = TimerX.Now;
-        var ext = Session as IExtend;
-        var next = (DateTime)(ext[nextKey] ?? DateTime.MinValue);
+        var next = _cacheProvider.Cache.Get<DateTime>(nextKey);
         if (next < now)
         {
-            //var ps = ControllerContext.Current.Parameters;
-            //var server = ps["server"] + "";
-            //var pid = ps["pid"].ToInt();
-            var online = _appService.GetOnline(app, _Net);
-            var ip = _Net.Remote.Host;
+            var online = _appService.GetOnline(app, ip);
 
             next = now.AddSeconds(60);
             list.AddRange(jb.AcquireOld(online.Server, ip, online.ProcessId, count, _cacheProvider.Cache));
@@ -185,7 +176,7 @@ public class JobService
                 _log.Info("作业[{0}/{1}]准备处理[{2}]个错误和[{3}]超时任务 [{4}]", app, jb.Name, n1, n2, list.Join(",", e => e.ID + ""));
             }
             else
-                ext[nextKey] = next;
+                _cacheProvider.Cache.Set(nextKey, next);
         }
     }
 
@@ -276,7 +267,7 @@ public class JobService
     /// <summary>报告状态（进度、成功、错误）</summary>
     /// <param name="task"></param>
     /// <returns></returns>
-    public Boolean Report(App app, TaskResult task)
+    public Boolean Report(App app, TaskResult task, String ip)
     {
         if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 
@@ -308,7 +299,7 @@ public class JobService
             SetJobFinish(job, jt);
 
             // 记录状态
-            _appService.UpdateOnline(app, jt, _Net);
+            _appService.UpdateOnline(app, jt, ip);
         }
         if (task.Status == JobStatus.错误)
         {
