@@ -30,10 +30,14 @@
     <None Remove="Log\**" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="Entity\应用配置.Biz.cs" />
+    <Compile Remove="Entity\应用配置.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Build.tt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="11.10.2023.1201" />
+    <PackageReference Include="NewLife.XCode" Version="11.10.2024.112-beta1221" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Build.log">

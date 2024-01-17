@@ -22,6 +22,15 @@
     <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Areas\Ant\Views\AppConfig\**" />
+    <Content Remove="Areas\Ant\Views\AppConfig\**" />
+    <EmbeddedResource Remove="Areas\Ant\Views\AppConfig\**" />
+    <None Remove="Areas\Ant\Views\AppConfig\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Areas\Ant\Controllers\AppConfigController.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Remove="Areas\Ant\Views\AppHistory\_List_Data.cshtml" />
     <Content Remove="Areas\Ant\Views\AppMessage\_List_Data.cshtml" />
     <Content Remove="Areas\Ant\Views\AppOnline\_List_Data.cshtml" />
@@ -31,8 +40,8 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="5.6.2023.1204" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.9.2023.1201" />
+    <PackageReference Include="NewLife.Cube.Core" Version="6.0.2024.116-beta1525" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.9.2024.104-beta0117" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />

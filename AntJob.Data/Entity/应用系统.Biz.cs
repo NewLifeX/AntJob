@@ -19,9 +19,9 @@ public partial class App : EntityBase<App>
         //df.Add(__.MessageCount);
 
         // 过滤器 UserModule、TimeModule、IPModule
-        //Meta.Modules.Add<UserModule>();
-        //Meta.Modules.Add<TimeModule>();
-        //Meta.Modules.Add<IPModule>();
+        Meta.Modules.Add<UserModule>();
+        Meta.Modules.Add<TimeModule>();
+        Meta.Modules.Add<IPModule>();
 
         // 单对象缓存
         var sc = Meta.SingleCache;

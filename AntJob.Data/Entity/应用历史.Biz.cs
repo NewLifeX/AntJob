@@ -4,7 +4,6 @@ using NewLife;
 using NewLife.Data;
 using XCode;
 using XCode.Cache;
-using XCode.Membership;
 
 namespace AntJob.Data.Entity;
 
@@ -24,31 +23,18 @@ public partial class AppHistory : EntityBase<AppHistory>
         Meta.Modules.Add<TraceModule>();
     }
 
-    /// <summary>
-    /// 验证数据
-    /// </summary>
-    /// <param name="isNew"></param>
-    public override void Valid(Boolean isNew)
+    /// <summary>验证数据</summary>
+    /// <param name="method"></param>
+    /// <returns></returns>
+    public override Boolean Valid(DataMethod method)
     {
-        var len = _.Remark.Length;
-        if (len > 0 && !Remark.IsNullOrEmpty() && Remark.Length > len) Remark = Remark[..len];
+        this.TrimExtraLong(__.Remark);
 
-        base.Valid(isNew);
+        return base.Valid(method);
     }
     #endregion
 
     #region 扩展属性
-    ///// <summary>应用</summary>
-    //[XmlIgnore, IgnoreDataMember]
-    ////[ScriptIgnore]
-    //public App App => Extends.Get(nameof(App), k => App.FindByID(AppID));
-
-    ///// <summary>应用</summary>
-    //[XmlIgnore, IgnoreDataMember]
-    ////[ScriptIgnore]
-    //[DisplayName("应用")]
-    //[Map(__.AppID, typeof(App), "ID")]
-    //public String AppName => App?.Name;
     #endregion
 
     #region 扩展查询

@@ -21,8 +21,6 @@ public class JobTaskController : EntityController<JobTask>
     {
         //MenuOrder = 70;
 
-        JobTask.Meta.Modules.Add<TimeModule>();
-
         ListFields.TraceUrl();
     }
 
