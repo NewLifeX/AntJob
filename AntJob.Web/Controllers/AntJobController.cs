@@ -5,6 +5,7 @@ using AntJob.Models;
 using AntJob.Server;
 using AntJob.Server.Services;
 using AntJob.Web.Common;
+using AntJob.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -15,6 +16,7 @@ using NewLife.Cube;
 using NewLife.Log;
 using NewLife.Remoting;
 using NewLife.Serialization;
+using NewLife.Web;
 using IActionFilter = Microsoft.AspNetCore.Mvc.Filters.IActionFilter;
 
 namespace AntJob.Web.Controllers;
@@ -23,8 +25,8 @@ namespace AntJob.Web.Controllers;
 [Route("[controller]")]
 public class AntJobController : ControllerBase, IActionFilter
 {
-    /// <summary>令牌</summary>
-    public String Token { get; private set; }
+    ///// <summary>令牌</summary>
+    //public String Token { get; private set; }
 
     /// <summary>用户主机</summary>
     public String UserHost => HttpContext.GetUserHost();
@@ -48,7 +50,7 @@ public class AntJobController : ControllerBase, IActionFilter
     {
         _args = context.ActionArguments;
 
-        var token = Token = ApiFilterAttribute.GetToken(context.HttpContext);
+        var token = ApiFilterAttribute.GetToken(context.HttpContext);
 
         try
         {
@@ -106,6 +108,60 @@ public class AntJobController : ControllerBase, IActionFilter
         var (app, rs) = _appService.Login(model, UserHost);
 
         return rs;
+    }
+
+    [ApiFilter]
+    public TokenModel Token([FromBody] TokenInModel model)
+    {
+        var set = _setting;
+
+        if (model.grant_type.IsNullOrEmpty()) model.grant_type = "password";
+
+        var ip = HttpContext.GetUserHost();
+        var clientId = model.ClientId;
+
+        try
+        {
+            // 密码模式
+            if (model.grant_type == "password")
+            {
+                var (app, rs) = _appService.Login(new LoginModel { User = model.UserName, Pass = model.Password }, ip);
+
+                var tokenModel = _appService.IssueToken(app.Name, set);
+
+                _appService.WriteHistory(app, "Authorize", true, model.ToJson(), ip);
+
+                return tokenModel;
+            }
+            // 刷新令牌
+            else if (model.grant_type == "refresh_token")
+            {
+                var (app, ex) = _appService.DecodeToken(model.refresh_token, set.TokenSecret);
+
+                if (ex != null)
+                {
+                    _appService.WriteHistory(app, "RefreshToken", false, ex.ToString(), ip);
+                    throw ex;
+                }
+
+                var tokenModel = _appService.IssueToken(app.Name, set);
+
+                //app.WriteHistory("RefreshToken", true, model.refresh_token, olt?.Version, ip, clientId);
+
+                return tokenModel;
+            }
+            else
+            {
+                throw new NotSupportedException($"未支持 grant_type={model.grant_type}");
+            }
+        }
+        catch (Exception ex)
+        {
+            var app = App.FindByName(model.UserName);
+            _appService.WriteHistory(app, "Authorize", false, ex.ToString(), ip);
+
+            throw;
+        }
     }
 
     /// <summary>获取当前应用的所有在线实例</summary>

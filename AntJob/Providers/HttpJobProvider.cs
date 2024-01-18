@@ -2,6 +2,7 @@
 using AntJob.Handlers;
 using AntJob.Models;
 using NewLife;
+using NewLife.Http;
 using NewLife.Log;
 using NewLife.Remoting;
 using NewLife.Threading;
@@ -53,14 +54,21 @@ public class HttpJobProvider : JobProvider
         var svr = Server?.Split(",").Where(e => e.StartsWithIgnoreCase("http://", "https://")).Join(",");
 
         // 使用配置中心账号
-        var ant = new ApiHttpClient(svr)
+        var client = new ApiHttpClient(svr)
         {
             Tracer = Tracer,
         };
 
+        client.Filter = new TokenHttpFilter
+        {
+            Action = "/AntJob/Login",
+            UserName = AppId,
+            Password = Secret,
+        };
+
         // 断开前一个连接
         Client.TryDispose();
-        Client = ant;
+        Client = client;
     }
 
     /// <summary>开始</summary>
