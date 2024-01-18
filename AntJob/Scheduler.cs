@@ -5,8 +5,10 @@ using NewLife;
 using NewLife.Log;
 using NewLife.Model;
 using NewLife.Reflection;
+using NewLife.Remoting;
 using NewLife.Threading;
 using Stardust.Registry;
+using static System.Net.WebRequestMethods;
 
 namespace AntJob;
 
@@ -56,6 +58,60 @@ public class Scheduler : DisposeBase
     #endregion
 
     #region 核心方法
+    /// <summary>加入调度中心，从注册中心获取地址，自动识别RPC/Http</summary>
+    /// <param name="server"></param>
+    /// <param name="appId"></param>
+    /// <param name="secret"></param>
+    /// <param name="debug"></param>
+    /// <returns></returns>
+    public IJobProvider Join(String server, String appId, String secret, Boolean debug = false)
+    {
+        var registry = ServiceProvider?.GetService<IRegistry>();
+        if (registry != null)
+        {
+            var svrs = registry.ResolveAddressAsync("AntServer").Result;
+            if (svrs != null && svrs.Length > 0) server = svrs.Join();
+        }
+
+        if (server.IsNullOrEmpty()) return null;
+
+        // 根据地址决定用Http还是RPC
+        var servers = server.Split(",");
+        if (servers.Any(e => e.StartsWithIgnoreCase("http://", "https://")))
+        {
+            var http = new HttpJobProvider
+            {
+                Debug = debug,
+                Server = server,
+                AppId = appId,
+                Secret = secret,
+            };
+
+            // 如果有注册中心，则使用注册中心的服务发现
+            if (registry != null)
+            {
+                //http.Client = registry.CreateForService("AntServer") as ApiHttpClient;
+                //http.Client.RoundRobin = false;
+            }
+
+            Provider = http;
+        }
+        else
+        {
+            var rpc = new NetworkJobProvider
+            {
+                Debug = debug,
+                Server = server,
+                AppId = appId,
+                Secret = secret,
+            };
+
+            Provider = rpc;
+        }
+
+        return Provider;
+    }
+
     /// <summary>开始</summary>
     public void Start()
     {
@@ -71,22 +127,22 @@ public class Scheduler : DisposeBase
         prv ??= Provider = new FileJobProvider();
         prv.Schedule ??= this;
 
-        if (prv is NetworkJobProvider network)
-        {
-            network.Tracer ??= Tracer;
+        //if (prv is NetworkJobProvider network)
+        //{
+        //    network.Tracer ??= Tracer;
 
-            // 从注册中心获取服务端地址，优先于本地配置文件
-            if (network.Server.IsNullOrEmpty() || network.Server.EqualIgnoreCase(AntSetting.Current.Server))
-            {
-                // 从注册中心获取包
-                var registry = ServiceProvider?.GetService<IRegistry>();
-                if (registry != null)
-                {
-                    var svrs = registry.ResolveAddressAsync("AntServer").Result;
-                    if (svrs != null && svrs.Length > 0) network.Server = svrs.Join();
-                }
-            }
-        }
+        //    // 从注册中心获取服务端地址，优先于本地配置文件
+        //    if (network.Server.IsNullOrEmpty() || network.Server.EqualIgnoreCase(AntSetting.Current.Server))
+        //    {
+        //        // 从注册中心获取包
+        //        var registry = ServiceProvider?.GetService<IRegistry>();
+        //        if (registry != null)
+        //        {
+        //            var svrs = registry.ResolveAddressAsync("AntServer").Result;
+        //            if (svrs != null && svrs.Length > 0) network.Server = svrs.Join();
+        //        }
+        //    }
+        //}
 
         prv.Start();
 

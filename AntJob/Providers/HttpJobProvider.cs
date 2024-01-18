@@ -3,12 +3,13 @@ using AntJob.Handlers;
 using AntJob.Models;
 using NewLife;
 using NewLife.Log;
+using NewLife.Remoting;
 using NewLife.Threading;
 
 namespace AntJob.Providers;
 
-/// <summary>网络任务提供者</summary>
-public class NetworkJobProvider : JobProvider
+/// <summary>Http任务提供者</summary>
+public class HttpJobProvider : JobProvider
 {
     #region 属性
     /// <summary>调试，打开编码日志</summary>
@@ -24,7 +25,7 @@ public class NetworkJobProvider : JobProvider
     public String Secret { get; set; }
 
     /// <summary>客户端</summary>
-    public AntClient Ant { get; set; }
+    public ApiHttpClient Client { get; set; }
 
     /// <summary>邻居伙伴。用于应用判断自身有多少个实例在运行</summary>
     public IPeer[] Peers { get; private set; }
@@ -46,24 +47,26 @@ public class NetworkJobProvider : JobProvider
     #endregion
 
     #region 启动停止
+    /// <summary>初始化</summary>
+    public void Init()
+    {
+        var svr = Server?.Split(",").Where(e => e.StartsWithIgnoreCase("http://", "https://")).Join(",");
+
+        // 使用配置中心账号
+        var ant = new ApiHttpClient(svr)
+        {
+            Tracer = Tracer,
+        };
+
+        // 断开前一个连接
+        Client.TryDispose();
+        Client = ant;
+    }
+
     /// <summary>开始</summary>
     public override void Start()
     {
-        var svr = Server;
-
-        // 使用配置中心账号
-        var ant = new AntClient(svr)
-        {
-            UserName = AppId,
-            Password = Secret,
-            Tracer = Tracer,
-        };
-        if (Debug) ant.EncoderLog = XTrace.Log;
-        ant.Open();
-
-        // 断开前一个连接
-        Ant.TryDispose();
-        Ant = ant;
+        if (Client == null) Init();
 
         var bs = Schedule?.Handlers;
 
@@ -91,7 +94,7 @@ public class NetworkJobProvider : JobProvider
 
             list.Add(job);
         }
-        if (list.Count > 0) Ant.AddJobs(list.ToArray());
+        if (list.Count > 0) Client.Post<Object>("/AntJob/AddJobs", new { jobs = list.ToArray() });
 
         // 定时更新邻居
         _timer = new TimerX(DoCheckPeer, null, 1_000, 30_000) { Async = true };
@@ -101,8 +104,8 @@ public class NetworkJobProvider : JobProvider
     public override void Stop()
     {
         // 断开前一个连接
-        Ant.TryDispose();
-        Ant = null;
+        Client.TryDispose();
+        Client = null;
     }
     #endregion
 
@@ -119,7 +122,7 @@ public class NetworkJobProvider : JobProvider
         {
             _NextGetJobs = now.AddSeconds(5);
 
-            _jobs = Ant.GetJobs();
+            _jobs = Client.Get<JobModel[]>("/AntJob/GetJobs");
         }
 
         return _jobs;
@@ -130,7 +133,7 @@ public class NetworkJobProvider : JobProvider
     /// <param name="topic">主题</param>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public override ITask[] Acquire(IJob job, String topic, Int32 count) => Ant.Acquire(job.Name, topic, count);
+    public override ITask[] Acquire(IJob job, String topic, Int32 count) => Client.Post<TaskModel[]>("/AntJob/Acquire", new AcquireModel { Job = job.Name, Topic = topic, Count = count });
 
     /// <summary>生产消息</summary>
     /// <param name="job">作业</param>
@@ -154,14 +157,11 @@ public class NetworkJobProvider : JobProvider
             model.Unique = option.Unique;
         }
 
-        return Ant.Produce(model);
+        return Client.Post<Int32>("/AntJob/Product", model);
     }
     #endregion
 
     #region 报告状态
-    //private static readonly String _MachineName = Environment.MachineName;
-    //private static readonly Int32 _ProcessID = Process.GetCurrentProcess().Id;
-
     /// <summary>报告进度，每个任务多次调用</summary>
     /// <param name="ctx">上下文</param>
     public override void Report(JobContext ctx)
@@ -222,7 +222,7 @@ public class NetworkJobProvider : JobProvider
     {
         try
         {
-            Ant.Report(task);
+            Client.Post<Boolean>("/AntJob/Report", task);
         }
         catch (Exception ex)
         {
@@ -235,7 +235,7 @@ public class NetworkJobProvider : JobProvider
     private TimerX _timer;
     private void DoCheckPeer(Object state)
     {
-        var ps = Ant?.GetPeers();
+        var ps = Client?.Get<PeerModel[]>("/AntJob/GetPeers");
         if (ps == null || ps.Length == 0) return;
 
         var old = (Peers ?? new IPeer[0]).ToList();

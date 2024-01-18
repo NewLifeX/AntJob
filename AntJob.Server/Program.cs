@@ -1,6 +1,5 @@
 ﻿using AntJob.Server;
 using AntJob.Server.Services;
-using NewLife;
 using NewLife.Caching;
 using NewLife.Caching.Services;
 using NewLife.Log;
@@ -12,10 +11,7 @@ using XCode;
 XTrace.UseConsole();
 
 var services = ObjectContainer.Current;
-var star = services.AddStardust();
-if (star.Server.IsNullOrEmpty()) services.AddSingleton<ITracer>(DefaultTracer.Instance ??= new DefaultTracer());
-
-services.AddSingleton(XTrace.Log);
+services.AddStardust();
 
 // 默认数据目录
 var set = NewLife.Setting.Current;
@@ -31,6 +27,8 @@ if (set2.IsNew)
     set2.ShowSQL = false;
     set2.Save();
 }
+
+services.AddSingleton(AntJobSetting.Current);
 
 // 分布式缓存，锚定配置中心RedisCache，若无配置则使用本地MemoryCache
 // 集群部署时，务必使用RedisCache，内部将使用Redis实现分布式锁

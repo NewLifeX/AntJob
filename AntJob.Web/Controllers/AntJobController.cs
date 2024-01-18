@@ -19,6 +19,8 @@ using IActionFilter = Microsoft.AspNetCore.Mvc.Filters.IActionFilter;
 
 namespace AntJob.Web.Controllers;
 
+[ApiController]
+[Route("[controller]")]
 public class AntJobController : ControllerBase, IActionFilter
 {
     /// <summary>令牌</summary>

@@ -1,8 +1,5 @@
-﻿using AntJob.Server.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using AntJob.Server;
+using AntJob.Server.Services;
 using NewLife.Cube;
 using XCode;
 
@@ -25,6 +22,8 @@ public class Startup
             set.BackupPath = "../Backup";
             set.Save();
         }
+
+        services.AddSingleton(AntJobSetting.Current);
 
         services.AddSingleton<AppService>();
         services.AddSingleton<JobService>();
@@ -64,5 +63,6 @@ public class Startup
 
         // 启用星尘注册中心，向注册中心注册服务，服务消费者将自动更新服务端地址列表
         app.RegisterService("AntWeb", null, env.EnvironmentName);
+        app.RegisterService("AntServer", null, env.EnvironmentName);
     }
 }
