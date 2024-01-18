@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using AntJob.Data;
 using AntJob.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +13,7 @@ namespace AntJob.Web.Areas.Ant.Controllers;
 /// <summary>作业任务</summary>
 [AntArea]
 [DisplayName("作业任务")]
+[Menu(0, false)]
 public class JobTaskController : EntityController<JobTask>
 {
     static JobTaskController()

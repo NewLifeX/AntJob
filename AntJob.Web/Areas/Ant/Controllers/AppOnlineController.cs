@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using AntJob.Data.Entity;
 using NewLife.Cube;
 using NewLife.Cube.Extensions;
@@ -11,6 +9,7 @@ namespace AntJob.Web.Areas.Ant.Controllers;
 /// <summary>应用在线</summary>
 [AntArea]
 [DisplayName("应用在线")]
+[Menu(80)]
 public class AppOnlineController : EntityController<AppOnline>
 {
     static AppOnlineController()

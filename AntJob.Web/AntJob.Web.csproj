@@ -32,6 +32,7 @@
     <Content Remove="Areas\Ant\Views\AppHistory\_List_Data.cshtml" />
     <Content Remove="Areas\Ant\Views\AppMessage\_List_Data.cshtml" />
     <Content Remove="Areas\Ant\Views\AppOnline\_List_Data.cshtml" />
+    <Content Remove="Areas\Ant\Views\App\_List_Data.cshtml" />
     <Content Remove="Areas\Ant\Views\JobError\_List_Data.cshtml" />
   </ItemGroup>
   <ItemGroup>
