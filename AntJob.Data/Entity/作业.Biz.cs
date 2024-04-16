@@ -70,7 +70,7 @@ public partial class Job : EntityBase<Job>
     private Int32 GetDefaultIdle()
     {
         // 定时调度，取步进加一分钟
-        if (Mode == JobModes.Alarm) return Step + 600;
+        if (Mode == JobModes.Time) return Step + 600;
 
         return 3600;
     }
@@ -204,7 +204,7 @@ public partial class Job : EntityBase<Job>
         switch (Mode)
         {
             case JobModes.Data:
-            case JobModes.Alarm:
+            case JobModes.Time:
                 return Start.Year > 2000 && Step > 0;
             case JobModes.Message:
                 return Topic.IsNullOrEmpty();
@@ -399,7 +399,7 @@ public partial class Job : EntityBase<Job>
         if (End.Year > 2000 && end > End) end = End;
 
         // 时间片必须严格要求按照步进大小分片，除非有合适的End
-        if (Mode != JobModes.Alarm)
+        if (Mode != JobModes.Time)
         {
             if (end > now) return false;
         }

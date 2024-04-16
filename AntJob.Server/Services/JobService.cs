@@ -129,7 +129,7 @@ public class JobService
                     list.AddRange(jb.AcquireMessage(model.Topic, server, ip, pid, model.Count - list.Count, _cacheProvider.Cache));
                     break;
                 case JobModes.Data:
-                case JobModes.Alarm:
+                case JobModes.Time:
                 //case JobModes.CSharp:
                 //case JobModes.Sql:
                 default:

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using AntJob.Data;
 using NewLife;
+using NewLife.Log;
 using NewLife.Serialization;
 
 namespace AntJob.Handlers;
@@ -58,18 +59,11 @@ public abstract class MessageHandler : Handler
         var ss = ctx.Task.Data.ToJsonEntity<String[]>();
         if (ss == null || ss.Length == 0) return;
 
-        //// 消息作业特殊优待字符串，不需要再次Json解码
-        //if (typeof(TModel) == typeof(String))
-        //{
         ctx.Total = ss.Length;
         ctx.Data = ss;
-        //}
-        //else
-        //{
-        //    var ms = ss.Select(e => e.ToJsonEntity<TModel>()).ToList();
-        //    ctx.Total = ms.Count;
-        //    ctx.Data = ms;
-        //}
+
+        var span = DefaultSpan.Current;
+        if (span != null) span.Value = ctx.Total;
 
         Execute(ctx);
     }
@@ -82,9 +76,6 @@ public abstract class MessageHandler : Handler
         var count = 0;
         foreach (String item in ctx.Data as IEnumerable)
         {
-            //ctx.Key = item as String;
-            //ctx.Entity = item;
-
             if (ProcessItem(ctx, item)) count++;
         }
 

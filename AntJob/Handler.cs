@@ -2,7 +2,7 @@
 using AntJob.Data;
 using AntJob.Providers;
 using NewLife;
-using NewLife.Collections;
+using NewLife.Data;
 using NewLife.Log;
 
 namespace AntJob;
@@ -14,7 +14,7 @@ namespace AntJob;
 /// 
 /// 定时调度只要当前时间达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑。
 /// </remarks>
-public abstract class Handler
+public abstract class Handler : IExtend
 {
     #region 属性
     /// <summary>名称</summary>
@@ -33,7 +33,7 @@ public abstract class Handler
     public Boolean Active { get; private set; }
 
     /// <summary>调度模式</summary>
-    public virtual JobModes Mode { get; set; } = JobModes.Alarm;
+    public virtual JobModes Mode { get; set; } = JobModes.Time;
 
     private volatile Int32 _Busy;
     /// <summary>正在处理中的任务数</summary>
@@ -44,11 +44,14 @@ public abstract class Handler
     #endregion
 
     #region 索引器
-    private readonly IDictionary<String, Object> _Items = new NullableDictionary<String, Object>(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<String, Object> _Items = [];
+    /// <summary>扩展数据</summary>
+    IDictionary<String, Object> IExtend.Items => _Items;
+
     /// <summary>用户数据</summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public Object this[String item] { get => _Items[item]; set => _Items[item] = value; }
+    public Object this[String item] { get => _Items.TryGetValue(item, out var obj) ? obj : null; set => _Items[item] = value; }
     #endregion
 
     #region 构造
@@ -64,7 +67,7 @@ public abstract class Handler
             Start = new DateTime(now.Year, now.Month, 1),
             Step = 30,
             Offset = 15,
-            Mode = JobModes.Alarm,
+            Mode = JobModes.Time,
         };
 
         // 默认并发数为核心数
@@ -150,6 +153,8 @@ public abstract class Handler
         try
         {
             OnProcess(ctx);
+
+            if (span != null) span.Value = ctx.Total;
         }
         catch (Exception ex)
         {
