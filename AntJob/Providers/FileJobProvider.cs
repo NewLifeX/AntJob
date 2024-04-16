@@ -119,7 +119,7 @@ public class FileJobProvider : JobProvider
             if (job.End.Year > 2000 && end > job.End) end = job.End;
 
             // 时间片必须严格要求按照步进大小分片，除非有合适的End
-            if (job.Mode != JobModes.Alarm)
+            if (job.Mode != JobModes.Time)
             {
                 if (end > now) break;
             }
@@ -166,7 +166,7 @@ public class FileJobProvider : JobProvider
             var n = 0;
             if (set.End > set.Start) n = (Int32)(set.End - set.Start).TotalSeconds;
             var msg = $"{ctx.Handler.Name} 处理{ctx.Total:n0} 行，区间（{set.Start} + {n}, {set.End:HH:mm:ss}）";
-            if (ctx.Handler.Mode == JobModes.Alarm)
+            if (ctx.Handler.Mode == JobModes.Time)
                 msg += $"，耗时{ctx.Cost:n0}ms";
             else
                 msg += $"，速度{ctx.Speed:n0}tps，耗时{ctx.Cost:n0}ms";

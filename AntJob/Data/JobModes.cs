@@ -13,7 +13,7 @@ namespace AntJob.Data
 
         /// <summary>定时调度</summary>
         [Description("定时调度")]
-        Alarm = 2,
+        Time = 2,
 
         /// <summary>消息调度</summary>
         [Description("消息调度")]

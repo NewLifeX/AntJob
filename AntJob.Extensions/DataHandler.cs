@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using AntJob.Data;
 using NewLife;
+using NewLife.Log;
 using XCode;
 using XCode.Configuration;
 
@@ -100,6 +101,7 @@ public abstract class DataHandler : Handler
     protected override void OnProcess(JobContext ctx)
     {
         var prov = Provider;
+        var span = DefaultSpan.Current;
         var row = 0;
         while (true)
         {
@@ -111,7 +113,11 @@ public abstract class DataHandler : Handler
             var data = Fetch(ctx, ref row);
 
             var list = data as IList;
-            if (list != null) ctx.Total += list.Count;
+            if (list != null)
+            {
+                ctx.Total += list.Count;
+                if (span != null) span.Value = ctx.Total;
+            }
             ctx.Data = data;
 
             if (data == null || list != null && list.Count == 0) break;
@@ -181,7 +187,9 @@ public abstract class DataHandler : Handler
     {
         var count = 0;
         foreach (var item in ctx.Data as IEnumerable)
+        {
             if (ProcessItem(ctx, item as IEntity)) count++;
+        }
 
         return count;
     }
