@@ -10,12 +10,10 @@ namespace AntJob.Web.Areas.Ant.Controllers;
 [AntArea]
 [DisplayName("应用历史")]
 [Menu(0, false)]
-public class AppHistoryController : EntityController<AppHistory>
+public class AppHistoryController : AntEntityController<AppHistory>
 {
     static AppHistoryController()
     {
-        //MenuOrder = 85;
-
         AppOnline.Meta.Table.DataTable.InsertOnly = true;
 
         ListFields.TraceUrl();
@@ -26,6 +24,8 @@ public class AppHistoryController : EntityController<AppHistory>
     /// <returns></returns>
     protected override IEnumerable<AppHistory> Search(Pager p)
     {
+        PageSetting.EnableAdd = false;
+
         var appid = p["appid"].ToInt(-1);
         var act = p["action"];
         var success = p["success"]?.ToBoolean();

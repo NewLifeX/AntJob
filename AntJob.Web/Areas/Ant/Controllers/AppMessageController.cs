@@ -10,11 +10,14 @@ namespace AntJob.Web.Areas.Ant.Controllers;
 [AntArea]
 [DisplayName("应用消息")]
 [Menu(70)]
-public class AppMessageController : EntityController<AppMessage>
+public class AppMessageController : AntEntityController<AppMessage>
 {
-    //static AppMessageController() => MenuOrder = 49;
+    static AppMessageController()
+    {
+        LogOnChange = true;
 
-    static AppMessageController() => ListFields.TraceUrl();
+        ListFields.TraceUrl();
+    }
 
     /// <summary>搜索数据集</summary>
     /// <param name="p"></param>

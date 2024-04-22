@@ -14,11 +14,11 @@ namespace AntJob.Web.Areas.Ant.Controllers;
 [AntArea]
 [DisplayName("作业任务")]
 [Menu(0, false)]
-public class JobTaskController : EntityController<JobTask>
+public class JobTaskController : AntEntityController<JobTask>
 {
     static JobTaskController()
     {
-        //MenuOrder = 70;
+        LogOnChange = true;
 
         ListFields.TraceUrl();
     }
@@ -28,6 +28,8 @@ public class JobTaskController : EntityController<JobTask>
     /// <returns></returns>
     protected override IEnumerable<JobTask> Search(Pager p)
     {
+        PageSetting.EnableAdd = false;
+
         var id = p["id"].ToInt(-1);
         var jobid = p["JobID"].ToInt(-1);
         var appid = p["AppID"].ToInt(-1);

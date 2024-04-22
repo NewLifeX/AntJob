@@ -1,0 +1,65 @@
+﻿@using AntJob.Data;
+@{
+    var path = Context.Request.Path + "";
+    var path2 = "/" + path?.Split("/").Take(3).Join("/");
+
+    var appId = Context.Request.Query["appId"].ToInt(0);
+    if (appId == 0 && path2.EqualIgnoreCase("/Ant/App"))
+    {
+        appId = Context.Request.Query["Id"].ToInt(0);
+    }
+
+    var start = Context.Request.Query["dtStart"].ToDateTime();
+    var end = Context.Request.Query["dtEnd"].ToDateTime();
+    if (end.Year < 2000) end = Context.Request.Query["dtEnd2"].ToDateTime().AddSeconds(1);
+
+    var app = App.FindByID(appId);
+
+    var dic = new Dictionary<String, Object>();
+    dic[app?.Name + ""] = "/Ant/App/Edit?Id=" + appId;
+    dic["作业"] = "/Ant/Job?appId=" + appId;
+    dic["任务"] = "/Ant/JobTask?appId=" + appId;
+    dic["消息"] = "/Ant/AppMessage?appId=" + appId;
+    dic["在线"] = "/Ant/AppOnline?appId=" + appId;
+    dic["历史"] = "/Ant/AppHistory?appId=" + appId;
+    dic["错误"] = "/Ant/JobError?appId=" + appId;
+
+}
+@if (appId > 0)
+{
+    <div class="navbar-collapse text-center">
+        <ul class="nav nav-pills" style="margin-bottom: 10px; display: inline-block;float: none;">
+            @foreach (var item in dic)
+            {
+                if (item.Value is IDictionary<String, Object> childs)
+                {
+                    <li role="presentation" class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">@item.Key <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            @foreach (var elm in childs)
+                            {
+                                var url = elm.Value + "";
+                                var v = url.Substring(null, "?");
+                                if (start.Year > 2000) url += "&dtStart=" + start.ToFullString();
+                                if (end.Year > 2000) url += "&dtEnd=" + end.ToFullString();
+                                <li role="presentation" class="@(path.EqualIgnoreCase(v)?"active":"")">
+                                    <a href="@url">@elm.Key</a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    var url = item.Value + "";
+                    var v = url.Substring(null, "?");
+                    if (start.Year > 2000) url += "&dtStart=" + start.ToFullString();
+                    if (end.Year > 2000) url += "&dtEnd=" + end.ToFullString();
+                    <li role="presentation" class="@(path.EqualIgnoreCase(v)?"active":"")">
+                        <a href="@url">@item.Key</a>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+}

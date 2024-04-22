@@ -10,12 +10,10 @@ namespace AntJob.Web.Areas.Ant.Controllers;
 [AntArea]
 [DisplayName("应用在线")]
 [Menu(80)]
-public class AppOnlineController : EntityController<AppOnline>
+public class AppOnlineController : AntEntityController<AppOnline>
 {
     static AppOnlineController()
     {
-        //MenuOrder = 90;
-
         AppOnline.Meta.Table.DataTable.InsertOnly = true;
 
         ListFields.TraceUrl();
@@ -26,6 +24,8 @@ public class AppOnlineController : EntityController<AppOnline>
     /// <returns></returns>
     protected override IEnumerable<AppOnline> Search(Pager p)
     {
+        PageSetting.EnableAdd = false;
+
         var appid = p["appid"].ToInt(-1);
         var start = p["dtStart"].ToDateTime();
         var end = p["dtEnd"].ToDateTime();

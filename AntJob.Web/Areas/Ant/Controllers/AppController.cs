@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel;
 using AntJob.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using NewLife;
 using NewLife.Cube;
+using NewLife.Cube.ViewModels;
 using NewLife.Web;
-using XCode;
 using XCode.Membership;
 
 namespace AntJob.Web.Areas.Ant.Controllers;
@@ -13,13 +14,20 @@ namespace AntJob.Web.Areas.Ant.Controllers;
 [AntArea]
 [DisplayName("应用系统")]
 [Menu(100)]
-public class AppController : EntityController<App>
+public class AppController : AntEntityController<App>
 {
     static AppController()
     {
+        LogOnChange = true;
+
         ListFields.RemoveField("UpdateUserID");
         ListFields.RemoveCreateField().RemoveRemarkField();
 
+        {
+            var df = ListFields.GetField("Name") as ListField;
+            df.Url = "/Ant/Ant/Detail?id={ID}";
+            df.Target = "_blank";
+        }
         {
             var df = ListFields.AddListField("Online", "UpdateUser");
             df.DisplayName = "在线";
@@ -52,22 +60,35 @@ public class AppController : EntityController<App>
         }
     }
 
+    public override void OnActionExecuting(ActionExecutingContext filterContext)
+    {
+        base.OnActionExecuting(filterContext);
+
+        var appId = GetRequest("Id").ToInt(-1);
+        if (appId > 0)
+        {
+            PageSetting.NavView = "_App_Nav";
+            PageSetting.EnableNavbar = false;
+        }
+    }
+
     /// <summary>搜索数据集</summary>
     /// <param name="p"></param>
     /// <returns></returns>
     protected override IEnumerable<App> Search(Pager p)
     {
         var id = p["id"].ToInt(-1);
+        if (id <= 0) id = p["appId"].ToInt(-1);
         if (id > 0)
         {
-            var list = new List<App>();
             var entity = App.FindByID(id);
-            if (entity != null) list.Add(entity);
-
-            return list;
+            if (entity != null) return [entity];
         }
 
-        return App.Search(p["category"], p["Enable"]?.ToBoolean(), p["q"], p);
+        var category = p["category"];
+        var enable = p["Enable"]?.ToBoolean();
+
+        return App.Search(category, enable, p["q"], p);
     }
 
     protected override Int32 OnUpdate(App entity)
@@ -85,7 +106,7 @@ public class AppController : EntityController<App>
     public ActionResult ResetApp()
     {
         var ids = GetRequest("keys").SplitAsInt();
-        if (!ids.Any()) return JsonRefresh("未选中项！");
+        if (ids.Length == 0) return JsonRefresh("未选中项！");
 
         var now = DateTime.Now;
         foreach (var appid in ids)
@@ -110,69 +131,5 @@ public class AppController : EntityController<App>
         }
 
         return JsonRefresh("操作完毕！");
-    }
-
-    /// <summary>启用禁用任务</summary>
-    /// <param name="id"></param>
-    /// <param name="enable"></param>
-    /// <returns></returns>
-    [EntityAuthorize(PermissionFlags.Update)]
-    public ActionResult Set(Int32 id = 0, Boolean enable = true)
-    {
-        if (id > 0)
-        {
-            var dt = App.FindByID(id);
-            if (dt == null) throw new ArgumentNullException(nameof(id), "找不到任务 " + id);
-
-            dt.Enable = enable;
-            dt.Save();
-        }
-        else
-        {
-            var ids = GetRequest("keys").SplitAsInt();
-
-            foreach (var item in ids)
-            {
-                var dt = App.FindByID(item);
-                if (dt != null && dt.Enable != enable)
-                {
-                    dt.Enable = enable;
-                    dt.Save();
-                }
-            }
-        }
-        return JsonRefresh("操作成功！");
-    }
-
-    protected override Boolean Valid(App entity, DataObjectMethodType type, Boolean post)
-    {
-        if (!post) return base.Valid(entity, type, post);
-
-        var act = type switch
-        {
-            DataObjectMethodType.Update => "修改",
-            DataObjectMethodType.Insert => "添加",
-            DataObjectMethodType.Delete => "删除",
-            _ => type + "",
-        };
-
-        // 必须提前写修改日志，否则修改后脏数据失效，保存的日志为空
-        if (type == DataObjectMethodType.Update && (entity as IEntity).HasDirty)
-            LogProvider.Provider.WriteLog(act, entity);
-
-        var err = "";
-        try
-        {
-            return base.Valid(entity, type, post);
-        }
-        catch (Exception ex)
-        {
-            err = ex.Message;
-            throw;
-        }
-        finally
-        {
-            LogProvider.Provider.WriteLog(act, entity, err);
-        }
     }
 }

@@ -5,7 +5,6 @@ using NewLife;
 using NewLife.Cube;
 using NewLife.Security;
 using NewLife.Web;
-using XCode;
 using XCode.Membership;
 
 namespace AntJob.Web.Areas.Ant.Controllers;
@@ -14,28 +13,23 @@ namespace AntJob.Web.Areas.Ant.Controllers;
 [AntArea]
 [DisplayName("作业")]
 [Menu(0, false)]
-public class JobController : EntityController<Job>
+public class JobController : AntEntityController<Job>
 {
     static JobController()
     {
-        var list = ListFields;
-        list.RemoveField("Type");
-        list.RemoveField("CreateUserID");
-        list.RemoveField("CreateTime");
-        list.RemoveField("CreateIP");
-        list.RemoveField("UpdateUserID");
-        list.RemoveField("UpdateIP");
+        LogOnChange = true;
 
-        //MenuOrder = 80;
+        ListFields.RemoveCreateField().RemoveUpdateField();
+        ListFields.AddListField("UpdateTime");
     }
-
-    public JobController() => PageSetting.EnableAdd = false;
 
     /// <summary>搜索数据集</summary>
     /// <param name="p"></param>
     /// <returns></returns>
     protected override IEnumerable<Job> Search(Pager p)
     {
+        PageSetting.EnableAdd = false;
+
         var id = p["ID"].ToInt(-1);
         var appid = p["appid"].ToInt(-1);
         var start = p["dtStart"].ToDateTime();
@@ -43,38 +37,6 @@ public class JobController : EntityController<Job>
         var mode = p["Mode"].ToInt(-1);
 
         return Job.Search(id, appid, start, end, mode, p["q"], p);
-    }
-
-    /// <summary>启用禁用任务</summary>
-    /// <param name="id"></param>
-    /// <param name="enable"></param>
-    /// <returns></returns>
-    [EntityAuthorize(PermissionFlags.Update)]
-    public ActionResult Set(Int32 id = 0, Boolean enable = true)
-    {
-        if (id > 0)
-        {
-            var dt = Job.FindByID(id);
-            if (dt == null) throw new ArgumentNullException(nameof(id), "找不到任务 " + id);
-
-            dt.Enable = enable;
-            dt.Save();
-        }
-        else
-        {
-            var ids = GetRequest("keys").SplitAsInt();
-
-            foreach (var item in ids)
-            {
-                var dt = Job.FindByID(item);
-                if (dt != null && dt.Enable != enable)
-                {
-                    dt.Enable = enable;
-                    dt.Save();
-                }
-            }
-        }
-        return JsonRefresh("操作成功！");
     }
 
     /// <summary>
@@ -173,37 +135,5 @@ public class JobController : EntityController<Job>
 
         // 跳转到编辑页，这里时候已经得到新的自增ID
         return Edit(job.ID + "");
-    }
-
-    protected override Boolean Valid(Job entity, DataObjectMethodType type, Boolean post)
-    {
-        if (!post) return base.Valid(entity, type, post);
-
-        var act = type switch
-        {
-            DataObjectMethodType.Update => "修改",
-            DataObjectMethodType.Insert => "添加",
-            DataObjectMethodType.Delete => "删除",
-            _ => type + "",
-        };
-
-        // 必须提前写修改日志，否则修改后脏数据失效，保存的日志为空
-        if (type == DataObjectMethodType.Update && (entity as IEntity).HasDirty)
-            LogProvider.Provider.WriteLog(act, entity);
-
-        var err = "";
-        try
-        {
-            return base.Valid(entity, type, post);
-        }
-        catch (Exception ex)
-        {
-            err = ex.Message;
-            throw;
-        }
-        finally
-        {
-            LogProvider.Provider.WriteLog(act, entity, err);
-        }
     }
 }

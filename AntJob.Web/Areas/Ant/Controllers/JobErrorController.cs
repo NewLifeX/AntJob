@@ -10,7 +10,7 @@ namespace AntJob.Web.Areas.Ant.Controllers;
 [AntArea]
 [DisplayName("作业错误")]
 [Menu(0, false)]
-public class JobErrorController : EntityController<JobError>
+public class JobErrorController : AntEntityController<JobError>
 {
     //static JobErrorController() => MenuOrder = 60;
 
@@ -24,6 +24,8 @@ public class JobErrorController : EntityController<JobError>
     /// <returns></returns>
     protected override IEnumerable<JobError> Search(Pager p)
     {
+        PageSetting.EnableAdd = false;
+
         var appid = p["appid"].ToInt(-1);
         var jobid = p["JobID"].ToInt(-1);
         var start = p["dtStart"].ToDateTime();
