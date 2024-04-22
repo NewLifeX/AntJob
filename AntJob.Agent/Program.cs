@@ -16,15 +16,6 @@ var set = AntSetting.Current;
 var scheduler = new Scheduler
 {
     ServiceProvider = services.BuildServiceProvider(),
-
-    //// 使用分布式调度引擎替换默认的本地文件调度
-    //Provider = new NetworkJobProvider
-    //{
-    //    Debug = set.Debug,
-    //    Server = set.Server,
-    //    AppID = set.AppID,
-    //    Secret = set.Secret,
-    //}
 };
 
 scheduler.Join(set.Server, set.AppID, set.Secret, set.Debug);

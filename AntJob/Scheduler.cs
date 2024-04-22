@@ -146,6 +146,7 @@ public class Scheduler : DisposeBase
             if (job != null && job.Mode == 0) job.Mode = handler.Mode;
             handler.Job = job;
 
+            handler.Tracer = Tracer;
             handler.Log = Log;
             handler.Start();
         }
