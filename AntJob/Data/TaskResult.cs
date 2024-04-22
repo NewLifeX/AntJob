@@ -31,6 +31,9 @@ public partial class TaskResult : ITaskResult
     /// <summary>最后键值</summary>
     public String Key { get; set; }
 
+    /// <summary>链路追踪</summary>
+    public String TraceId { get; set; }
+
     /// <summary>消息内容。异常信息或其它任务消息</summary>
     public String Message { get; set; }
     #endregion

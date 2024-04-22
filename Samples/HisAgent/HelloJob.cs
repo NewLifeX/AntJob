@@ -18,6 +18,8 @@ internal class HelloJob : Handler
 
     protected override Int32 Execute(JobContext ctx)
     {
+        using var span = Tracer?.NewSpan("HelloJob", ctx.Task.Time);
+
         // 当前任务时间
         var time = ctx.Task.Time;
         WriteLog("新生命蚂蚁调度系统！当前任务时间：{0}", time);

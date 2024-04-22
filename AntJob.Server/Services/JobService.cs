@@ -289,6 +289,21 @@ public class JobService
         task.Key = result.Key;
         task.Message = result.Message;
 
+        //var traceId = result.TraceId ?? DefaultSpan.Current + "";
+        //if (!traceId.IsNullOrEmpty()) task.TraceId = traceId;
+        //task.TraceId += $",{result.TraceId},{DefaultSpan.Current}";
+        var tis = task.TraceId.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
+        var traceId = result.TraceId;
+        if (!traceId.IsNullOrEmpty())
+        {
+            var ss = traceId.Split('-');
+            if (ss.Length > 3 && ss[0].Length == 2) traceId = ss[1];
+            if (!tis.Contains(traceId)) tis.Add(traceId);
+        }
+        traceId = DefaultSpan.Current?.TraceId;
+        if (!traceId.IsNullOrEmpty() && !tis.Contains(traceId)) tis.Add(traceId);
+        task.TraceId = tis.Join(",");
+
         // 已终结的作业，汇总统计
         if (result.Status == JobStatus.完成 || result.Status == JobStatus.错误)
         {

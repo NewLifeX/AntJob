@@ -63,6 +63,6 @@ public class Startup
 
         // 启用星尘注册中心，向注册中心注册服务，服务消费者将自动更新服务端地址列表
         app.RegisterService("AntWeb", null, env.EnvironmentName);
-        app.RegisterService("AntServer", null, env.EnvironmentName);
+        //app.RegisterService("AntServer", null, env.EnvironmentName);
     }
 }
