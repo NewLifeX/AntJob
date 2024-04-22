@@ -16,7 +16,7 @@ public class CSharpHandler : Handler
     /// <summary>实例化</summary>
     public CSharpHandler()
     {
-        Mode = JobModes.CSharp;
+        Mode = JobModes.Time;
 
         var job = Job;
         job.BatchSize = 8;

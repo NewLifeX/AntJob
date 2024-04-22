@@ -67,6 +67,19 @@ public class JobService
             if (job.Cron.IsNullOrEmpty()) job.Cron = item.Cron;
             if (job.Topic.IsNullOrEmpty()) job.Topic = item.Topic;
 
+            // 添加定时作业时，计算下一次执行时间
+            if (job.ID == 0 && job.Mode == JobModes.Time)
+            {
+                if (job.Step <= 0 && job.Cron.IsNullOrEmpty()) continue;
+
+                // 计算下一次执行时间
+                var cron = new Cron(job.Cron);
+                var time = item.Time.Year > 2000 ? item.Time : DateTime.Now;
+                item.Time = cron.GetNext(time);
+
+                if (job.Step <= 0) job.Step = 30;
+            }
+
             if (job.Save() != 0)
             {
                 // 更新作业数
@@ -127,8 +140,18 @@ public class JobService
                 case JobModes.Message:
                     list.AddRange(AcquireMessage(job, model.Topic, server, ip, pid, model.Count - list.Count, _cacheProvider.Cache));
                     break;
-                case JobModes.Data:
                 case JobModes.Time:
+                    {
+                        // 如果能够切片，则查询数据库后进入，避免缓存导致重复
+                        if (TrySplitTime(job, false, out var end))
+                        {
+                            // 申请任务前，不能再查数据库，那样子会导致多线程脏读，从而出现多客户端分到相同任务的情况
+                            //jb = Job.FindByKey(jb.ID);
+                            list.AddRange(Acquire(job, server, ip, pid, model.Count - list.Count, _cacheProvider.Cache));
+                        }
+                        break;
+                    }
+                case JobModes.Data:
                 //case JobModes.CSharp:
                 //case JobModes.Sql:
                 default:
@@ -430,10 +453,13 @@ public class JobService
         var start = job.Time;
         for (var i = 0; i < count; i++)
         {
-            if (!TrySplit(job, start, step, out var end)) break;
+            var end = DateTime.MinValue;
+            if (job.Mode == JobModes.Time && !TrySplitTime(job, true, out end) ||
+                job.Mode != JobModes.Time && !TrySplit(job, start, step, out end))
+                break;
 
-            // 创建新的分片
-            var ti = new JobTask
+            // 创建新的任务
+            var task = new JobTask
             {
                 AppID = job.AppID,
                 JobID = job.ID,
@@ -454,7 +480,7 @@ public class JobService
 
             // 重复切片判断
             var key = $"job:task:{job.ID}:{start:yyyyMMddHHmmss}";
-            if (!cache.Add(key, ti, 30))
+            if (!cache.Add(key, task, 30))
             {
                 var ti2 = cache.Get<JobTask>(key);
                 XTrace.WriteLine("[{0}]重复切片：{1}", key, ti2?.ToJson());
@@ -462,9 +488,9 @@ public class JobService
             }
             else
             {
-                ti.Insert();
+                task.Insert();
 
-                list.Add(ti);
+                list.Add(task);
             }
 
             // 更新任务
@@ -477,12 +503,57 @@ public class JobService
             // 任务需要ID，不能批量插入优化
             //list.Insert(null);
 
+            job.LastStatus = JobStatus.就绪;
+            job.LastTime = DateTime.Now;
+
             job.UpdateTime = DateTime.Now;
             job.Save();
             ts.Commit();
         }
 
         return list;
+    }
+
+    /// <summary>尝试分割时间片</summary>
+    /// <param name="job"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
+    public Boolean TrySplitTime(Job job, Boolean modify, out DateTime end)
+    {
+        var start = job.Time;
+
+        // 当前时间减去偏移量，作为当前时间。数据抽取不许超过该时间。去掉毫秒
+        var now = DateTime.Now.AddSeconds(-job.Offset).Trim("s");
+
+        end = DateTime.MinValue;
+
+        // 开始时间和结束时间是否越界
+        if (start >= now) return false;
+
+        // 任务结束时间超过作业结束时间时，取后者
+        if (job.End.Year > 2000 && end > job.End) end = job.End;
+
+        // 时间区间判断
+        if (end.Year > 2000 && start >= end) return false;
+
+        if (modify)
+        {
+            // 计算下一次执行时间
+            if (!job.Cron.IsNullOrEmpty())
+            {
+                var cron = new Cron(job.Cron);
+                var time = job.Time.Year > 2000 ? job.Time : DateTime.Now;
+                job.Time = cron.GetNext(time);
+            }
+            else
+            {
+                var step = job.Step;
+                if (step <= 0) step = 30;
+                job.Time = job.Time.AddSeconds(step);
+            }
+        }
+
+        return true;
     }
 
     /// <summary>尝试分割时间片</summary>
@@ -510,10 +581,7 @@ public class JobService
         if (job.End.Year > 2000 && end > job.End) end = job.End;
 
         // 时间片必须严格要求按照步进大小分片，除非有合适的End
-        if (job.Mode != JobModes.Time)
-        {
-            if (end > now) return false;
-        }
+        if (end > now) return false;
 
         // 时间区间判断
         if (start >= end) return false;

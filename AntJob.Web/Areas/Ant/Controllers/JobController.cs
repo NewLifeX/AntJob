@@ -47,12 +47,12 @@ public class JobController : AntEntityController<Job>
             var job = data as Job;
             return job.Mode switch
             {
-                JobModes.Data => "Start=" + job.Time.ToFullString(""),
+                JobModes.Data => job.Time.ToFullString(""),
                 JobModes.Time => job.Cron,
                 JobModes.Message => job.Topic,
-                JobModes.CSharp => "[C#]" + job.Time.ToString(""),
-                JobModes.Sql => "[Sql]" + job.Time.ToString(""),
-                _ => job.Time.ToString(""),
+                //JobModes.CSharp => "[C#]" + job.Time.ToFullString(""),
+                //JobModes.Sql => "[Sql]" + job.Time.ToFullString(""),
+                _ => job.Time.ToFullString(""),
             };
         }
     }
