@@ -146,7 +146,7 @@ public abstract class Handler : IExtend
         };
 
         // APM埋点
-        var span = Schedule.Tracer?.NewSpan($"job:{Name}", task.Data ?? $"({task.Start.ToFullString()}, {task.End.ToFullString()})");
+        var span = Schedule.Tracer?.NewSpan($"job:{Name}", task.Data ?? $"({task.Time.ToFullString()}, {task.End.ToFullString()})");
         ctx.Remark = span?.ToString();
 
         var sw = Stopwatch.StartNew();

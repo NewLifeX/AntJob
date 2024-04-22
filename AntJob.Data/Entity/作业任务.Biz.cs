@@ -199,6 +199,7 @@ public partial class JobTask : EntityBase<JobTask>
         {
             ID = ID,
 
+            Time = Start,
             Start = Start,
             End = End,
             //Offset = Offset,

@@ -130,7 +130,7 @@ public class FileJobProvider : JobProvider
             // 切分新任务
             var set = new TaskModel
             {
-                Start = start,
+                Time = start,
                 End = end,
                 //Step = job.Step,
                 //Offset = job.Offset,
@@ -163,13 +163,16 @@ public class FileJobProvider : JobProvider
         if (ctx.Total > 0)
         {
             var set = ctx.Task;
+            var time = set.Time;
+            var end = set.End;
             var n = 0;
-            if (set.End > set.Start) n = (Int32)(set.End - set.Start).TotalSeconds;
-            var msg = $"{ctx.Handler.Name} 处理{ctx.Total:n0} 行，区间（{set.Start} + {n}, {set.End:HH:mm:ss}）";
+            if (end > time) n = (Int32)(end - time).TotalSeconds;
+            var msg = $"{ctx.Handler.Name} 处理{ctx.Total:n0} 行，区间（{time} + {n}, {end:HH:mm:ss}）";
             if (ctx.Handler.Mode == JobModes.Time)
                 msg += $"，耗时{ctx.Cost:n0}ms";
             else
                 msg += $"，速度{ctx.Speed:n0}tps，耗时{ctx.Cost:n0}ms";
+
             XTrace.WriteLine(msg);
         }
     }

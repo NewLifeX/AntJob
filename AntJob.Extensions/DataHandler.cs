@@ -147,7 +147,7 @@ public abstract class DataHandler : Handler
         if (task == null) throw new ArgumentNullException(nameof(task), "没有设置数据抽取配置");
 
         // 验证时间段
-        var start = task.Start;
+        var start = task.Time;
         var end = task.End;
 
         // 区间无效
