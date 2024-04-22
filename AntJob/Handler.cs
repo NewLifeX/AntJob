@@ -65,6 +65,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
             Step = 30,
             Offset = 15,
             Mode = JobModes.Time,
+            Cron = "0/30 * * *",
         };
 
         // 默认并发数为核心数

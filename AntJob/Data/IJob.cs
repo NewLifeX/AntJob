@@ -1,4 +1,6 @@
-﻿namespace AntJob.Data;
+﻿using System.Xml.Serialization;
+
+namespace AntJob.Data;
 
 /// <summary>作业参数</summary>
 public interface IJob
@@ -32,6 +34,9 @@ public interface IJob
 
     /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
     JobModes Mode { get; set; }
+
+    /// <summary>Cron定时表达式</summary>
+    String Cron { get; set; }
 
     /// <summary>消息主题</summary>
     String Topic { get; set; }

@@ -251,7 +251,7 @@ public class Scheduler : DisposeBase
             {
                 using var span = Tracer?.NewSpan($"job:NewHandler", job);
 
-                XTrace.WriteLine("发现未知作业[{0}]@[{1}]", job.Name, job.ClassName);
+                WriteLog("发现未知作业[{0}]@[{1}]", job.Name, job.ClassName);
                 try
                 {
                     // 实例化一个处理器
@@ -261,7 +261,7 @@ public class Scheduler : DisposeBase
                         handler = type.CreateInstance() as Handler;
                         if (handler != null)
                         {
-                            XTrace.WriteLine("添加新作业[{0}]@[{1}]", job.Name, job.ClassName);
+                            WriteLog("添加新作业[{0}]@[{1}]", job.Name, job.ClassName);
 
                             handler.Name = job.Name;
                             handler.Schedule = this;

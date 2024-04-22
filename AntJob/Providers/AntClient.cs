@@ -90,7 +90,7 @@ public class AntClient : ApiClient
         var rs = await base.InvokeWithClientAsync<LoginResponse>(client, "Login", arg);
 
         var set = AntSetting.Current;
-        if (set.Debug) XTrace.WriteLine("登录{0}成功！{1}", client, rs.ToJson());
+        if (set.Debug) Log?.Info("登录{0}成功！{1}", client, rs.ToJson());
 
         // 保存下发密钥
         if (!rs.Secret.IsNullOrEmpty())

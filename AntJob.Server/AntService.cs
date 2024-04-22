@@ -123,7 +123,7 @@ class AntService : IApi, IActionFilter
     [Api(nameof(AddJobs))]
     public String[] AddJobs(JobModel[] jobs)
     {
-        if (jobs == null || jobs.Length == 0) return new String[0];
+        if (jobs == null || jobs.Length == 0) return [];
 
         return _jobService.AddJobs(_App, jobs);
     }
@@ -134,11 +134,17 @@ class AntService : IApi, IActionFilter
     [Api(nameof(Acquire))]
     public ITask[] Acquire(AcquireModel model)
     {
+        var span = DefaultSpan.Current;
+        if (span != null) span.Value = 0;
+
         var job = model.Job?.Trim();
-        if (job.IsNullOrEmpty()) return new TaskModel[0];
+        if (job.IsNullOrEmpty()) return [];
 
         var ip = _Net.Remote.Host;
-        return _jobService.Acquire(_App, model, ip);
+        var tasks = _jobService.Acquire(_App, model, ip);
+        if (span != null) span.Value = tasks?.Length ?? 0;
+
+        return tasks;
     }
 
     /// <summary>生产消息</summary>

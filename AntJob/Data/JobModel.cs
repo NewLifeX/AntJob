@@ -55,6 +55,10 @@ public partial class JobModel
     [XmlAttribute]
     public String Description { get; set; }
 
+    /// <summary>Cron定时表达式</summary>
+    [XmlAttribute]
+    public String Cron { get; set; }
+
     /// <summary>消息主题</summary>
     [XmlAttribute]
     public String Topic { get; set; }

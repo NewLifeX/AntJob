@@ -225,7 +225,7 @@ public class NetworkJobProvider : JobProvider
         }
         catch (Exception ex)
         {
-            XTrace.WriteLine("[{0}]的[{1}]状态报告失败！{2}", job, task.Status, ex.GetTrue().Message);
+            WriteLog("[{0}]的[{1}]状态报告失败！{2}", job, task.Status, ex.GetTrue().Message);
         }
     }
     #endregion
@@ -242,13 +242,13 @@ public class NetworkJobProvider : JobProvider
         {
             var pr = old.FirstOrDefault(e => e.Instance == item.Instance);
             if (pr == null)
-                XTrace.WriteLine("[{0}]上线！{1}", item.Instance, item.Machine);
+                WriteLog("[{0}]上线！{1}", item.Instance, item.Machine);
             else
                 old.Remove(pr);
         }
         foreach (var item in old)
         {
-            XTrace.WriteLine("[{0}]下线！{1}", item.Instance, item.Machine);
+            WriteLog("[{0}]下线！{1}", item.Instance, item.Machine);
         }
 
         Peers = ps;
