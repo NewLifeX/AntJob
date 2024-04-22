@@ -140,13 +140,14 @@
         <Column Name="ClassName" DataType="String" Length="100" Description="类名。支持该作业的处理器实现" />
         <Column Name="DisplayName" DataType="String" Description="显示名" />
         <Column Name="Mode" DataType="Int32" Description="调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑" Type="JobModes" />
+        <Column Name="Cron" DataType="String" Description="执行频次。定时调度的Cron表达式" />
         <Column Name="Topic" DataType="String" Description="主题。消息调度时消费的主题" />
         <Column Name="MessageCount" DataType="Int32" Description="消息数" />
-        <Column Name="Start" DataType="DateTime" Description="开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
-        <Column Name="End" DataType="DateTime" Description="结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用" />
+        <Column Name="Start" DataType="DateTime" Description="开始。从该时间开始调度作业任务，默认不设置时从当前时间开始" />
+        <Column Name="End" DataType="DateTime" Description="结束。到该时间停止调度作业，默认不设置时永不停止" />
         <Column Name="Step" DataType="Int32" Description="步进。切分任务的时间区间，秒" />
         <Column Name="BatchSize" DataType="Int32" Description="批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用" />
-        <Column Name="Offset" DataType="Int32" Description="偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒" />
+        <Column Name="Offset" DataType="Int32" ItemType="TimeSpan" Description="偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒" />
         <Column Name="MaxTask" DataType="Int32" Description="并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度" />
         <Column Name="MaxError" DataType="Int32" Description="最大错误。连续错误达到最大错误数时停止" />
         <Column Name="MaxRetry" DataType="Int32" Description="最大重试。默认10次，超过该次数后将不再重试" />
@@ -154,12 +155,15 @@
         <Column Name="MaxRetain" DataType="Int32" Description="保留。任务项保留天数，超过天数的任务项将被删除，默认3天" />
         <Column Name="MaxIdle" DataType="Int32" Description="最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警" />
         <Column Name="ErrorDelay" DataType="Int32" Description="错误延迟。默认60秒，出错延迟后重新发放" />
+        <Column Name="Deadline" DataType="DateTime" Description="最后期限。超过该时间后，任务将不再执行" />
         <Column Name="Total" DataType="Int64" Description="总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1" />
         <Column Name="Success" DataType="Int64" Description="成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数" />
         <Column Name="Error" DataType="Int32" Description="错误" />
         <Column Name="Times" DataType="Int32" Description="次数" />
         <Column Name="Speed" DataType="Int32" Description="速度" />
         <Column Name="Enable" DataType="Boolean" Description="启用" />
+        <Column Name="LastStatus" DataType="Int32" Description="最后一次状态" Type="JobStatus" />
+        <Column Name="LastTime" DataType="DateTime" Description="最后一次时间" />
         <Column Name="Data" DataType="String" Length="-1" Description="数据。Sql模板或C#模板" />
         <Column Name="CreateUserID" DataType="Int32" Description="创建人" Category="扩展" />
         <Column Name="CreateUser" DataType="String" Description="创建者" Category="扩展" />

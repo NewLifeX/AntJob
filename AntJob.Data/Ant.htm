@@ -866,6 +866,17 @@
         </tr>
 
         <tr>
+            <td>Cron</td>
+            <td>执行频次</td>
+            <td>String</td>
+            <td>50</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>定时调度的Cron表达式</td>
+        </tr>
+
+        <tr>
             <td>Topic</td>
             <td>主题</td>
             <td>String</td>
@@ -895,7 +906,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</td>
+            <td>从该时间开始调度作业任务，默认不设置时从当前时间开始</td>
         </tr>
 
         <tr>
@@ -906,7 +917,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用</td>
+            <td>到该时间停止调度作业，默认不设置时永不停止</td>
         </tr>
 
         <tr>
@@ -1020,6 +1031,17 @@
         </tr>
 
         <tr>
+            <td>Deadline</td>
+            <td>最后期限</td>
+            <td>DateTime</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>超过该时间后，任务将不再执行</td>
+        </tr>
+
+        <tr>
             <td>Total</td>
             <td>总数</td>
             <td>Int64</td>
@@ -1082,6 +1104,28 @@
             <td></td>
             <td></td>
             <td>N</td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td>LastStatus</td>
+            <td>最后一次状态</td>
+            <td>Int32</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>N</td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td>LastTime</td>
+            <td>最后一次时间</td>
+            <td>DateTime</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
             <td></td>
         </tr>
 

@@ -70,6 +70,14 @@ public partial class Job
     [BindColumn("Mode", "调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑", "")]
     public JobModes Mode { get => _Mode; set { if (OnPropertyChanging("Mode", value)) { _Mode = value; OnPropertyChanged("Mode"); } } }
 
+    private String _Cron;
+    /// <summary>执行频次。定时调度的Cron表达式</summary>
+    [DisplayName("执行频次")]
+    [Description("执行频次。定时调度的Cron表达式")]
+    [DataObjectField(false, false, true, 50)]
+    [BindColumn("Cron", "执行频次。定时调度的Cron表达式", "")]
+    public String Cron { get => _Cron; set { if (OnPropertyChanging("Cron", value)) { _Cron = value; OnPropertyChanged("Cron"); } } }
+
     private String _Topic;
     /// <summary>主题。消息调度时消费的主题</summary>
     [DisplayName("主题")]
@@ -87,19 +95,19 @@ public partial class Job
     public Int32 MessageCount { get => _MessageCount; set { if (OnPropertyChanging("MessageCount", value)) { _MessageCount = value; OnPropertyChanged("MessageCount"); } } }
 
     private DateTime _Start;
-    /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
+    /// <summary>开始。从该时间开始调度作业任务，默认不设置时从当前时间开始</summary>
     [DisplayName("开始")]
-    [Description("开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用")]
+    [Description("开始。从该时间开始调度作业任务，默认不设置时从当前时间开始")]
     [DataObjectField(false, false, true, 0)]
-    [BindColumn("Start", "开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用", "")]
+    [BindColumn("Start", "开始。从该时间开始调度作业任务，默认不设置时从当前时间开始", "")]
     public DateTime Start { get => _Start; set { if (OnPropertyChanging("Start", value)) { _Start = value; OnPropertyChanged("Start"); } } }
 
     private DateTime _End;
-    /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用</summary>
+    /// <summary>结束。到该时间停止调度作业，默认不设置时永不停止</summary>
     [DisplayName("结束")]
-    [Description("结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用")]
+    [Description("结束。到该时间停止调度作业，默认不设置时永不停止")]
     [DataObjectField(false, false, true, 0)]
-    [BindColumn("End", "结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用", "")]
+    [BindColumn("End", "结束。到该时间停止调度作业，默认不设置时永不停止", "")]
     public DateTime End { get => _End; set { if (OnPropertyChanging("End", value)) { _End = value; OnPropertyChanged("End"); } } }
 
     private Int32 _Step;
@@ -123,7 +131,7 @@ public partial class Job
     [DisplayName("偏移")]
     [Description("偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("Offset", "偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒", "")]
+    [BindColumn("Offset", "偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒", "", ItemType = "TimeSpan")]
     public Int32 Offset { get => _Offset; set { if (OnPropertyChanging("Offset", value)) { _Offset = value; OnPropertyChanged("Offset"); } } }
 
     private Int32 _MaxTask;
@@ -182,6 +190,14 @@ public partial class Job
     [BindColumn("ErrorDelay", "错误延迟。默认60秒，出错延迟后重新发放", "")]
     public Int32 ErrorDelay { get => _ErrorDelay; set { if (OnPropertyChanging("ErrorDelay", value)) { _ErrorDelay = value; OnPropertyChanged("ErrorDelay"); } } }
 
+    private DateTime _Deadline;
+    /// <summary>最后期限。超过该时间后，任务将不再执行</summary>
+    [DisplayName("最后期限")]
+    [Description("最后期限。超过该时间后，任务将不再执行")]
+    [DataObjectField(false, false, true, 0)]
+    [BindColumn("Deadline", "最后期限。超过该时间后，任务将不再执行", "")]
+    public DateTime Deadline { get => _Deadline; set { if (OnPropertyChanging("Deadline", value)) { _Deadline = value; OnPropertyChanged("Deadline"); } } }
+
     private Int64 _Total;
     /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
     [DisplayName("总数")]
@@ -229,6 +245,22 @@ public partial class Job
     [DataObjectField(false, false, false, 0)]
     [BindColumn("Enable", "启用", "")]
     public Boolean Enable { get => _Enable; set { if (OnPropertyChanging("Enable", value)) { _Enable = value; OnPropertyChanged("Enable"); } } }
+
+    private JobStatus _LastStatus;
+    /// <summary>最后一次状态</summary>
+    [DisplayName("最后一次状态")]
+    [Description("最后一次状态")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("LastStatus", "最后一次状态", "")]
+    public JobStatus LastStatus { get => _LastStatus; set { if (OnPropertyChanging("LastStatus", value)) { _LastStatus = value; OnPropertyChanged("LastStatus"); } } }
+
+    private DateTime _LastTime;
+    /// <summary>最后一次时间</summary>
+    [DisplayName("最后一次时间")]
+    [Description("最后一次时间")]
+    [DataObjectField(false, false, true, 0)]
+    [BindColumn("LastTime", "最后一次时间", "")]
+    public DateTime LastTime { get => _LastTime; set { if (OnPropertyChanging("LastTime", value)) { _LastTime = value; OnPropertyChanged("LastTime"); } } }
 
     private String _Data;
     /// <summary>数据。Sql模板或C#模板</summary>
@@ -334,6 +366,7 @@ public partial class Job
             "ClassName" => _ClassName,
             "DisplayName" => _DisplayName,
             "Mode" => _Mode,
+            "Cron" => _Cron,
             "Topic" => _Topic,
             "MessageCount" => _MessageCount,
             "Start" => _Start,
@@ -348,12 +381,15 @@ public partial class Job
             "MaxRetain" => _MaxRetain,
             "MaxIdle" => _MaxIdle,
             "ErrorDelay" => _ErrorDelay,
+            "Deadline" => _Deadline,
             "Total" => _Total,
             "Success" => _Success,
             "Error" => _Error,
             "Times" => _Times,
             "Speed" => _Speed,
             "Enable" => _Enable,
+            "LastStatus" => _LastStatus,
+            "LastTime" => _LastTime,
             "Data" => _Data,
             "CreateUserID" => _CreateUserID,
             "CreateUser" => _CreateUser,
@@ -376,6 +412,7 @@ public partial class Job
                 case "ClassName": _ClassName = Convert.ToString(value); break;
                 case "DisplayName": _DisplayName = Convert.ToString(value); break;
                 case "Mode": _Mode = (JobModes)value.ToInt(); break;
+                case "Cron": _Cron = Convert.ToString(value); break;
                 case "Topic": _Topic = Convert.ToString(value); break;
                 case "MessageCount": _MessageCount = value.ToInt(); break;
                 case "Start": _Start = value.ToDateTime(); break;
@@ -390,12 +427,15 @@ public partial class Job
                 case "MaxRetain": _MaxRetain = value.ToInt(); break;
                 case "MaxIdle": _MaxIdle = value.ToInt(); break;
                 case "ErrorDelay": _ErrorDelay = value.ToInt(); break;
+                case "Deadline": _Deadline = value.ToDateTime(); break;
                 case "Total": _Total = value.ToLong(); break;
                 case "Success": _Success = value.ToLong(); break;
                 case "Error": _Error = value.ToInt(); break;
                 case "Times": _Times = value.ToInt(); break;
                 case "Speed": _Speed = value.ToInt(); break;
                 case "Enable": _Enable = value.ToBoolean(); break;
+                case "LastStatus": _LastStatus = (JobStatus)value.ToInt(); break;
+                case "LastTime": _LastTime = value.ToDateTime(); break;
                 case "Data": _Data = Convert.ToString(value); break;
                 case "CreateUserID": _CreateUserID = value.ToInt(); break;
                 case "CreateUser": _CreateUser = Convert.ToString(value); break;
@@ -445,16 +485,19 @@ public partial class Job
         /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
         public static readonly Field Mode = FindByName("Mode");
 
+        /// <summary>执行频次。定时调度的Cron表达式</summary>
+        public static readonly Field Cron = FindByName("Cron");
+
         /// <summary>主题。消息调度时消费的主题</summary>
         public static readonly Field Topic = FindByName("Topic");
 
         /// <summary>消息数</summary>
         public static readonly Field MessageCount = FindByName("MessageCount");
 
-        /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
+        /// <summary>开始。从该时间开始调度作业任务，默认不设置时从当前时间开始</summary>
         public static readonly Field Start = FindByName("Start");
 
-        /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用</summary>
+        /// <summary>结束。到该时间停止调度作业，默认不设置时永不停止</summary>
         public static readonly Field End = FindByName("End");
 
         /// <summary>步进。切分任务的时间区间，秒</summary>
@@ -487,6 +530,9 @@ public partial class Job
         /// <summary>错误延迟。默认60秒，出错延迟后重新发放</summary>
         public static readonly Field ErrorDelay = FindByName("ErrorDelay");
 
+        /// <summary>最后期限。超过该时间后，任务将不再执行</summary>
+        public static readonly Field Deadline = FindByName("Deadline");
+
         /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
         public static readonly Field Total = FindByName("Total");
 
@@ -504,6 +550,12 @@ public partial class Job
 
         /// <summary>启用</summary>
         public static readonly Field Enable = FindByName("Enable");
+
+        /// <summary>最后一次状态</summary>
+        public static readonly Field LastStatus = FindByName("LastStatus");
+
+        /// <summary>最后一次时间</summary>
+        public static readonly Field LastTime = FindByName("LastTime");
 
         /// <summary>数据。Sql模板或C#模板</summary>
         public static readonly Field Data = FindByName("Data");
@@ -559,16 +611,19 @@ public partial class Job
         /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
         public const String Mode = "Mode";
 
+        /// <summary>执行频次。定时调度的Cron表达式</summary>
+        public const String Cron = "Cron";
+
         /// <summary>主题。消息调度时消费的主题</summary>
         public const String Topic = "Topic";
 
         /// <summary>消息数</summary>
         public const String MessageCount = "MessageCount";
 
-        /// <summary>开始。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
+        /// <summary>开始。从该时间开始调度作业任务，默认不设置时从当前时间开始</summary>
         public const String Start = "Start";
 
-        /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），默认空表示无止境，消息调度不适用</summary>
+        /// <summary>结束。到该时间停止调度作业，默认不设置时永不停止</summary>
         public const String End = "End";
 
         /// <summary>步进。切分任务的时间区间，秒</summary>
@@ -601,6 +656,9 @@ public partial class Job
         /// <summary>错误延迟。默认60秒，出错延迟后重新发放</summary>
         public const String ErrorDelay = "ErrorDelay";
 
+        /// <summary>最后期限。超过该时间后，任务将不再执行</summary>
+        public const String Deadline = "Deadline";
+
         /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
         public const String Total = "Total";
 
@@ -618,6 +676,12 @@ public partial class Job
 
         /// <summary>启用</summary>
         public const String Enable = "Enable";
+
+        /// <summary>最后一次状态</summary>
+        public const String LastStatus = "LastStatus";
+
+        /// <summary>最后一次时间</summary>
+        public const String LastTime = "LastTime";
 
         /// <summary>数据。Sql模板或C#模板</summary>
         public const String Data = "Data";
