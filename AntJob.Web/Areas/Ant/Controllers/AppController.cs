@@ -25,7 +25,7 @@ public class AppController : AntEntityController<App>
 
         {
             var df = ListFields.GetField("Name") as ListField;
-            df.Url = "/Ant/Ant/Detail?id={ID}";
+            df.Url = "/Ant/App/Detail?id={ID}";
             df.Target = "_blank";
         }
         {

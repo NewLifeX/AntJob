@@ -1,8 +1,11 @@
 ﻿using System.ComponentModel;
+using AntJob.Data;
 using AntJob.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using NewLife;
 using NewLife.Cube;
+using NewLife.Cube.ViewModels;
+using NewLife.Data;
 using NewLife.Security;
 using NewLife.Web;
 using XCode.Membership;
@@ -19,8 +22,39 @@ public class JobController : AntEntityController<Job>
     {
         LogOnChange = true;
 
+        ListFields.RemoveField("ClassName", "Cron", "Topic", "MessageCount", "Time", "End");
+        ListFields.RemoveField("MaxError", "MaxRetry", "MaxTime", "MaxRetain", "MaxIdle", "ErrorDelay", "Deadline");
+        ListFields.RemoveField("Total", "Success", "Error", "Times", "Speed");
         ListFields.RemoveCreateField().RemoveUpdateField();
         ListFields.AddListField("UpdateTime");
+
+        {
+            var df = ListFields.AddListField("Task", "UpdateUser");
+            df.DisplayName = "任务";
+            df.Url = "/Ant/JobTask?appid={AppID}&jobId={ID}";
+        }
+        {
+            var df = ListFields.AddListField("Title", null, "Mode");
+            df.Header = "执行频次";
+            df.AddService(new MyTextField());
+        }
+    }
+
+    class MyTextField : ILinkExtend
+    {
+        public String Resolve(DataField field, IModel data)
+        {
+            var job = data as Job;
+            return job.Mode switch
+            {
+                JobModes.Data => "Start=" + job.Time.ToFullString(""),
+                JobModes.Time => job.Cron,
+                JobModes.Message => job.Topic,
+                JobModes.CSharp => "[C#]" + job.Time.ToString(""),
+                JobModes.Sql => "[Sql]" + job.Time.ToString(""),
+                _ => job.Time.ToString(""),
+            };
+        }
     }
 
     /// <summary>搜索数据集</summary>

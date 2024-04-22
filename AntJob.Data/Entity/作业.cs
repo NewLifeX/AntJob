@@ -62,6 +62,14 @@ public partial class Job
     [BindColumn("DisplayName", "显示名", "")]
     public String DisplayName { get => _DisplayName; set { if (OnPropertyChanging("DisplayName", value)) { _DisplayName = value; OnPropertyChanged("DisplayName"); } } }
 
+    private Boolean _Enable;
+    /// <summary>启用</summary>
+    [DisplayName("启用")]
+    [Description("启用")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("Enable", "启用", "")]
+    public Boolean Enable { get => _Enable; set { if (OnPropertyChanging("Enable", value)) { _Enable = value; OnPropertyChanged("Enable"); } } }
+
     private JobModes _Mode;
     /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
     [DisplayName("调度模式")]
@@ -136,6 +144,7 @@ public partial class Job
 
     private Int32 _MaxTask;
     /// <summary>并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度</summary>
+    [Category("控制参数")]
     [DisplayName("并行度")]
     [Description("并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度")]
     [DataObjectField(false, false, false, 0)]
@@ -144,6 +153,7 @@ public partial class Job
 
     private Int32 _MaxError;
     /// <summary>最大错误。连续错误达到最大错误数时停止</summary>
+    [Category("控制参数")]
     [DisplayName("最大错误")]
     [Description("最大错误。连续错误达到最大错误数时停止")]
     [DataObjectField(false, false, false, 0)]
@@ -152,6 +162,7 @@ public partial class Job
 
     private Int32 _MaxRetry;
     /// <summary>最大重试。默认10次，超过该次数后将不再重试</summary>
+    [Category("控制参数")]
     [DisplayName("最大重试")]
     [Description("最大重试。默认10次，超过该次数后将不再重试")]
     [DataObjectField(false, false, false, 0)]
@@ -160,6 +171,7 @@ public partial class Job
 
     private Int32 _MaxTime;
     /// <summary>最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器</summary>
+    [Category("控制参数")]
     [DisplayName("最大执行时间")]
     [Description("最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器")]
     [DataObjectField(false, false, false, 0)]
@@ -168,6 +180,7 @@ public partial class Job
 
     private Int32 _MaxRetain;
     /// <summary>保留。任务项保留天数，超过天数的任务项将被删除，默认3天</summary>
+    [Category("控制参数")]
     [DisplayName("保留")]
     [Description("保留。任务项保留天数，超过天数的任务项将被删除，默认3天")]
     [DataObjectField(false, false, false, 0)]
@@ -176,6 +189,7 @@ public partial class Job
 
     private Int32 _MaxIdle;
     /// <summary>最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警</summary>
+    [Category("控制参数")]
     [DisplayName("最大空闲时间")]
     [Description("最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警")]
     [DataObjectField(false, false, false, 0)]
@@ -184,6 +198,7 @@ public partial class Job
 
     private Int32 _ErrorDelay;
     /// <summary>错误延迟。默认60秒，出错延迟后重新发放</summary>
+    [Category("控制参数")]
     [DisplayName("错误延迟")]
     [Description("错误延迟。默认60秒，出错延迟后重新发放")]
     [DataObjectField(false, false, false, 0)]
@@ -192,6 +207,7 @@ public partial class Job
 
     private DateTime _Deadline;
     /// <summary>最后期限。超过该时间后，任务将不再执行</summary>
+    [Category("控制参数")]
     [DisplayName("最后期限")]
     [Description("最后期限。超过该时间后，任务将不再执行")]
     [DataObjectField(false, false, true, 0)]
@@ -200,6 +216,7 @@ public partial class Job
 
     private Int64 _Total;
     /// <summary>总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1</summary>
+    [Category("统计")]
     [DisplayName("总数")]
     [Description("总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1")]
     [DataObjectField(false, false, false, 0)]
@@ -208,6 +225,7 @@ public partial class Job
 
     private Int64 _Success;
     /// <summary>成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数</summary>
+    [Category("统计")]
     [DisplayName("成功")]
     [Description("成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数")]
     [DataObjectField(false, false, false, 0)]
@@ -216,6 +234,7 @@ public partial class Job
 
     private Int32 _Error;
     /// <summary>错误</summary>
+    [Category("统计")]
     [DisplayName("错误")]
     [Description("错误")]
     [DataObjectField(false, false, false, 0)]
@@ -224,6 +243,7 @@ public partial class Job
 
     private Int32 _Times;
     /// <summary>次数</summary>
+    [Category("统计")]
     [DisplayName("次数")]
     [Description("次数")]
     [DataObjectField(false, false, false, 0)]
@@ -232,22 +252,16 @@ public partial class Job
 
     private Int32 _Speed;
     /// <summary>速度</summary>
+    [Category("统计")]
     [DisplayName("速度")]
     [Description("速度")]
     [DataObjectField(false, false, false, 0)]
     [BindColumn("Speed", "速度", "")]
     public Int32 Speed { get => _Speed; set { if (OnPropertyChanging("Speed", value)) { _Speed = value; OnPropertyChanged("Speed"); } } }
 
-    private Boolean _Enable;
-    /// <summary>启用</summary>
-    [DisplayName("启用")]
-    [Description("启用")]
-    [DataObjectField(false, false, false, 0)]
-    [BindColumn("Enable", "启用", "")]
-    public Boolean Enable { get => _Enable; set { if (OnPropertyChanging("Enable", value)) { _Enable = value; OnPropertyChanged("Enable"); } } }
-
     private JobStatus _LastStatus;
     /// <summary>最后一次状态</summary>
+    [Category("统计")]
     [DisplayName("最后一次状态")]
     [Description("最后一次状态")]
     [DataObjectField(false, false, false, 0)]
@@ -256,6 +270,7 @@ public partial class Job
 
     private DateTime _LastTime;
     /// <summary>最后一次时间</summary>
+    [Category("统计")]
     [DisplayName("最后一次时间")]
     [Description("最后一次时间")]
     [DataObjectField(false, false, true, 0)]
@@ -365,6 +380,7 @@ public partial class Job
             "Name" => _Name,
             "ClassName" => _ClassName,
             "DisplayName" => _DisplayName,
+            "Enable" => _Enable,
             "Mode" => _Mode,
             "Cron" => _Cron,
             "Topic" => _Topic,
@@ -387,7 +403,6 @@ public partial class Job
             "Error" => _Error,
             "Times" => _Times,
             "Speed" => _Speed,
-            "Enable" => _Enable,
             "LastStatus" => _LastStatus,
             "LastTime" => _LastTime,
             "Data" => _Data,
@@ -411,6 +426,7 @@ public partial class Job
                 case "Name": _Name = Convert.ToString(value); break;
                 case "ClassName": _ClassName = Convert.ToString(value); break;
                 case "DisplayName": _DisplayName = Convert.ToString(value); break;
+                case "Enable": _Enable = value.ToBoolean(); break;
                 case "Mode": _Mode = (JobModes)value.ToInt(); break;
                 case "Cron": _Cron = Convert.ToString(value); break;
                 case "Topic": _Topic = Convert.ToString(value); break;
@@ -433,7 +449,6 @@ public partial class Job
                 case "Error": _Error = value.ToInt(); break;
                 case "Times": _Times = value.ToInt(); break;
                 case "Speed": _Speed = value.ToInt(); break;
-                case "Enable": _Enable = value.ToBoolean(); break;
                 case "LastStatus": _LastStatus = (JobStatus)value.ToInt(); break;
                 case "LastTime": _LastTime = value.ToDateTime(); break;
                 case "Data": _Data = Convert.ToString(value); break;
@@ -481,6 +496,9 @@ public partial class Job
 
         /// <summary>显示名</summary>
         public static readonly Field DisplayName = FindByName("DisplayName");
+
+        /// <summary>启用</summary>
+        public static readonly Field Enable = FindByName("Enable");
 
         /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
         public static readonly Field Mode = FindByName("Mode");
@@ -548,9 +566,6 @@ public partial class Job
         /// <summary>速度</summary>
         public static readonly Field Speed = FindByName("Speed");
 
-        /// <summary>启用</summary>
-        public static readonly Field Enable = FindByName("Enable");
-
         /// <summary>最后一次状态</summary>
         public static readonly Field LastStatus = FindByName("LastStatus");
 
@@ -607,6 +622,9 @@ public partial class Job
 
         /// <summary>显示名</summary>
         public const String DisplayName = "DisplayName";
+
+        /// <summary>启用</summary>
+        public const String Enable = "Enable";
 
         /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
         public const String Mode = "Mode";
@@ -673,9 +691,6 @@ public partial class Job
 
         /// <summary>速度</summary>
         public const String Speed = "Speed";
-
-        /// <summary>启用</summary>
-        public const String Enable = "Enable";
 
         /// <summary>最后一次状态</summary>
         public const String LastStatus = "LastStatus";

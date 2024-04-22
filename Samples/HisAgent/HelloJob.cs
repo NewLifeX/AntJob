@@ -10,10 +10,7 @@ internal class HelloJob : Handler
 {
     public HelloJob()
     {
-        // 今天零点开始，每10秒一次
-        var job = Job;
-        job.Time = DateTime.Today;
-        job.Step = 10;
+        Job.Cron = "7/30 * * * * ?";
     }
 
     protected override Int32 Execute(JobContext ctx)

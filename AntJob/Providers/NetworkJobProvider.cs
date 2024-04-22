@@ -2,7 +2,6 @@
 using AntJob.Handlers;
 using AntJob.Models;
 using NewLife;
-using NewLife.Log;
 using NewLife.Threading;
 
 namespace AntJob.Providers;
@@ -47,6 +46,8 @@ public class NetworkJobProvider : JobProvider
     public override void Start()
     {
         var svr = Server;
+
+        WriteLog("正在连接调度中心：{0}", svr);
 
         // 使用配置中心账号
         var ant = new AntClient(svr)

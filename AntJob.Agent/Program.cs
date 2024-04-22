@@ -16,6 +16,7 @@ var set = AntSetting.Current;
 var scheduler = new Scheduler
 {
     ServiceProvider = services.BuildServiceProvider(),
+    Log = XTrace.Log,
 };
 
 scheduler.Join(set.Server, set.AppID, set.Secret, set.Debug);
