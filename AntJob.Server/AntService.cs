@@ -291,7 +291,7 @@ class AntService : IApi, IActionFilter
                     list.AddRange(jb.AcquireMessage(model.Topic, server, ip, pid, model.Count - list.Count, _cacheProvider.Cache));
                     break;
                 case JobModes.Data:
-                case JobModes.Alarm:
+                case JobModes.Time:
                 //case JobModes.CSharp:
                 //case JobModes.Sql:
                 default:
@@ -435,49 +435,52 @@ class AntService : IApi, IActionFilter
 
     #region 状态报告
     /// <summary>报告状态（进度、成功、错误）</summary>
-    /// <param name="task"></param>
+    /// <param name="result"></param>
     /// <returns></returns>
     [Api(nameof(Report))]
-    public Boolean Report(TaskResult task)
+    public Boolean Report(TaskResult result)
     {
-        if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
+        if (result == null || result.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + result?.ID);
 
         // 判断是否有权
         var app = _App;
 
-        var jt = JobTask.FindByID(task.ID) ?? throw new InvalidOperationException($"找不到任务[{task.ID}]");
-        var job = Job.FindByID(jt.JobID);
+        var task = JobTask.FindByID(result.ID) ?? throw new InvalidOperationException($"找不到任务[{result.ID}]");
+        var job = Job.FindByID(task.JobID);
         if (job == null || job.AppID != app.ID)
         {
-            _log.Info(task.ToJson());
-            throw new InvalidOperationException($"应用[{app}]无权操作作业[{job}#{jt}]");
+            _log.Info(result.ToJson());
+            throw new InvalidOperationException($"应用[{app}]无权操作作业[{job}#{task}]");
         }
 
         // 只有部分字段允许客户端修改
-        if (task.Status > 0) jt.Status = task.Status;
+        if (result.Status > 0) task.Status = result.Status;
 
-        jt.Speed = task.Speed;
-        jt.Total = task.Total;
-        jt.Success = task.Success;
-        jt.Cost = task.Cost;
-        jt.Key = task.Key;
-        jt.Message = task.Message;
+        task.Speed = result.Speed;
+        task.Total = result.Total;
+        task.Success = result.Success;
+        task.Cost = result.Cost;
+        task.Key = result.Key;
+        task.Message = result.Message;
+
+        var traceId = result.TraceId ?? DefaultSpan.Current + "";
+        if (!traceId.IsNullOrEmpty()) task.TraceId = traceId;
 
         // 已终结的作业，汇总统计
-        if (task.Status == JobStatus.完成 || task.Status == JobStatus.错误)
+        if (result.Status == JobStatus.完成 || result.Status == JobStatus.错误)
         {
-            jt.Times++;
+            task.Times++;
 
-            SetJobFinish(job, jt);
+            SetJobFinish(job, task);
 
             // 记录状态
-            UpdateOnline(app, jt, _Net);
+            UpdateOnline(app, task, _Net);
         }
-        if (task.Status == JobStatus.错误)
+        if (result.Status == JobStatus.错误)
         {
-            SetJobError(job, jt);
+            SetJobError(job, task);
 
-            jt.Error++;
+            task.Error++;
             //ji.Message = err.Message;
 
             // 出错时判断如果超过最大错误数，则停止作业
@@ -485,10 +488,10 @@ class AntService : IApi, IActionFilter
         }
 
         // 从创建到完成的全部耗时
-        var ts = DateTime.Now - jt.CreateTime;
-        jt.FullCost = (Int32)ts.TotalSeconds;
+        var ts = DateTime.Now - task.CreateTime;
+        task.FullCost = (Int32)ts.TotalSeconds;
 
-        jt.SaveAsync();
+        task.SaveAsync();
         //ji.Save();
 
         return true;

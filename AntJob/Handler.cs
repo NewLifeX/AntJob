@@ -138,16 +138,17 @@ public abstract class Handler : IExtend
     {
         if (task == null) return;
 
+        var result = new TaskResult { ID = task.ID };
         var ctx = new JobContext
         {
             Handler = this,
             Task = task,
-            Result = new TaskResult { ID = task.ID },
+            Result = result,
         };
 
         // APM埋点
         var span = Schedule.Tracer?.NewSpan($"job:{Name}", task.Data ?? $"({task.Start.ToFullString()}, {task.End.ToFullString()})");
-        ctx.Remark = span?.ToString();
+        result.TraceId = span?.ToString();
 
         var sw = Stopwatch.StartNew();
         try
