@@ -246,7 +246,7 @@ public class HttpJobProvider : JobProvider
         var ps = Client?.Get<PeerModel[]>("/AntJob/GetPeers");
         if (ps == null || ps.Length == 0) return;
 
-        var old = (Peers ?? new IPeer[0]).ToList();
+        var old = (Peers ?? []).ToList();
         foreach (var item in ps)
         {
             var pr = old.FirstOrDefault(e => e.Instance == item.Instance);

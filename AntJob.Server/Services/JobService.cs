@@ -3,7 +3,6 @@ using AntJob.Data.Entity;
 using AntJob.Models;
 using NewLife;
 using NewLife.Caching;
-using NewLife.Data;
 using NewLife.Log;
 using NewLife.Serialization;
 using NewLife.Threading;
@@ -15,14 +14,12 @@ public class JobService
 {
     private readonly AppService _appService;
     private readonly ICacheProvider _cacheProvider;
-    private readonly ITracer _tracer;
     private readonly ILog _log;
 
-    public JobService(AppService appService, ICacheProvider cacheProvider, ITracer tracer, ILog log)
+    public JobService(AppService appService, ICacheProvider cacheProvider, ILog log)
     {
         _appService = appService;
         _cacheProvider = cacheProvider;
-        _tracer = tracer;
         _log = log;
     }
 

@@ -1,6 +1,5 @@
 ﻿using AntJob;
 using AntJob.Extensions;
-using AntJob.Providers;
 using NewLife.Log;
 using NewLife.Model;
 using Stardust;

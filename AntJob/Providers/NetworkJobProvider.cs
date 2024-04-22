@@ -28,9 +28,6 @@ public class NetworkJobProvider : JobProvider
 
     /// <summary>邻居伙伴。用于应用判断自身有多少个实例在运行</summary>
     public IPeer[] Peers { get; private set; }
-
-    /// <summary>性能跟踪器</summary>
-    public ITracer Tracer { get; set; }
     #endregion
 
     #region 构造
@@ -56,9 +53,11 @@ public class NetworkJobProvider : JobProvider
         {
             UserName = AppId,
             Password = Secret,
+
             Tracer = Tracer,
+            Log = Log,
         };
-        if (Debug) ant.EncoderLog = XTrace.Log;
+        if (Debug) ant.EncoderLog = Log;
         ant.Open();
 
         // 断开前一个连接
@@ -238,7 +237,7 @@ public class NetworkJobProvider : JobProvider
         var ps = Ant?.GetPeers();
         if (ps == null || ps.Length == 0) return;
 
-        var old = (Peers ?? new IPeer[0]).ToList();
+        var old = (Peers ?? []).ToList();
         foreach (var item in ps)
         {
             var pr = old.FirstOrDefault(e => e.Instance == item.Instance);

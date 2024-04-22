@@ -5,10 +5,8 @@ using NewLife;
 using NewLife.Log;
 using NewLife.Model;
 using NewLife.Reflection;
-using NewLife.Remoting;
 using NewLife.Threading;
 using Stardust.Registry;
-using static System.Net.WebRequestMethods;
 
 namespace AntJob;
 
@@ -17,16 +15,13 @@ public class Scheduler : DisposeBase
 {
     #region 属性
     /// <summary>处理器集合</summary>
-    public List<Handler> Handlers { get; } = new List<Handler>();
+    public List<Handler> Handlers { get; } = [];
 
     /// <summary>作业提供者</summary>
     public IJobProvider Provider { get; set; }
 
     /// <summary>服务提供者</summary>
     public IServiceProvider ServiceProvider { get; set; }
-
-    /// <summary>性能跟踪器</summary>
-    public ITracer Tracer { get; set; }
     #endregion
 
     #region 构造
@@ -120,6 +115,7 @@ public class Scheduler : DisposeBase
         if (hs.Count == 0) throw new ArgumentNullException(nameof(Handlers), "没有可用处理器");
 
         // 埋点
+        Tracer ??= ServiceProvider?.GetService<ITracer>();
         using var span = Tracer?.NewSpan("job:SchedulerStart");
 
         // 启动作业提供者
@@ -127,22 +123,8 @@ public class Scheduler : DisposeBase
         prv ??= Provider = new FileJobProvider();
         prv.Schedule ??= this;
 
-        //if (prv is NetworkJobProvider network)
-        //{
-        //    network.Tracer ??= Tracer;
-
-        //    // 从注册中心获取服务端地址，优先于本地配置文件
-        //    if (network.Server.IsNullOrEmpty() || network.Server.EqualIgnoreCase(AntSetting.Current.Server))
-        //    {
-        //        // 从注册中心获取包
-        //        var registry = ServiceProvider?.GetService<IRegistry>();
-        //        if (registry != null)
-        //        {
-        //            var svrs = registry.ResolveAddressAsync("AntServer").Result;
-        //            if (svrs != null && svrs.Length > 0) network.Server = svrs.Join();
-        //        }
-        //    }
-        //}
+        if (prv is ITracerFeature tf) tf.Tracer = Tracer;
+        if (prv is ILogFeature lf) lf.Log = Log;
 
         prv.Start();
 
@@ -151,8 +133,7 @@ public class Scheduler : DisposeBase
         if (jobs == null || jobs.Length == 0) throw new Exception("调度中心没有可用作业");
 
         // 输出日志
-        var msg = $"启动任务调度引擎[{prv}]，作业[{hs.Count}]项，定时{Period}秒";
-        XTrace.WriteLine(msg);
+        WriteLog($"启动任务调度引擎[{prv}]，作业[{hs.Count}]项，定时{Period}秒");
 
         // 设置日志
         foreach (var handler in hs)
@@ -165,7 +146,7 @@ public class Scheduler : DisposeBase
             if (job != null && job.Mode == 0) job.Mode = handler.Mode;
             handler.Job = job;
 
-            handler.Log = XTrace.Log;
+            handler.Log = Log;
             handler.Start();
         }
 
@@ -287,7 +268,7 @@ public class Scheduler : DisposeBase
 
                             if (handler is MessageHandler messageHandler && !job.Topic.IsNullOrEmpty()) messageHandler.Topic = job.Topic;
 
-                            handler.Log = XTrace.Log;
+                            handler.Log = Log;
                             handler.Tracer = Tracer;
                             handler.Start();
 
@@ -323,5 +304,18 @@ public class Scheduler : DisposeBase
         // 如果有数据，马上开始下一轮
         if (rs) TimerX.Current.SetNext(-1);
     }
+    #endregion
+
+    #region 日志
+    /// <summary>性能跟踪器</summary>
+    public ITracer Tracer { get; set; }
+
+    /// <summary>日志</summary>
+    public ILog Log { get; set; } = Logger.Null;
+
+    /// <summary>写日志</summary>
+    /// <param name="format"></param>
+    /// <param name="args"></param>
+    public void WriteLog(String format, params Object[] args) => Log?.Info(format, args);
     #endregion
 }

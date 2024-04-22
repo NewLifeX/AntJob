@@ -3,7 +3,6 @@ using AntJob.Data;
 using AntJob.Data.Entity;
 using AntJob.Models;
 using NewLife;
-using NewLife.Caching;
 using NewLife.Log;
 using NewLife.Remoting;
 using NewLife.Security;
@@ -13,16 +12,9 @@ namespace AntJob.Server.Services;
 
 public class AppService
 {
-    private readonly ICacheProvider _cacheProvider;
-    private readonly ITracer _tracer;
     private readonly ILog _log;
 
-    public AppService(ICacheProvider cacheProvider, ITracer tracer, ILog log)
-    {
-        _cacheProvider = cacheProvider;
-        _tracer = tracer;
-        _log = log;
-    }
+    public AppService(ILog log) => _log = log;
 
     #region 登录
     /// <summary>应用登录</summary>

@@ -1,5 +1,6 @@
 ﻿using AntJob.Data;
 using NewLife;
+using NewLife.Log;
 
 namespace AntJob.Providers;
 
@@ -44,7 +45,7 @@ public interface IJobProvider
 }
 
 /// <summary>任务提供者基类</summary>
-public abstract class JobProvider : DisposeBase, IJobProvider
+public abstract class JobProvider : DisposeBase, IJobProvider, ITracerFeature, ILogFeature
 {
     /// <summary>调度器</summary>
     public Scheduler Schedule { get; set; }
@@ -81,4 +82,17 @@ public abstract class JobProvider : DisposeBase, IJobProvider
     /// <summary>完成任务，每个任务只调用一次</summary>
     /// <param name="ctx">上下文</param>
     public virtual void Finish(JobContext ctx) { }
+
+    #region 日志
+    /// <summary>性能跟踪器</summary>
+    public ITracer Tracer { get; set; }
+
+    /// <summary>日志</summary>
+    public ILog Log { get; set; } = Logger.Null;
+
+    /// <summary>写日志</summary>
+    /// <param name="format"></param>
+    /// <param name="args"></param>
+    public void WriteLog(String format, params Object[] args) => Log?.Info(format, args);
+    #endregion
 }

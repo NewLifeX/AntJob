@@ -5,18 +5,16 @@ using AntJob.Models;
 using AntJob.Server.Services;
 using NewLife;
 using NewLife.Caching;
-using NewLife.Data;
 using NewLife.Log;
 using NewLife.Net;
 using NewLife.Remoting;
 using NewLife.Threading;
-using XCode;
 
 namespace AntJob.Server;
 
 /// <summary>蚂蚁服务层，Rpc接口服务</summary>
 /// <remarks>
-/// 该服务层主要用于蚂蚁调度器与蚂蚁工作器之间的通讯，以及蚂蚁工作器与蚂蚁数据中心之间的通讯。
+/// 该服务层主要用于蚂蚁调度器与蚂蚁处理器之间的通讯，以及蚂蚁处理器与蚂蚁数据中心之间的通讯。
 /// 服务注册到内部对象容器IObjectContainer，要求宿主ApiServer指定ServiceProvider为IObjectContainer。
 /// </remarks>
 [Api(null)]
@@ -65,7 +63,7 @@ class AntService : IApi, IActionFilter
         }
         else
         {
-            throw new ApiException(401, $"{_Net.Remote}未登录！不能执行{act}");
+            throw new ApiException(ApiCode.Unauthorized, $"{_Net.Remote}未登录！不能执行{act}");
         }
     }
 

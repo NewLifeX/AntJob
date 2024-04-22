@@ -29,6 +29,8 @@ public class Worker : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        InitData();
+
         var set = AntJobSetting.Current;
 
         // 实例化RPC服务端，指定端口，指定ServiceProvider，用于依赖注入获取接口服务层
@@ -46,18 +48,18 @@ public class Worker : IHostedService
         // 本地结点
         AntService.Local = new IPEndPoint(NetHelper.MyIP(), set.Port);
 
-        // 数据缓存，也用于全局锁，支持MemoryCache和Redis
-        if (_cacheProvider.Cache is not FullRedis && !set.RedisCache.IsNullOrEmpty())
-        {
-            var redis = new Redis { Timeout = 5_000 + 1_000 };
-            redis.Init(set.RedisCache);
+        //// 数据缓存，也用于全局锁，支持MemoryCache和Redis
+        //if (_cacheProvider.Cache is not FullRedis && !set.RedisCache.IsNullOrEmpty())
+        //{
+        //    var redis = new Redis { Timeout = 5_000 + 1_000 };
+        //    redis.Init(set.RedisCache);
 
-            _cacheProvider.Cache = redis;
-        }
+        //    _cacheProvider.Cache = redis;
+        //}
 
         server.Start();
 
-        _clearOnlineTimer = new TimerX(ClearOnline, null, 1000, 10 * 1000);
+        _clearOnlineTimer = new TimerX(ClearOnline, null, 1000, 10 * 1000) { Async = true };
         _clearItemTimer = new TimerX(ClearItems, null, 10_000, 3600_000) { Async = true };
 
         // 启用星尘注册中心，向注册中心注册服务，服务消费者将自动更新服务端地址列表
@@ -74,8 +76,6 @@ public class Worker : IHostedService
 
     private static void InitData()
     {
-        var n = App.Meta.Count;
-
         var set = NewLife.Setting.Current;
         if (set.IsNew)
         {
@@ -94,6 +94,8 @@ public class Worker : IHostedService
 
             set2.Save();
         }
+
+        _ = EntityFactory.InitAllAsync();
     }
 
     #region 清理过时

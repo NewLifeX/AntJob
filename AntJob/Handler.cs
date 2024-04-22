@@ -14,7 +14,7 @@ namespace AntJob;
 /// 
 /// 定时调度只要当前时间达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑。
 /// </remarks>
-public abstract class Handler : IExtend
+public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 {
     #region 属性
     /// <summary>名称</summary>
@@ -38,9 +38,6 @@ public abstract class Handler : IExtend
     private volatile Int32 _Busy;
     /// <summary>正在处理中的任务数</summary>
     public Int32 Busy => _Busy;
-
-    /// <summary>性能跟踪器</summary>
-    public ITracer Tracer { get; set; }
     #endregion
 
     #region 索引器
@@ -206,6 +203,9 @@ public abstract class Handler : IExtend
     #endregion
 
     #region 日志
+    /// <summary>性能跟踪器</summary>
+    public ITracer Tracer { get; set; }
+
     /// <summary>日志</summary>
     public ILog Log { get; set; } = Logger.Null;
 

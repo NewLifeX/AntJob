@@ -33,13 +33,13 @@ public class AntClient : ApiClient
     /// <summary>实例化</summary>
     public AntClient()
     {
-        Log = XTrace.Log;
+        //Log = XTrace.Log;
 
         //StatPeriod = 60;
         ShowError = true;
 
 #if DEBUG
-        EncoderLog = XTrace.Log;
+        EncoderLog = Log;
         StatPeriod = 10;
 #endif
     }
