@@ -158,9 +158,6 @@ public class NetworkJobProvider : JobProvider
     #endregion
 
     #region 报告状态
-    //private static readonly String _MachineName = Environment.MachineName;
-    //private static readonly Int32 _ProcessID = Process.GetCurrentProcess().Id;
-
     /// <summary>报告进度，每个任务多次调用</summary>
     /// <param name="ctx">上下文</param>
     public override void Report(JobContext ctx)

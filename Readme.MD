@@ -24,7 +24,7 @@
 v4版本是对v3版本的重构，主要是为了解决v3版本的一些问题，以及提供更多的功能。  
 v4版本亮点：
 1. []新增Http接入，由AntWeb提供调度服务，无需部署AntServer，满足轻量级项目需要。（进行中，等NewLife.Remoting提供WebsocketClient）
-2. []增强定时调度，支持指定Cron表达式，逐步替代Start+Step的恒定间隔定时调度
+2. [x]增强定时调度，支持指定Cron表达式，逐步替代Start+Step的恒定间隔定时调度
 3. []提前生成任务，提前下发给执行器，到时间后马上执行，提高任务执行时间精度
 4. []支持任务主动延迟，任务在执行中发现数据条件未满足时，可以向调度中心请求延迟一段时间后再执行，增加执行次数但不增加错误次数
 5. []扩充调度模式，常态化部署AntAgent，正式把Sql调度和C#调度加入主线，将来增加数据抽取和数据推送等多种调度模式
@@ -107,14 +107,14 @@ namespace HisAgent
         {
             // 今天零点开始，每10秒一次
             var job = Job;
-            job.Start = DateTime.Today;
+            job.Time = DateTime.Today;
             job.Step = 10;
         }
 
         protected override Int32 Execute(JobContext ctx)
         {
             // 当前任务时间
-            var time = ctx.Task.Start;
+            var time = ctx.Task.Time;
             WriteLog("新生命蚂蚁调度系统！当前任务时间：{0}", time);
 
             // 成功处理数据量

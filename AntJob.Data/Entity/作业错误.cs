@@ -63,13 +63,13 @@ public partial class JobError
     [BindColumn("Client", "客户端。IP加进程", "")]
     public String Client { get => _Client; set { if (OnPropertyChanging("Client", value)) { _Client = value; OnPropertyChanged("Client"); } } }
 
-    private DateTime _Start;
-    /// <summary>开始。大于等于</summary>
-    [DisplayName("开始")]
-    [Description("开始。大于等于")]
+    private DateTime _Time;
+    /// <summary>数据时间。大于等于</summary>
+    [DisplayName("数据时间")]
+    [Description("数据时间。大于等于")]
     [DataObjectField(false, false, true, 0)]
-    [BindColumn("Start", "开始。大于等于", "")]
-    public DateTime Start { get => _Start; set { if (OnPropertyChanging("Start", value)) { _Start = value; OnPropertyChanged("Start"); } } }
+    [BindColumn("Start", "数据时间。大于等于", "")]
+    public DateTime Time { get => _Time; set { if (OnPropertyChanging("Time", value)) { _Time = value; OnPropertyChanged("Time"); } } }
 
     private DateTime _End;
     /// <summary>结束。小于，不等于</summary>
@@ -170,7 +170,7 @@ public partial class JobError
             "JobID" => _JobID,
             "TaskID" => _TaskID,
             "Client" => _Client,
-            "Start" => _Start,
+            "Time" => _Time,
             "End" => _End,
             "Data" => _Data,
             "Server" => _Server,
@@ -192,7 +192,7 @@ public partial class JobError
                 case "JobID": _JobID = value.ToInt(); break;
                 case "TaskID": _TaskID = value.ToInt(); break;
                 case "Client": _Client = Convert.ToString(value); break;
-                case "Start": _Start = value.ToDateTime(); break;
+                case "Time": _Time = value.ToDateTime(); break;
                 case "End": _End = value.ToDateTime(); break;
                 case "Data": _Data = Convert.ToString(value); break;
                 case "Server": _Server = Convert.ToString(value); break;
@@ -232,7 +232,7 @@ public partial class JobError
 
     /// <summary>作业项</summary>
     [Map(nameof(TaskID), typeof(JobTask), "ID")]
-    public String TaskStart => Task?.ToString();
+    public String TaskTime => Task?.ToString();
 
     #endregion
 
@@ -255,8 +255,8 @@ public partial class JobError
         /// <summary>客户端。IP加进程</summary>
         public static readonly Field Client = FindByName("Client");
 
-        /// <summary>开始。大于等于</summary>
-        public static readonly Field Start = FindByName("Start");
+        /// <summary>数据时间。大于等于</summary>
+        public static readonly Field Time = FindByName("Time");
 
         /// <summary>结束。小于，不等于</summary>
         public static readonly Field End = FindByName("End");
@@ -309,8 +309,8 @@ public partial class JobError
         /// <summary>客户端。IP加进程</summary>
         public const String Client = "Client";
 
-        /// <summary>开始。大于等于</summary>
-        public const String Start = "Start";
+        /// <summary>数据时间。大于等于</summary>
+        public const String Time = "Time";
 
         /// <summary>结束。小于，不等于</summary>
         public const String End = "End";

@@ -50,7 +50,7 @@ public class JobService
                 AppID = app.ID,
                 Name = item.Name,
                 Enable = item.Enable,
-                Start = item.Start,
+                Time = item.Time,
                 End = item.End,
                 Offset = item.Offset,
                 Step = item.Step,
@@ -92,6 +92,7 @@ public class JobService
         // 应用停止发放作业
         app = App.FindByID(app.ID) ?? app;
         if (!app.Enable) return [];
+
         var job = app.Jobs.FirstOrDefault(e => e.Name == jobName);
 
         // 全局锁，确保单个作业只有一个线程在分配作业
@@ -104,7 +105,7 @@ public class JobService
             job = Job.FindByAppIDAndName(app.ID, jobName);
 
         if (job == null) throw new XException($"应用[{app.ID}/{app.Name}]下未找到作业[{jobName}]");
-        if (job.Step == 0 || job.Start.Year <= 2000) throw new XException("作业[{0}/{1}]未设置开始时间或步进", job.ID, job.Name);
+        if (job.Step == 0 || job.Time.Year <= 2000) throw new XException("作业[{0}/{1}]未设置开始时间或步进", job.ID, job.Name);
 
         var online = _appService.GetOnline(app, ip);
 
@@ -133,7 +134,7 @@ public class JobService
                 default:
                     {
                         // 如果能够切片，则查询数据库后进入，避免缓存导致重复
-                        if (TrySplit(job, job.Start, job.Step, out var end))
+                        if (TrySplit(job, job.Time, job.Step, out var end))
                         {
                             // 申请任务前，不能再查数据库，那样子会导致多线程脏读，从而出现多客户端分到相同任务的情况
                             //jb = Job.FindByKey(jb.ID);
@@ -366,7 +367,7 @@ public class JobService
             AppID = job.AppID,
             JobID = job.ID,
             TaskID = task.ID,
-            Start = task.Start,
+            Time = task.Time,
             End = task.End,
             Data = task.Data,
 
@@ -426,7 +427,7 @@ public class JobService
         //using var ck = cache.AcquireLock($"Job:{ID}", 5_000);
 
         using var ts = Job.Meta.CreateTrans();
-        var start = job.Start;
+        var start = job.Time;
         for (var i = 0; i < count; i++)
         {
             if (!TrySplit(job, start, step, out var end)) break;
@@ -436,7 +437,7 @@ public class JobService
             {
                 AppID = job.AppID,
                 JobID = job.ID,
-                Start = start,
+                Time = start,
                 End = end,
                 BatchSize = job.BatchSize,
 
@@ -467,7 +468,7 @@ public class JobService
             }
 
             // 更新任务
-            job.Start = end;
+            job.Time = end;
             start = end;
         }
 

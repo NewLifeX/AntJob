@@ -23,7 +23,7 @@
             }
             <th class="text-center hidden-md hidden-sm hidden-xs"><a href="@Html.Raw(page.GetSortUrl("ID"))">编号</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("TaskID"))">任务</a></th>
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Start"))" title="@JobTask._.Start.Description">开始</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Time"))" title="@JobTask._.Time.Description">开始</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("End"))" title="@JobTask._.End.Description">结束</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Client"))" title="@JobTask._.Client.Description">客户端</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("BatchSize"))" title="@JobTask._.BatchSize.Description">批大小</a></th>
@@ -77,7 +77,7 @@
                 }
                 <td class="text-center hidden-md hidden-sm hidden-xs">@entity.ID</td>
                 <td class="text-center"><a href="Job?ID=@entity.JobID">@entity.JobName</a></td>
-                <td>@entity.Start.ToFullString("")</td>
+                <td>@entity.Time.ToFullString("")</td>
                 <td>@entity.End.ToString("HH:mm:ss")</td>
                 <td>@entity.Client</td>
                 <td class="text-right">@entity.BatchSize.ToString("n0")</td>

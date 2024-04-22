@@ -94,7 +94,7 @@ public class AppController : EntityController<App>
             var jobs = Job.FindAllByAppID2(appid);
             foreach (var job in jobs)
             {
-                job.Start = new DateTime(now.Year, now.Month, 1);
+                job.Time = new DateTime(now.Year, now.Month, 1);
                 job.ResetOther();
             }
 

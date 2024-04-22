@@ -14,8 +14,8 @@ public interface IJob
     /// <summary>是否启用</summary>
     Boolean Enable { get; set; }
 
-    /// <summary>开始。大于等于该时间，定时作业和数据作业使用</summary>
-    DateTime Start { get; set; }
+    /// <summary>数据时间。定时调度的执行时间点，或者数据调度的开始时间</summary>
+    DateTime Time { get; set; }
 
     /// <summary>结束。小于该时间，数据作业使用</summary>
     DateTime End { get; set; }

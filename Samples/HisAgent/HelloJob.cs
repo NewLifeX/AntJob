@@ -12,7 +12,7 @@ internal class HelloJob : Handler
     {
         // 今天零点开始，每10秒一次
         var job = Job;
-        job.Start = DateTime.Today;
+        job.Time = DateTime.Today;
         job.Step = 10;
     }
 

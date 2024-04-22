@@ -1,4 +1,5 @@
-﻿using NewLife;
+﻿using AntJob.Data;
+using NewLife;
 
 namespace AntJob.Handlers;
 
@@ -15,7 +16,7 @@ public class CSharpHandler : Handler
     /// <summary>实例化</summary>
     public CSharpHandler()
     {
-        //Mode = JobModes.CSharp;
+        Mode = JobModes.CSharp;
 
         var job = Job;
         job.BatchSize = 8;

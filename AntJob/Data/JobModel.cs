@@ -19,9 +19,9 @@ public partial class JobModel
     [XmlAttribute]
     public Boolean Enable { get; set; }
 
-    /// <summary>开始。大于等于</summary>
+    /// <summary>数据时间。定时调度的执行时间点，或者数据调度的开始时间</summary>
     [XmlAttribute]
-    public DateTime Start { get; set; }
+    public DateTime Time { get; set; }
 
     /// <summary>结束。小于</summary>
     [XmlAttribute]

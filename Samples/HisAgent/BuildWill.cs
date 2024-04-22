@@ -15,7 +15,7 @@ namespace HisAgent
         public BuildWill()
         {
             var job = Job;
-            job.Start = DateTime.Today;
+            job.Time = DateTime.Today;
             job.Step = 30;
         }
 

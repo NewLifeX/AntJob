@@ -89,7 +89,7 @@ public abstract class DataHandler : Handler
         if (job.Step == 0) job.Step = 30;
 
         // 获取最小时间
-        if (job.Start.Year < 2000) throw new InvalidOperationException("数据任务必须设置开始时间");
+        if (job.Time.Year < 2000) throw new InvalidOperationException("数据任务必须设置开始时间");
 
         return base.Start();
     }

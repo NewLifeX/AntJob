@@ -212,7 +212,7 @@ public partial class Job : EntityBase<Job>
         {
             case JobModes.Data:
             case JobModes.Time:
-                return Start.Year > 2000 && Step > 0;
+                return Time.Year > 2000 && Step > 0;
             case JobModes.Message:
                 return Topic.IsNullOrEmpty();
             default:
@@ -230,14 +230,14 @@ public partial class Job : EntityBase<Job>
     {
         if (days < 0)
         {
-            Start = DateTime.MinValue;
+            Time = DateTime.MinValue;
 
             if (stime > DateTime.MinValue)
-                Start = stime;
+                Time = stime;
             End = etime;
         }
         else
-            Start = DateTime.Now.Date.AddDays(-days);
+            Time = DateTime.Now.Date.AddDays(-days);
 
         Save();
     }
@@ -276,7 +276,7 @@ public partial class Job : EntityBase<Job>
     {
         // 如果禁用，仅返回最简单的字段
         // 缺少开始时间赋值，会导致客户端启动校验失败，Job没有启用的状态下服务器报错无法正常启动
-        if (!Enable) return new JobModel { Name = Name, Enable = Enable, Start = Start };
+        if (!Enable) return new JobModel { Name = Name, Enable = Enable, Time = Time };
 
         return new JobModel
         {
@@ -284,7 +284,7 @@ public partial class Job : EntityBase<Job>
             ClassName = ClassName,
             Enable = Enable,
 
-            Start = Start,
+            Time = Time,
             End = End,
             Cron = Cron,
             Topic = Topic,

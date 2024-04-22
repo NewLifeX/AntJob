@@ -4,7 +4,6 @@ using System.Reflection;
 using AntJob.Data;
 using AntJob.Models;
 using NewLife;
-using NewLife.Log;
 using NewLife.Net;
 using NewLife.Reflection;
 using NewLife.Remoting;
@@ -33,15 +32,7 @@ public class AntClient : ApiClient
     /// <summary>实例化</summary>
     public AntClient()
     {
-        //Log = XTrace.Log;
-
-        //StatPeriod = 60;
         ShowError = true;
-
-#if DEBUG
-        EncoderLog = Log;
-        StatPeriod = 10;
-#endif
     }
 
     /// <summary>实例化</summary>

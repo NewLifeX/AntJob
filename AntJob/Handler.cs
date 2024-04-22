@@ -61,7 +61,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         var now = DateTime.Now;
         var job = new JobModel
         {
-            Start = new DateTime(now.Year, now.Month, 1),
+            Time = new DateTime(now.Year, now.Month, 1),
             Step = 30,
             Offset = 15,
             Mode = JobModes.Time,
@@ -84,7 +84,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
         var msg = "开始工作";
         var job = Job;
-        if (job != null) msg += $" {job.Enable} 区间（{job.Start.ToFullString("")}, {job.End.ToFullString("")}） Offset={job.Offset} Step={job.Step} MaxTask={job.MaxTask}";
+        if (job != null) msg += $" {job.Enable} 区间（{job.Time.ToFullString("")}, {job.End.ToFullString("")}） Offset={job.Offset} Step={job.Step} MaxTask={job.MaxTask}";
 
         using var span = Tracer?.NewSpan($"job:{Name}:Start", msg);
         WriteLog(msg);
