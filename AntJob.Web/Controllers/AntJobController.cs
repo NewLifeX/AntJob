@@ -4,7 +4,6 @@ using AntJob.Data.Entity;
 using AntJob.Models;
 using AntJob.Server;
 using AntJob.Server.Services;
-using AntJob.Web.Common;
 using AntJob.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

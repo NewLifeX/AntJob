@@ -43,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="11.11.2024.402" />
+    <PackageReference Include="NewLife.XCode" Version="11.11.2024.417-beta0711" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob\AntJob.csproj" />

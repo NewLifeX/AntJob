@@ -27,6 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Areas\Ant\Controllers\AppConfigController.cs" />
+    <Compile Remove="Common\ApiFilterAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="Areas\Ant\Views\AppHistory\_List_Data.cshtml" />
@@ -46,8 +47,8 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="6.1.2024.403" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.9.2024.402" />
+    <PackageReference Include="NewLife.Cube.Core" Version="6.1.2024.419-beta0700" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.9.2024.422-beta0942" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
@@ -55,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Ant\Views\AppOnline\" />
+    <Folder Include="Common\" />
     <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
