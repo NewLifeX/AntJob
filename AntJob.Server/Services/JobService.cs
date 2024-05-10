@@ -7,6 +7,7 @@ using NewLife.Log;
 using NewLife.Serialization;
 using NewLife.Threading;
 using XCode;
+using XCode.DataAccessLayer;
 
 namespace AntJob.Server.Services;
 
@@ -729,6 +730,16 @@ public class JobService
         ts.Commit();
 
         return list;
+    }
+    #endregion
+
+    #region 辅助
+    /// <summary>兼容旧数据库。如DataTime对应Start</summary>
+    /// <param name="dal"></param>
+    /// <param name="tableName"></param>
+    public static void FixOld(DAL dal, String tableName)
+    {
+
     }
     #endregion
 }
