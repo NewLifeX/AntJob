@@ -115,7 +115,7 @@ public class AppController : AntEntityController<App>
             var jobs = Job.FindAllByAppID2(appid);
             foreach (var job in jobs)
             {
-                job.Time = new DateTime(now.Year, now.Month, 1);
+                job.DataTime = new DateTime(now.Year, now.Month, 1);
                 job.ResetOther();
             }
 

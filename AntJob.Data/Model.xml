@@ -42,15 +42,17 @@
     <Table Name="App" Description="应用系统。管理数据计算作业的应用模块，计算作业隶属于某个应用">
       <Columns>
         <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-        <Column Name="Name" DataType="String" Master="True" Nullable="False" Description="名称" />
-        <Column Name="DisplayName" DataType="String" Description="显示名" />
-        <Column Name="Secret" DataType="String" Description="密钥" />
+        <Column Name="Name" DataType="String" Master="True" Nullable="False" Description="名称。应用英文名" />
+        <Column Name="DisplayName" DataType="String" Description="显示名。应用中文名" />
+        <Column Name="Secret" DataType="String" Description="密钥。一般不设置，应用默认接入" />
         <Column Name="Category" DataType="String" Description="类别" />
         <Column Name="Version" DataType="String" Description="版本" />
         <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
         <Column Name="Enable" DataType="Boolean" Description="启用" />
-        <Column Name="JobCount" DataType="Int32" Description="作业数" />
-        <Column Name="MessageCount" DataType="Int32" Description="消息数" />
+        <Column Name="JobCount" DataType="Int32" Description="作业数。该应用下作业个数" />
+        <Column Name="MessageCount" DataType="Int32" Description="消息数。该应用下消息条数" />
+        <Column Name="ManagerId" DataType="Int32" Map="XCode.Membership.User@ID@Name" Description="管理人。负责该应用的管理员" />
+        <Column Name="Manager" DataType="String" Description="管理者" />
         <Column Name="CreateUserID" DataType="Int32" Description="创建人" Category="扩展" />
         <Column Name="CreateUser" DataType="String" Description="创建者" Category="扩展" />
         <Column Name="CreateTime" DataType="DateTime" Description="创建时间" Category="扩展" />
@@ -132,7 +134,7 @@
         <Index Columns="UpdateTime" />
       </Indexes>
     </Table>
-    <Table Name="Job" Description="作业。数据计算逻辑的主要单元，每个作业即是一个业务逻辑，各个作业之前存在依赖关系">
+    <Table Name="Job" Description="作业。数据计算逻辑的主要单元，每个作业即是一个业务逻辑">
       <Columns>
         <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
         <Column Name="AppID" DataType="Int32" Map="App@ID@$" Description="应用" />
@@ -144,7 +146,7 @@
         <Column Name="Cron" DataType="String" Description="执行频次。定时调度的Cron表达式" />
         <Column Name="Topic" DataType="String" Description="主题。消息调度时消费的主题" />
         <Column Name="MessageCount" DataType="Int32" Description="消息数" />
-        <Column Name="Time" ColumnName="Start" DataType="DateTime" Description="数据时间。从该时间开始调度作业任务，默认不设置时从当前时间开始" />
+        <Column Name="DataTime" DataType="DateTime" Description="数据时间。下一次处理数据的时间，默认从当前时间开始" />
         <Column Name="End" DataType="DateTime" Description="结束。到该时间停止调度作业，默认不设置时永不停止" />
         <Column Name="Step" DataType="Int32" Description="步进。切分任务的时间区间，秒" />
         <Column Name="BatchSize" DataType="Int32" Description="批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用" />
@@ -185,7 +187,7 @@
         <Column Name="AppID" DataType="Int32" Map="App@ID@$" Description="应用" />
         <Column Name="JobID" DataType="Int32" Map="Job@ID@$" Description="作业" />
         <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
-        <Column Name="Time" ColumnName="Start" DataType="DateTime" Master="True" Description="数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
+        <Column Name="DataTime" DataType="DateTime" Master="True" Description="数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
         <Column Name="End" DataType="DateTime" Description="结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
         <Column Name="BatchSize" DataType="Int32" Description="批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用" />
         <Column Name="Total" DataType="Int32" Description="总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1" />
@@ -209,7 +211,7 @@
         <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" Category="扩展" />
       </Columns>
       <Indexes>
-        <Index Columns="JobID,Status,Start" />
+        <Index Columns="JobID,Status,DataTime" />
         <Index Columns="AppID,Client,Status" />
         <Index Columns="JobID,CreateTime" />
       </Indexes>
@@ -221,7 +223,7 @@
         <Column Name="JobID" DataType="Int32" Map="Job@ID@$" Description="作业" />
         <Column Name="TaskID" DataType="Int32" Map="JobTask@ID@$" Description="作业项" />
         <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
-        <Column Name="Time" ColumnName="Start" DataType="DateTime" Description="数据时间。大于等于" />
+        <Column Name="DataTime" DataType="DateTime" Description="数据时间。大于等于" />
         <Column Name="End" DataType="DateTime" Description="结束。小于，不等于" />
         <Column Name="Data" DataType="String" Length="2000" Description="数据" />
         <Column Name="Server" DataType="String" Description="服务器" />

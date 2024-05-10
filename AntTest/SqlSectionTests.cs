@@ -9,7 +9,7 @@ namespace AntTest
         public void ParseQuery()
         {
             var tt = @"/*use his*/
-select * from t1 where time between '{Start}' and '{End}'
+select * from t1 where time between '{dt}' and '{End}'
 ";
 
             var section = new SqlSection();
@@ -17,7 +17,7 @@ select * from t1 where time between '{Start}' and '{End}'
 
             Assert.Equal("his", section.ConnName);
             Assert.Equal(SqlActions.Query, section.Action);
-            Assert.Equal("select * from t1 where time between '{Start}' and '{End}'", section.Sql);
+            Assert.Equal("select * from t1 where time between '{dt}' and '{End}'", section.Sql);
         }
 
         [Fact]
@@ -39,7 +39,7 @@ insert into t1 (c1, c2) values(v1, v2);
         public void ParseDelete()
         {
             var tt = @"/*use his*/
-delete from t2 where time between '{Start}' and '{End}';
+delete from t2 where time between '{dt}' and '{End}';
 ";
 
             var section = new SqlSection();
@@ -47,7 +47,7 @@ delete from t2 where time between '{Start}' and '{End}';
 
             Assert.Equal("his", section.ConnName);
             Assert.Equal(SqlActions.Execute, section.Action);
-            Assert.Equal("delete from t2 where time between '{Start}' and '{End}'", section.Sql);
+            Assert.Equal("delete from t2 where time between '{dt}' and '{End}'", section.Sql);
         }
 
         [Fact]
@@ -85,10 +85,10 @@ insert t2;
         public void ParseAllSqls()
         {
             var tt = @"/*use his*/
-select * from t1 where time between '{Start}' and '{End}'
+select * from t1 where time between '{dt}' and '{End}'
 
 /*use his_bak*/
-delete from t2 where time between '{Start}' and '{End}';
+delete from t2 where time between '{dt}' and '{End}';
 
 /*use his_bak*/
 insert t2;
@@ -100,11 +100,11 @@ insert t2;
 
             Assert.Equal("his", cs[0].ConnName);
             Assert.Equal(SqlActions.Query, cs[0].Action);
-            Assert.Equal("select * from t1 where time between '{Start}' and '{End}'", cs[0].Sql);
+            Assert.Equal("select * from t1 where time between '{dt}' and '{End}'", cs[0].Sql);
 
             Assert.Equal("his_bak", cs[1].ConnName);
             Assert.Equal(SqlActions.Execute, cs[1].Action);
-            Assert.Equal("delete from t2 where time between '{Start}' and '{End}'", cs[1].Sql);
+            Assert.Equal("delete from t2 where time between '{dt}' and '{End}'", cs[1].Sql);
 
             Assert.Equal("his_bak", cs[2].ConnName);
             Assert.Equal(SqlActions.Insert, cs[2].Action);

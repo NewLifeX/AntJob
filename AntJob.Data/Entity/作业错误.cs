@@ -63,13 +63,13 @@ public partial class JobError
     [BindColumn("Client", "客户端。IP加进程", "")]
     public String Client { get => _Client; set { if (OnPropertyChanging("Client", value)) { _Client = value; OnPropertyChanged("Client"); } } }
 
-    private DateTime _Time;
+    private DateTime _DataTime;
     /// <summary>数据时间。大于等于</summary>
     [DisplayName("数据时间")]
     [Description("数据时间。大于等于")]
     [DataObjectField(false, false, true, 0)]
-    [BindColumn("Start", "数据时间。大于等于", "")]
-    public DateTime Time { get => _Time; set { if (OnPropertyChanging("Time", value)) { _Time = value; OnPropertyChanged("Time"); } } }
+    [BindColumn("DataTime", "数据时间。大于等于", "")]
+    public DateTime DataTime { get => _DataTime; set { if (OnPropertyChanging("DataTime", value)) { _DataTime = value; OnPropertyChanged("DataTime"); } } }
 
     private DateTime _End;
     /// <summary>结束。小于，不等于</summary>
@@ -170,7 +170,7 @@ public partial class JobError
             "JobID" => _JobID,
             "TaskID" => _TaskID,
             "Client" => _Client,
-            "Time" => _Time,
+            "DataTime" => _DataTime,
             "End" => _End,
             "Data" => _Data,
             "Server" => _Server,
@@ -192,7 +192,7 @@ public partial class JobError
                 case "JobID": _JobID = value.ToInt(); break;
                 case "TaskID": _TaskID = value.ToInt(); break;
                 case "Client": _Client = Convert.ToString(value); break;
-                case "Time": _Time = value.ToDateTime(); break;
+                case "DataTime": _DataTime = value.ToDateTime(); break;
                 case "End": _End = value.ToDateTime(); break;
                 case "Data": _Data = Convert.ToString(value); break;
                 case "Server": _Server = Convert.ToString(value); break;
@@ -232,7 +232,7 @@ public partial class JobError
 
     /// <summary>作业项</summary>
     [Map(nameof(TaskID), typeof(JobTask), "ID")]
-    public String TaskTime => Task?.ToString();
+    public String TaskDataTime => Task?.ToString();
 
     #endregion
 
@@ -256,7 +256,7 @@ public partial class JobError
         public static readonly Field Client = FindByName("Client");
 
         /// <summary>数据时间。大于等于</summary>
-        public static readonly Field Time = FindByName("Time");
+        public static readonly Field DataTime = FindByName("DataTime");
 
         /// <summary>结束。小于，不等于</summary>
         public static readonly Field End = FindByName("End");
@@ -310,7 +310,7 @@ public partial class JobError
         public const String Client = "Client";
 
         /// <summary>数据时间。大于等于</summary>
-        public const String Time = "Time";
+        public const String DataTime = "DataTime";
 
         /// <summary>结束。小于，不等于</summary>
         public const String End = "End";

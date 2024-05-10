@@ -20,7 +20,8 @@ public static class TemplateHelper
         var p = 0;
         while (true)
         {
-            var ti = Find(str, "Start", p);
+            var ti = Find(str, "DataTime", p);
+            ti ??= Find(str, "dt", p);
             if (ti == null)
             {
                 sb.Append(str.Substring(p));

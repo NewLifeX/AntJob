@@ -50,7 +50,7 @@ public class JobService
                 AppID = app.ID,
                 Name = item.Name,
                 Enable = item.Enable,
-                Time = item.Time,
+                DataTime = item.DataTime,
                 End = item.End,
                 Offset = item.Offset,
                 Step = item.Step,
@@ -74,8 +74,8 @@ public class JobService
 
                 // 计算下一次执行时间
                 var cron = new Cron(job.Cron);
-                var time = item.Time.Year > 2000 ? item.Time : DateTime.Now;
-                item.Time = cron.GetNext(time);
+                var time = item.DataTime.Year > 2000 ? item.DataTime : DateTime.Now;
+                item.DataTime = cron.GetNext(time);
 
                 if (job.Step <= 0) job.Step = 30;
             }
@@ -118,7 +118,7 @@ public class JobService
             job = Job.FindByAppIDAndName(app.ID, jobName);
 
         if (job == null) throw new XException($"应用[{app.ID}/{app.Name}]下未找到作业[{jobName}]");
-        if (job.Step == 0 || job.Time.Year <= 2000) throw new XException("作业[{0}/{1}]未设置开始时间或步进", job.ID, job.Name);
+        if (job.Step == 0 || job.DataTime.Year <= 2000) throw new XException("作业[{0}/{1}]未设置开始时间或步进", job.ID, job.Name);
 
         var online = _appService.GetOnline(app, ip);
 
@@ -157,7 +157,7 @@ public class JobService
                 default:
                     {
                         // 如果能够切片，则查询数据库后进入，避免缓存导致重复
-                        if (TrySplit(job, job.Time, job.Step, out var end))
+                        if (TrySplit(job, job.DataTime, job.Step, out var end))
                         {
                             // 申请任务前，不能再查数据库，那样子会导致多线程脏读，从而出现多客户端分到相同任务的情况
                             //jb = Job.FindByKey(jb.ID);
@@ -390,7 +390,7 @@ public class JobService
             AppID = job.AppID,
             JobID = job.ID,
             TaskID = task.ID,
-            Time = task.Time,
+            DataTime = task.DataTime,
             End = task.End,
             Data = task.Data,
 
@@ -450,7 +450,7 @@ public class JobService
         //using var ck = cache.AcquireLock($"Job:{ID}", 5_000);
 
         using var ts = Job.Meta.CreateTrans();
-        var start = job.Time;
+        var start = job.DataTime;
         for (var i = 0; i < count; i++)
         {
             var end = DateTime.MinValue;
@@ -463,7 +463,7 @@ public class JobService
             {
                 AppID = job.AppID,
                 JobID = job.ID,
-                Time = start,
+                DataTime = start,
                 End = end,
                 BatchSize = job.BatchSize,
 
@@ -476,7 +476,7 @@ public class JobService
             };
 
             //// 如果有模板，则进行计算替换
-            //if (!Data.IsNullOrEmpty()) ti.Data = TemplateHelper.Build(Data, ti.Start, ti.End);
+            //if (!Data.IsNullOrEmpty()) ti.Data = TemplateHelper.Build(Data, ti.DataTime, ti.End);
 
             // 重复切片判断
             var key = $"job:task:{job.ID}:{start:yyyyMMddHHmmss}";
@@ -494,7 +494,7 @@ public class JobService
             }
 
             // 更新任务
-            job.Time = end;
+            job.DataTime = end;
             start = end;
         }
 
@@ -520,7 +520,7 @@ public class JobService
     /// <returns></returns>
     public Boolean TrySplitTime(Job job, Boolean modify, out DateTime end)
     {
-        var start = job.Time;
+        var start = job.DataTime;
 
         // 当前时间减去偏移量，作为当前时间。数据抽取不许超过该时间。去掉毫秒
         var now = DateTime.Now.AddSeconds(-job.Offset).Trim("s");
@@ -542,14 +542,14 @@ public class JobService
             if (!job.Cron.IsNullOrEmpty())
             {
                 var cron = new Cron(job.Cron);
-                var time = job.Time.Year > 2000 ? job.Time : DateTime.Now;
-                job.Time = cron.GetNext(time);
+                var time = job.DataTime.Year > 2000 ? job.DataTime : DateTime.Now;
+                job.DataTime = cron.GetNext(time);
             }
             else
             {
                 var step = job.Step;
                 if (step <= 0) step = 30;
-                job.Time = job.Time.AddSeconds(step);
+                job.DataTime = job.DataTime.AddSeconds(step);
             }
         }
 

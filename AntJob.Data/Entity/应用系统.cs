@@ -31,27 +31,27 @@ public partial class App
     public Int32 ID { get => _ID; set { if (OnPropertyChanging("ID", value)) { _ID = value; OnPropertyChanged("ID"); } } }
 
     private String _Name;
-    /// <summary>名称</summary>
+    /// <summary>名称。应用英文名</summary>
     [DisplayName("名称")]
-    [Description("名称")]
+    [Description("名称。应用英文名")]
     [DataObjectField(false, false, false, 50)]
-    [BindColumn("Name", "名称", "", Master = true)]
+    [BindColumn("Name", "名称。应用英文名", "", Master = true)]
     public String Name { get => _Name; set { if (OnPropertyChanging("Name", value)) { _Name = value; OnPropertyChanged("Name"); } } }
 
     private String _DisplayName;
-    /// <summary>显示名</summary>
+    /// <summary>显示名。应用中文名</summary>
     [DisplayName("显示名")]
-    [Description("显示名")]
+    [Description("显示名。应用中文名")]
     [DataObjectField(false, false, true, 50)]
-    [BindColumn("DisplayName", "显示名", "")]
+    [BindColumn("DisplayName", "显示名。应用中文名", "")]
     public String DisplayName { get => _DisplayName; set { if (OnPropertyChanging("DisplayName", value)) { _DisplayName = value; OnPropertyChanged("DisplayName"); } } }
 
     private String _Secret;
-    /// <summary>密钥</summary>
+    /// <summary>密钥。一般不设置，应用默认接入</summary>
     [DisplayName("密钥")]
-    [Description("密钥")]
+    [Description("密钥。一般不设置，应用默认接入")]
     [DataObjectField(false, false, true, 50)]
-    [BindColumn("Secret", "密钥", "")]
+    [BindColumn("Secret", "密钥。一般不设置，应用默认接入", "")]
     public String Secret { get => _Secret; set { if (OnPropertyChanging("Secret", value)) { _Secret = value; OnPropertyChanged("Secret"); } } }
 
     private String _Category;
@@ -87,20 +87,36 @@ public partial class App
     public Boolean Enable { get => _Enable; set { if (OnPropertyChanging("Enable", value)) { _Enable = value; OnPropertyChanged("Enable"); } } }
 
     private Int32 _JobCount;
-    /// <summary>作业数</summary>
+    /// <summary>作业数。该应用下作业个数</summary>
     [DisplayName("作业数")]
-    [Description("作业数")]
+    [Description("作业数。该应用下作业个数")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("JobCount", "作业数", "")]
+    [BindColumn("JobCount", "作业数。该应用下作业个数", "")]
     public Int32 JobCount { get => _JobCount; set { if (OnPropertyChanging("JobCount", value)) { _JobCount = value; OnPropertyChanged("JobCount"); } } }
 
     private Int32 _MessageCount;
-    /// <summary>消息数</summary>
+    /// <summary>消息数。该应用下消息条数</summary>
     [DisplayName("消息数")]
-    [Description("消息数")]
+    [Description("消息数。该应用下消息条数")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("MessageCount", "消息数", "")]
+    [BindColumn("MessageCount", "消息数。该应用下消息条数", "")]
     public Int32 MessageCount { get => _MessageCount; set { if (OnPropertyChanging("MessageCount", value)) { _MessageCount = value; OnPropertyChanged("MessageCount"); } } }
+
+    private Int32 _ManagerId;
+    /// <summary>管理人。负责该应用的管理员</summary>
+    [DisplayName("管理人")]
+    [Description("管理人。负责该应用的管理员")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("ManagerId", "管理人。负责该应用的管理员", "")]
+    public Int32 ManagerId { get => _ManagerId; set { if (OnPropertyChanging("ManagerId", value)) { _ManagerId = value; OnPropertyChanged("ManagerId"); } } }
+
+    private String _Manager;
+    /// <summary>管理者</summary>
+    [DisplayName("管理者")]
+    [Description("管理者")]
+    [DataObjectField(false, false, true, 50)]
+    [BindColumn("Manager", "管理者", "")]
+    public String Manager { get => _Manager; set { if (OnPropertyChanging("Manager", value)) { _Manager = value; OnPropertyChanged("Manager"); } } }
 
     private Int32 _CreateUserID;
     /// <summary>创建人</summary>
@@ -202,6 +218,8 @@ public partial class App
             "Enable" => _Enable,
             "JobCount" => _JobCount,
             "MessageCount" => _MessageCount,
+            "ManagerId" => _ManagerId,
+            "Manager" => _Manager,
             "CreateUserID" => _CreateUserID,
             "CreateUser" => _CreateUser,
             "CreateTime" => _CreateTime,
@@ -227,6 +245,8 @@ public partial class App
                 case "Enable": _Enable = value.ToBoolean(); break;
                 case "JobCount": _JobCount = value.ToInt(); break;
                 case "MessageCount": _MessageCount = value.ToInt(); break;
+                case "ManagerId": _ManagerId = value.ToInt(); break;
+                case "Manager": _Manager = Convert.ToString(value); break;
                 case "CreateUserID": _CreateUserID = value.ToInt(); break;
                 case "CreateUser": _CreateUser = Convert.ToString(value); break;
                 case "CreateTime": _CreateTime = value.ToDateTime(); break;
@@ -243,6 +263,14 @@ public partial class App
     #endregion
 
     #region 关联映射
+    /// <summary>管理人</summary>
+    [XmlIgnore, IgnoreDataMember, ScriptIgnore]
+    public XCode.Membership.User MyManager => Extends.Get(nameof(MyManager), k => XCode.Membership.User.FindByID(ManagerId));
+
+    /// <summary>管理人</summary>
+    [Map(nameof(ManagerId), typeof(XCode.Membership.User), "ID")]
+    public String ManagerName => MyManager?.Name;
+
     #endregion
 
     #region 字段名
@@ -252,13 +280,13 @@ public partial class App
         /// <summary>编号</summary>
         public static readonly Field ID = FindByName("ID");
 
-        /// <summary>名称</summary>
+        /// <summary>名称。应用英文名</summary>
         public static readonly Field Name = FindByName("Name");
 
-        /// <summary>显示名</summary>
+        /// <summary>显示名。应用中文名</summary>
         public static readonly Field DisplayName = FindByName("DisplayName");
 
-        /// <summary>密钥</summary>
+        /// <summary>密钥。一般不设置，应用默认接入</summary>
         public static readonly Field Secret = FindByName("Secret");
 
         /// <summary>类别</summary>
@@ -273,11 +301,17 @@ public partial class App
         /// <summary>启用</summary>
         public static readonly Field Enable = FindByName("Enable");
 
-        /// <summary>作业数</summary>
+        /// <summary>作业数。该应用下作业个数</summary>
         public static readonly Field JobCount = FindByName("JobCount");
 
-        /// <summary>消息数</summary>
+        /// <summary>消息数。该应用下消息条数</summary>
         public static readonly Field MessageCount = FindByName("MessageCount");
+
+        /// <summary>管理人。负责该应用的管理员</summary>
+        public static readonly Field ManagerId = FindByName("ManagerId");
+
+        /// <summary>管理者</summary>
+        public static readonly Field Manager = FindByName("Manager");
 
         /// <summary>创建人</summary>
         public static readonly Field CreateUserID = FindByName("CreateUserID");
@@ -315,13 +349,13 @@ public partial class App
         /// <summary>编号</summary>
         public const String ID = "ID";
 
-        /// <summary>名称</summary>
+        /// <summary>名称。应用英文名</summary>
         public const String Name = "Name";
 
-        /// <summary>显示名</summary>
+        /// <summary>显示名。应用中文名</summary>
         public const String DisplayName = "DisplayName";
 
-        /// <summary>密钥</summary>
+        /// <summary>密钥。一般不设置，应用默认接入</summary>
         public const String Secret = "Secret";
 
         /// <summary>类别</summary>
@@ -336,11 +370,17 @@ public partial class App
         /// <summary>启用</summary>
         public const String Enable = "Enable";
 
-        /// <summary>作业数</summary>
+        /// <summary>作业数。该应用下作业个数</summary>
         public const String JobCount = "JobCount";
 
-        /// <summary>消息数</summary>
+        /// <summary>消息数。该应用下消息条数</summary>
         public const String MessageCount = "MessageCount";
+
+        /// <summary>管理人。负责该应用的管理员</summary>
+        public const String ManagerId = "ManagerId";
+
+        /// <summary>管理者</summary>
+        public const String Manager = "Manager";
 
         /// <summary>创建人</summary>
         public const String CreateUserID = "CreateUserID";

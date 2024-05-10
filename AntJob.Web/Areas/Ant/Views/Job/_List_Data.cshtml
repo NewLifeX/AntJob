@@ -28,7 +28,7 @@
             {
                 <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("AppName"))">应用</a></th>
             }
-            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Start"))" title="@Job._.Time.Description">开始时间</a></th>
+            <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("DataTime"))" title="@Job._.DataTime.Description">数据时间</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("End"))" title="@Job._.End.Description">结束</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("Step"))" title="@Job._.Step.Description">步进</a></th>
             <th class="text-center"><a href="@Html.Raw(page.GetSortUrl("BatchSize"))" title="@Job._.BatchSize.Description">批大小</a></th>
@@ -54,8 +54,8 @@
     <tbody>
         @foreach (var entity in Model)
         {
-            var st = entity.Time.ToFullString("");
-            if (entity.Time.Date == DateTime.Now.Date) { st = entity.Time.ToString("HH:mm:ss"); }
+            var st = entity.DataTime.ToFullString("");
+            if (entity.DataTime.Date == DateTime.Now.Date) { st = entity.DataTime.ToString("HH:mm:ss"); }
             if (entity.Mode == JobModes.Message) { st = $"{entity.Topic}/{entity.MessageCount}"; }
 
             var ut = entity.UpdateTime.ToFullString("");

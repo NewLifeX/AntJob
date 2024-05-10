@@ -15,7 +15,7 @@ class BuildWill : DataHandler
     public BuildWill()
     {
         var job = Job;
-        job.Time = DateTime.Today;
+        job.DataTime = DateTime.Today;
         job.Step = 30;
         job.BatchSize = 1000;
     }

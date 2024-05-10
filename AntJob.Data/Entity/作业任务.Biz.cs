@@ -108,14 +108,14 @@ public partial class JobTask : EntityBase<JobTask>
     /// <summary>根据作业、状态、数据时间查找</summary>
     /// <param name="jobId">作业</param>
     /// <param name="status">状态</param>
-    /// <param name="time">数据时间</param>
+    /// <param name="dataTime">数据时间</param>
     /// <returns>实体列表</returns>
-    public static IList<JobTask> FindAllByJobIDAndStatusAndTime(Int32 jobId, JobStatus status, DateTime time)
+    public static IList<JobTask> FindAllByJobIDAndStatusAndDataTime(Int32 jobId, JobStatus status, DateTime dataTime)
     {
         // 实体缓存
-        if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.JobID == jobId && e.Status == status && e.Time == time);
+        if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.JobID == jobId && e.Status == status && e.DataTime == dataTime);
 
-        return FindAll(_.JobID == jobId & _.Status == status & _.Time == time);
+        return FindAll(_.JobID == jobId & _.Status == status & _.DataTime == dataTime);
     }
     #endregion
 
@@ -141,7 +141,7 @@ public partial class JobTask : EntityBase<JobTask>
         if (status >= JobStatus.就绪) exp &= _.Status == status;
         if (!client.IsNullOrEmpty()) exp &= _.Client == client;
         if (!key.IsNullOrEmpty()) exp &= _.Data.Contains(key) | _.Message.Contains(key) | _.Key == key;
-        exp &= _.Time.Between(start, end);
+        exp &= _.DataTime.Between(start, end);
 
         return FindAll(exp, p);
     }
@@ -199,7 +199,7 @@ public partial class JobTask : EntityBase<JobTask>
         {
             ID = ID,
 
-            Time = Time,
+            DataTime = DataTime,
             End = End,
             //Offset = Offset,
             //Step = Step,

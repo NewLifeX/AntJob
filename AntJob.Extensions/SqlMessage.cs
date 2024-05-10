@@ -45,7 +45,7 @@ public class SqlMessage : MessageHandler
     {
         if (dt == null || dt.Columns == null || dt.Columns.Length == 0 || dt.Rows == null || dt.Rows.Count == 0) return;
 
-        // select id as topic_roleId, id as topic_myId from role where updatetime>='{Start}' and updatetime<'{End}'
+        // select id as topic_roleId, id as topic_myId from role where updatetime>='{dt}' and updatetime<'{End}'
 
         for (var i = 0; i < dt.Columns.Length; i++)
         {

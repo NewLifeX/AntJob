@@ -8,7 +8,7 @@ public partial class TaskModel : ITask
     public Int32 ID { get; set; }
 
     /// <summary>数据时间。定时调度的执行时间点，或者数据调度的开始时间</summary>
-    public DateTime Time { get; set; }
+    public DateTime DataTime { get; set; }
 
     /// <summary>结束。小于，不等于</summary>
     public DateTime End { get; set; }

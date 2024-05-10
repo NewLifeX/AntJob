@@ -28,7 +28,7 @@ public class SqlHandler : Handler
     {
         //var sqls = ctx.Task.Data as String;
         var sqls = Job.Data;
-        sqls = TemplateHelper.Build(sqls, ctx.Task.Time, ctx.Task.End);
+        sqls = TemplateHelper.Build(sqls, ctx.Task.DataTime, ctx.Task.End);
         // 向调度中心返回解析后的Sql语句
         ctx.Remark = sqls;
 

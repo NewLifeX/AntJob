@@ -43,7 +43,7 @@ public class FileJobProvider : JobProvider
                 var df = job?.Job;
                 if (df != null) model.Copy(df);
 
-                if (model.Time.Year <= 2000) model.Time = DateTime.Now.Date;
+                if (model.DataTime.Year <= 2000) model.DataTime = DateTime.Now.Date;
                 if (model.Step <= 0) model.Step = 30;
                 if (model.BatchSize <= 0) model.BatchSize = 10000;
                 if (model.MaxTask <= 0) model.MaxTask = Environment.ProcessorCount;
@@ -108,7 +108,7 @@ public class FileJobProvider : JobProvider
         var step = job.Step;
         if (step <= 0) step = 30;
 
-        var start = job.Time;
+        var start = job.DataTime;
         for (var i = 0; i < count; i++)
         {
             // 开始时间和结束时间是否越界
@@ -130,7 +130,7 @@ public class FileJobProvider : JobProvider
             // 切分新任务
             var task = new TaskModel
             {
-                Time = start,
+                DataTime = start,
                 End = end,
                 //Step = job.Step,
                 //Offset = job.Offset,
@@ -138,7 +138,7 @@ public class FileJobProvider : JobProvider
             };
 
             // 更新任务
-            job.Time = end;
+            job.DataTime = end;
             start = end;
 
             list.Add(task);
@@ -163,7 +163,7 @@ public class FileJobProvider : JobProvider
         if (ctx.Total > 0)
         {
             var set = ctx.Task;
-            var time = set.Time;
+            var time = set.DataTime;
             var end = set.End;
             var n = 0;
             if (end > time) n = (Int32)(end - time).TotalSeconds;

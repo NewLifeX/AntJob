@@ -13,12 +13,12 @@ using XCode.DataAccessLayer;
 
 namespace AntJob.Data.Entity;
 
-/// <summary>作业。数据计算逻辑的主要单元，每个作业即是一个业务逻辑，各个作业之前存在依赖关系</summary>
+/// <summary>作业。数据计算逻辑的主要单元，每个作业即是一个业务逻辑</summary>
 [Serializable]
 [DataObject]
-[Description("作业。数据计算逻辑的主要单元，每个作业即是一个业务逻辑，各个作业之前存在依赖关系")]
+[Description("作业。数据计算逻辑的主要单元，每个作业即是一个业务逻辑")]
 [BindIndex("IU_Job_AppID_Name", true, "AppID,Name")]
-[BindTable("Job", Description = "作业。数据计算逻辑的主要单元，每个作业即是一个业务逻辑，各个作业之前存在依赖关系", ConnName = "Ant", DbType = DatabaseType.None)]
+[BindTable("Job", Description = "作业。数据计算逻辑的主要单元，每个作业即是一个业务逻辑", ConnName = "Ant", DbType = DatabaseType.None)]
 public partial class Job
 {
     #region 属性
@@ -102,13 +102,13 @@ public partial class Job
     [BindColumn("MessageCount", "消息数", "")]
     public Int32 MessageCount { get => _MessageCount; set { if (OnPropertyChanging("MessageCount", value)) { _MessageCount = value; OnPropertyChanged("MessageCount"); } } }
 
-    private DateTime _Time;
-    /// <summary>数据时间。从该时间开始调度作业任务，默认不设置时从当前时间开始</summary>
+    private DateTime _DataTime;
+    /// <summary>数据时间。下一次处理数据的时间，默认从当前时间开始</summary>
     [DisplayName("数据时间")]
-    [Description("数据时间。从该时间开始调度作业任务，默认不设置时从当前时间开始")]
+    [Description("数据时间。下一次处理数据的时间，默认从当前时间开始")]
     [DataObjectField(false, false, true, 0)]
-    [BindColumn("Start", "数据时间。从该时间开始调度作业任务，默认不设置时从当前时间开始", "")]
-    public DateTime Time { get => _Time; set { if (OnPropertyChanging("Time", value)) { _Time = value; OnPropertyChanged("Time"); } } }
+    [BindColumn("DataTime", "数据时间。下一次处理数据的时间，默认从当前时间开始", "")]
+    public DateTime DataTime { get => _DataTime; set { if (OnPropertyChanging("DataTime", value)) { _DataTime = value; OnPropertyChanged("DataTime"); } } }
 
     private DateTime _End;
     /// <summary>结束。到该时间停止调度作业，默认不设置时永不停止</summary>
@@ -385,7 +385,7 @@ public partial class Job
             "Cron" => _Cron,
             "Topic" => _Topic,
             "MessageCount" => _MessageCount,
-            "Time" => _Time,
+            "DataTime" => _DataTime,
             "End" => _End,
             "Step" => _Step,
             "BatchSize" => _BatchSize,
@@ -431,7 +431,7 @@ public partial class Job
                 case "Cron": _Cron = Convert.ToString(value); break;
                 case "Topic": _Topic = Convert.ToString(value); break;
                 case "MessageCount": _MessageCount = value.ToInt(); break;
-                case "Time": _Time = value.ToDateTime(); break;
+                case "DataTime": _DataTime = value.ToDateTime(); break;
                 case "End": _End = value.ToDateTime(); break;
                 case "Step": _Step = value.ToInt(); break;
                 case "BatchSize": _BatchSize = value.ToInt(); break;
@@ -512,8 +512,8 @@ public partial class Job
         /// <summary>消息数</summary>
         public static readonly Field MessageCount = FindByName("MessageCount");
 
-        /// <summary>数据时间。从该时间开始调度作业任务，默认不设置时从当前时间开始</summary>
-        public static readonly Field Time = FindByName("Time");
+        /// <summary>数据时间。下一次处理数据的时间，默认从当前时间开始</summary>
+        public static readonly Field DataTime = FindByName("DataTime");
 
         /// <summary>结束。到该时间停止调度作业，默认不设置时永不停止</summary>
         public static readonly Field End = FindByName("End");
@@ -638,8 +638,8 @@ public partial class Job
         /// <summary>消息数</summary>
         public const String MessageCount = "MessageCount";
 
-        /// <summary>数据时间。从该时间开始调度作业任务，默认不设置时从当前时间开始</summary>
-        public const String Time = "Time";
+        /// <summary>数据时间。下一次处理数据的时间，默认从当前时间开始</summary>
+        public const String DataTime = "DataTime";
 
         /// <summary>结束。到该时间停止调度作业，默认不设置时永不停止</summary>
         public const String End = "End";

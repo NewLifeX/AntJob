@@ -21,7 +21,7 @@ public partial class JobModel
 
     /// <summary>数据时间。定时调度的执行时间点，或者数据调度的开始时间</summary>
     [XmlAttribute]
-    public DateTime Time { get; set; }
+    public DateTime DataTime { get; set; }
 
     /// <summary>结束。小于</summary>
     [XmlAttribute]

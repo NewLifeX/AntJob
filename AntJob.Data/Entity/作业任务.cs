@@ -17,7 +17,7 @@ namespace AntJob.Data.Entity;
 [Serializable]
 [DataObject]
 [Description("作业任务。计算作业在执行过程中生成的任务实例，具有该次执行所需参数")]
-[BindIndex("IX_JobTask_JobID_Status_Start", false, "JobID,Status,Start")]
+[BindIndex("IX_JobTask_JobID_Status_DataTime", false, "JobID,Status,DataTime")]
 [BindIndex("IX_JobTask_AppID_Client_Status", false, "AppID,Client,Status")]
 [BindIndex("IX_JobTask_JobID_CreateTime", false, "JobID,CreateTime")]
 [BindTable("JobTask", Description = "作业任务。计算作业在执行过程中生成的任务实例，具有该次执行所需参数", ConnName = "Ant", DbType = DatabaseType.None)]
@@ -56,13 +56,13 @@ public partial class JobTask
     [BindColumn("Client", "客户端。IP加进程", "")]
     public String Client { get => _Client; set { if (OnPropertyChanging("Client", value)) { _Client = value; OnPropertyChanged("Client"); } } }
 
-    private DateTime _Time;
+    private DateTime _DataTime;
     /// <summary>数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
     [DisplayName("数据时间")]
     [Description("数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用")]
     [DataObjectField(false, false, true, 0)]
-    [BindColumn("Start", "数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用", "", Master = true)]
-    public DateTime Time { get => _Time; set { if (OnPropertyChanging("Time", value)) { _Time = value; OnPropertyChanged("Time"); } } }
+    [BindColumn("DataTime", "数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用", "", Master = true)]
+    public DateTime DataTime { get => _DataTime; set { if (OnPropertyChanging("DataTime", value)) { _DataTime = value; OnPropertyChanged("DataTime"); } } }
 
     private DateTime _End;
     /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
@@ -250,7 +250,7 @@ public partial class JobTask
             "AppID" => _AppID,
             "JobID" => _JobID,
             "Client" => _Client,
-            "Time" => _Time,
+            "DataTime" => _DataTime,
             "End" => _End,
             "BatchSize" => _BatchSize,
             "Total" => _Total,
@@ -282,7 +282,7 @@ public partial class JobTask
                 case "AppID": _AppID = value.ToInt(); break;
                 case "JobID": _JobID = value.ToInt(); break;
                 case "Client": _Client = Convert.ToString(value); break;
-                case "Time": _Time = value.ToDateTime(); break;
+                case "DataTime": _DataTime = value.ToDateTime(); break;
                 case "End": _End = value.ToDateTime(); break;
                 case "BatchSize": _BatchSize = value.ToInt(); break;
                 case "Total": _Total = value.ToInt(); break;
@@ -346,7 +346,7 @@ public partial class JobTask
         public static readonly Field Client = FindByName("Client");
 
         /// <summary>数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
-        public static readonly Field Time = FindByName("Time");
+        public static readonly Field DataTime = FindByName("DataTime");
 
         /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
         public static readonly Field End = FindByName("End");
@@ -430,7 +430,7 @@ public partial class JobTask
         public const String Client = "Client";
 
         /// <summary>数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
-        public const String Time = "Time";
+        public const String DataTime = "DataTime";
 
         /// <summary>结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用</summary>
         public const String End = "End";
