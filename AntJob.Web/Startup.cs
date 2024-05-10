@@ -40,6 +40,9 @@ public class Startup
         EntityFactory.InitConnection("Cube");
         EntityFactory.InitConnection("Ant");
 
+        // 修正旧版数据
+        Task.Run(() => JobService.FixOld());
+
         // 使用Cube前添加自己的管道
         if (env.IsDevelopment())
             app.UseDeveloperExceptionPage();

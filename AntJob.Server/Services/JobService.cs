@@ -735,11 +735,40 @@ public class JobService
 
     #region 辅助
     /// <summary>兼容旧数据库。如DataTime对应Start</summary>
+    public static void FixOld()
+    {
+        using var span = DefaultTracer.Instance?.NewSpan(nameof(FixOld));
+
+        var dal = DAL.Create("Ant");
+        FixOld(dal, "Job");
+        FixOld(dal, "JobTask");
+        FixOld(dal, "JobError");
+    }
+
+    /// <summary>兼容旧数据库。如DataTime对应Start</summary>
     /// <param name="dal"></param>
     /// <param name="tableName"></param>
     public static void FixOld(DAL dal, String tableName)
     {
+        var table = dal.Tables.FirstOrDefault(e => tableName.EqualIgnoreCase(e.Name, e.TableName));
+        if (table == null) return;
 
+        // 如果不包括Start列，则不需要处理
+        if (!table.Columns.Any(e => e.Name.EqualIgnoreCase("Start"))) return;
+        if (!table.Columns.Any(e => e.Name.EqualIgnoreCase("DataTime"))) return;
+
+        // 查询最后一批数据，更新字段值
+        var id = dal.Query<Int32>($"select id from {tableName} where (DataTime is null or DataTime<'2000-01-01') order by id desc", null, 0, 1).FirstOrDefault();
+        if (id == 0) return;
+
+        XTrace.WriteLine("数据表[{0}]最大Id是：{1}，开始修正", tableName, id);
+        if (id > 100_000)
+            id -= 100_000;
+        else
+            id = 0;
+
+        var rs = dal.Execute($"update {tableName} set DataTime=Start where ID>{id} and (DataTime is null or DataTime<'2000-01-01')");
+        XTrace.WriteLine("从Id={0}开始，共修正{1}行", id, rs);
     }
     #endregion
 }

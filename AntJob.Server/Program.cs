@@ -39,6 +39,9 @@ services.AddSingleton<JobService>();
 // 预热数据层，执行反向工程建表等操作
 EntityFactory.InitConnection("Ant");
 
+// 修正旧版数据
+_ = Task.Run(() => JobService.FixOld());
+
 // 友好退出
 var host = services.BuildHost();
 
