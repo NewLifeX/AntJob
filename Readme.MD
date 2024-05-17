@@ -187,7 +187,7 @@ public class AntSetting : Config<AntSetting>
 ![image.png](https://cdn.nlark.com/yuque/0/2020/png/1144030/1586439584880-ea4aa91c-460d-4893-b849-8ac8b0995311.png#align=left&display=inline&height=340&name=image.png&originHeight=680&originWidth=1075&size=127959&status=done&style=none&width=537.5)  
 AppID默认取本应用名，Secret由调度中心生成并下发。  
 调度中心默认打开自动注册AutoRegistry，任意应用登录时自动注册，省去人工配置应用账号的麻烦。  
-企业内部正式场景使用时，为安全期间，建议关闭自动注册。  
+企业内部正式场景使用时，为安全起见，建议关闭自动注册。  
 
 再来看看前面跑起来的日志  
 ```sql
