@@ -544,13 +544,13 @@ public class JobService
             {
                 var cron = new Cron(job.Cron);
                 var time = job.DataTime.Year > 2000 ? job.DataTime : DateTime.Now;
-                job.DataTime = cron.GetNext(time);
+                end = job.DataTime = cron.GetNext(time);
             }
             else
             {
                 var step = job.Step;
                 if (step <= 0) step = 30;
-                job.DataTime = job.DataTime.AddSeconds(step);
+                end = job.DataTime = job.DataTime.AddSeconds(step);
             }
         }
 
