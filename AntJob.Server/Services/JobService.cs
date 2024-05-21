@@ -11,18 +11,11 @@ using XCode.DataAccessLayer;
 
 namespace AntJob.Server.Services;
 
-public class JobService
+public class JobService(AppService appService, ICacheProvider cacheProvider, ILog log)
 {
-    private readonly AppService _appService;
-    private readonly ICacheProvider _cacheProvider;
-    private readonly ILog _log;
-
-    public JobService(AppService appService, ICacheProvider cacheProvider, ILog log)
-    {
-        _appService = appService;
-        _cacheProvider = cacheProvider;
-        _log = log;
-    }
+    private readonly AppService _appService = appService;
+    private readonly ICacheProvider _cacheProvider = cacheProvider;
+    private readonly ILog _log = log;
 
     #region 业务
     /// <summary>获取指定名称的作业</summary>
@@ -31,7 +24,21 @@ public class JobService
     {
         var jobs = Job.FindAllByAppID(app.ID);
 
-        return jobs.Select(e => e.ToModel()).ToArray();
+        //return jobs.Select(e => e.ToModel()).ToArray();
+
+        // 服务端下发的时间，约定UTC
+        var rs = new List<IJob>();
+        foreach (var job in jobs)
+        {
+            var model = job.ToModel();
+            model.DataTime = model.DataTime.ToUniversalTime();
+            if (model.End.Year > 1000)
+                model.End = model.End.ToUniversalTime();
+
+            rs.Add(model);
+        }
+
+        return rs.ToArray();
     }
 
     /// <summary>批量添加作业</summary>
@@ -43,30 +50,31 @@ public class JobService
 
         var myJobs = Job.FindAllByAppID(app.ID);
         var list = new List<String>();
-        foreach (var item in jobs)
+        foreach (var model in jobs)
         {
-            var job = myJobs.FirstOrDefault(e => e.Name.EqualIgnoreCase(item.Name));
+            // 客户端上报的时间，约定UTC，需要转为本地时间
+            var job = myJobs.FirstOrDefault(e => e.Name.EqualIgnoreCase(model.Name));
             job ??= new Job
             {
                 AppID = app.ID,
-                Name = item.Name,
-                Enable = item.Enable,
-                DataTime = item.DataTime,
-                End = item.End,
-                Offset = item.Offset,
-                Step = item.Step,
-                BatchSize = item.BatchSize,
-                MaxTask = item.MaxTask,
-                Mode = item.Mode,
+                Name = model.Name,
+                Enable = model.Enable,
+                DataTime = model.DataTime.ToLocalTime(),
+                End = model.End.Year > 1000 ? model.End.ToLocalTime() : model.End,
+                Offset = model.Offset,
+                Step = model.Step,
+                BatchSize = model.BatchSize,
+                MaxTask = model.MaxTask,
+                Mode = model.Mode,
                 MaxError = 100,
             };
 
-            if (item.Mode > 0) job.Mode = item.Mode;
-            if (!item.DisplayName.IsNullOrEmpty()) job.DisplayName = item.DisplayName;
-            if (!item.Description.IsNullOrEmpty()) job.Remark = item.Description;
-            if (!item.ClassName.IsNullOrEmpty()) job.ClassName = item.ClassName;
-            if (job.Cron.IsNullOrEmpty()) job.Cron = item.Cron;
-            if (job.Topic.IsNullOrEmpty()) job.Topic = item.Topic;
+            if (model.Mode > 0) job.Mode = model.Mode;
+            if (!model.DisplayName.IsNullOrEmpty()) job.DisplayName = model.DisplayName;
+            if (!model.Description.IsNullOrEmpty()) job.Remark = model.Description;
+            if (!model.ClassName.IsNullOrEmpty()) job.ClassName = model.ClassName;
+            if (job.Cron.IsNullOrEmpty()) job.Cron = model.Cron;
+            if (job.Topic.IsNullOrEmpty()) job.Topic = model.Topic;
 
             // 添加定时作业时，计算下一次执行时间
             if (job.ID == 0 && job.Mode == JobModes.Time)
@@ -75,8 +83,8 @@ public class JobService
 
                 // 计算下一次执行时间
                 var cron = new Cron(job.Cron);
-                var time = item.DataTime.Year > 2000 ? item.DataTime : DateTime.Now;
-                item.DataTime = cron.GetNext(time);
+                var time = job.DataTime.Year > 2000 ? job.DataTime : DateTime.Now;
+                job.DataTime = cron.GetNext(time);
 
                 if (job.Step <= 0) job.Step = 30;
             }
@@ -173,7 +181,21 @@ public class JobService
         online.Tasks += list.Count;
         online.SaveAsync();
 
-        return list.Select(e => e.ToModel()).ToArray();
+        //return list.Select(e => e.ToModel()).ToArray();
+
+        // 服务端下发的时间，约定UTC
+        var rs = new List<ITask>();
+        foreach (var task in list)
+        {
+            var model2 = task.ToModel();
+            model2.DataTime = model2.DataTime.ToUniversalTime();
+            if (model2.End.Year > 1000)
+                model2.End = model2.End.ToUniversalTime();
+
+            rs.Add(model2);
+        }
+
+        return rs.ToArray();
     }
 
     private void CheckErrorTask(App app, Job job, Int32 count, List<JobTask> list, String ip)

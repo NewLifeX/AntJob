@@ -1,4 +1,5 @@
-﻿using AntJob.Data;
+﻿using System.Threading.Tasks;
+using AntJob.Data;
 using AntJob.Handlers;
 using AntJob.Models;
 using NewLife;
@@ -89,9 +90,26 @@ public class NetworkJobProvider : JobProvider
                 if (handler is MessageHandler mhandler) job2.Topic = mhandler.Topic;
             }
 
+            // 改为UTC通信
+            job.DataTime = job.DataTime.ToUniversalTime();
+            if (job.End.Year > 1000)
+                job.End = job.End.ToUniversalTime();
+
             list.Add(job);
         }
         if (list.Count > 0) Ant.AddJobs(list.ToArray());
+
+        // 通信完成，改回来本地时间
+        foreach (var handler in bs)
+        {
+            var job = handler.Job;
+            if (job != null)
+            {
+                job.DataTime = job.DataTime.ToLocalTime();
+                if (job.End.Year > 1000)
+                    job.End = job.End.ToLocalTime();
+            }
+        }
 
         // 定时更新邻居
         _timer = new TimerX(DoCheckPeer, null, 1_000, 30_000) { Async = true };
@@ -120,6 +138,17 @@ public class NetworkJobProvider : JobProvider
             _NextGetJobs = now.AddSeconds(5);
 
             _jobs = Ant.GetJobs();
+
+            if (_jobs != null)
+            {
+                foreach (var job in _jobs)
+                {
+                    // 通信约定UTC，收到后需转为本地时间
+                    job.DataTime = job.DataTime.ToLocalTime();
+                    if (job.End.Year > 1000)
+                        job.End = job.End.ToLocalTime();
+                }
+            }
         }
 
         return _jobs;
@@ -130,7 +159,22 @@ public class NetworkJobProvider : JobProvider
     /// <param name="topic">主题</param>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public override ITask[] Acquire(IJob job, String topic, Int32 count) => Ant.Acquire(job.Name, topic, count);
+    public override ITask[] Acquire(IJob job, String topic, Int32 count)
+    {
+        var rs = Ant.Acquire(job.Name, topic, count);
+        if (rs != null)
+        {
+            foreach (var task in rs)
+            {
+                // 通信约定UTC，收到后需转为本地时间
+                task.DataTime = task.DataTime.ToLocalTime();
+                if (task.End.Year > 1000)
+                    task.End = task.End.ToLocalTime();
+            }
+        }
+
+        return rs;
+    }
 
     /// <summary>生产消息</summary>
     /// <param name="job">作业</param>

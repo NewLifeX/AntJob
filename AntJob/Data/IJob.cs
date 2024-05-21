@@ -1,6 +1,4 @@
-﻿using System.Xml.Serialization;
-
-namespace AntJob.Data;
+﻿namespace AntJob.Data;
 
 /// <summary>作业参数</summary>
 public interface IJob

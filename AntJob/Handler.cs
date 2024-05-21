@@ -61,7 +61,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         var now = DateTime.Now;
         var job = new JobModel
         {
-            DataTime = new DateTime(now.Year, now.Month, 1),
+            DataTime = now.Date.AddDays(-now.Date.Day + 1),
             Step = 30,
             Offset = 15,
             Mode = JobModes.Time,
