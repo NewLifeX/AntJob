@@ -158,8 +158,9 @@ public abstract class DataHandler : Handler
         var exp = new WhereExpression();
         if (fi.Type == typeof(DateTime))
         {
-            if (start > DateTime.MinValue && start < DateTime.MaxValue) exp &= fi >= start;
-            if (end > DateTime.MinValue && end < DateTime.MaxValue) exp &= fi < end;
+            //因为 XCode 不处理时区，所以这里需要转为本地时间
+            if (start > DateTime.MinValue && start < DateTime.MaxValue) exp &= fi >= start.ToLocalTime();
+            if (end > DateTime.MinValue && end < DateTime.MaxValue) exp &= fi < end.ToLocalTime();
         }
         else if (fi.Type == typeof(Int64))
         {
