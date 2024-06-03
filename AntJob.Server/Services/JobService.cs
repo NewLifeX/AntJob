@@ -350,7 +350,12 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
         traceId = DefaultSpan.Current?.TraceId;
         if (!traceId.IsNullOrEmpty() && !tis.Contains(traceId)) tis.Add(traceId);
         task.TraceId = tis.Join(",");
-
+        while (true)
+        {
+            if (task.TraceId.Length <= JobTask._.TraceId.Length) break;
+            tis.RemoveAt(0);
+            task.TraceId = tis.Join(",");
+        }
         // 已终结的作业，汇总统计
         if (result.Status == JobStatus.完成 || result.Status == JobStatus.错误)
         {
