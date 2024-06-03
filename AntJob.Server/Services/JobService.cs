@@ -376,8 +376,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
         var ts = DateTime.Now - task.CreateTime;
         task.FullCost = (Int32)ts.TotalSeconds;
 
-        task.SaveAsync();
-        //ji.Save();
+        task.Update();
 
         return true;
     }
