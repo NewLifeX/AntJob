@@ -6,27 +6,30 @@ on:
     paths:
         - 'AntJob/**'
         - 'AntJob.Extensions/**'
+  pull_request:
+    branches: [ master ]
+    paths:
+        - 'AntJob/**'
+        - 'AntJob.Extensions/**'
   workflow_dispatch:
 
 jobs:
   build-publish:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+    - uses: actions/checkout@v4
+    - name: Setup dotNET
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
-    - name: Restore
-      run: |
-        dotnet restore AntJob/AntJob.csproj
-        dotnet restore AntJob.Extensions/AntJob.Extensions.csproj
+        dotnet-version: |
+          6.0.x
+          7.0.x
+          8.x
     - name: Build
       run: |
-        dotnet pack --no-restore --version-suffix $(date "+%Y.%m%d-beta%H%M") -c Release -o out AntJob/AntJob.csproj
-        dotnet pack --no-restore --version-suffix $(date "+%Y.%m%d-beta%H%M") -c Release -o out AntJob.Extensions/AntJob.Extensions.csproj
+        dotnet pack -c Release -o out AntJob/AntJob.csproj
+        dotnet pack -c Release -o out AntJob.Extensions/AntJob.Extensions.csproj
     - name: Publish
       run: |
         dotnet nuget push ./out/*.nupkg --skip-duplicate --source https://nuget.pkg.github.com/NewLifeX/index.json --api-key ${{ github.token }}
