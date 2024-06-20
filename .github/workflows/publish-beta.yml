@@ -26,10 +26,12 @@ jobs:
           6.0.x
           7.0.x
           8.x
+    - name: Get Version
+      run: echo "VERSION=$(date '+%Y.%m%d-beta%H%M')" >> $GITHUB_ENV
     - name: Build
       run: |
-        dotnet pack -c Release -o out AntJob/AntJob.csproj
-        dotnet pack -c Release -o out AntJob.Extensions/AntJob.Extensions.csproj
+        dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob/AntJob.csproj
+        dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob.Extensions/AntJob.Extensions.csproj
     - name: Publish
       run: |
         dotnet nuget push ./out/*.nupkg --skip-duplicate --source https://nuget.pkg.github.com/NewLifeX/index.json --api-key ${{ github.token }}
