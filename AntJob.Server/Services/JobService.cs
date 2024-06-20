@@ -508,6 +508,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
                 JobID = job.ID,
                 DataTime = start,
                 End = end,
+                Data = job.Data,
                 BatchSize = job.BatchSize,
 
                 Server = server,
