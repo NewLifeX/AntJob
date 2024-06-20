@@ -20,4 +20,7 @@ public enum JobStatus
 
     /// <summary>已取消</summary>
     取消 = 5,
+
+    /// <summary>延迟重试</summary>
+    延迟 = 6,
 }

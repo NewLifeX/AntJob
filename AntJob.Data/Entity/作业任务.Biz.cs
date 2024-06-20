@@ -150,23 +150,22 @@ public partial class JobTask : EntityBase<JobTask>
     /// <param name="taskid"></param>
     /// <param name="end"></param>
     /// <param name="maxRetry"></param>
-    /// <param name="stats"></param>
+    /// <param name="maxError"></param>
+    /// <param name="status"></param>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public static IList<JobTask> Search(Int32 taskid, DateTime end, Int32 maxRetry, JobStatus[] stats, Int32 count)
+    public static IList<JobTask> Search(Int32 taskid, DateTime end, Int32 maxRetry, Int32 maxError, JobStatus[] status, Int32 count)
     {
         var exp = new WhereExpression();
         if (taskid > 0) exp &= _.JobID == taskid;
         if (maxRetry > 0) exp &= _.Times < maxRetry;
-        exp &= _.Status.In(stats);
-        exp &= _.UpdateTime >= DateTime.Now.AddDays(-7);
-        if (end > DateTime.MinValue)
-        {
-            exp &= _.UpdateTime < end;
-        }
+        if (status != null && status.Length > 0) exp &= _.Status.In(status);
 
         // 限制任务的错误次数，避免无限执行
-        exp &= _.Error < 32;
+        if (maxError > 0) exp &= _.Error < maxError;
+
+        exp &= _.UpdateTime >= DateTime.Now.AddDays(-7);
+        if (end > DateTime.MinValue) exp &= _.UpdateTime < end;
 
         return FindAll(exp, _.ID.Asc(), null, 0, count);
     }

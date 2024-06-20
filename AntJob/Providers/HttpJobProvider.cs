@@ -186,6 +186,8 @@ public class HttpJobProvider : JobProvider
         task.Total = ctx.Total;
         task.Success = ctx.Success;
 
+        if (ctx.NextTime.Year > 2000) task.NextTime = ctx.NextTime.ToUniversalTime();
+
         Report(ctx.Handler.Job, task);
     }
 
@@ -214,11 +216,11 @@ public class HttpJobProvider : JobProvider
                 task.Message = msg;
             }
         }
-        else
+        else if (task.Status <= JobStatus.处理中)
         {
             task.Status = JobStatus.完成;
-            task.Cost = (Int32)Math.Round(ctx.Cost / 1000);
         }
+        task.Cost = (Int32)Math.Round(ctx.Cost / 1000);
         if (task.Message.IsNullOrEmpty()) task.Message = ctx.Remark;
 
         task.Key = ctx.Key;

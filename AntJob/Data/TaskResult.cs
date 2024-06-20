@@ -28,6 +28,9 @@ public partial class TaskResult : ITaskResult
     /// <summary>状态</summary>
     public JobStatus Status { get; set; }
 
+    /// <summary>下一次执行时间。UTC时间，确保时区兼容</summary>
+    public DateTime NextTime { get; set; }
+
     /// <summary>最后键值</summary>
     public String Key { get; set; }
 

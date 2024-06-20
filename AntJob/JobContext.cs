@@ -38,6 +38,9 @@ public class JobContext : IExtend
     /// <summary>处理异常</summary>
     public Exception Error { get; set; }
 
+    /// <summary>下一次执行时间</summary>
+    public DateTime NextTime { get; set; }
+
     /// <summary>任务备注消息。可用于保存到任务项内容字段</summary>
     public String Remark { get; set; }
     #endregion

@@ -127,14 +127,14 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
             job = Job.FindByAppIDAndName(app.ID, jobName);
 
         if (job == null) throw new XException($"应用[{app.ID}/{app.Name}]下未找到作业[{jobName}]");
-        if (job.Step == 0 || job.DataTime.Year <= 2000) throw new XException("作业[{0}/{1}]未设置开始时间或步进", job.ID, job.Name);
+        if (job.Step == 0 || job.DataTime.Year <= 2000) throw new XException("作业[{0}/{1}]未设置数据时间或步进", job.ID, job.Name);
 
         var online = _appService.GetOnline(app, ip);
 
         var list = new List<JobTask>();
 
         // 每分钟检查一下错误任务和中断任务
-        CheckErrorTask(app, job, model.Count, list, ip);
+        CheckOldTask(app, job, model.Count, list, ip);
 
         // 错误项不够时，增加切片
         if (list.Count < model.Count)
@@ -198,7 +198,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
         return rs.ToArray();
     }
 
-    private void CheckErrorTask(App app, Job job, Int32 count, List<JobTask> list, String ip)
+    private void CheckOldTask(App app, Job job, Int32 count, List<JobTask> list, String ip)
     {
         // 每分钟检查一下错误任务和中断任务
         var nextKey = $"antjob:NextAcquireOld_{job.ID}";
@@ -216,9 +216,10 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
                 // 既然有数据，待会还来
                 next = now;
 
-                var n1 = list.Count(e => e.Status == JobStatus.错误 || e.Status == JobStatus.取消);
-                var n2 = list.Count(e => e.Status == JobStatus.就绪 || e.Status == JobStatus.抽取中 || e.Status == JobStatus.处理中);
-                _log.Info("作业[{0}/{1}]准备处理[{2}]个错误和[{3}]超时任务 [{4}]", app, job.Name, n1, n2, list.Join(",", e => e.ID + ""));
+                var n1 = list.Count(e => e.Status is JobStatus.错误 or JobStatus.取消);
+                var n2 = list.Count(e => e.Status is JobStatus.就绪 or JobStatus.抽取中 or JobStatus.处理中);
+                var n3 = list.Count(e => e.Status == JobStatus.延迟);
+                _log.Info("作业[{0}/{1}]准备处理[{2}]个错误、[{3}]超时和[{4}]个延迟任务 [{5}]", app, job.Name, n1, n2, n3, list.Join(",", e => e.ID + ""));
             }
             else
                 _cacheProvider.Cache.Set(nextKey, next);
@@ -356,8 +357,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
             tis.RemoveAt(0);
             task.TraceId = tis.Join(",");
         }
-        // 已终结的作业，汇总统计
-        if (result.Status == JobStatus.完成 || result.Status == JobStatus.错误)
+        // 已终结的任务，汇总统计
+        if (result.Status is JobStatus.完成 or JobStatus.错误)
         {
             task.Times++;
 
@@ -366,7 +367,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
             // 记录状态
             _appService.UpdateOnline(app, task, ip);
         }
-        if (result.Status == JobStatus.错误)
+        else if (result.Status == JobStatus.错误)
         {
             SetJobError(job, task);
 
@@ -375,6 +376,14 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
 
             // 出错时判断如果超过最大错误数，则停止作业
             CheckMaxError(app, job);
+        }
+        else if (result.Status == JobStatus.延迟)
+        {
+            task.Times++;
+
+            // 延迟任务的下一次执行时间
+            if (result.NextTime.Year > 2000)
+                task.UpdateTime = result.NextTime.ToLocalTime();
         }
 
         // 从创建到完成的全部耗时
@@ -635,7 +644,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
         if (job.ErrorDelay > 0)
         {
             var dt = DateTime.Now.AddSeconds(-job.ErrorDelay);
-            var list2 = JobTask.Search(job.ID, dt, job.MaxRetry, [JobStatus.错误, JobStatus.取消], count);
+            var list2 = JobTask.Search(job.ID, dt, job.MaxRetry, 32, [JobStatus.错误, JobStatus.取消, JobStatus.延迟], count);
             if (list2.Count > 0) list.AddRange(list2);
         }
 
@@ -643,7 +652,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
         if (job.MaxTime > 0 && list.Count < count)
         {
             var dt = DateTime.Now.AddSeconds(-job.MaxTime);
-            var list2 = JobTask.Search(job.ID, dt, job.MaxRetry, [JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中], count - list.Count);
+            var list2 = JobTask.Search(job.ID, dt, job.MaxRetry, 32, [JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中], count - list.Count);
             if (list2.Count > 0) list.AddRange(list2);
         }
         if (list.Count > 0)
@@ -653,8 +662,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
                 task.Server = server;
                 task.ProcessID = Interlocked.Increment(ref _idxBatch);
                 task.Client = $"{ip}@{pid}";
-                //ti.Status = JobStatus.就绪;
-                task.CreateTime = DateTime.Now;
+                task.Status = JobStatus.处理中;
+                //task.CreateTime = DateTime.Now;
                 task.UpdateTime = DateTime.Now;
             }
             list.Save();
@@ -720,7 +729,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ILo
                     Server = server,
                     ProcessID = Interlocked.Increment(ref _idxBatch),
                     Client = $"{ip}@{pid}",
-                    Status = JobStatus.就绪,
+                    Status = JobStatus.处理中,
                     CreateTime = DateTime.Now,
                     UpdateTime = DateTime.Now
                 };

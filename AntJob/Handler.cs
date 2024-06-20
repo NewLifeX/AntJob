@@ -199,6 +199,15 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// <returns></returns>
     public Int32 Produce(String topic, String[] messages, MessageOption option = null) => Provider.Produce(Job?.Name, topic, messages, option);
 
+    /// <summary>延迟执行，指定下一次执行时间</summary>
+    /// <param name="ctx"></param>
+    /// <param name="nextTime"></param>
+    public void Delay(JobContext ctx, DateTime nextTime)
+    {
+        ctx.Status = JobStatus.延迟;
+        ctx.NextTime = nextTime;
+    }
+
     /// <summary>整个任务完成</summary>
     /// <param name="ctx"></param>
     protected virtual void OnFinish(JobContext ctx) => Provider?.Finish(ctx);

@@ -247,11 +247,11 @@ public class NetworkJobProvider : JobProvider
                 task.Message = msg;
             }
         }
-        else
+        else if (task.Status <= JobStatus.处理中)
         {
             task.Status = JobStatus.完成;
-            task.Cost = (Int32)Math.Round(ctx.Cost / 1000);
         }
+        task.Cost = (Int32)Math.Round(ctx.Cost / 1000);
         if (task.Message.IsNullOrEmpty()) task.Message = ctx.Remark;
 
         task.Key = ctx.Key;
