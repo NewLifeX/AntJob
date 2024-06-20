@@ -328,6 +328,7 @@ public partial class Job : EntityBase<Job>
                 JobID = ID,
                 Start = start,
                 End = end,
+                Data = Data,
                 BatchSize = BatchSize,
             };
 
