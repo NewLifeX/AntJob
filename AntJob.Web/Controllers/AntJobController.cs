@@ -35,7 +35,6 @@ public class AntJobController : ControllerBase, IActionFilter
     private AntJobSetting _setting;
     private readonly AppService _appService;
     private readonly JobService _jobService;
-    private readonly ICacheProvider _cacheProvider;
 
     #region 构造
     public AntJobController(AppService appService, JobService jobService, AntJobSetting setting)

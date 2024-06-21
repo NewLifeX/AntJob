@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using NewLife;
 using NewLife.Data;
@@ -46,7 +47,7 @@ public partial class App : EntityBase<App>
 
     #region 扩展属性
     /// <summary>作业集合</summary>
-    [XmlIgnore]
+    [XmlIgnore, IgnoreDataMember]
     public IList<Job> Jobs => Extends.Get(nameof(Jobs), k => Job.FindAllByAppID(ID));
     #endregion
 

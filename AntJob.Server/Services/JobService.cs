@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using AntJob.Data;
 using AntJob.Data.Entity;
 using AntJob.Models;
@@ -135,7 +136,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         var list = new List<JobTask>();
 
-        // 每分钟检查一下错误任务和中断任务
+        // 首先检查延迟任务和错误任务
+        CheckDelayTask(app, job, model.Count, list, ip);
         CheckOldTask(app, job, model.Count, list, ip);
 
         // 错误项不够时，增加切片
@@ -200,32 +202,76 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         return rs.ToArray();
     }
 
-    private void CheckOldTask(App app, Job job, Int32 count, List<JobTask> list, String ip)
+    private void CheckDelayTask(App app, Job job, Int32 count, List<JobTask> list, String ip)
     {
-        // 每分钟检查一下错误任务和中断任务
-        var nextKey = $"antjob:NextAcquireOld_{job.ID}";
+        // 获取下一次检查时间
+        var cache = _cacheProvider.Cache;
+        var nextKey = $"antjob:NextDelay_{job.ID}";
         var now = TimerX.Now;
-        var next = _cacheProvider.Cache.Get<DateTime>(nextKey);
+        var next = cache.Get<DateTime>(nextKey);
+        if (next >= now)
+        {
+            // 如果常规检查时间未到，看看是否有挂起任务
+            var pendingKey = $"antjob:PendingDelay_{job.ID}";
+            var pending = cache.Get<DateTime>(pendingKey);
+            if (pending.Year > 2000) next = pending;
+        }
         if (next < now)
         {
             var online = _appService.GetOnline(app, ip);
 
             next = now.AddSeconds(60);
-            list.AddRange(AcquireOld(job, online.Server, ip, online.ProcessId, count, _cacheProvider.Cache));
+            list.AddRange(AcquireDelay(job, online.Server, ip, online.ProcessId, count, cache));
 
             if (list.Count > 0)
             {
                 // 既然有数据，待会还来
                 next = now;
 
-                var n1 = list.Count(e => e.Status is JobStatus.错误 or JobStatus.取消);
-                var n2 = list.Count(e => e.Status is JobStatus.就绪 or JobStatus.抽取中 or JobStatus.处理中);
-                var n3 = list.Count(e => e.Status == JobStatus.延迟);
-                _log.Info("作业[{0}/{1}]准备处理[{2}]个错误、[{3}]超时和[{4}]个延迟任务 [{5}]", app, job.Name, n1, n2, n3, list.Join(",", e => e.ID + ""));
+                _log.Info("作业[{0}/{1}]准备处理[{2}]个延迟任务 [{3}]", app, job.Name, list.Count, list.Join(",", e => e.ID + ""));
             }
-            else
-                _cacheProvider.Cache.Set(nextKey, next);
+
+            cache.Set(nextKey, next);
         }
+    }
+
+    private void CheckOldTask(App app, Job job, Int32 count, List<JobTask> list, String ip)
+    {
+        // 每分钟检查一下错误任务和中断任务
+        var cache = _cacheProvider.Cache;
+        var nextKey = $"antjob:NextOld_{job.ID}";
+        var now = TimerX.Now;
+        var next = cache.Get<DateTime>(nextKey);
+        if (next < now)
+        {
+            var online = _appService.GetOnline(app, ip);
+
+            next = now.AddSeconds(60);
+            list.AddRange(AcquireOld(job, online.Server, ip, online.ProcessId, count, cache));
+
+            if (list.Count > 0)
+            {
+                // 既然有数据，待会还来
+                next = now;
+
+                var n1 = list.Count(e => e.Status is JobStatus.错误);
+                var n2 = list.Count(e => e.Status is JobStatus.就绪 or JobStatus.抽取中 or JobStatus.处理中);
+                _log.Info("作业[{0}/{1}]准备处理[{2}]个错误和[{3}]超时任务 [{4}]", app, job.Name, n1, n2, list.Join(",", e => e.ID + ""));
+            }
+
+            cache.Set(nextKey, next);
+        }
+    }
+
+    /// <summary>设置作业最近一个延迟任务的时间</summary>
+    /// <param name="jobId"></param>
+    /// <param name="nextTime"></param>
+    public void SetDelay(Int32 jobId, DateTime nextTime)
+    {
+        var nextKey = $"antjob:PendingDelay_{jobId}";
+        var next = _cacheProvider.Cache.Get<DateTime>(nextKey);
+        if (next.Year < 2000 || next > nextTime)
+            _cacheProvider.Cache.Set(nextKey, nextTime, 600);
     }
 
     /// <summary>生产消息</summary>
@@ -387,7 +433,15 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
             // 延迟任务的下一次执行时间
             if (result.NextTime.Year > 2000)
+            {
                 task.UpdateTime = result.NextTime.ToLocalTime();
+
+                SetDelay(task.JobID, task.UpdateTime);
+            }
+            else
+            {
+                SetDelay(task.JobID, DateTime.Now.AddSeconds(job.ErrorDelay));
+            }
         }
 
         // 从创建到完成的全部耗时
@@ -636,6 +690,40 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         return true;
     }
 
+    /// <summary>申请延迟任务</summary>
+    /// <param name="server">申请任务的服务端</param>
+    /// <param name="ip">申请任务的IP</param>
+    /// <param name="pid">申请任务的服务端进程ID</param>
+    /// <param name="count">要申请的任务个数</param>
+    /// <param name="cache">缓存对象</param>
+    /// <returns></returns>
+    public IList<JobTask> AcquireDelay(Job job, String server, String ip, Int32 pid, Int32 count, ICache cache)
+    {
+        using var span = _tracer?.NewSpan(nameof(AcquireDelay), new { job.Name, server, ip, pid, count });
+
+        using var ts = Job.Meta.CreateTrans();
+
+        var dt = DateTime.Now;
+        var list = JobTask.Search(job.ID, dt, job.MaxRetry, 32, [JobStatus.取消, JobStatus.延迟], count);
+        foreach (var task in list)
+        {
+            task.Server = server;
+            task.ProcessID = Interlocked.Increment(ref _idxBatch);
+            task.Client = $"{ip}@{pid}";
+            task.Status = JobStatus.就绪;
+            //task.CreateTime = DateTime.Now;
+            task.UpdateTime = DateTime.Now;
+        }
+        list.Save();
+
+        ts.Commit();
+
+        // 记录任务数
+        span?.AppendTag(null, list.Count);
+
+        return list;
+    }
+
     /// <summary>申请历史错误或中断的任务</summary>
     /// <param name="server">申请任务的服务端</param>
     /// <param name="ip">申请任务的IP</param>
@@ -654,7 +742,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         if (job.ErrorDelay > 0)
         {
             var dt = DateTime.Now.AddSeconds(-job.ErrorDelay);
-            var list2 = JobTask.Search(job.ID, dt, job.MaxRetry, 32, [JobStatus.错误, JobStatus.取消, JobStatus.延迟], count);
+            var list2 = JobTask.Search(job.ID, dt, job.MaxRetry, 32, [JobStatus.错误], count);
             if (list2.Count > 0) list.AddRange(list2);
         }
 

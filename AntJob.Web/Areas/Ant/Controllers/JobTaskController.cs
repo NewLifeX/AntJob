@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using AntJob.Data;
 using AntJob.Data.Entity;
+using AntJob.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using NewLife;
 using NewLife.Cube;
@@ -16,12 +17,16 @@ namespace AntJob.Web.Areas.Ant.Controllers;
 [Menu(0, false)]
 public class JobTaskController : AntEntityController<JobTask>
 {
+    private readonly JobService _jobService;
+
     static JobTaskController()
     {
         LogOnChange = true;
 
         ListFields.TraceUrl();
     }
+
+    public JobTaskController(JobService jobService) => _jobService = jobService;
 
     /// <summary>搜索数据集</summary>
     /// <param name="p"></param>
@@ -47,32 +52,23 @@ public class JobTaskController : AntEntityController<JobTask>
     [EntityAuthorize(PermissionFlags.Update)]
     public ActionResult Set(Int32 id = 0)
     {
-        if (id > 0)
+        var rs = 0;
+        var ids = GetRequest("keys").SplitAsInt();
+        foreach (var item in ids)
         {
-            var dt = JobTask.FindByID(id);
-            if (dt == null) throw new ArgumentNullException(nameof(id), "找不到任务 " + id);
-
-            dt.Status = JobStatus.取消;
-            if (dt.Times >= 10) dt.Times = 0;
-
-            dt.Save();
-        }
-        else
-        {
-            var ids = GetRequest("keys").SplitAsInt();
-
-            foreach (var item in ids)
+            var task = JobTask.FindByID(item);
+            if (task != null)
             {
-                var dt = JobTask.FindByID(item);
-                if (dt != null)
-                {
-                    dt.Status = JobStatus.取消;
-                    if (dt.Times >= 10) dt.Times = 0;
+                task.Status = JobStatus.取消;
+                if (task.Times >= 10) task.Times = 0;
 
-                    dt.Save();
-                }
+                rs += task.Save();
+
+                // 提醒调度，马上放行
+                _jobService.SetDelay(task.JobID, DateTime.Now);
             }
         }
-        return JsonRefresh("操作成功！");
+
+        return JsonRefresh($"操作成功！rs={rs}");
     }
 }
