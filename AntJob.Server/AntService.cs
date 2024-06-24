@@ -96,6 +96,10 @@ class AntService : IApi, IActionFilter
     [Api(nameof(Login))]
     public LoginResponse Login(LoginModel model)
     {
+        // 兼容旧版本
+        if (model.Code.IsNullOrEmpty() && !model.User.IsNullOrEmpty()) model.Code = model.User;
+        if (model.Secret.IsNullOrEmpty() && !model.Pass.IsNullOrEmpty()) model.Secret = model.Pass;
+
         if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
         var (app, online, rs) = _appService.Login(model, _Net.Remote.Host);

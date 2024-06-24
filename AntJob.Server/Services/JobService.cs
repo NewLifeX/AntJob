@@ -34,6 +34,11 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         foreach (var job in jobs)
         {
             var model = job.ToModel();
+#pragma warning disable CS0612 // 类型或成员已过时
+            // 为兼容旧版
+            model.Start = model.DataTime;
+#pragma warning restore CS0612 // 类型或成员已过时
+
             model.DataTime = model.DataTime.ToUniversalTime();
             if (model.End.Year > 1000)
                 model.End = model.End.ToUniversalTime();
@@ -195,6 +200,11 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         foreach (var task in list)
         {
             var model2 = task.ToModel();
+#pragma warning disable CS0612 // 类型或成员已过时
+            // 为兼容旧版
+            model2.Start = model2.DataTime;
+#pragma warning restore CS0612 // 类型或成员已过时
+
             model2.DataTime = model2.DataTime.ToUniversalTime();
             if (model2.End.Year > 1000)
                 model2.End = model2.End.ToUniversalTime();

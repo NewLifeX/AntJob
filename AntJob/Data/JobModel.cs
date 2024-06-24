@@ -23,6 +23,11 @@ public partial class JobModel
     [XmlAttribute]
     public DateTime DataTime { get; set; }
 
+    /// <summary>开始时间。兼容旧版</summary>
+    [XmlAttribute]
+    [Obsolete]
+    public DateTime Start { get; set; }
+
     /// <summary>结束。小于</summary>
     [XmlAttribute]
     public DateTime End { get; set; }

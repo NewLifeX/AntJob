@@ -5,11 +5,11 @@ namespace AntJob.Models;
 /// <summary>登录模型</summary>
 public class LoginModel : LoginRequest
 {
-    ///// <summary>用户名</summary>
-    //public String User { get; set; }
+    /// <summary>用户名</summary>
+    public String User { get; set; }
 
-    ///// <summary>用户名</summary>
-    //public String Pass { get; set; }
+    /// <summary>用户名</summary>
+    public String Pass { get; set; }
 
     /// <summary>显示名</summary>
     public String DisplayName { get; set; }
