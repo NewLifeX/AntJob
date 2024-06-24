@@ -63,6 +63,7 @@ public class Scheduler : DisposeBase
         var registry = ServiceProvider?.GetService<IRegistry>();
         if (registry != null)
         {
+            var rs = registry.ResolveAsync("AntServer").Result;
             var svrs = registry.ResolveAddressAsync("AntServer").Result;
             if (svrs != null && svrs.Length > 0) server = svrs.Join();
         }
@@ -71,7 +72,7 @@ public class Scheduler : DisposeBase
         set.Server = server;
 
         // 根据地址决定用Http还是RPC
-        var servers = server.Split(",");
+        //var servers = server.Split(",");
         //if (servers.Any(e => e.StartsWithIgnoreCase("http://", "https://")))
         //{
         //    var http = new HttpJobProvider
@@ -103,6 +104,38 @@ public class Scheduler : DisposeBase
 
     /// <summary>开始</summary>
     public void Start()
+    {
+        OnStart();
+    }
+
+    /// <summary>异步开始。使用定时器尝试连接服务端</summary>
+    public void StartAsync()
+    {
+        _timerStart = new TimerX(CheckStart, null, 100, 15000, "Job") { Async = true };
+    }
+
+    private Boolean _inited;
+    private TimerX _timerStart;
+    private void CheckStart(Object state)
+    {
+        if (!_inited)
+        {
+            try
+            {
+                OnStart();
+
+                _inited = true;
+            }
+            catch (Exception ex)
+            {
+                Log?.Error(ex.Message);
+            }
+        }
+
+        if (_inited) _timerStart.TryDispose();
+    }
+
+    private void OnStart()
     {
         // 检查本地添加的处理器
         var hs = Handlers;

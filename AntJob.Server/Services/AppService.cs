@@ -92,7 +92,7 @@ public class AppService
 
             app = new App
             {
-                Secret = Rand.NextString(16)
+                //Secret = Rand.NextString(16)
             };
         }
         else if (app.Secret.MD5() != pass)
@@ -101,7 +101,7 @@ public class AppService
             //var set = AntJobSetting.Current;
             if (!_setting.AutoRegistry) throw new Exception($"应用[{name}]申请重新激活，但服务器设置禁止自动注册");
 
-            if (app.Secret.IsNullOrEmpty()) app.Secret = Rand.NextString(16);
+            //if (app.Secret.IsNullOrEmpty()) app.Secret = Rand.NextString(16);
         }
 
         if (app.ID == 0)
