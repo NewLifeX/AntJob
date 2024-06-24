@@ -54,7 +54,7 @@ public class JobController : AntEntityController<Job>
             df.DataVisible = e => (e as Job).Mode != JobModes.Message;
         }
         {
-            var df = ListFields.GetField("Total");
+            var df = ListFields.GetField("Success");
             df.AddService(new ColorNumberField { Color = "green" });
         }
         {
