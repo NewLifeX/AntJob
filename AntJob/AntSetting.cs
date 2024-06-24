@@ -2,12 +2,13 @@
 using System.Reflection;
 using NewLife;
 using NewLife.Configuration;
+using NewLife.Remoting.Clients;
 
 namespace AntJob;
 
 /// <summary>蚂蚁配置。主要用于网络型调度系统</summary>
 [Config("Ant")]
-public class AntSetting : Config<AntSetting>
+public class AntSetting : Config<AntSetting>, IClientSetting
 {
     #region 属性
     /// <summary>调试开关。默认false</summary>
@@ -25,6 +26,8 @@ public class AntSetting : Config<AntSetting>
     /// <summary>应用密钥。</summary>
     [Description("应用密钥。")]
     public String Secret { get; set; }
+
+    String IClientSetting.Code { get => AppID; set => AppID = value; }
     #endregion
 
     #region 方法

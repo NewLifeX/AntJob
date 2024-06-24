@@ -4,124 +4,107 @@ using System.Reflection;
 using AntJob.Data;
 using AntJob.Models;
 using NewLife;
-using NewLife.Net;
+using NewLife.Model;
 using NewLife.Reflection;
-using NewLife.Remoting;
-using NewLife.Serialization;
+using NewLife.Remoting.Clients;
+using NewLife.Remoting.Models;
 
 namespace AntJob.Providers;
 
 /// <summary>蚂蚁客户端</summary>
-public class AntClient : ApiClient
+public class AntClient : ClientBase
 {
+    private readonly AntSetting _setting;
     #region 属性
-    /// <summary>用户名</summary>
-    public String UserName { get; set; }
+    #endregion
 
-    /// <summary>密码</summary>
-    public String Password { get; set; }
+    #region 构造
+    /// <summary>实例化</summary>
+    public AntClient() => Prefix = "Ant/";
 
-    /// <summary>是否已登录</summary>
-    public Boolean Logined { get; set; }
-
-    /// <summary>最后一次登录成功后的消息</summary>
-    public LoginResponse Info { get; private set; }
+    /// <summary>实例化</summary>
+    /// <param name="setting"></param>
+    public AntClient(AntSetting setting) : base(setting)
+    {
+        _setting = setting;
+        Prefix = _setting.Server.StartsWithIgnoreCase("http://", "https://") ? "AntJob/" : "Ant/";
+    }
     #endregion
 
     #region 方法
-    /// <summary>实例化</summary>
-    public AntClient()
+    /// <summary>初始化</summary>
+    protected override void OnInit()
     {
-        ShowError = true;
-    }
+        var provider = ServiceProvider ??= ObjectContainer.Provider;
 
-    /// <summary>实例化</summary>
-    /// <param name="uri"></param>
-    public AntClient(String uri) : this()
-    {
-        if (!uri.IsNullOrEmpty())
+        // 找到容器，注册默认的模型实现，供后续InvokeAsync时自动创建正确的模型对象
+        var container = ModelExtension.GetService<IObjectContainer>(provider) ?? ObjectContainer.Current;
+        if (container != null)
         {
-            var ss = uri.Split(",", ";");
-
-            Servers = ss;
-
-            var u = new Uri(ss[0]);
-            var us = u.UserInfo.Split(":");
-            if (us.Length > 0) UserName = us[0];
-            if (us.Length > 1) Password = us[1];
+            container.TryAddTransient<ILoginRequest, LoginModel>();
+            //container.TryAddTransient<ILoginResponse, LoginResponse>();
+            //container.TryAddTransient<ILogoutResponse, LogoutResponse>();
+            //container.TryAddTransient<IPingRequest, PingInfo>();
+            //container.TryAddTransient<IPingResponse, PingResponse>();
+            //container.TryAddTransient<IUpgradeInfo, UpgradeInfo>();
         }
+
+        Prefix = _setting.Server.StartsWithIgnoreCase("http://", "https://") ? "AntJob/" : "Ant/";
+
+        base.OnInit();
     }
     #endregion
 
     #region 登录
-    /// <summary>连接后自动登录</summary>
-    /// <param name="client">客户端</param>
-    /// <param name="force">强制登录</param>
-    protected override async Task<Object> OnLoginAsync(ISocketClient client, Boolean force)
+    /// <summary>创建登录请求</summary>
+    /// <returns></returns>
+    public override ILoginRequest BuildLoginRequest()
     {
-        if (Logined && !force) return null;
-
-        var asmx = AssemblyX.Entry;
-        var title = asmx?.Asm.GetCustomAttribute<AssemblyTitleAttribute>();
-        var dis = asmx?.Asm.GetCustomAttribute<DisplayNameAttribute>();
-        var des = asmx?.Asm.GetCustomAttribute<DescriptionAttribute>();
-        var dname = title?.Title ?? dis?.DisplayName ?? des?.Description;
-
-        var arg = new LoginModel
+        var request = base.BuildLoginRequest();
+        if (request is LoginModel model)
         {
-            User = UserName,
-            Pass = Password.IsNullOrEmpty() ? null : Password.MD5(),
-            DisplayName = dname,
-            Machine = Environment.MachineName,
-            ProcessId = Process.GetCurrentProcess().Id,
-            Version = asmx.Version,
-            Compile = asmx.Compile,
-        };
+            var asmx = AssemblyX.Entry;
+            var title = asmx?.Asm.GetCustomAttribute<AssemblyTitleAttribute>();
+            var dis = asmx?.Asm.GetCustomAttribute<DisplayNameAttribute>();
+            var des = asmx?.Asm.GetCustomAttribute<DescriptionAttribute>();
+            var dname = title?.Title ?? dis?.DisplayName ?? des?.Description;
 
-        var rs = await base.InvokeWithClientAsync<LoginResponse>(client, "Login", arg);
-
-        var set = AntSetting.Current;
-        if (set.Debug) Log?.Info("登录{0}成功！{1}", client, rs.ToJson());
-
-        // 保存下发密钥
-        if (!rs.Secret.IsNullOrEmpty())
-        {
-            set.Secret = rs.Secret;
-            set.Save();
+            model.DisplayName = dname;
+            model.Machine = Environment.MachineName;
+            model.ProcessId = Process.GetCurrentProcess().Id;
+            model.Compile = asmx.Compile;
         }
 
-        Logined = true;
-
-        return Info = rs;
+        return request;
     }
     #endregion
 
     #region 核心方法
     /// <summary>获取指定名称的作业</summary>
     /// <returns></returns>
-    public IJob[] GetJobs() => Invoke<JobModel[]>(nameof(GetJobs));
+    public IJob[] GetJobs() => InvokeAsync<JobModel[]>(nameof(GetJobs)).Result;
 
     /// <summary>批量添加作业</summary>
     /// <param name="jobs"></param>
     /// <returns></returns>
-    public String[] AddJobs(IJob[] jobs) => Invoke<String[]>(nameof(AddJobs), new { jobs });
+    public String[] AddJobs(IJob[] jobs) => InvokeAsync<String[]>(nameof(AddJobs), new { jobs }).Result;
 
     /// <summary>申请作业任务</summary>
     /// <param name="job">作业</param>
     /// <param name="topic">主题</param>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public ITask[] Acquire(String job, String topic, Int32 count) => Invoke<TaskModel[]>(nameof(Acquire), new AcquireModel
+    public ITask[] Acquire(String job, String topic, Int32 count) => InvokeAsync<TaskModel[]>(nameof(Acquire), new AcquireModel
     {
         Job = job,
         Topic = topic,
         Count = count,
-    });
+    }).Result;
 
     /// <summary>生产消息</summary>
     /// <param name="model">模型</param>
     /// <returns></returns>
-    public Int32 Produce(ProduceModel model) => Invoke<Int32>(nameof(Produce), model);
+    public Int32 Produce(ProduceModel model) => InvokeAsync<Int32>(nameof(Produce), model).Result;
 
     /// <summary>报告状态（进度、成功、错误）</summary>
     /// <param name="task"></param>
@@ -134,7 +117,7 @@ public class AntClient : ApiClient
         {
             try
             {
-                return Invoke<Boolean>(nameof(Report), task);
+                return InvokeAsync<Boolean>(nameof(Report), task).Result;
             }
             catch (Exception ex)
             {
@@ -147,6 +130,6 @@ public class AntClient : ApiClient
 
     /// <summary>获取当前应用的所有在线实例</summary>
     /// <returns></returns>
-    public IPeer[] GetPeers() => Invoke<PeerModel[]>(nameof(GetPeers));
+    public IPeer[] GetPeers() => InvokeAsync<PeerModel[]>(nameof(GetPeers)).Result;
     #endregion
 }

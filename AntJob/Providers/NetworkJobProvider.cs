@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using AntJob.Data;
+﻿using AntJob.Data;
 using AntJob.Handlers;
 using AntJob.Models;
 using NewLife;
@@ -8,21 +7,9 @@ using NewLife.Threading;
 namespace AntJob.Providers;
 
 /// <summary>网络任务提供者</summary>
-public class NetworkJobProvider : JobProvider
+public class NetworkJobProvider(AntSetting setting) : JobProvider
 {
     #region 属性
-    /// <summary>调试，打开编码日志</summary>
-    public Boolean Debug { get; set; }
-
-    /// <summary>调度中心地址</summary>
-    public String Server { get; set; }
-
-    /// <summary>应用编号</summary>
-    public String AppId { get; set; }
-
-    /// <summary>应用密钥</summary>
-    public String Secret { get; set; }
-
     /// <summary>客户端</summary>
     public AntClient Ant { get; set; }
 
@@ -37,6 +24,8 @@ public class NetworkJobProvider : JobProvider
     {
         base.Dispose(disposing);
 
+        Stop();
+
         _timer.TryDispose();
         _timer = null;
     }
@@ -46,21 +35,15 @@ public class NetworkJobProvider : JobProvider
     /// <summary>开始</summary>
     public override void Start()
     {
-        var svr = Server;
-
-        WriteLog("正在连接调度中心：{0}", svr);
+        WriteLog("正在连接调度中心：{0}", setting.Server);
 
         // 使用配置中心账号
-        var ant = new AntClient(svr)
+        var ant = new AntClient(setting)
         {
-            UserName = AppId,
-            Password = Secret,
-
             Tracer = Tracer,
             Log = Log,
         };
-        if (Debug) ant.EncoderLog = Log;
-        ant.Open();
+        ant.Login().Wait();
 
         // 断开前一个连接
         Ant.TryDispose();
@@ -118,6 +101,8 @@ public class NetworkJobProvider : JobProvider
     /// <summary>停止</summary>
     public override void Stop()
     {
+        Ant?.Logout(nameof(Stop)).Wait(1_000);
+
         // 断开前一个连接
         Ant.TryDispose();
         Ant = null;
@@ -274,6 +259,7 @@ public class NetworkJobProvider : JobProvider
 
     #region 邻居
     private TimerX _timer;
+
     private void DoCheckPeer(Object state)
     {
         var ps = Ant?.GetPeers();

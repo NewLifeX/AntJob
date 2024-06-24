@@ -93,13 +93,8 @@ public class Scheduler : DisposeBase
         }
         else
         {
-            var rpc = new NetworkJobProvider
-            {
-                Debug = debug,
-                Server = server,
-                AppId = appId,
-                Secret = secret,
-            };
+            var set = AntSetting.Current;
+            var rpc = new NetworkJobProvider(set);
 
             Provider = rpc;
         }

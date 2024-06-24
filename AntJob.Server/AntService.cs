@@ -8,6 +8,7 @@ using NewLife.Caching;
 using NewLife.Log;
 using NewLife.Net;
 using NewLife.Remoting;
+using NewLife.Remoting.Models;
 using NewLife.Threading;
 
 namespace AntJob.Server;
@@ -95,7 +96,7 @@ class AntService : IApi, IActionFilter
     [Api(nameof(Login))]
     public LoginResponse Login(LoginModel model)
     {
-        if (model.User.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.User));
+        if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
         var (app, rs) = _appService.Login(model, _Net.Remote.Host);
 

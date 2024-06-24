@@ -5,6 +5,7 @@ using AntJob.Models;
 using NewLife;
 using NewLife.Log;
 using NewLife.Remoting;
+using NewLife.Remoting.Models;
 using NewLife.Security;
 using NewLife.Web;
 
@@ -22,29 +23,29 @@ public class AppService
     /// <returns></returns>
     public (App, LoginResponse) Login(LoginModel model, String ip)
     {
-        if (model.User.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.User));
+        if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
-        _log.Info("[{0}]从[{1}]登录[{2}@{3}]", model.User, ip, model.Machine, model.ProcessId);
+        _log.Info("[{0}]从[{1}]登录[{2}@{3}]", model.Code, ip, model.Machine, model.ProcessId);
 
         // 找应用
         var autoReg = false;
-        var app = App.FindByName(model.User);
-        if (app == null || app.Secret.MD5() != model.Pass)
+        var app = App.FindByName(model.Code);
+        if (app == null || app.Secret.MD5() != model.Secret)
         {
-            app = CheckApp(app, model.User, model.Pass, ip);
-            if (app == null) throw new ArgumentOutOfRangeException(nameof(model.User));
+            app = CheckApp(app, model.Code, model.Secret, ip);
+            if (app == null) throw new ArgumentOutOfRangeException(nameof(model.Code));
 
             autoReg = true;
         }
 
-        if (app == null) throw new Exception($"应用[{model.User}]不存在！");
+        if (app == null) throw new Exception($"应用[{model.Code}]不存在！");
         if (!app.Enable) throw new Exception("已禁用！");
 
         // 核对密码
         if (!autoReg && !app.Secret.IsNullOrEmpty())
         {
             var pass2 = app.Secret.MD5();
-            if (model.Pass != pass2) throw new Exception("密码错误！");
+            if (model.Secret != pass2) throw new Exception("密码错误！");
         }
 
         // 版本和编译时间
@@ -60,9 +61,9 @@ public class AppService
         online.CompileTime = model.Compile;
         online.Save();
 
-        WriteHistory(app, autoReg ? "注册" : "登录", true, $"[{model.User}/{model.Pass}]在[{model.Machine}@{model.ProcessId}]登录[{app}]成功");
+        WriteHistory(app, autoReg ? "注册" : "登录", true, $"[{model.Code}/{model.Secret}]在[{model.Machine}@{model.ProcessId}]登录[{app}]成功");
 
-        var rs = new LoginResponse { Name = app.Name, DisplayName = app.DisplayName };
+        var rs = new LoginResponse { Name = app.Name };
         if (autoReg) rs.Secret = app.Secret;
 
         return (app, rs);

@@ -14,6 +14,7 @@ using NewLife.Caching;
 using NewLife.Cube;
 using NewLife.Log;
 using NewLife.Remoting;
+using NewLife.Remoting.Models;
 using NewLife.Serialization;
 using NewLife.Web;
 using IActionFilter = Microsoft.AspNetCore.Mvc.Filters.IActionFilter;
@@ -101,7 +102,7 @@ public class AntJobController : ControllerBase, IActionFilter
     [HttpPost(nameof(Login))]
     public LoginResponse Login(LoginModel model)
     {
-        if (model.User.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.User));
+        if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
         var (app, rs) = _appService.Login(model, UserHost);
 
@@ -123,7 +124,7 @@ public class AntJobController : ControllerBase, IActionFilter
             // 密码模式
             if (model.grant_type == "password")
             {
-                var (app, rs) = _appService.Login(new LoginModel { User = model.UserName, Pass = model.Password }, ip);
+                var (app, rs) = _appService.Login(new LoginModel { Code = model.UserName, Secret = model.Password }, ip);
 
                 var tokenModel = _appService.IssueToken(app.Name, set);
 
