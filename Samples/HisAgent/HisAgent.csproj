@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,10 +8,6 @@
     <OutputPath>..\..\Bin\HisAgent</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="2.9.2024.422-beta0942" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\AntJob.Extensions\AntJob.Extensions.csproj" />

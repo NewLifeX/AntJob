@@ -54,13 +54,12 @@ public class Scheduler : DisposeBase
 
     #region 核心方法
     /// <summary>加入调度中心，从注册中心获取地址，自动识别RPC/Http</summary>
-    /// <param name="server"></param>
-    /// <param name="appId"></param>
-    /// <param name="secret"></param>
-    /// <param name="debug"></param>
+    /// <param name="set"></param>
     /// <returns></returns>
-    public IJobProvider Join(String server, String appId, String secret, Boolean debug = false)
+    public IJobProvider Join(AntSetting set)
     {
+        var server = set.Server;
+
         var registry = ServiceProvider?.GetService<IRegistry>();
         if (registry != null)
         {
@@ -69,31 +68,31 @@ public class Scheduler : DisposeBase
         }
 
         if (server.IsNullOrEmpty()) return null;
+        set.Server = server;
 
         // 根据地址决定用Http还是RPC
         var servers = server.Split(",");
-        if (servers.Any(e => e.StartsWithIgnoreCase("http://", "https://")))
-        {
-            var http = new HttpJobProvider
-            {
-                Debug = debug,
-                Server = server,
-                AppId = appId,
-                Secret = secret,
-            };
+        //if (servers.Any(e => e.StartsWithIgnoreCase("http://", "https://")))
+        //{
+        //    var http = new HttpJobProvider
+        //    {
+        //        Debug = debug,
+        //        Server = server,
+        //        AppId = appId,
+        //        Secret = secret,
+        //    };
 
-            // 如果有注册中心，则使用注册中心的服务发现
-            if (registry != null)
-            {
-                //http.Client = registry.CreateForService("AntServer") as ApiHttpClient;
-                //http.Client.RoundRobin = false;
-            }
+        //    // 如果有注册中心，则使用注册中心的服务发现
+        //    if (registry != null)
+        //    {
+        //        //http.Client = registry.CreateForService("AntServer") as ApiHttpClient;
+        //        //http.Client.RoundRobin = false;
+        //    }
 
-            Provider = http;
-        }
-        else
+        //    Provider = http;
+        //}
+        //else
         {
-            var set = AntSetting.Current;
             var rpc = new NetworkJobProvider(set);
 
             Provider = rpc;

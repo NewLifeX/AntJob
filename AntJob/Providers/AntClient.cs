@@ -20,14 +20,14 @@ public class AntClient : ClientBase
 
     #region 构造
     /// <summary>实例化</summary>
-    public AntClient() => Prefix = "Ant/";
+    public AntClient() => Prefix = "";
 
     /// <summary>实例化</summary>
     /// <param name="setting"></param>
     public AntClient(AntSetting setting) : base(setting)
     {
         _setting = setting;
-        Prefix = _setting.Server.StartsWithIgnoreCase("http://", "https://") ? "AntJob/" : "Ant/";
+        Prefix = _setting.Server.StartsWithIgnoreCase("http://", "https://") ? "AntJob/" : "";
     }
     #endregion
 
@@ -49,7 +49,7 @@ public class AntClient : ClientBase
             //container.TryAddTransient<IUpgradeInfo, UpgradeInfo>();
         }
 
-        Prefix = _setting.Server.StartsWithIgnoreCase("http://", "https://") ? "AntJob/" : "Ant/";
+        Prefix = _setting.Server.StartsWithIgnoreCase("http://", "https://") ? "AntJob/" : "";
 
         base.OnInit();
     }

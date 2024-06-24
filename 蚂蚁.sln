@@ -5,6 +5,7 @@ VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Others", "Others", "{0EA980BB-BB15-41A3-B75B-537BC42E985B}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.github\workflows\publish-beta.yml = .github\workflows\publish-beta.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml
 		Readme.MD = Readme.MD
@@ -25,11 +26,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntJob.Extensions", "AntJob
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{E842807F-C45E-44DA-8AAE-7915C1EBF2A2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A1EF271C-AEA8-4EA3-A76F-906B4D4A9058}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntJob.Agent", "AntJob.Agent\AntJob.Agent.csproj", "{0970FDBA-2331-4600-8DD5-A37B41AF989F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HisAgent", "Samples\HisAgent\HisAgent.csproj", "{E62006DC-E61B-42B0-A06B-ED5BF3F73D9E}"
@@ -37,8 +33,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HisData", "Samples\HisData\HisData.csproj", "{38F8667D-70B7-4A90-8CA7-63738E925DFF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HisWeb", "Samples\HisWeb\HisWeb.csproj", "{153499A6-E73C-4C5A-8867-D29BD586A74B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTest", "UnitTest", "{26660D0A-8724-4434-88D1-5EE861A68309}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntTest", "AntTest\AntTest.csproj", "{A13E58D2-A185-4945-98B7-B6B0951A19D2}"
 EndProject
@@ -100,7 +94,6 @@ Global
 		{E62006DC-E61B-42B0-A06B-ED5BF3F73D9E} = {E842807F-C45E-44DA-8AAE-7915C1EBF2A2}
 		{38F8667D-70B7-4A90-8CA7-63738E925DFF} = {E842807F-C45E-44DA-8AAE-7915C1EBF2A2}
 		{153499A6-E73C-4C5A-8867-D29BD586A74B} = {E842807F-C45E-44DA-8AAE-7915C1EBF2A2}
-		{A13E58D2-A185-4945-98B7-B6B0951A19D2} = {26660D0A-8724-4434-88D1-5EE861A68309}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9337283C-C795-479F-A2F1-C892EBE2490C}

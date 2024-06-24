@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AntJob;
-using Microsoft.Extensions.Hosting;
 using NewLife;
 using NewLife.Log;
+using NewLife.Model;
 
 namespace HisAgent;
 
@@ -12,13 +12,16 @@ public class JobHost : BackgroundService
 {
     private Scheduler _scheduler;
     private readonly IServiceProvider _serviceProvider;
+    private readonly AntSetting _setting;
 
-    public JobHost(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+    public JobHost(IServiceProvider serviceProvider, AntSetting setting)
+    {
+        _serviceProvider = serviceProvider;
+        _setting = setting;
+    }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var set = AntSetting.Current;
-
         // 实例化调度器
         var scheduler = new Scheduler
         {
@@ -26,7 +29,7 @@ public class JobHost : BackgroundService
             Log = XTrace.Log,
         };
 
-        scheduler.Join(set.Server, set.AppID, set.Secret, set.Debug);
+        scheduler.Join(_setting);
 
         // 添加作业
         scheduler.AddHandler<HelloJob>();

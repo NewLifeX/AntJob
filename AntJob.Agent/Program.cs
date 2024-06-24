@@ -19,7 +19,7 @@ var scheduler = new Scheduler
     Log = XTrace.Log,
 };
 
-scheduler.Join(set.Server, set.AppID, set.Secret, set.Debug);
+scheduler.Join(set);
 
 // 添加作业处理器
 //sc.Handlers.Add(new CSharpHandler());

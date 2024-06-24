@@ -1,33 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using AntJob;
+using HisAgent;
 using NewLife.Log;
+using NewLife.Model;
+using Stardust;
 
-namespace HisAgent;
+// 启用控制台日志，拦截所有异常
+XTrace.UseConsole();
 
-class Program
-{
-    static void Main(string[] args)
-    {
-        XTrace.UseConsole();
+var services = ObjectContainer.Current;
+services.AddStardust();
 
-        CreateHostBuilder(args).Build().Run();
-    }
+services.AddSingleton(AntSetting.Current);
 
-    /// <summary></summary>
-    /// <param name="args"></param>
-    /// <returns></returns>
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-      Host.CreateDefaultBuilder(args)
-        .ConfigureServices((hostContext, services) => ConfigureServices(services));
+// 友好退出
+var host = services.BuildHost();
 
-    /// <summary></summary>
-    /// <param name="hostBuilderContext"></param>
-    /// <param name="services"></param>
-    public static void ConfigureServices(IServiceCollection services)
-    {
-        services.AddStardust();
+host.Add<JobHost>();
 
-        // 添加后台调度服务
-        services.AddHostedService<JobHost>();
-    }
-}
+await host.RunAsync();
