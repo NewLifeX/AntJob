@@ -89,7 +89,7 @@ class AntService : IApi, IActionFilter
     }
     #endregion
 
-    #region 登录
+    #region 登录心跳
     /// <summary>应用登录</summary>
     /// <param name="model">模型</param>
     /// <returns></returns>
@@ -98,12 +98,31 @@ class AntService : IApi, IActionFilter
     {
         if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
-        var (app, rs) = _appService.Login(model, _Net.Remote.Host);
+        var (app, online, rs) = _appService.Login(model, _Net.Remote.Host);
 
         // 记录当前用户
         Session["App"] = app;
+        Session["AppOnline"] = online;
 
         return rs;
+    }
+
+    [Api(nameof(Logout))]
+    public ILogoutResponse Logout(String reason)
+    {
+        var app = Session["App"] as App;
+        var online = Session["AppOnline"] as AppOnline;
+
+        return _appService.Logout(app, online, reason, _Net.Remote.Host);
+    }
+
+    [Api(nameof(Ping))]
+    public IPingResponse Ping(PingRequest request)
+    {
+        var app = Session["App"] as App;
+        var online = Session["AppOnline"] as AppOnline;
+
+        return _appService.Ping(app, online, request, _Net.Remote.Host);
     }
 
     /// <summary>获取当前应用的所有在线实例</summary>

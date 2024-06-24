@@ -21,11 +21,11 @@ public class AppService
     /// <summary>应用登录</summary>
     /// <param name="model">模型</param>
     /// <returns></returns>
-    public (App, LoginResponse) Login(LoginModel model, String ip)
+    public (App, AppOnline, LoginResponse) Login(LoginModel model, String ip)
     {
         if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
-        _log.Info("[{0}]从[{1}]登录[{2}@{3}]", model.Code, ip, model.Machine, model.ProcessId);
+        _log.Info("[{0}]从[{1}]登录[{2}]", model.Code, ip, model.ClientId);
 
         // 找应用
         var autoReg = false;
@@ -56,17 +56,19 @@ public class AppService
         app.Save();
 
         // 应用上线
-        var online = CreateOnline(app, ip, model.Machine, model.ProcessId);
+        var online = CreateOnline(app, ip, model.ClientId);
+        online.Name = model.Machine;
+        online.ProcessId = model.ProcessId;
         online.Version = model.Version;
         online.CompileTime = model.Compile;
         online.Save();
 
-        WriteHistory(app, autoReg ? "注册" : "登录", true, $"[{model.Code}/{model.Secret}]在[{model.Machine}@{model.ProcessId}]登录[{app}]成功");
+        WriteHistory(app, autoReg ? "注册" : "登录", true, $"[{model.Code}/{model.Secret}]在[{model.ClientId}]登录[{app}]成功");
 
         var rs = new LoginResponse { Name = app.Name };
         if (autoReg) rs.Secret = app.Secret;
 
-        return (app, rs);
+        return (app, online, rs);
     }
 
     protected virtual App CheckApp(App app, String user, String pass, String ip)
@@ -110,9 +112,48 @@ public class AppService
 
         return app;
     }
+
+    public ILogoutResponse Logout(App app, AppOnline online, String reason, String ip)
+    {
+        if (app != null)
+        {
+            online ??= GetOnline(app, ip);
+            if (online != null)
+            {
+                WriteHistory(app, "注销", true, reason, ip);
+
+                online.Delete();
+            }
+        }
+
+        return new LogoutResponse { Name = app?.Name };
+    }
     #endregion
 
     #region 在线状态
+    public IPingResponse Ping(App app, AppOnline online, IPingRequest request, String ip)
+    {
+        if (app != null)
+        {
+            online ??= GetOnline(app, ip);
+            if (online != null)
+            {
+                if (request is PingRequest req)
+                {
+                }
+                online.UpdateIP = ip;
+
+                online.Save();
+            }
+        }
+
+        return new PingResponse
+        {
+            Time = request.Time,
+            ServerTime = DateTime.UtcNow.ToLong(),
+        };
+    }
+
     /// <summary>获取当前应用的所有在线实例</summary>
     /// <returns></returns>
     public PeerModel[] GetPeers(App app)
@@ -122,17 +163,13 @@ public class AppService
         return olts.Select(e => e.ToModel()).ToArray();
     }
 
-    AppOnline CreateOnline(App app, String ip, String machine, Int32 pid)
+    AppOnline CreateOnline(App app, String ip, String clientId)
     {
         var online = GetOnline(app, ip);
-        online.Client = $"{(ip.IsNullOrEmpty() ? machine : ip)}@{pid}";
-        online.Name = machine;
-        online.ProcessId = pid;
+        online.Client = clientId;
         online.UpdateIP = ip;
-        //online.Version = version;
 
         online.Server = Environment.MachineName;
-        //online.Save();
 
         return online;
     }
