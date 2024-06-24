@@ -4,6 +4,7 @@ using NewLife.Caching;
 using NewLife.Caching.Services;
 using NewLife.Log;
 using NewLife.Model;
+using NewLife.Security;
 using Stardust;
 using XCode;
 
@@ -35,6 +36,9 @@ services.AddSingleton(AntJobSetting.Current);
 services.AddSingleton<ICacheProvider, RedisCacheProvider>();
 services.AddSingleton<AppService>();
 services.AddSingleton<JobService>();
+
+// 注册密码提供者，用于通信过程中保护密钥，避免明文传输
+services.AddSingleton<IPasswordProvider>(new SaltPasswordProvider { Algorithm = "md5", SaltTime = 60 });
 
 // 预热数据层，执行反向工程建表等操作
 EntityFactory.InitConnection("Ant");

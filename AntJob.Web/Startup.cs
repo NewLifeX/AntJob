@@ -1,6 +1,7 @@
 ﻿using AntJob.Server;
 using AntJob.Server.Services;
 using NewLife.Cube;
+using NewLife.Security;
 using XCode;
 
 namespace AntJob.Web;
@@ -27,6 +28,9 @@ public class Startup
 
         services.AddSingleton<AppService>();
         services.AddSingleton<JobService>();
+
+        // 注册密码提供者，用于通信过程中保护密钥，避免明文传输
+        services.AddSingleton<IPasswordProvider>(new SaltPasswordProvider { Algorithm = "md5", SaltTime = 60 });
 
         services.AddControllersWithViews();
         services.AddCube();

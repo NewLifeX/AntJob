@@ -17,12 +17,14 @@ public class Worker : IHostedService
     private readonly IRegistry _registry;
     private readonly ICacheProvider _cacheProvider;
     private readonly IServiceProvider _provider;
+    private readonly AntJobSetting _setting;
     private readonly ITracer _tracer;
 
-    public Worker(ICacheProvider cacheProvider, IServiceProvider provider, ITracer tracer)
+    public Worker(ICacheProvider cacheProvider, IServiceProvider provider, AntJobSetting setting, ITracer tracer)
     {
         _cacheProvider = cacheProvider;
         _provider = provider;
+        _setting = setting;
         _tracer = tracer;
         _registry = provider.GetService<IRegistry>();
     }
@@ -31,7 +33,8 @@ public class Worker : IHostedService
     {
         InitData();
 
-        var set = AntJobSetting.Current;
+        //var set = AntJobSetting.Current;
+        var set = _setting;
 
         // 实例化RPC服务端，指定端口，指定ServiceProvider，用于依赖注入获取接口服务层
         var server = new ApiServer(set.Port)

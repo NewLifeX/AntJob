@@ -13,9 +13,16 @@ namespace AntJob.Server.Services;
 
 public class AppService
 {
+    private readonly IPasswordProvider _passwordProvider;
+    private readonly AntJobSetting _setting;
     private readonly ILog _log;
 
-    public AppService(ILog log) => _log = log;
+    public AppService(IPasswordProvider passwordProvider, AntJobSetting setting, ILog log)
+    {
+        _passwordProvider = passwordProvider;
+        _setting = setting;
+        _log = log;
+    }
 
     #region 登录
     /// <summary>应用登录</summary>
@@ -30,7 +37,10 @@ public class AppService
         // 找应用
         var autoReg = false;
         var app = App.FindByName(model.Code);
-        if (app == null || app.Secret.MD5() != model.Secret)
+
+        // 登录密码未设置或者未提交，则执行动态注册
+        var secret = model.Secret;
+        if (app == null || !app.Secret.IsNullOrEmpty() && secret.IsNullOrEmpty())
         {
             app = CheckApp(app, model.Code, model.Secret, ip);
             if (app == null) throw new ArgumentOutOfRangeException(nameof(model.Code));
@@ -44,8 +54,7 @@ public class AppService
         // 核对密码
         if (!autoReg && !app.Secret.IsNullOrEmpty())
         {
-            var pass2 = app.Secret.MD5();
-            if (model.Secret != pass2) throw new Exception("密码错误！");
+            if (secret.IsNullOrEmpty() || !_passwordProvider.Verify(app.Secret, secret)) throw new Exception("密码错误！");
         }
 
         // 版本和编译时间
@@ -78,8 +87,8 @@ public class AppService
         if (app == null)
         {
             // 是否支持自动注册
-            var set = AntJobSetting.Current;
-            if (!set.AutoRegistry) throw new Exception($"找不到应用[{name}]");
+            //var set = AntJobSetting.Current;
+            if (!_setting.AutoRegistry) throw new Exception($"找不到应用[{name}]");
 
             app = new App
             {
@@ -89,8 +98,8 @@ public class AppService
         else if (app.Secret.MD5() != pass)
         {
             // 是否支持自动注册
-            var set = AntJobSetting.Current;
-            if (!set.AutoRegistry) throw new Exception($"应用[{name}]申请重新激活，但服务器设置禁止自动注册");
+            //var set = AntJobSetting.Current;
+            if (!_setting.AutoRegistry) throw new Exception($"应用[{name}]申请重新激活，但服务器设置禁止自动注册");
 
             if (app.Secret.IsNullOrEmpty()) app.Secret = Rand.NextString(16);
         }

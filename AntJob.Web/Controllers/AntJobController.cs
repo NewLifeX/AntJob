@@ -104,7 +104,7 @@ public class AntJobController : ControllerBase, IActionFilter
     {
         if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
-        var (app, rs) = _appService.Login(model, UserHost);
+        var (app, online, rs) = _appService.Login(model, UserHost);
 
         return rs;
     }
@@ -124,7 +124,7 @@ public class AntJobController : ControllerBase, IActionFilter
             // 密码模式
             if (model.grant_type == "password")
             {
-                var (app, rs) = _appService.Login(new LoginModel { Code = model.UserName, Secret = model.Password }, ip);
+                var (app, online, rs) = _appService.Login(new LoginModel { Code = model.UserName, Secret = model.Password }, ip);
 
                 var tokenModel = _appService.IssueToken(app.Name, set);
 
