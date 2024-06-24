@@ -22,21 +22,44 @@ public class JobController : AntEntityController<Job>
     {
         LogOnChange = true;
 
-        ListFields.RemoveField("ClassName", "Cron", "Topic", "MessageCount", "Time", "End");
+        ListFields.RemoveField("ClassName", "", "Cron", "Topic", "MessageCount", "Time", "End");
         ListFields.RemoveField("MaxError", "MaxRetry", "MaxTime", "MaxRetain", "MaxIdle", "ErrorDelay", "Deadline");
-        ListFields.RemoveField("Total", "Success", "Error", "Times", "Speed");
         ListFields.RemoveCreateField().RemoveUpdateField();
         ListFields.AddListField("UpdateTime");
 
         {
-            var df = ListFields.AddListField("Task", "UpdateUser");
+            var df = ListFields.AddListField("Task", "Enable");
             df.DisplayName = "任务";
             df.Url = "/Ant/JobTask?appid={AppID}&jobId={ID}";
         }
         {
             var df = ListFields.AddListField("Title", null, "Mode");
-            df.Header = "执行频次";
+            df.Header = "下一次/Cron/主题";
             df.AddService(new MyTextField());
+        }
+        {
+            var df = ListFields.GetField("DataTime");
+            df.AddService(new ColorField { Color = "Magenta", GetValue = e => ((DateTime)e).ToFullString("") });
+        }
+        {
+            var df = ListFields.GetField("Step");
+            df.DataVisible = e => (e as Job).Mode == JobModes.Data;
+        }
+        {
+            var df = ListFields.GetField("BatchSize");
+            df.DataVisible = e => (e as Job).Mode != JobModes.Time;
+        }
+        {
+            var df = ListFields.GetField("MaxTask");
+            df.DataVisible = e => (e as Job).Mode != JobModes.Message;
+        }
+        {
+            var df = ListFields.GetField("Total");
+            df.AddService(new ColorNumberField { Color = "green" });
+        }
+        {
+            var df = ListFields.GetField("Error");
+            df.AddService(new ColorNumberField { Color = "red" });
         }
     }
 
@@ -47,14 +70,70 @@ public class JobController : AntEntityController<Job>
             var job = data as Job;
             return job.Mode switch
             {
-                JobModes.Data => job.DataTime.ToFullString(""),
-                JobModes.Time => job.Cron,
-                JobModes.Message => job.Topic,
+                JobModes.Data => $"<font color=blue><b>{job.DataTime.ToFullString("")}</b></font>",
+                JobModes.Time => $"<font color=DarkVoilet><b>{job.Cron}</b></font>",
+                JobModes.Message => $"<font color=green><b>{job.Topic}</b></font>",
                 //JobModes.CSharp => "[C#]" + job.Time.ToFullString(""),
                 //JobModes.Sql => "[Sql]" + job.Time.ToFullString(""),
-                _ => job.DataTime.ToFullString(""),
+                _ => $"<b>{job.DataTime.ToFullString("")}</b>",
             };
         }
+    }
+
+    class ColorField : ILinkExtend
+    {
+        public String Color { get; set; }
+
+        public Func<Object, String> GetValue;
+
+        public String Resolve(DataField field, IModel data)
+        {
+            var value = data[field.Name];
+            if (GetValue != null) value = GetValue(value);
+            return $"<font color={Color}><b>{value}</b></font>";
+        }
+    }
+
+    class ColorNumberField : ILinkExtend
+    {
+        public String Color { get; set; }
+
+        public String Resolve(DataField field, IModel data)
+        {
+            var value = data[field.Name];
+            return $"<font color={Color}><b>{value:n0}</b></font>";
+        }
+    }
+
+    protected override FieldCollection OnGetFields(ViewKinds kind, Object model)
+    {
+        var fs = base.OnGetFields(kind, model);
+        if (model is not Job job) return fs;
+
+        if (kind is ViewKinds.EditForm or ViewKinds.Detail)
+        {
+            // Cron/Topic/MessageCount/End/Step/Offset/BatchSize
+            switch (job.Mode)
+            {
+                case JobModes.Data:
+                    fs.RemoveField("Topic", "MessageCount", "Cron");
+                    break;
+                case JobModes.Time:
+                    fs.RemoveField("Topic", "MessageCount", "Step", "BatchSize");
+                    break;
+                case JobModes.Message:
+                    fs.RemoveField("Cron", "End", "Step", "Offset");
+                    break;
+                default:
+                    break;
+            }
+        }
+        else if (kind is ViewKinds.AddForm)
+        {
+            fs.RemoveField("Cron", "Topic", "MessageCount", "End", "Step", "Offset", "BatchSize");
+        }
+
+        return fs;
     }
 
     /// <summary>搜索数据集</summary>

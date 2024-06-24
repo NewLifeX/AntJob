@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using NewLife;
 using NewLife.Cube;
 using NewLife.Cube.Extensions;
+using NewLife.Cube.ViewModels;
 using NewLife.Web;
 using XCode.Membership;
 
@@ -23,10 +24,25 @@ public class JobTaskController : AntEntityController<JobTask>
     {
         LogOnChange = true;
 
+        ListFields.RemoveField("Server", "ProcessID");
+        ListFields.RemoveCreateField();
+
         ListFields.TraceUrl();
     }
 
     public JobTaskController(JobService jobService) => _jobService = jobService;
+
+    protected override FieldCollection OnGetFields(ViewKinds kind, Object model)
+    {
+        var fs = base.OnGetFields(kind, model);
+        if (kind == ViewKinds.List)
+        {
+            var jobId = GetRequest("jobId").ToInt();
+            if (jobId > 0) fs.RemoveField("JobID");
+        }
+
+        return fs;
+    }
 
     /// <summary>搜索数据集</summary>
     /// <param name="p"></param>
@@ -42,6 +58,11 @@ public class JobTaskController : AntEntityController<JobTask>
         var start = p["dtStart"].ToDateTime();
         var end = p["dtEnd"].ToDateTime();
         var client = p["Client"];
+
+        if (jobid > 0)
+        {
+            ListFields.RemoveField("JobID");
+        }
 
         return JobTask.Search(id, appid, jobid, status, start, end, client, p["q"], p);
     }
