@@ -679,133 +679,6 @@
     </tbody>
 </table>
 <br></br>
-<h3>应用配置（AppConfig）</h3>
-<table>
-    <thead>
-        <tr>
-            <th>名称</th>
-            <th>显示名</th>
-            <th>类型</th>
-            <th>长度</th>
-            <th>精度</th>
-            <th>主键</th>
-            <th>允许空</th>
-            <th>备注</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>ID</td>
-            <td>编号</td>
-            <td>Int32</td>
-            <td></td>
-            <td></td>
-            <td title="自增">AI</td>
-            <td>N</td>
-            <td></td>
-        </tr>
-
-        <tr>
-            <td>AppID</td>
-            <td>应用</td>
-            <td>Int32</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>N</td>
-            <td></td>
-        </tr>
-
-        <tr>
-            <td>Name</td>
-            <td>名称</td>
-            <td>String</td>
-            <td>50</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-
-        <tr>
-            <td>Content</td>
-            <td>内容</td>
-            <td>String</td>
-            <td>5000</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>一般是json格式</td>
-        </tr>
-
-        <tr>
-            <td>CreateUserID</td>
-            <td>创建人</td>
-            <td>Int32</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>N</td>
-            <td></td>
-        </tr>
-
-        <tr>
-            <td>CreateTime</td>
-            <td>创建时间</td>
-            <td>DateTime</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-
-        <tr>
-            <td>CreateIP</td>
-            <td>创建地址</td>
-            <td>String</td>
-            <td>50</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-
-        <tr>
-            <td>UpdateUserID</td>
-            <td>更新人</td>
-            <td>Int32</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>N</td>
-            <td></td>
-        </tr>
-
-        <tr>
-            <td>UpdateTime</td>
-            <td>更新时间</td>
-            <td>DateTime</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-
-        <tr>
-            <td>UpdateIP</td>
-            <td>更新地址</td>
-            <td>String</td>
-            <td>50</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-    </tbody>
-</table>
-<br></br>
 <h3>作业（Job）</h3>
 <table>
     <thead>
@@ -1131,24 +1004,24 @@
 
         <tr>
             <td>LastStatus</td>
-            <td>最后一次状态</td>
+            <td>最后状态</td>
             <td>Int32</td>
             <td></td>
             <td></td>
             <td></td>
             <td>N</td>
-            <td></td>
+            <td>最后一次状态</td>
         </tr>
 
         <tr>
             <td>LastTime</td>
-            <td>最后一次时间</td>
+            <td>最后时间</td>
             <td>DateTime</td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
-            <td></td>
+            <td>最后一次时间</td>
         </tr>
 
         <tr>

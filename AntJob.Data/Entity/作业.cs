@@ -260,21 +260,21 @@ public partial class Job
     public Int32 Speed { get => _Speed; set { if (OnPropertyChanging("Speed", value)) { _Speed = value; OnPropertyChanged("Speed"); } } }
 
     private JobStatus _LastStatus;
-    /// <summary>最后一次状态</summary>
+    /// <summary>最后状态。最后一次状态</summary>
     [Category("统计")]
-    [DisplayName("最后一次状态")]
-    [Description("最后一次状态")]
+    [DisplayName("最后状态")]
+    [Description("最后状态。最后一次状态")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("LastStatus", "最后一次状态", "")]
+    [BindColumn("LastStatus", "最后状态。最后一次状态", "")]
     public JobStatus LastStatus { get => _LastStatus; set { if (OnPropertyChanging("LastStatus", value)) { _LastStatus = value; OnPropertyChanged("LastStatus"); } } }
 
     private DateTime _LastTime;
-    /// <summary>最后一次时间</summary>
+    /// <summary>最后时间。最后一次时间</summary>
     [Category("统计")]
-    [DisplayName("最后一次时间")]
-    [Description("最后一次时间")]
+    [DisplayName("最后时间")]
+    [Description("最后时间。最后一次时间")]
     [DataObjectField(false, false, true, 0)]
-    [BindColumn("LastTime", "最后一次时间", "")]
+    [BindColumn("LastTime", "最后时间。最后一次时间", "")]
     public DateTime LastTime { get => _LastTime; set { if (OnPropertyChanging("LastTime", value)) { _LastTime = value; OnPropertyChanged("LastTime"); } } }
 
     private String _Data;
@@ -566,10 +566,10 @@ public partial class Job
         /// <summary>速度</summary>
         public static readonly Field Speed = FindByName("Speed");
 
-        /// <summary>最后一次状态</summary>
+        /// <summary>最后状态。最后一次状态</summary>
         public static readonly Field LastStatus = FindByName("LastStatus");
 
-        /// <summary>最后一次时间</summary>
+        /// <summary>最后时间。最后一次时间</summary>
         public static readonly Field LastTime = FindByName("LastTime");
 
         /// <summary>数据。Sql模板或C#模板</summary>
@@ -692,10 +692,10 @@ public partial class Job
         /// <summary>速度</summary>
         public const String Speed = "Speed";
 
-        /// <summary>最后一次状态</summary>
+        /// <summary>最后状态。最后一次状态</summary>
         public const String LastStatus = "LastStatus";
 
-        /// <summary>最后一次时间</summary>
+        /// <summary>最后时间。最后一次时间</summary>
         public const String LastTime = "LastTime";
 
         /// <summary>数据。Sql模板或C#模板</summary>

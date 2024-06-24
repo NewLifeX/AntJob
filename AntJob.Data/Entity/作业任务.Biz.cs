@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NewLife;
@@ -116,6 +116,18 @@ public partial class JobTask : EntityBase<JobTask>
         if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.JobID == jobId && e.Status == status && e.DataTime == dataTime);
 
         return FindAll(_.JobID == jobId & _.Status == status & _.DataTime == dataTime);
+    }
+
+    /// <summary>根据作业、数据时间查找</summary>
+    /// <param name="jobId">作业</param>
+    /// <param name="dataTime">数据时间</param>
+    /// <returns>实体列表</returns>
+    public static IList<JobTask> FindAllByJobIDAndDataTime(Int32 jobId, DateTime dataTime)
+    {
+        // 实体缓存
+        if (Meta.Session.Count < 1000) return Meta.Cache.FindAll(e => e.JobID == jobId && e.DataTime == dataTime);
+
+        return FindAll(_.JobID == jobId & _.DataTime == dataTime);
     }
     #endregion
 
