@@ -82,14 +82,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             // 添加定时作业时，计算下一次执行时间
             if (job.ID == 0 && job.Mode == JobModes.Time)
             {
-                if (job.Step <= 0 && job.Cron.IsNullOrEmpty()) continue;
-
-                // 计算下一次执行时间
-                var cron = new Cron(job.Cron);
-                var time = job.DataTime.Year > 2000 ? job.DataTime : DateTime.Now;
-                job.DataTime = cron.GetNext(time);
-
-                if (job.Step <= 0) job.Step = 30;
+                var next = job.GetNext();
+                if (next.Year > 2000) job.DataTime = next;
             }
 
             if (job.Save() != 0)
@@ -130,7 +124,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             job = Job.FindByAppIDAndName(app.ID, jobName);
 
         if (job == null) throw new XException($"应用[{app.ID}/{app.Name}]下未找到作业[{jobName}]");
-        if (job.Step == 0 || job.DataTime.Year <= 2000) throw new XException("作业[{0}/{1}]未设置数据时间或步进", job.ID, job.Name);
+        if (job.DataTime.Year <= 2000) throw new XException("作业[{0}/{1}]未设置数据时间", job.ID, job.Name);
 
         var online = _appService.GetOnline(app, ip);
 
@@ -170,7 +164,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
                 default:
                     {
                         // 如果能够切片，则查询数据库后进入，避免缓存导致重复
-                        if (TrySplit(job, job.DataTime, job.Step, out var end))
+                        if (TrySplit(job, job.DataTime, out var end))
                         {
                             // 申请任务前，不能再查数据库，那样子会导致多线程脏读，从而出现多客户端分到相同任务的情况
                             //jb = Job.FindByKey(jb.ID);
@@ -179,6 +173,15 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
                     }
                     break;
             }
+        }
+
+        if (list.Count > 0)
+        {
+            job.LastStatus = JobStatus.就绪;
+            job.LastTime = DateTime.Now;
+
+            job.UpdateTime = DateTime.Now;
+            job.Save();
         }
 
         // 记录状态
@@ -450,6 +453,10 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         task.Update();
 
+        job.LastStatus = result.Status;
+        job.LastTime = DateTime.Now;
+        job.SaveAsync();
+
         return true;
     }
 
@@ -528,7 +535,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     /// <summary>用于表示切片批次的序号</summary>
     private Int32 _idxBatch;
 
-    /// <summary>申请任务分片</summary>
+    /// <summary>申请任务分片（时间调度&数据调度）</summary>
     /// <param name="server">申请任务的服务端</param>
     /// <param name="ip">申请任务的IP</param>
     /// <param name="pid">申请任务的服务端进程ID</param>
@@ -541,9 +548,6 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         if (!job.Enable) return list;
 
-        var step = job.Step;
-        if (step <= 0) step = 30;
-
         using var span = _tracer?.NewSpan(nameof(Acquire), new { job.Name, server, ip, pid, count });
 
         using var ts = Job.Meta.CreateTrans();
@@ -552,7 +556,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         {
             var end = DateTime.MinValue;
             if (job.Mode == JobModes.Time && !TrySplitTime(job, true, out end) ||
-                job.Mode != JobModes.Time && !TrySplit(job, start, step, out end))
+                job.Mode != JobModes.Time && !TrySplit(job, start, out end))
                 break;
 
             // 创建新的任务
@@ -596,18 +600,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             start = end;
         }
 
-        if (list.Count > 0)
-        {
-            // 任务需要ID，不能批量插入优化
-            //list.Insert(null);
-
-            job.LastStatus = JobStatus.就绪;
-            job.LastTime = DateTime.Now;
-
-            job.UpdateTime = DateTime.Now;
-            job.Save();
-            ts.Commit();
-        }
+        ts.Commit();
 
         // 记录任务数
         span?.AppendTag(null, list.Count);
@@ -615,7 +608,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         return list;
     }
 
-    /// <summary>尝试分割时间片</summary>
+    /// <summary>尝试分割时间片（时间调度）</summary>
     /// <param name="job"></param>
     /// <param name="end"></param>
     /// <returns></returns>
@@ -637,32 +630,19 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         // 时间区间判断
         if (end.Year > 2000 && start >= end) return false;
 
+        // 计算下一次执行时间
         if (modify)
-        {
-            // 计算下一次执行时间
-            if (!job.Cron.IsNullOrEmpty())
-            {
-                var cron = new Cron(job.Cron);
-                var time = job.DataTime.Year > 2000 ? job.DataTime : DateTime.Now;
-                end = job.DataTime = cron.GetNext(time);
-            }
-            else
-            {
-                var step = job.Step;
-                if (step <= 0) step = 30;
-                end = job.DataTime = job.DataTime.AddSeconds(step);
-            }
-        }
+            end = job.DataTime = job.GetNext();
 
         return true;
     }
 
-    /// <summary>尝试分割时间片</summary>
+    /// <summary>尝试分割时间片（数据调度）</summary>
     /// <param name="start"></param>
     /// <param name="step"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    public Boolean TrySplit(Job job, DateTime start, Int32 step, out DateTime end)
+    public Boolean TrySplit(Job job, DateTime start, out DateTime end)
     {
         // 当前时间减去偏移量，作为当前时间。数据抽取不许超过该时间
         var now = DateTime.Now.AddSeconds(-job.Offset);
@@ -674,6 +654,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         // 开始时间和结束时间是否越界
         if (start >= now) return false;
 
+        var step = job.Step;
         if (step <= 0) step = 30;
 
         // 必须严格要求按照步进大小分片，除非有合适的End

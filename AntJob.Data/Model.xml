@@ -180,7 +180,7 @@
         <Column Name="Cost" DataType="Int32" Description="耗时。秒，执行端计算的执行时间" />
         <Column Name="FullCost" DataType="Int32" Description="全部耗时。秒，从任务发放到执行完成的时间" />
         <Column Name="Status" DataType="Int32" Description="状态" Type="JobStatus" />
-        <Column Name="MsgCount" DataType="Int32" Description="消费消息数" />
+        <Column Name="MsgCount" DataType="Int32" Description="消息。消费消息数" />
         <Column Name="Server" DataType="String" Description="服务器" />
         <Column Name="ProcessID" DataType="Int32" Description="进程" />
         <Column Name="Key" DataType="String" Description="最后键。Handler内记录作为样本的数据" />

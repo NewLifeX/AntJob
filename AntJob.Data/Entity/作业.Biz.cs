@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NewLife;
 using NewLife.Data;
+using NewLife.Threading;
 using XCode;
 
 namespace AntJob.Data.Entity;
@@ -37,7 +38,8 @@ public partial class Job : EntityBase<Job>
         //    throw new ArgumentNullException(nameof(Data), $"{Mode}调度模式要求设置Data模板");
 
         // 参数默认值
-        if (Step == 0) Step = 5;
+        var step = Step;
+        if (step == 0) step = Step = 5;
         if (MaxRetain == 0) MaxRetain = 3;
         if (MaxIdle == 0) MaxIdle = GetDefaultIdle();
 
@@ -56,14 +58,14 @@ public partial class Job : EntityBase<Job>
         // 定时任务自动生成Cron
         if (Mode == JobModes.Time && Cron.IsNullOrEmpty())
         {
-            if (Step < 60)
-                Cron = $"0 */{Step} * * * ?";
-            else if (Step % 86400 == 0 && Step / 86400 < 30)
-                Cron = $"0 0 0 0/{Step / 86400} * ?";
-            else if (Step % 3600 == 0 && Step / 3600 < 24)
-                Cron = $"0 0 0/{Step / 3600} * * ?";
-            else if (Step % 60 == 0 && Step / 60 < 60)
-                Cron = $"0 0/{Step / 60} * * * ?";
+            if (step < 60)
+                Cron = $"0 */{step} * * * ?";
+            else if (step % 86400 == 0 && step / 86400 < 30)
+                Cron = $"0 0 0 0/{step / 86400} * ?";
+            else if (step % 3600 == 0 && step / 3600 < 24)
+                Cron = $"0 0 0/{step / 3600} * * ?";
+            else if (step % 60 == 0 && step / 60 < 60)
+                Cron = $"0 0/{step / 60} * * * ?";
         }
 
         var app = App;
@@ -220,6 +222,37 @@ public partial class Job : EntityBase<Job>
         }
 
         return false;
+    }
+
+    /// <summary>获取下一次执行时间</summary>
+    /// <returns></returns>
+    public DateTime GetNext()
+    {
+        var step = Step;
+        if (step <= 0) step = 30;
+
+        switch (Mode)
+        {
+            case JobModes.Data:
+                break;
+            case JobModes.Time:
+                if (!Cron.IsNullOrEmpty())
+                {
+                    var cron = new Cron(Cron);
+                    var time = DataTime.Year > 2000 ? DataTime : DateTime.Now;
+                    return cron.GetNext(time);
+                }
+                else
+                {
+                    return DataTime.AddSeconds(step);
+                }
+            case JobModes.Message:
+                break;
+            default:
+                break;
+        }
+
+        return DateTime.MinValue;
     }
 
     /// <summary>重置任务，让它从新开始工作</summary>

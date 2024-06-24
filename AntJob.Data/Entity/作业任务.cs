@@ -145,11 +145,11 @@ public partial class JobTask
     public JobStatus Status { get => _Status; set { if (OnPropertyChanging("Status", value)) { _Status = value; OnPropertyChanged("Status"); } } }
 
     private Int32 _MsgCount;
-    /// <summary>消费消息数</summary>
-    [DisplayName("消费消息数")]
-    [Description("消费消息数")]
+    /// <summary>消息。消费消息数</summary>
+    [DisplayName("消息")]
+    [Description("消息。消费消息数")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("MsgCount", "消费消息数", "")]
+    [BindColumn("MsgCount", "消息。消费消息数", "")]
     public Int32 MsgCount { get => _MsgCount; set { if (OnPropertyChanging("MsgCount", value)) { _MsgCount = value; OnPropertyChanged("MsgCount"); } } }
 
     private String _Server;
@@ -378,7 +378,7 @@ public partial class JobTask
         /// <summary>状态</summary>
         public static readonly Field Status = FindByName("Status");
 
-        /// <summary>消费消息数</summary>
+        /// <summary>消息。消费消息数</summary>
         public static readonly Field MsgCount = FindByName("MsgCount");
 
         /// <summary>服务器</summary>
@@ -462,7 +462,7 @@ public partial class JobTask
         /// <summary>状态</summary>
         public const String Status = "Status";
 
-        /// <summary>消费消息数</summary>
+        /// <summary>消息。消费消息数</summary>
         public const String MsgCount = "MsgCount";
 
         /// <summary>服务器</summary>
