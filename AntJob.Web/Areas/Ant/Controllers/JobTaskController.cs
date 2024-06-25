@@ -5,6 +5,7 @@ using AntJob.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using NewLife;
 using NewLife.Cube;
+using NewLife.Cube.Entity;
 using NewLife.Cube.Extensions;
 using NewLife.Cube.ViewModels;
 using NewLife.Data;
@@ -39,8 +40,23 @@ public class JobTaskController : AntEntityController<JobTask>
             df.AddService(new ColorNumberField { Color = "red" });
         }
         {
-            var df = ListFields.GetField("Status");
-            df.AddService(new MyStatusField());
+            var df = ListFields.GetField("Status") as ListField;
+            //df.AddService(new MyStatusField());
+            df.GetClass = e =>
+            {
+                var job = e as JobTask;
+                return job.Status switch
+                {
+                    JobStatus.就绪 => "text-center",
+                    JobStatus.抽取中 => "text-center info",
+                    JobStatus.处理中 => "text-center warning",
+                    JobStatus.错误 => "text-center danger",
+                    JobStatus.完成 => "text-center success",
+                    JobStatus.取消 => "text-center active",
+                    JobStatus.延迟 => "text-center active",
+                    _ => "",
+                };
+            };
         }
 
         ListFields.TraceUrl();
@@ -97,8 +113,11 @@ public class JobTaskController : AntEntityController<JobTask>
         var fs = base.OnGetFields(kind, model);
         if (kind == ViewKinds.List)
         {
+            var appId = GetRequest("appId").ToInt();
+            if (appId > 0) fs.RemoveField("AppID", "AppName");
+
             var jobId = GetRequest("jobId").ToInt();
-            if (jobId > 0) fs.RemoveField("JobID");
+            if (jobId > 0) fs.RemoveField("JobID", "JobName");
         }
 
         return fs;

@@ -28,17 +28,23 @@ public class JobController : AntEntityController<Job>
         ListFields.AddListField("UpdateTime");
 
         {
-            var df = ListFields.AddListField("Task", "Enable");
-            df.DisplayName = "任务";
+            var df = ListFields.GetField("Name") as ListField;
             df.Url = "/Ant/JobTask?appid={AppID}&jobId={ID}";
         }
+        //{
+        //    var df = ListFields.AddListField("Task", "Enable");
+        //    df.DisplayName = "任务";
+        //    df.Url = "/Ant/JobTask?appid={AppID}&jobId={ID}";
+        //}
         {
             var df = ListFields.AddListField("Title", null, "Mode");
             df.Header = "下一次/Cron/主题";
+            df.HeaderTitle = "Cron格式，秒+分+时+天+月+星期+年";
             df.AddService(new MyTextField());
         }
         {
-            var df = ListFields.GetField("DataTime");
+            var df = ListFields.GetField("DataTime") as ListField;
+            //df.GetClass = e => "text-center text-primary font-weight-bold";
             df.AddService(new ColorField { Color = "Magenta", GetValue = e => ((DateTime)e).ToFullString("") });
         }
         {
@@ -60,6 +66,24 @@ public class JobController : AntEntityController<Job>
         {
             var df = ListFields.GetField("Error");
             df.AddService(new ColorNumberField { Color = "red" });
+        }
+        {
+            var df = ListFields.GetField("LastStatus") as ListField;
+            df.GetClass = e =>
+            {
+                var job = e as Job;
+                return job.LastStatus switch
+                {
+                    JobStatus.就绪 => "text-center",
+                    JobStatus.抽取中 => "text-center info",
+                    JobStatus.处理中 => "text-center warning",
+                    JobStatus.错误 => "text-center danger",
+                    JobStatus.完成 => "text-center success",
+                    JobStatus.取消 => "text-center active",
+                    JobStatus.延迟 => "text-center active",
+                    _ => "",
+                };
+            };
         }
     }
 
