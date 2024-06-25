@@ -204,6 +204,8 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         task.Total = ctx.Total;
         task.Success = ctx.Success;
 
+        if (ctx.NextTime.Year > 2000) task.NextTime = ctx.NextTime.ToUniversalTime();
+
         Report(ctx.Handler.Job, task);
     }
 
@@ -217,6 +219,8 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         task.Total = ctx.Total;
         task.Success = ctx.Success;
         task.Times++;
+
+        if (ctx.NextTime.Year > 2000) task.NextTime = ctx.NextTime.ToUniversalTime();
 
         // 区分正常完成还是错误终止
         if (ctx.Error != null)
@@ -232,9 +236,13 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
                 task.Message = msg;
             }
         }
-        else if (task.Status <= JobStatus.处理中)
+        else if (ctx.Status <= JobStatus.处理中)
         {
             task.Status = JobStatus.完成;
+        }
+        else
+        {
+            task.Status = ctx.Status;
         }
         task.Cost = (Int32)Math.Round(ctx.Cost / 1000);
         if (task.Message.IsNullOrEmpty()) task.Message = ctx.Remark;

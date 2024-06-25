@@ -38,6 +38,8 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     private volatile Int32 _Busy;
     /// <summary>正在处理中的任务数</summary>
     public Int32 Busy => _Busy;
+
+    private Int32 _speed;
     #endregion
 
     #region 索引器
@@ -148,6 +150,9 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         var span = Schedule.Tracer?.NewSpan($"job:{Name}", task.Data ?? $"({task.DataTime.ToFullString()}, {task.End.ToFullString()})");
         result.TraceId = span?.ToString();
 
+        // 较慢的作业，及时报告进度
+        if (_speed < 10) Report(ctx, JobStatus.处理中);
+
         var sw = Stopwatch.StartNew();
         try
         {
@@ -170,6 +175,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
         sw.Stop();
         ctx.Cost = sw.Elapsed.TotalMilliseconds;
+        _speed = ctx.Speed;
 
         OnFinish(ctx);
         Schedule?.OnFinish(ctx);
@@ -184,6 +190,19 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         ctx.Total = 1;
         ctx.Success = Execute(ctx);
     }
+
+    /// <summary>报告任务状态</summary>
+    /// <param name="ctx"></param>
+    /// <param name="status"></param>
+    protected virtual void Report(JobContext ctx, JobStatus status)
+    {
+        ctx.Status = status;
+        Provider?.Report(ctx);
+    }
+
+    /// <summary>整个任务完成</summary>
+    /// <param name="ctx"></param>
+    protected virtual void OnFinish(JobContext ctx) => Provider?.Finish(ctx);
     #endregion
 
     #region 数据处理
@@ -207,10 +226,6 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         ctx.Status = JobStatus.延迟;
         ctx.NextTime = nextTime;
     }
-
-    /// <summary>整个任务完成</summary>
-    /// <param name="ctx"></param>
-    protected virtual void OnFinish(JobContext ctx) => Provider?.Finish(ctx);
     #endregion
 
     #region 日志

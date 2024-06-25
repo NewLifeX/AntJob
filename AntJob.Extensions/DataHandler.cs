@@ -90,7 +90,7 @@ public abstract class DataHandler : Handler
 
         //// 获取最小时间
         //if (job.DataTime.Year < 2000) throw new InvalidOperationException("数据任务必须设置开始时间");
-        
+
         //todo 如果DataTime为空，则自动获取最小时间，并设置到DataTime，以减轻平台设置负担
 
         return base.Start();
@@ -102,7 +102,6 @@ public abstract class DataHandler : Handler
     /// <param name="ctx"></param>
     protected override void OnProcess(JobContext ctx)
     {
-        var prov = Provider;
         var span = DefaultSpan.Current;
         var row = 0;
         while (true)
@@ -125,8 +124,7 @@ public abstract class DataHandler : Handler
             if (data == null || list != null && list.Count == 0) break;
 
             // 报告进度
-            ctx.Status = JobStatus.处理中;
-            prov?.Report(ctx);
+            Report(ctx, JobStatus.处理中);
 
             // 批量处理
             ctx.Success += Execute(ctx);

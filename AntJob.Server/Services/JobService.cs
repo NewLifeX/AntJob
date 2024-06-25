@@ -487,7 +487,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         {
             // 平均速度
             if (job.Speed > 0)
-                job.Speed = (Int32)((job.Speed * 3L + p1) / 4);
+                job.Speed = (Int32)Math.Round((job.Speed * 3d + p1) / 4);
             else
                 job.Speed = p1;
         }
