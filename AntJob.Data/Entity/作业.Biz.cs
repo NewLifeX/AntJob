@@ -238,9 +238,15 @@ public partial class Job : EntityBase<Job>
             case JobModes.Time:
                 if (!Cron.IsNullOrEmpty())
                 {
-                    var cron = new Cron(Cron);
                     var time = DataTime.Year > 2000 ? DataTime : DateTime.Now;
-                    return cron.GetNext(time);
+                    var next = DateTime.MaxValue;
+                    foreach (var item in Cron.Split(";"))
+                    {
+                        var cron = new Cron(item);
+                        var dt = cron.GetNext(time);
+                        if (dt < next) dt = next;
+                    }
+                    return next;
                 }
                 else
                 {
