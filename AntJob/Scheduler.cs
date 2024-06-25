@@ -2,6 +2,7 @@
 using AntJob.Handlers;
 using AntJob.Providers;
 using NewLife;
+using NewLife.Caching;
 using NewLife.Log;
 using NewLife.Model;
 using NewLife.Reflection;
@@ -22,6 +23,8 @@ public class Scheduler : DisposeBase
 
     /// <summary>服务提供者</summary>
     public IServiceProvider ServiceProvider { get; set; }
+
+    private ICache _cache = MemoryCache.Default;
     #endregion
 
     #region 构造
@@ -276,6 +279,9 @@ public class Scheduler : DisposeBase
             var handler = handlers.FirstOrDefault(e => e.Name == job.Name);
             if (handler == null && job.Enable && !job.ClassName.IsNullOrEmpty())
             {
+                // 遇到废弃作业时，避免反复输出日志
+                if (!_cache.Add($"job:NewHandler:{job.Name}", 1, 3600)) return;
+
                 using var span = Tracer?.NewSpan($"job:NewHandler", job);
 
                 WriteLog("发现未知作业[{0}]@[{1}]", job.Name, job.ClassName);
