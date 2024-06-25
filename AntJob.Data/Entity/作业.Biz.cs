@@ -244,9 +244,10 @@ public partial class Job : EntityBase<Job>
                     {
                         var cron = new Cron(item);
                         var dt = cron.GetNext(time);
-                        if (dt < next) dt = next;
+                        if (dt < next) next = dt;
                     }
                     return next;
+                    //return NewLife.Threading.Cron.GetNext(Cron.Split(";"), time);
                 }
                 else
                 {
@@ -269,7 +270,7 @@ public partial class Job : EntityBase<Job>
     {
         if (days < 0)
         {
-            DataTime = DateTime.MinValue;
+            //DataTime = DateTime.MinValue;
 
             if (stime > DateTime.MinValue)
                 DataTime = stime;

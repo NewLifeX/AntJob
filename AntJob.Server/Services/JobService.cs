@@ -155,7 +155,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
                 case JobModes.Time:
                     {
                         // 如果能够切片，则查询数据库后进入，避免缓存导致重复
-                        if (TrySplitTime(job, false, out var end))
+                        if (TrySplitTime(job, out _))
                         {
                             // 申请任务前，不能再查数据库，那样子会导致多线程脏读，从而出现多客户端分到相同任务的情况
                             //jb = Job.FindByKey(jb.ID);
@@ -182,7 +182,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         if (list.Count > 0)
         {
-            job.LastStatus = JobStatus.就绪;
+            job.LastStatus = JobStatus.处理中;
             job.LastTime = DateTime.Now;
 
             job.UpdateTime = DateTime.Now;
@@ -565,9 +565,11 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         for (var i = 0; i < count; i++)
         {
             var end = DateTime.MinValue;
-            if (job.Mode == JobModes.Time && !TrySplitTime(job, true, out end) ||
+            if (job.Mode == JobModes.Time && !TrySplitTime(job, out end) ||
                 job.Mode != JobModes.Time && !TrySplit(job, start, out end))
                 break;
+            if (end.Year < 2000 || end.Year > 9000)
+                throw new ArgumentOutOfRangeException(nameof(end), end, "结束时间不合法");
 
             // 创建新的任务
             var task = new JobTask
@@ -622,7 +624,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     /// <param name="job"></param>
     /// <param name="end"></param>
     /// <returns></returns>
-    public Boolean TrySplitTime(Job job, Boolean modify, out DateTime end)
+    public Boolean TrySplitTime(Job job, out DateTime end)
     {
         var start = job.DataTime;
 
@@ -641,8 +643,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         if (end.Year > 2000 && start >= end) return false;
 
         // 计算下一次执行时间
-        if (modify)
-            end = job.DataTime = job.GetNext();
+        end = job.GetNext();
 
         return true;
     }
