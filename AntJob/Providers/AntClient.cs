@@ -5,6 +5,7 @@ using AntJob.Data;
 using AntJob.Models;
 using NewLife;
 using NewLife.Model;
+using NewLife.Net;
 using NewLife.Reflection;
 using NewLife.Remoting.Clients;
 using NewLife.Remoting.Models;
@@ -14,20 +15,31 @@ namespace AntJob.Providers;
 /// <summary>蚂蚁客户端</summary>
 public class AntClient : ClientBase
 {
-    private readonly AntSetting _setting;
     #region 属性
+    private readonly AntSetting _setting;
     #endregion
 
     #region 构造
     /// <summary>实例化</summary>
-    public AntClient() => Prefix = "";
+    public AntClient() => InitClient();
 
     /// <summary>实例化</summary>
     /// <param name="setting"></param>
     public AntClient(AntSetting setting) : base(setting)
     {
         _setting = setting;
-        Prefix = _setting.Server.StartsWithIgnoreCase("http://", "https://") ? "AntJob/" : "";
+
+        InitClient();
+    }
+
+    private void InitClient()
+    {
+        Features = Features.Login | Features.Ping;
+
+        if (Server.StartsWithIgnoreCase("http://", "https://"))
+            SetActions("AntJob/");
+        else
+            SetActions("");
     }
     #endregion
 
@@ -49,7 +61,7 @@ public class AntClient : ClientBase
             //container.TryAddTransient<IUpgradeInfo, UpgradeInfo>();
         }
 
-        Prefix = _setting.Server.StartsWithIgnoreCase("http://", "https://") ? "AntJob/" : "";
+        InitClient();
 
         base.OnInit();
     }
