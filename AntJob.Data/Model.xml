@@ -137,7 +137,7 @@
         <Column Name="MaxError" DataType="Int32" Description="最大错误。连续错误达到最大错误数时停止" Category="控制参数" />
         <Column Name="MaxRetry" DataType="Int32" Description="最大重试。默认10次，超过该次数后将不再重试" Category="控制参数" />
         <Column Name="MaxTime" DataType="Int32" Description="最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器" Category="控制参数" />
-        <Column Name="MaxRetain" DataType="Int32" Description="保留。任务项保留天数，超过天数的任务项将被删除，默认3天" Category="控制参数" />
+        <Column Name="MaxRetain" DataType="Int32" Description="保留。任务项保留天数，超过天数的任务项将被删除，默认30天" Category="控制参数" />
         <Column Name="MaxIdle" DataType="Int32" Description="最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警" Category="控制参数" />
         <Column Name="ErrorDelay" DataType="Int32" Description="错误延迟。默认60秒，出错延迟后重新发放" Category="控制参数" />
         <Column Name="Deadline" DataType="DateTime" Description="最后期限。超过该时间后，任务将不再执行" Category="控制参数" />

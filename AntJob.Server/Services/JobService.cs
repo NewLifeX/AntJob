@@ -529,7 +529,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     private void CheckMaxError(App app, Job job)
     {
         // 出错时判断如果超过最大错误数，则停止作业
-        var maxError = job.MaxError < 1 ? 100 : job.MaxError;
+        var maxError = job.MaxError <= 0 ? 100 : job.MaxError;
         if (job.Enable && job.Error > maxError)
         {
             job.MaxError = maxError;
@@ -695,8 +695,9 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         using var ts = Job.Meta.CreateTrans();
 
-        var dt = DateTime.Now;
-        var list = JobTask.Search(job.ID, dt, job.MaxRetry, 32, [JobStatus.取消, JobStatus.延迟], count);
+        var now = DateTime.Now;
+        var maxError = job.MaxError - job.Error;
+        var list = JobTask.Search(job.ID, now.AddDays(-7), now, job.MaxRetry, maxError, [JobStatus.取消, JobStatus.延迟], count);
         foreach (var task in list)
         {
             task.Server = server;
@@ -730,19 +731,22 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         using var ts = Job.Meta.CreateTrans();
         var list = new List<JobTask>();
 
+        var now = DateTime.Now;
+        var maxError = job.MaxError - job.Error;
+
         // 查找历史错误任务
         if (job.ErrorDelay > 0)
         {
-            var dt = DateTime.Now.AddSeconds(-job.ErrorDelay);
-            var list2 = JobTask.Search(job.ID, dt, job.MaxRetry, 32, [JobStatus.错误], count);
+            var end = now.AddSeconds(-job.ErrorDelay);
+            var list2 = JobTask.Search(job.ID, now.AddDays(-7), end, job.MaxRetry, maxError, [JobStatus.错误], count);
             if (list2.Count > 0) list.AddRange(list2);
         }
 
         // 查找历史中断任务，持续10分钟仍然未完成
         if (job.MaxTime > 0 && list.Count < count)
         {
-            var dt = DateTime.Now.AddSeconds(-job.MaxTime);
-            var list2 = JobTask.Search(job.ID, dt, job.MaxRetry, 32, [JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中], count - list.Count);
+            var end = now.AddSeconds(-job.MaxTime);
+            var list2 = JobTask.Search(job.ID, now.AddDays(-7), end, job.MaxRetry, maxError, [JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中], count - list.Count);
             if (list2.Count > 0) list.AddRange(list2);
         }
         if (list.Count > 0)

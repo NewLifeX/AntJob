@@ -40,12 +40,12 @@ public partial class Job : EntityBase<Job>
         // 参数默认值
         var step = Step;
         if (step == 0) step = Step = 5;
-        if (MaxRetain == 0) MaxRetain = 3;
+        if (MaxRetain == 0) MaxRetain = 30;
         if (MaxIdle == 0) MaxIdle = GetDefaultIdle();
 
         if (isNew)
         {
-            if (!Dirtys[nameof(MaxRetry)]) MaxRetry = 10;
+            if (!Dirtys[nameof(MaxRetry)]) MaxRetry = 100;
             if (!Dirtys[nameof(MaxTime)]) MaxTime = 600;
             if (!Dirtys[nameof(ErrorDelay)]) ErrorDelay = 60;
             if (!Dirtys[nameof(MaxIdle)]) MaxIdle = GetDefaultIdle();

@@ -179,12 +179,12 @@ public partial class Job
     public Int32 MaxTime { get => _MaxTime; set { if (OnPropertyChanging("MaxTime", value)) { _MaxTime = value; OnPropertyChanged("MaxTime"); } } }
 
     private Int32 _MaxRetain;
-    /// <summary>保留。任务项保留天数，超过天数的任务项将被删除，默认3天</summary>
+    /// <summary>保留。任务项保留天数，超过天数的任务项将被删除，默认30天</summary>
     [Category("控制参数")]
     [DisplayName("保留")]
-    [Description("保留。任务项保留天数，超过天数的任务项将被删除，默认3天")]
+    [Description("保留。任务项保留天数，超过天数的任务项将被删除，默认30天")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("MaxRetain", "保留。任务项保留天数，超过天数的任务项将被删除，默认3天", "")]
+    [BindColumn("MaxRetain", "保留。任务项保留天数，超过天数的任务项将被删除，默认30天", "")]
     public Int32 MaxRetain { get => _MaxRetain; set { if (OnPropertyChanging("MaxRetain", value)) { _MaxRetain = value; OnPropertyChanged("MaxRetain"); } } }
 
     private Int32 _MaxIdle;
@@ -539,7 +539,7 @@ public partial class Job
         /// <summary>最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器</summary>
         public static readonly Field MaxTime = FindByName("MaxTime");
 
-        /// <summary>保留。任务项保留天数，超过天数的任务项将被删除，默认3天</summary>
+        /// <summary>保留。任务项保留天数，超过天数的任务项将被删除，默认30天</summary>
         public static readonly Field MaxRetain = FindByName("MaxRetain");
 
         /// <summary>最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警</summary>
@@ -665,7 +665,7 @@ public partial class Job
         /// <summary>最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器</summary>
         public const String MaxTime = "MaxTime";
 
-        /// <summary>保留。任务项保留天数，超过天数的任务项将被删除，默认3天</summary>
+        /// <summary>保留。任务项保留天数，超过天数的任务项将被删除，默认30天</summary>
         public const String MaxRetain = "MaxRetain";
 
         /// <summary>最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警</summary>

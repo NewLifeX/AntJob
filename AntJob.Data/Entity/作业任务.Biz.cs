@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using NewLife;
@@ -160,13 +160,14 @@ public partial class JobTask : EntityBase<JobTask>
 
     /// <summary>获取该任务下特定状态的任务项</summary>
     /// <param name="taskid"></param>
+    /// <param name="start"></param>
     /// <param name="end"></param>
     /// <param name="maxRetry"></param>
     /// <param name="maxError"></param>
     /// <param name="status"></param>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public static IList<JobTask> Search(Int32 taskid, DateTime end, Int32 maxRetry, Int32 maxError, JobStatus[] status, Int32 count)
+    public static IList<JobTask> Search(Int32 taskid, DateTime start, DateTime end, Int32 maxRetry, Int32 maxError, JobStatus[] status, Int32 count)
     {
         var exp = new WhereExpression();
         if (taskid > 0) exp &= _.JobID == taskid;
@@ -176,8 +177,8 @@ public partial class JobTask : EntityBase<JobTask>
         // 限制任务的错误次数，避免无限执行
         if (maxError > 0) exp &= _.Error < maxError;
 
-        exp &= _.UpdateTime >= DateTime.Now.AddDays(-7);
-        if (end > DateTime.MinValue) exp &= _.UpdateTime < end;
+        if (start.Year > 2000) exp &= _.UpdateTime >= start;
+        if (end.Year > 2000) exp &= _.UpdateTime < end;
 
         return FindAll(exp, _.ID.Asc(), null, 0, count);
     }
