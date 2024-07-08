@@ -37,7 +37,7 @@
     <None Remove="Build.tt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="11.13.2024.606" />
+    <PackageReference Include="NewLife.XCode" Version="11.13.2024.701" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Build.log">

@@ -36,6 +36,10 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageReadmeFile>Readme.MD</PackageReadmeFile>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="Providers\HttpJobProvider.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
@@ -45,9 +49,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="10.10.2024.625-beta1559" />
-    <PackageReference Include="NewLife.Remoting" Version="3.0.2024.628-beta0626" />
-    <PackageReference Include="NewLife.Stardust" Version="3.0.2024.628-beta0628" />
+    <PackageReference Include="NewLife.Core" Version="10.10.2024.701" />
+    <PackageReference Include="NewLife.Remoting" Version="3.0.2024.708" />
+    <PackageReference Include="NewLife.Stardust" Version="3.0.2024.707" />
   </ItemGroup>
   
   <ItemGroup>

@@ -103,6 +103,15 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         return list.ToArray();
     }
 
+    /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
+    /// <param name="app"></param>
+    /// <param name="job"></param>
+    /// <returns></returns>
+    public IJob SetJob(App app, JobModel job)
+    {
+
+    }
+
     /// <summary>申请作业任务</summary>
     /// <param name="model">模型</param>
     /// <returns></returns>

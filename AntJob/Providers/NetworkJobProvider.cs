@@ -146,6 +146,11 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         return _jobs;
     }
 
+    /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
+    /// <param name="job"></param>
+    /// <returns></returns>
+    public override IJob SetJob(IJob job) => Ant.SetJob(job);
+
     /// <summary>申请任务</summary>
     /// <param name="job">作业</param>
     /// <param name="topic">主题</param>

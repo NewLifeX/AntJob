@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NewLife.Cube.Core" Version="6.1.2024.625-beta1720" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.0.2024.628-beta0628" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.0.2024.707" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />

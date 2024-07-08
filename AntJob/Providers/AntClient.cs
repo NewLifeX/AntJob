@@ -101,6 +101,11 @@ public class AntClient : ClientBase
     /// <returns></returns>
     public String[] AddJobs(IJob[] jobs) => InvokeAsync<String[]>(nameof(AddJobs), new { jobs }).Result;
 
+    /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
+    /// <param name="job"></param>
+    /// <returns></returns>
+    public IJob SetJob(IJob job) => InvokeAsync<JobModel>(nameof(SetJob), new { job }).Result;
+
     /// <summary>申请作业任务</summary>
     /// <param name="job">作业</param>
     /// <param name="topic">主题</param>

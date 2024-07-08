@@ -20,6 +20,11 @@ public interface IJobProvider
     /// <returns></returns>
     IJob[] GetJobs();
 
+    /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
+    /// <param name="job"></param>
+    /// <returns></returns>
+    IJob SetJob(IJob job);
+
     /// <summary>申请任务</summary>
     /// <param name="job">作业</param>
     /// <param name="topic">主题</param>
@@ -59,6 +64,11 @@ public abstract class JobProvider : DisposeBase, IJobProvider, ITracerFeature, I
     /// <summary>获取所有作业名称</summary>
     /// <returns></returns>
     public abstract IJob[] GetJobs();
+
+    /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
+    /// <param name="job"></param>
+    /// <returns></returns>
+    public abstract IJob SetJob(IJob job);
 
     /// <summary>申请任务</summary>
     /// <param name="job">作业</param>
