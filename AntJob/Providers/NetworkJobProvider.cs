@@ -80,7 +80,14 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
 
             list.Add(job);
         }
-        if (list.Count > 0) Ant.AddJobs(list.ToArray());
+        if (list.Count > 0)
+        {
+            WriteLog("注册作业[{0}]：{1}", list.Count, list.Join(",", e => e.Name));
+
+            var rs = Ant.AddJobs(list.ToArray());
+
+            WriteLog("注册成功[{0}]：{1}", rs?.Length, rs.Join());
+        }
 
         // 通信完成，改回来本地时间
         foreach (var handler in bs)

@@ -37,7 +37,7 @@ public class JobHost : BackgroundService
         scheduler.AddHandler<BuildWill>();
 
         // 启动调度引擎，调度器内部多线程处理
-        scheduler.Start();
+        scheduler.StartAsync();
         _scheduler = scheduler;
 
         return Task.CompletedTask;

@@ -159,8 +159,8 @@ public class Scheduler : DisposeBase
         prv.Start();
 
         // 获取本应用在调度中心管理的所有作业
-        var jobs = prv.GetJobs();
-        if (jobs == null || jobs.Length == 0) throw new Exception("调度中心没有可用作业");
+        var jobs = prv.GetJobs() ?? [];
+        //if (jobs == null || jobs.Length == 0) throw new Exception("调度中心没有可用作业");
 
         // 输出日志
         WriteLog($"启动任务调度引擎[{prv}]，作业[{hs.Count}]项，定时{Period}秒");
@@ -173,12 +173,22 @@ public class Scheduler : DisposeBase
 
             // 查找作业参数，分配给处理器
             var job = jobs.FirstOrDefault(e => e.Name == handler.Name);
+            if (job == null || !job.Enable) continue;
+
             if (job != null && job.Mode == 0) job.Mode = handler.Mode;
             handler.Job = job;
 
             handler.Tracer = Tracer;
             handler.Log = Log;
-            handler.Start();
+
+            try
+            {
+                handler.Start();
+            }
+            catch (Exception ex)
+            {
+                Log?.Error("作业[{0}]启动失败！{1}", handler.GetType().FullName, ex.Message);
+            }
         }
 
         // 定时执行
@@ -197,7 +207,14 @@ public class Scheduler : DisposeBase
 
         foreach (var handler in Handlers)
         {
-            handler.Stop("SchedulerStop");
+            try
+            {
+                handler.Stop("SchedulerStop");
+            }
+            catch (Exception ex)
+            {
+                Log?.Error("作业[{0}]停止失败！{1}", handler.GetType().FullName, ex.Message);
+            }
         }
     }
 
@@ -236,7 +253,17 @@ public class Scheduler : DisposeBase
             // 更新作业参数，并启动处理器
             handler.Job = job;
             if (job.Mode == 0) job.Mode = handler.Mode;
-            if (!handler.Active) handler.Start();
+            if (!handler.Active)
+            {
+                try
+                {
+                    handler.Start();
+                }
+                catch (Exception ex)
+                {
+                    Log?.Error("作业[{0}]启动失败！{1}", handler.GetType().FullName, ex.Message);
+                }
+            }
 
             // 如果正在处理任务数没达到最大并行度，则继续安排任务
             var max = job.MaxTask;
@@ -300,7 +327,8 @@ public class Scheduler : DisposeBase
                             handler.Schedule = this;
                             handler.Provider = provider;
 
-                            if (handler is MessageHandler messageHandler && !job.Topic.IsNullOrEmpty()) messageHandler.Topic = job.Topic;
+                            if (handler is MessageHandler messageHandler && !job.Topic.IsNullOrEmpty())
+                                messageHandler.Topic = job.Topic;
 
                             handler.Log = Log;
                             handler.Tracer = Tracer;
@@ -313,7 +341,8 @@ public class Scheduler : DisposeBase
                 catch (Exception ex)
                 {
                     span?.SetError(ex, null);
-                    XTrace.WriteException(ex);
+                    //XTrace.WriteException(ex);
+                    Log?.Error("作业[{0}]启动失败！{1}", handler?.GetType().FullName, ex.Message);
                 }
             }
         }

@@ -27,7 +27,7 @@ scheduler.AddHandler<SqlHandler>();
 scheduler.AddHandler<SqlMessage>();
 
 // 启动调度引擎，调度器内部多线程处理
-scheduler.Start();
+scheduler.StartAsync();
 
 // 友好退出
 var host = services.BuildHost();
