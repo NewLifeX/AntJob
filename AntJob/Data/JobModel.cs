@@ -4,7 +4,7 @@ namespace AntJob.Data;
 
 /// <summary>作业模型</summary>
 /// <remarks>定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</remarks>
-public partial class JobModel
+public partial class JobModel : ICloneable
 {
     #region 属性
     /// <summary>名称</summary>
@@ -77,5 +77,7 @@ public partial class JobModel
     /// <summary>已重载。</summary>
     /// <returns></returns>
     public override String ToString() => Name;
+
+    Object ICloneable.Clone() => MemberwiseClone();
     #endregion
 }

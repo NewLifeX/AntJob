@@ -155,7 +155,7 @@ class AntService : IApi, IActionFilter
     /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
     /// <returns></returns>
     [Api(nameof(SetJob))]
-    public IJob SetJob(JobModel job) => _jobService.SetJob(_App, job);
+    public IJob SetJob(JobModel job) => _jobService.SetJob(_App, job, ControllerContext.Current.Parameters);
 
     /// <summary>申请作业任务</summary>
     /// <param name="model">模型</param>

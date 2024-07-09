@@ -104,7 +104,7 @@ public class AntClient : ClientBase
     /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
     /// <param name="job"></param>
     /// <returns></returns>
-    public IJob SetJob(IJob job) => InvokeAsync<JobModel>(nameof(SetJob), new { job }).Result;
+    public IJob SetJob(IDictionary<String, Object> job) => InvokeAsync<JobModel>(nameof(SetJob), job).Result;
 
     /// <summary>申请作业任务</summary>
     /// <param name="job">作业</param>

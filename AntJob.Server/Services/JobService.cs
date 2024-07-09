@@ -6,6 +6,7 @@ using AntJob.Models;
 using NewLife;
 using NewLife.Caching;
 using NewLife.Log;
+using NewLife.Reflection;
 using NewLife.Serialization;
 using NewLife.Threading;
 using XCode;
@@ -105,11 +106,24 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
     /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
     /// <param name="app"></param>
-    /// <param name="job"></param>
+    /// <param name="model"></param>
     /// <returns></returns>
-    public IJob SetJob(App app, JobModel job)
+    public IJob SetJob(App app, JobModel model, IDictionary<String, Object> parameters)
     {
+        var job = Job.FindByAppIDAndName(app.ID, model.Name);
+        if (job == null) return null;
 
+        // 可以修改的字段
+        var fs = new[] { nameof(IJob.Enable), nameof(IJob.DataTime), nameof(IJob.End), nameof(IJob.Step), nameof(JobModel.DisplayName), nameof(JobModel.Description), nameof(IJob.Topic), nameof(IJob.Data) };
+        foreach (var item in fs)
+        {
+            if (parameters.ContainsKey(item))
+                job.SetItem(item, model.GetValue(item));
+        }
+
+        job.Update();
+
+        return job.ToModel();
     }
 
     /// <summary>申请作业任务</summary>

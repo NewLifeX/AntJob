@@ -118,6 +118,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
 
     #region 作业消息控制
     private IJob[] _jobs;
+    private IJob[] _baks;
     private DateTime _NextGetJobs;
     /// <summary>获取所有作业名称</summary>
     /// <returns></returns>
@@ -140,6 +141,9 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
                     if (job.End.Year > 1000)
                         job.End = job.End.ToLocalTime();
                 }
+
+                // 备份一份，用于比较
+                _baks = _jobs.Select(e => ((ICloneable)e).Clone() as IJob).ToArray();
             }
         }
 
@@ -149,7 +153,24 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
     /// <param name="job"></param>
     /// <returns></returns>
-    public override IJob SetJob(IJob job) => Ant.SetJob(job);
+    public override IJob SetJob(IJob job)
+    {
+        var dic = job.ToDictionary();
+        var old = _baks?.FirstOrDefault(e => e.Name == job.Name);
+        old ??= new JobModel();
+
+        var dic2 = old.ToDictionary();
+        foreach (var item in dic2)
+        {
+            if (item.Key == nameof(job.Name)) continue;
+
+            // 未修改的不要传递过去
+            if (dic.TryGetValue(item.Key, out var value) && Equals(value, item.Value))
+                dic.Remove(item.Key);
+        }
+
+        return Ant.SetJob(dic);
+    }
 
     /// <summary>申请任务</summary>
     /// <param name="job">作业</param>
