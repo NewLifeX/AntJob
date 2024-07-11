@@ -436,7 +436,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             task.Error++;
             //ji.Message = err.Message;
 
-            SetJobError(job, task);
+            SetJobError(job, task, ip);
 
             // 出错时判断如果超过最大错误数，则停止作业
             CheckMaxError(app, job);
@@ -502,7 +502,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         //job.Save();
     }
 
-    private JobError SetJobError(Job job, JobTask task)
+    private JobError SetJobError(Job job, JobTask task, String ip)
     {
         using var span = _tracer?.NewSpan(nameof(SetJobError), new { job.Name, task.DataTime });
 
@@ -519,6 +519,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             ProcessID = task.ProcessID,
             Client = task.Client,
 
+            CreateIP = ip,
+            UpdateIP = ip,
             CreateTime = DateTime.Now,
             UpdateTime = DateTime.Now,
         };

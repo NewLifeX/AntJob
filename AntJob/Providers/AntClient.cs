@@ -71,20 +71,19 @@ public class AntClient : ClientBase
     /// <returns></returns>
     public override ILoginRequest BuildLoginRequest()
     {
-        var request = base.BuildLoginRequest();
-        if (request is LoginModel model)
-        {
-            var asmx = AssemblyX.Entry;
-            var title = asmx?.Asm.GetCustomAttribute<AssemblyTitleAttribute>();
-            var dis = asmx?.Asm.GetCustomAttribute<DisplayNameAttribute>();
-            var des = asmx?.Asm.GetCustomAttribute<DescriptionAttribute>();
-            var dname = title?.Title ?? dis?.DisplayName ?? des?.Description;
+        var request = new LoginModel();
+        FillLoginRequest(request);
 
-            model.DisplayName = dname;
-            model.Machine = Environment.MachineName;
-            model.ProcessId = Process.GetCurrentProcess().Id;
-            model.Compile = asmx.Compile;
-        }
+        var asmx = AssemblyX.Entry;
+        var title = asmx?.Asm.GetCustomAttribute<AssemblyTitleAttribute>();
+        var dis = asmx?.Asm.GetCustomAttribute<DisplayNameAttribute>();
+        var des = asmx?.Asm.GetCustomAttribute<DescriptionAttribute>();
+        var dname = title?.Title ?? dis?.DisplayName ?? des?.Description;
+
+        request.DisplayName = dname;
+        request.Machine = Environment.MachineName;
+        request.ProcessId = Process.GetCurrentProcess().Id;
+        request.Compile = asmx.Compile;
 
         return request;
     }

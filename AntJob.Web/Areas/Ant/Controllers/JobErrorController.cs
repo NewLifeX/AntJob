@@ -12,10 +12,10 @@ namespace AntJob.Web.Areas.Ant.Controllers;
 [Menu(0, false)]
 public class JobErrorController : AntEntityController<JobError>
 {
-    //static JobErrorController() => MenuOrder = 60;
-
     static JobErrorController()
     {
+        ListFields.AddListField("Message", null, "TraceId");
+
         ListFields.TraceUrl();
     }
 

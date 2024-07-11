@@ -2,6 +2,7 @@
 using AntJob.Data.Entity;
 using NewLife.Cube;
 using NewLife.Cube.Extensions;
+using NewLife.Cube.ViewModels;
 using NewLife.Web;
 
 namespace AntJob.Web.Areas.Ant.Controllers;
@@ -15,6 +16,9 @@ public class AppHistoryController : AntEntityController<AppHistory>
     static AppHistoryController()
     {
         AppOnline.Meta.Table.DataTable.InsertOnly = true;
+
+        ListFields.RemoveField("Id", "Version", "CompileTime", "");
+        ListFields.AddListField("Remark", null, "TraceId");
 
         ListFields.TraceUrl();
     }

@@ -72,7 +72,7 @@ public class AppService
         online.CompileTime = model.Compile;
         online.Save();
 
-        WriteHistory(app, autoReg ? "注册" : "登录", true, $"[{model.Code}/{model.Secret}]在[{model.ClientId}]登录[{app}]成功");
+        WriteHistory(app, autoReg ? "注册" : "登录", true, $"[{model.Code}/{model.Secret}]在[{model.ClientId}]登录[{app}]成功", ip);
 
         var rs = new LoginResponse { Name = app.Name };
         if (autoReg) rs.Secret = app.Secret;
