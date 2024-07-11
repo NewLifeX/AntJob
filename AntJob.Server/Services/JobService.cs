@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using AntJob.Data;
+﻿using AntJob.Data;
 using AntJob.Data.Entity;
 using AntJob.Models;
 using NewLife;
@@ -417,30 +415,11 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         task.Speed = result.Speed;
         task.Total = result.Total;
         task.Success = result.Success;
-        task.Cost = result.Cost;
+        task.Cost = (Int32)Math.Round(result.Cost / 1000d);
         task.Key = result.Key;
         task.Message = result.Message;
 
-        //var traceId = result.TraceId ?? DefaultSpan.Current + "";
-        //if (!traceId.IsNullOrEmpty()) task.TraceId = traceId;
-        //task.TraceId += $",{result.TraceId},{DefaultSpan.Current}";
-        var tis = task.TraceId.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
-        var traceId = result.TraceId;
-        if (!traceId.IsNullOrEmpty())
-        {
-            var ss = traceId.Split('-');
-            if (ss.Length > 3 && ss[0].Length == 2) traceId = ss[1];
-            if (!tis.Contains(traceId)) tis.Add(traceId);
-        }
-        traceId = DefaultSpan.Current?.TraceId;
-        if (!traceId.IsNullOrEmpty() && !tis.Contains(traceId)) tis.Add(traceId);
-        task.TraceId = tis.Join(",");
-        while (true)
-        {
-            if (task.TraceId.Length <= JobTask._.TraceId.Length) break;
-            tis.RemoveAt(0);
-            task.TraceId = tis.Join(",");
-        }
+        var traceId = result.TraceId ?? DefaultSpan.Current + "";
         // 已终结的任务，汇总统计
         if (result.Status is JobStatus.完成 or JobStatus.错误)
         {

@@ -148,7 +148,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
         // APM埋点
         var span = Schedule.Tracer?.NewSpan($"job:{Name}", task.Data ?? $"({task.DataTime.ToFullString()}, {task.End.ToFullString()})");
-        result.TraceId = span?.ToString();
+        result.TraceId = span?.TraceId;
 
         // 较慢的作业，及时报告进度
         if (_speed < 10) Report(ctx, JobStatus.处理中);

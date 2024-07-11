@@ -5,7 +5,6 @@ using AntJob.Data;
 using AntJob.Models;
 using NewLife;
 using NewLife.Model;
-using NewLife.Net;
 using NewLife.Reflection;
 using NewLife.Remoting.Clients;
 using NewLife.Remoting.Models;

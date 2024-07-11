@@ -265,19 +265,21 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
             if (ex != null)
             {
                 var msg = ctx.Error.GetMessage();
-                if (msg.Contains("Exception:")) msg = msg.Substring("Exception:").Trim();
+                var p = msg.IndexOf("Exception:");
+                if (p >= 0) msg = msg.Substring(p + "Exception:".Length).Trim();
                 task.Message = msg;
             }
         }
-        else if (ctx.Status <= JobStatus.处理中)
+        else if (ctx.Status == JobStatus.延迟)
         {
-            task.Status = JobStatus.完成;
+            task.Status = JobStatus.延迟;
         }
         else
         {
-            task.Status = ctx.Status;
+            task.Status = JobStatus.完成;
         }
-        task.Cost = (Int32)Math.Round(ctx.Cost / 1000);
+
+        task.Cost = (Int32)Math.Round(ctx.Cost);
         if (task.Message.IsNullOrEmpty()) task.Message = ctx.Remark;
 
         task.Key = ctx.Key;

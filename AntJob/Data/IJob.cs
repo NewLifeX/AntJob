@@ -18,7 +18,7 @@ public interface IJob
     /// <summary>结束。小于该时间，数据作业使用</summary>
     DateTime End { get; set; }
 
-    /// <summary>时间偏移。距离实时时间的秒数，部分业务不能跑到实时</summary>
+    /// <summary>时间偏移。距离实时时间的秒数，考虑到服务器之间的时间差，部分业务不能跑到实时</summary>
     Int32 Offset { get; set; }
 
     /// <summary>步进。最大区间大小，秒</summary>

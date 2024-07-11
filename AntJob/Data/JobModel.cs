@@ -32,7 +32,7 @@ public partial class JobModel : ICloneable
     [XmlAttribute]
     public DateTime End { get; set; }
 
-    /// <summary>时间偏移。距离实时时间的秒数，部分业务不能跑到实时</summary>
+    /// <summary>时间偏移。距离实时时间的秒数，考虑到服务器之间的时间差，部分业务不能跑到实时</summary>
     [XmlAttribute]
     public Int32 Offset { get; set; }
 
