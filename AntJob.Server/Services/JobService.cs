@@ -421,7 +421,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         var traceId = result.TraceId ?? DefaultSpan.Current + "";
         // 已终结的任务，汇总统计
-        if (result.Status is JobStatus.完成 or JobStatus.错误)
+        if (result.Status is JobStatus.完成)
         {
             task.Times++;
 
@@ -432,13 +432,17 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         }
         else if (result.Status == JobStatus.错误)
         {
-            SetJobError(job, task);
-
+            task.Times++;
             task.Error++;
             //ji.Message = err.Message;
 
+            SetJobError(job, task);
+
             // 出错时判断如果超过最大错误数，则停止作业
             CheckMaxError(app, job);
+
+            // 记录状态
+            _appService.UpdateOnline(app, task, ip);
         }
         else if (result.Status == JobStatus.延迟)
         {
