@@ -15,7 +15,7 @@ internal class HelloJob : Handler
         Job.Cron = "7/30 * * * * ?";
     }
 
-    protected override Int32 Execute(JobContext ctx)
+    public override Int32 Execute(JobContext ctx)
     {
         using var span = Tracer?.NewSpan("HelloJob", ctx.Task.DataTime);
 

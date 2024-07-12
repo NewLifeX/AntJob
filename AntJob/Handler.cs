@@ -9,10 +9,16 @@ namespace AntJob;
 
 /// <summary>处理器基类，每个作业一个处理器</summary>
 /// <remarks>
+/// 文档：https://newlifex.com/blood/antjob
+/// 
 /// 每个作业一个处理器类，负责一个业务处理模块。
 /// 例如在数据同步或数据清洗中，每张表就写一个处理器，如果一组数据表有共同特性，还可以为它们封装一个自己的处理器基类。
 /// 
 /// 定时调度只要当前时间达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑。
+/// 
+/// 调度器控制方法：Start|Stop|Acquire
+/// 任务处理流程：Process->OnProcess->Execute->OnFinish
+/// 任务控制方法：Produce|Delay
 /// </remarks>
 public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 {
@@ -134,7 +140,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
     /// <summary>处理一项新任务</summary>
     /// <param name="task"></param>
-    public void Process(ITask task)
+    public virtual void Process(ITask task)
     {
         if (task == null) return;
 
@@ -147,7 +153,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         };
 
         // APM埋点
-        using var span = Schedule.Tracer?.NewSpan($"job:{Name}", task.Data ?? $"({task.DataTime.ToFullString()}, {task.End.ToFullString()})");
+        using var span = Schedule?.Tracer?.NewSpan($"job:{Name}", task.Data ?? $"({task.DataTime.ToFullString()}, {task.End.ToFullString()})");
         result.TraceId = span?.TraceId;
 
         // 较慢的作业，及时报告进度
@@ -180,7 +186,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         OnFinish(ctx);
         Schedule?.OnFinish(ctx);
 
-        ctx.Items.Clear();
+        //ctx.Items.Clear();
     }
 
     /// <summary>处理任务。内部分批处理</summary>
@@ -209,19 +215,19 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// <summary>处理一批数据，一个任务内多次调用</summary>
     /// <param name="ctx">上下文</param>
     /// <returns></returns>
-    protected abstract Int32 Execute(JobContext ctx);
+    public abstract Int32 Execute(JobContext ctx);
 
     /// <summary>生产消息</summary>
     /// <param name="topic">主题</param>
     /// <param name="messages">消息集合</param>
     /// <param name="option">消息选项</param>
     /// <returns></returns>
-    public Int32 Produce(String topic, String[] messages, MessageOption option = null) => Provider.Produce(Job?.Name, topic, messages, option);
+    public virtual Int32 Produce(String topic, String[] messages, MessageOption option = null) => Provider.Produce(Job?.Name, topic, messages, option);
 
     /// <summary>延迟执行，指定下一次执行时间</summary>
     /// <param name="ctx"></param>
     /// <param name="nextTime"></param>
-    public void Delay(JobContext ctx, DateTime nextTime)
+    public virtual void Delay(JobContext ctx, DateTime nextTime)
     {
         ctx.Status = JobStatus.延迟;
         ctx.NextTime = nextTime;

@@ -71,7 +71,7 @@ public abstract class MessageHandler : Handler
     /// <summary>根据解码后的消息执行任务</summary>
     /// <param name="ctx">上下文</param>
     /// <returns></returns>
-    protected override Int32 Execute(JobContext ctx)
+    public override Int32 Execute(JobContext ctx)
     {
         var count = 0;
         foreach (String item in ctx.Data as IEnumerable)
@@ -86,6 +86,6 @@ public abstract class MessageHandler : Handler
     /// <param name="ctx">上下文</param>
     /// <param name="message">消息</param>
     /// <returns></returns>
-    protected virtual Boolean ProcessItem(JobContext ctx, String message) => true;
+    public virtual Boolean ProcessItem(JobContext ctx, String message) => true;
     #endregion
 }

@@ -9,8 +9,10 @@ namespace AntJob.Extensions;
 
 /// <summary>数据处理作业（泛型）</summary>
 /// <remarks>
+/// 文档：https://newlifex.com/blood/antjob
+/// 
 /// 定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑。
-/// 任务切片条件：StartTime + Step + Offset &lt;= Now
+/// 任务切片条件：DataTime + Step + Offset &lt;= Now
 /// </remarks>
 /// <typeparam name="TEntity"></typeparam>
 public abstract class DataHandler<TEntity> : DataHandler where TEntity : Entity<TEntity>, new()
@@ -22,7 +24,7 @@ public abstract class DataHandler<TEntity> : DataHandler where TEntity : Entity<
     /// <summary>处理一批数据</summary>
     /// <param name="ctx">上下文</param>
     /// <returns></returns>
-    protected override Int32 Execute(JobContext ctx)
+    public override Int32 Execute(JobContext ctx)
     {
         var count = 0;
         foreach (var item in ctx.Data as IEnumerable)
@@ -35,14 +37,16 @@ public abstract class DataHandler<TEntity> : DataHandler where TEntity : Entity<
     /// <param name="ctx">上下文</param>
     /// <param name="entity"></param>
     /// <returns></returns>
-    protected virtual Boolean ProcessItem(JobContext ctx, TEntity entity) => true;
+    public virtual Boolean ProcessItem(JobContext ctx, TEntity entity) => true;
     #endregion
 }
 
 /// <summary>数据处理作业</summary>
 /// <remarks>
+/// 文档：https://newlifex.com/blood/antjob
+/// 
 /// 定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑。
-/// 任务切片条件：StartTime + Step + Offset &lt;= Now
+/// 任务切片条件：DataTime + Step + Offset &lt;= Now
 /// </remarks>
 public abstract class DataHandler : Handler
 {
@@ -183,7 +187,7 @@ public abstract class DataHandler : Handler
     /// <summary>处理一批数据</summary>
     /// <param name="ctx">上下文</param>
     /// <returns></returns>
-    protected override Int32 Execute(JobContext ctx)
+    public override Int32 Execute(JobContext ctx)
     {
         var count = 0;
         foreach (var item in ctx.Data as IEnumerable)
@@ -198,6 +202,6 @@ public abstract class DataHandler : Handler
     /// <param name="ctx">上下文</param>
     /// <param name="entity"></param>
     /// <returns></returns>
-    protected virtual Boolean ProcessItem(JobContext ctx, IEntity entity) => true;
+    public virtual Boolean ProcessItem(JobContext ctx, IEntity entity) => true;
     #endregion
 }

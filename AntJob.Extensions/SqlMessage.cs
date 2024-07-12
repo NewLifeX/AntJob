@@ -20,7 +20,7 @@ public class SqlMessage : MessageHandler
     /// <summary>根据解码后的消息执行任务</summary>
     /// <param name="ctx">上下文</param>
     /// <returns></returns>
-    protected override Int32 Execute(JobContext ctx)
+    public override Int32 Execute(JobContext ctx)
     {
         var msgs = ctx.Data as String[];
         var sqls = Job.Data;

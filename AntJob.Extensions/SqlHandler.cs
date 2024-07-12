@@ -24,7 +24,7 @@ public class SqlHandler : Handler
     /// <summary>执行</summary>
     /// <param name="ctx"></param>
     /// <returns></returns>
-    protected override Int32 Execute(JobContext ctx)
+    public override Int32 Execute(JobContext ctx)
     {
         //var sqls = ctx.Task.Data as String;
         var sqls = Job.Data;

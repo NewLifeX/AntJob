@@ -17,7 +17,7 @@ internal class BuildPatient : Handler
         Job.Cron = "5 1/3 * * * ?";
     }
 
-    protected override Int32 Execute(JobContext ctx)
+    public override Int32 Execute(JobContext ctx)
     {
         // 随机造几个病人
         var count = Rand.Next(1, 9);

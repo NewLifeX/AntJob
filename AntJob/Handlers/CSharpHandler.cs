@@ -26,7 +26,7 @@ public class CSharpHandler : Handler
     /// <summary>执行</summary>
     /// <param name="ctx"></param>
     /// <returns></returns>
-    protected override Int32 Execute(JobContext ctx)
+    public override Int32 Execute(JobContext ctx)
     {
         var code = ctx.Data as String;
         if (code.IsNullOrWhiteSpace()) return -1;

@@ -29,7 +29,7 @@ class BuildWill : DataHandler
         return base.Start();
     }
 
-    protected override Boolean ProcessItem(JobContext ctx, IEntity entity)
+    public override Boolean ProcessItem(JobContext ctx, IEntity entity)
     {
         var pi = entity as ZYBH0;
 
