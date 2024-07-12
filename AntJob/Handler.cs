@@ -147,7 +147,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         };
 
         // APM埋点
-        var span = Schedule.Tracer?.NewSpan($"job:{Name}", task.Data ?? $"({task.DataTime.ToFullString()}, {task.End.ToFullString()})");
+        using var span = Schedule.Tracer?.NewSpan($"job:{Name}", task.Data ?? $"({task.DataTime.ToFullString()}, {task.End.ToFullString()})");
         result.TraceId = span?.TraceId;
 
         // 较慢的作业，及时报告进度
@@ -170,7 +170,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         finally
         {
             Interlocked.Decrement(ref _Busy);
-            span?.Dispose();
+            //span?.Dispose();
         }
 
         sw.Stop();
