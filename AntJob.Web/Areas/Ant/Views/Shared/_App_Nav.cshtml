@@ -40,8 +40,6 @@
                             {
                                 var url = elm.Value + "";
                                 var v = url.Substring(null, "?");
-                                if (start.Year > 2000) url += "&dtStart=" + start.ToFullString();
-                                if (end.Year > 2000) url += "&dtEnd=" + end.ToFullString();
                                 <li role="presentation" class="@(path.EqualIgnoreCase(v)?"active":"")">
                                     <a href="@url">@elm.Key</a>
                                 </li>
@@ -53,8 +51,6 @@
                 {
                     var url = item.Value + "";
                     var v = url.Substring(null, "?");
-                    if (start.Year > 2000) url += "&dtStart=" + start.ToFullString();
-                    if (end.Year > 2000) url += "&dtEnd=" + end.ToFullString();
                     <li role="presentation" class="@(path.EqualIgnoreCase(v)?"active":"")">
                         <a href="@url">@item.Key</a>
                     </li>
