@@ -1,4 +1,5 @@
-﻿using AntJob.Data;
+﻿using System.Collections;
+using AntJob.Data;
 using NewLife.Collections;
 using NewLife.Data;
 
@@ -58,5 +59,21 @@ public class JobContext : IExtend
     #region 扩展属性
     /// <summary>处理速度</summary>
     public Int32 Speed => (Cost <= 0 || Total == 0) ? 0 : (Int32)Math.Min(Total * 1000L / Cost, Int32.MaxValue);
+    #endregion
+
+    #region 方法
+    /// <summary>根据指定实体类型返回数据列表</summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public IList<T> GetDatas<T>()
+    {
+        if (Data == null) return null;
+        if (Data is IList<T> data) return data;
+
+        // 修改列表类型，由 IList<IEntity> 改为 IList<TEntity> ，方便用户使用
+        if (Data is IEnumerable enumerable) return enumerable.Cast<T>().ToList();
+
+        return null;
+    }
     #endregion
 }

@@ -21,6 +21,22 @@ public abstract class DataHandler<TEntity> : DataHandler where TEntity : Entity<
     public DataHandler() => Factory = Entity<TEntity>.Meta.Factory;
 
     #region 数据处理
+    /// <summary>分批抽取数据，一个任务内多次调用</summary>
+    /// <param name="ctx">上下文</param>
+    /// <param name="row">开始行数</param>
+    /// <returns></returns>
+    protected override Object Fetch(JobContext ctx, ref Int32 row)
+    {
+        var list = base.Fetch(ctx, ref row);
+        if (list is IEnumerable enumerable)
+        {
+            // 修改列表类型，由 IList<IEntity> 改为 IList<TEntity> ，方便用户使用
+            list = enumerable.Cast<TEntity>().ToList();
+        }
+
+        return list;
+    }
+
     /// <summary>处理一批数据</summary>
     /// <param name="ctx">上下文</param>
     /// <returns></returns>
@@ -28,7 +44,9 @@ public abstract class DataHandler<TEntity> : DataHandler where TEntity : Entity<
     {
         var count = 0;
         foreach (var item in ctx.Data as IEnumerable)
+        {
             if (ProcessItem(ctx, item as TEntity)) count++;
+        }
 
         return count;
     }
