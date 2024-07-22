@@ -644,14 +644,14 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         // 开始时间和结束时间是否越界
         if (start >= now) return false;
 
+        // 计算下一次执行时间
+        end = job.GetNext();
+
         // 任务结束时间超过作业结束时间时，取后者
         if (job.End.Year > 2000 && end > job.End) end = job.End;
 
         // 时间区间判断
         if (end.Year > 2000 && start >= end) return false;
-
-        // 计算下一次执行时间
-        end = job.GetNext();
 
         return true;
     }
