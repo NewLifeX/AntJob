@@ -9,11 +9,7 @@ public class Program
     {
         XTrace.UseConsole();
 
-        var app = ApplicationManager.Load();
-        do
-        {
-            app.Start(CreateHostBuilder(args).Build());
-        } while (app.Restarting);
+        CreateHostBuilder(args).Build().Run();
     }
 
     public static IHostBuilder CreateHostBuilder(String[] args)

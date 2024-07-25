@@ -273,6 +273,9 @@ public partial class App
 
     #endregion
 
+    #region 扩展查询
+    #endregion
+
     #region 字段名
     /// <summary>取得应用系统字段信息的快捷方式</summary>
     public partial class _

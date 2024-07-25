@@ -133,7 +133,7 @@ public partial class AppOnline
     [DisplayName("耗时")]
     [Description("耗时。执行任务总耗时，秒")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("Cost", "耗时。执行任务总耗时，秒", "")]
+    [BindColumn("Cost", "耗时。执行任务总耗时，秒", "", ItemType = "TimeSpan")]
     public Int64 Cost { get => _Cost; set { if (OnPropertyChanging("Cost", value)) { _Cost = value; OnPropertyChanged("Cost"); } } }
 
     private Int64 _Speed;
@@ -269,6 +269,9 @@ public partial class AppOnline
     [Map(nameof(AppID), typeof(App), "ID")]
     public String AppName => App?.ToString();
 
+    #endregion
+
+    #region 扩展查询
     #endregion
 
     #region 字段名

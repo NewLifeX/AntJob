@@ -61,7 +61,7 @@ public partial class JobTask
     [DisplayName("数据时间")]
     [Description("数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用")]
     [DataObjectField(false, false, true, 0)]
-    [BindColumn("DataTime", "数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用", "", Master = true)]
+    [BindColumn("DataTime", "数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用", "", DataScale = "time", Master = true)]
     public DateTime DataTime { get => _DataTime; set { if (OnPropertyChanging("DataTime", value)) { _DataTime = value; OnPropertyChanged("DataTime"); } } }
 
     private DateTime _End;
@@ -125,7 +125,7 @@ public partial class JobTask
     [DisplayName("耗时")]
     [Description("耗时。秒，执行端计算的执行时间")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("Cost", "耗时。秒，执行端计算的执行时间", "")]
+    [BindColumn("Cost", "耗时。秒，执行端计算的执行时间", "", ItemType = "TimeSpan")]
     public Int32 Cost { get => _Cost; set { if (OnPropertyChanging("Cost", value)) { _Cost = value; OnPropertyChanged("Cost"); } } }
 
     private Int32 _FullCost;
@@ -133,7 +133,7 @@ public partial class JobTask
     [DisplayName("全部耗时")]
     [Description("全部耗时。秒，从任务发放到执行完成的时间")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("FullCost", "全部耗时。秒，从任务发放到执行完成的时间", "")]
+    [BindColumn("FullCost", "全部耗时。秒，从任务发放到执行完成的时间", "", ItemType = "TimeSpan")]
     public Int32 FullCost { get => _FullCost; set { if (OnPropertyChanging("FullCost", value)) { _FullCost = value; OnPropertyChanged("FullCost"); } } }
 
     private JobStatus _Status;
@@ -327,6 +327,41 @@ public partial class JobTask
     [Map(nameof(JobID), typeof(Job), "ID")]
     public String JobName => Job?.ToString();
 
+    #endregion
+
+    #region 扩展查询
+    /// <summary>根据编号查找</summary>
+    /// <param name="id">编号</param>
+    /// <returns>实体对象</returns>
+    public static JobTask FindByID(Int32 id)
+    {
+        if (id < 0) return null;
+
+        return Find(_.ID == id);
+    }
+
+    /// <summary>根据作业查找</summary>
+    /// <param name="jobId">作业</param>
+    /// <returns>实体列表</returns>
+    public static IList<JobTask> FindAllByJobID(Int32 jobId)
+    {
+        if (jobId < 0) return [];
+
+        return FindAll(_.JobID == jobId);
+    }
+    #endregion
+
+    #region 数据清理
+    /// <summary>清理指定时间段内的数据</summary>
+    /// <param name="start">开始时间。未指定时清理小于指定时间的所有数据</param>
+    /// <param name="end">结束时间</param>
+    /// <returns>清理行数</returns>
+    public static Int32 DeleteWith(DateTime start, DateTime end)
+    {
+        if (start == end) return Delete(_.DataTime == start);
+
+        return Delete(_.DataTime.Between(start, end));
+    }
     #endregion
 
     #region 字段名

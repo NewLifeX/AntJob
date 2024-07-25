@@ -27,7 +27,7 @@ public partial class AppMessage
     [DisplayName("编号")]
     [Description("编号")]
     [DataObjectField(true, false, false, 0)]
-    [BindColumn("Id", "编号", "")]
+    [BindColumn("Id", "编号", "", DataScale = "time")]
     public Int64 Id { get => _Id; set { if (OnPropertyChanging("Id", value)) { _Id = value; OnPropertyChanged("Id"); } } }
 
     private Int32 _AppID;
@@ -165,6 +165,29 @@ public partial class AppMessage
     [Map(nameof(JobID), typeof(Job), "ID")]
     public String JobName => Job?.ToString();
 
+    #endregion
+
+    #region 扩展查询
+    /// <summary>根据编号查找</summary>
+    /// <param name="id">编号</param>
+    /// <returns>实体对象</returns>
+    public static AppMessage FindById(Int64 id)
+    {
+        if (id < 0) return null;
+
+        return Find(_.Id == id);
+    }
+    #endregion
+
+    #region 数据清理
+    /// <summary>清理指定时间段内的数据</summary>
+    /// <param name="start">开始时间。未指定时清理小于指定时间的所有数据</param>
+    /// <param name="end">结束时间</param>
+    /// <returns>清理行数</returns>
+    public static Int32 DeleteWith(DateTime start, DateTime end)
+    {
+        return Delete(_.Id.Between(start, end, Meta.Factory.Snow));
+    }
     #endregion
 
     #region 字段名

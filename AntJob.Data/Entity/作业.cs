@@ -175,7 +175,7 @@ public partial class Job
     [DisplayName("最大执行时间")]
     [Description("最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("MaxTime", "最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器", "")]
+    [BindColumn("MaxTime", "最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器", "", ItemType = "TimeSpan")]
     public Int32 MaxTime { get => _MaxTime; set { if (OnPropertyChanging("MaxTime", value)) { _MaxTime = value; OnPropertyChanged("MaxTime"); } } }
 
     private Int32 _MaxRetain;
@@ -193,7 +193,7 @@ public partial class Job
     [DisplayName("最大空闲时间")]
     [Description("最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("MaxIdle", "最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警", "")]
+    [BindColumn("MaxIdle", "最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警", "", ItemType = "TimeSpan")]
     public Int32 MaxIdle { get => _MaxIdle; set { if (OnPropertyChanging("MaxIdle", value)) { _MaxIdle = value; OnPropertyChanged("MaxIdle"); } } }
 
     private Int32 _ErrorDelay;
@@ -202,7 +202,7 @@ public partial class Job
     [DisplayName("错误延迟")]
     [Description("错误延迟。默认60秒，出错延迟后重新发放")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("ErrorDelay", "错误延迟。默认60秒，出错延迟后重新发放", "")]
+    [BindColumn("ErrorDelay", "错误延迟。默认60秒，出错延迟后重新发放", "", ItemType = "TimeSpan")]
     public Int32 ErrorDelay { get => _ErrorDelay; set { if (OnPropertyChanging("ErrorDelay", value)) { _ErrorDelay = value; OnPropertyChanged("ErrorDelay"); } } }
 
     private DateTime _Deadline;
@@ -476,6 +476,9 @@ public partial class Job
     [Map(nameof(AppID), typeof(App), "ID")]
     public String AppName => App?.ToString();
 
+    #endregion
+
+    #region 扩展查询
     #endregion
 
     #region 字段名

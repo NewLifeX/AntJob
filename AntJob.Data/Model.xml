@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<EntityModel xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="https://newlifex.com https://newlifex.com/Model202309.xsd" Document="https://newlifex.com/xcode/model" xmlns="https://newlifex.com/Model202309.xsd">
+<EntityModel xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="https://newlifex.com https://newlifex.com/Model202407.xsd" Document="https://newlifex.com/xcode/model" xmlns="https://newlifex.com/Model202407.xsd">
   <Option>
     <!--类名模板。其中{name}替换为Table.Name，如{name}Model/I{name}Dto等-->
     <ClassNameTemplate />
@@ -82,7 +82,7 @@
         <Column Name="Total" DataType="Int64" Description="总数" />
         <Column Name="Success" DataType="Int64" Description="成功" />
         <Column Name="Error" DataType="Int64" Description="错误" />
-        <Column Name="Cost" DataType="Int64" Description="耗时。执行任务总耗时，秒" />
+        <Column Name="Cost" DataType="Int64" ItemType="TimeSpan" Description="耗时。执行任务总耗时，秒" />
         <Column Name="Speed" DataType="Int64" Description="速度。每秒处理数" />
         <Column Name="LastKey" DataType="String" Description="最后键" />
         <Column Name="TraceId" DataType="String" Length="200" Description="追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链" Category="扩展" />
@@ -99,7 +99,7 @@
     </Table>
     <Table Name="AppHistory" Description="应用历史。数据计算应用的操作历史">
       <Columns>
-        <Column Name="Id" DataType="Int64" PrimaryKey="True" Description="编号" />
+        <Column Name="Id" DataType="Int64" PrimaryKey="True" DataScale="time" Description="编号" />
         <Column Name="AppID" DataType="Int32" Map="App@ID@$" Description="应用" />
         <Column Name="Name" DataType="String" Master="True" Description="名称" />
         <Column Name="Action" DataType="String" Description="操作" />
@@ -136,10 +136,10 @@
         <Column Name="MaxTask" DataType="Int32" Description="并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度" Category="控制参数" />
         <Column Name="MaxError" DataType="Int32" Description="最大错误。连续错误达到最大错误数时停止" Category="控制参数" />
         <Column Name="MaxRetry" DataType="Int32" Description="最大重试。默认10次，超过该次数后将不再重试" Category="控制参数" />
-        <Column Name="MaxTime" DataType="Int32" Description="最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器" Category="控制参数" />
+        <Column Name="MaxTime" DataType="Int32" ItemType="TimeSpan" Description="最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器" Category="控制参数" />
         <Column Name="MaxRetain" DataType="Int32" Description="保留。任务项保留天数，超过天数的任务项将被删除，默认30天" Category="控制参数" />
-        <Column Name="MaxIdle" DataType="Int32" Description="最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警" Category="控制参数" />
-        <Column Name="ErrorDelay" DataType="Int32" Description="错误延迟。默认60秒，出错延迟后重新发放" Category="控制参数" />
+        <Column Name="MaxIdle" DataType="Int32" ItemType="TimeSpan" Description="最大空闲时间。默认3600秒，超过该时间不更新则认为应用程序故障，系统触发告警" Category="控制参数" />
+        <Column Name="ErrorDelay" DataType="Int32" ItemType="TimeSpan" Description="错误延迟。默认60秒，出错延迟后重新发放" Category="控制参数" />
         <Column Name="Deadline" DataType="DateTime" Description="最后期限。超过该时间后，任务将不再执行" Category="控制参数" />
         <Column Name="Total" DataType="Int64" Description="总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1" Category="统计" />
         <Column Name="Success" DataType="Int64" Description="成功。成功处理的数据，取自于Handler.Execute返回值，或者ProcessItem返回true的个数" Category="统计" />
@@ -169,7 +169,7 @@
         <Column Name="AppID" DataType="Int32" Map="App@ID@$" Description="应用" />
         <Column Name="JobID" DataType="Int32" Map="Job@ID@$" Description="作业" />
         <Column Name="Client" DataType="String" Description="客户端。IP加进程" />
-        <Column Name="DataTime" DataType="DateTime" DataScale="time" Master="True" Description="数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
+        <Column Name="DataTime" DataType="DateTime" Master="True" DataScale="time" Description="数据时间。大于等于，定时调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
         <Column Name="End" DataType="DateTime" Description="结束。小于不等于，数据调度到达该时间点后触发（可能有偏移量），消息调度不适用" />
         <Column Name="BatchSize" DataType="Int32" Description="批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用" />
         <Column Name="Total" DataType="Int32" Description="总数。任务处理的总数据，例如数据调度抽取得到的总行数，定时调度默认1" />
@@ -178,7 +178,7 @@
         <Column Name="Times" DataType="Int32" Description="次数" />
         <Column Name="Speed" DataType="Int32" Description="速度。每秒处理数，执行端计算" />
         <Column Name="Cost" DataType="Int32" ItemType="TimeSpan" Description="耗时。秒，执行端计算的执行时间" />
-        <Column Name="FullCost" DataType="Int32"  ItemType="TimeSpan" Description="全部耗时。秒，从任务发放到执行完成的时间" />
+        <Column Name="FullCost" DataType="Int32" ItemType="TimeSpan" Description="全部耗时。秒，从任务发放到执行完成的时间" />
         <Column Name="Status" DataType="Int32" Description="状态" Type="JobStatus" />
         <Column Name="MsgCount" DataType="Int32" Description="消息。消费消息数" />
         <Column Name="Server" DataType="String" Description="服务器" />
@@ -224,7 +224,7 @@
     </Table>
     <Table Name="AppMessage" Description="应用消息。消息调度，某些作业负责生产消息，供其它作业进行消费处理">
       <Columns>
-        <Column Name="Id" DataType="Int64" PrimaryKey="True" Description="编号" />
+        <Column Name="Id" DataType="Int64" PrimaryKey="True" DataScale="time" Description="编号" />
         <Column Name="AppID" DataType="Int32" Map="App@ID@$" Description="应用" />
         <Column Name="JobID" DataType="Int32" Map="Job@ID@$" Description="作业。生产消息的作业" />
         <Column Name="Topic" DataType="String" Description="主题。区分作业下多种消息" />
