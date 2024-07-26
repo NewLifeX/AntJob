@@ -96,6 +96,14 @@ public partial class AppOnline
     [BindColumn("Server", "服务端。客户端登录到哪个服务端，IP加端口", "")]
     public String Server { get => _Server; set { if (OnPropertyChanging("Server", value)) { _Server = value; OnPropertyChanged("Server"); } } }
 
+    private Boolean _Enable;
+    /// <summary>启用。是否允许申请任务</summary>
+    [DisplayName("启用")]
+    [Description("启用。是否允许申请任务")]
+    [DataObjectField(false, false, false, 0)]
+    [BindColumn("Enable", "启用。是否允许申请任务", "")]
+    public Boolean Enable { get => _Enable; set { if (OnPropertyChanging("Enable", value)) { _Enable = value; OnPropertyChanged("Enable"); } } }
+
     private Int32 _Tasks;
     /// <summary>任务数</summary>
     [DisplayName("任务数")]
@@ -215,6 +223,7 @@ public partial class AppOnline
             "Version" => _Version,
             "CompileTime" => _CompileTime,
             "Server" => _Server,
+            "Enable" => _Enable,
             "Tasks" => _Tasks,
             "Total" => _Total,
             "Success" => _Success,
@@ -242,6 +251,7 @@ public partial class AppOnline
                 case "Version": _Version = Convert.ToString(value); break;
                 case "CompileTime": _CompileTime = value.ToDateTime(); break;
                 case "Server": _Server = Convert.ToString(value); break;
+                case "Enable": _Enable = value.ToBoolean(); break;
                 case "Tasks": _Tasks = value.ToInt(); break;
                 case "Total": _Total = value.ToLong(); break;
                 case "Success": _Success = value.ToLong(); break;
@@ -304,6 +314,9 @@ public partial class AppOnline
 
         /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
         public static readonly Field Server = FindByName("Server");
+
+        /// <summary>启用。是否允许申请任务</summary>
+        public static readonly Field Enable = FindByName("Enable");
 
         /// <summary>任务数</summary>
         public static readonly Field Tasks = FindByName("Tasks");
@@ -373,6 +386,9 @@ public partial class AppOnline
 
         /// <summary>服务端。客户端登录到哪个服务端，IP加端口</summary>
         public const String Server = "Server";
+
+        /// <summary>启用。是否允许申请任务</summary>
+        public const String Enable = "Enable";
 
         /// <summary>任务数</summary>
         public const String Tasks = "Tasks";

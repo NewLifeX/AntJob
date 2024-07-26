@@ -78,6 +78,7 @@
         <Column Name="Version" DataType="String" Description="版本。客户端" />
         <Column Name="CompileTime" DataType="DateTime" Description="编译时间" />
         <Column Name="Server" DataType="String" Description="服务端。客户端登录到哪个服务端，IP加端口" />
+        <Column Name="Enable" DataType="Boolean" Description="启用。是否允许申请任务" />
         <Column Name="Tasks" DataType="Int32" Description="任务数" />
         <Column Name="Total" DataType="Int64" Description="总数" />
         <Column Name="Success" DataType="Int64" Description="成功" />

@@ -186,7 +186,7 @@ public class AppService
     public AppOnline GetOnline(App app, String ip)
     {
         var ins = $"{app.Name}@{ip}";
-        var online = AppOnline.FindByInstance(ins) ?? new AppOnline { CreateIP = ip };
+        var online = AppOnline.FindByInstance(ins) ?? new AppOnline { Enable = true, CreateIP = ip };
         online.AppID = app.ID;
         online.Instance = ins;
 
