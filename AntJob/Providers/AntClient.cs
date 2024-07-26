@@ -83,7 +83,7 @@ public class AntClient : ClientBase
         request.DisplayName = dname;
         request.Machine = Environment.MachineName;
         request.ProcessId = Process.GetCurrentProcess().Id;
-        request.Compile = asmx.Compile;
+        //request.Compile = asmx.Compile;
 
         return request;
     }

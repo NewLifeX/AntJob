@@ -59,7 +59,8 @@ public class AppService
 
         // 版本和编译时间
         if (app.Version.IsNullOrEmpty() || app.Version.CompareTo(model.Version) < 0) app.Version = model.Version;
-        if (app.CompileTime < model.Compile) app.CompileTime = model.Compile;
+        var compile = model.Compile.ToDateTime().ToLocalTime();
+        if (app.CompileTime < compile) app.CompileTime = compile;
         if (app.DisplayName.IsNullOrEmpty()) app.DisplayName = model.DisplayName;
 
         app.Save();
@@ -69,7 +70,7 @@ public class AppService
         online.Name = model.Machine;
         online.ProcessId = model.ProcessId;
         online.Version = model.Version;
-        online.CompileTime = model.Compile;
+        online.CompileTime = compile;
         online.Save();
 
         WriteHistory(app, autoReg ? "注册" : "登录", true, $"[{model.Code}/{model.Secret}]在[{model.ClientId}]登录[{app}]成功", ip);

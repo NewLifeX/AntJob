@@ -23,8 +23,8 @@ public class LoginModel : LoginRequest
     ///// <summary>版本</summary>
     //public String Version { get; set; }
 
-    /// <summary>编译时间</summary>
-    public DateTime Compile { get; set; }
+    ///// <summary>编译时间</summary>
+    //public DateTime Compile { get; set; }
 }
 
 ///// <summary>登录响应</summary>
