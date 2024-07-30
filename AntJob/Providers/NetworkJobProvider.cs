@@ -56,6 +56,16 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         var list = new List<IJob>();
         foreach (var handler in bs)
         {
+            // 初始化处理器
+            try
+            {
+                handler.Init();
+            }
+            catch (Exception ex)
+            {
+                Log?.Error(ex.Message);
+            }
+
             var job = handler.Job ?? new JobModel();
 
             job.Name = handler.Name;
@@ -74,7 +84,8 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
             }
 
             // 改为UTC通信
-            job.DataTime = job.DataTime.ToUniversalTime();
+            if (job.DataTime.Year > 1000)
+                job.DataTime = job.DataTime.ToUniversalTime();
             if (job.End.Year > 1000)
                 job.End = job.End.ToUniversalTime();
 

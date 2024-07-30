@@ -85,6 +85,9 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     #endregion
 
     #region 基本方法
+    /// <summary>初始化。作业处理器启动之前</summary>
+    public virtual void Init() { }
+
     /// <summary>开始</summary>
     public virtual Boolean Start()
     {

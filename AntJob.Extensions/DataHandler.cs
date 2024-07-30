@@ -104,11 +104,9 @@ public abstract class DataHandler : Handler
     #endregion
 
     #region 方法
-    /// <summary>开始</summary>
-    public override Boolean Start()
+    /// <summary>初始化。作业处理器启动之前</summary>
+    public override void Init()
     {
-        if (Active) return false;
-
         if (Factory == null) throw new ArgumentNullException(nameof(Factory));
 
         // 自动识别雪花Id字段
@@ -123,12 +121,38 @@ public abstract class DataHandler : Handler
         var job = Job;
         if (job.Step == 0) job.Step = 30;
 
-        //// 获取最小时间
-        //if (job.DataTime.Year < 2000) throw new InvalidOperationException("数据任务必须设置开始时间");
-
         //todo 如果DataTime为空，则自动获取最小时间，并设置到DataTime，以减轻平台设置负担
 
-        return base.Start();
+        // 获取最小数据时间
+        if (job.DataTime.Year < 2000)
+        {
+            //throw new InvalidOperationException("数据任务必须设置开始时间");
+            job.DataTime = GetMinDataTime();
+        }
+    }
+
+    /// <summary>获取最小数据时间。初始化作业时自动设置首个数据时间</summary>
+    /// <returns></returns>
+    public virtual DateTime GetMinDataTime()
+    {
+        var field = Field;
+        if (field == null) return DateTime.MinValue;
+
+        // 按时间字段升序，取第一个
+        var list = Factory.FindAll(null, field.Asc(), field, 0, 1);
+        if (list.Count > 0)
+        {
+            var value = list[0][field.Name];
+            if (field.Type == typeof(Int64))
+            {
+                // 雪花Id
+                return Factory.Snow.TryParse(value.ToLong(), out var dt, out _, out _) ? dt.ToLocalTime() : DateTime.MinValue;
+            }
+
+            return value.ToDateTime();
+        }
+
+        return DateTime.MinValue;
     }
     #endregion
 
