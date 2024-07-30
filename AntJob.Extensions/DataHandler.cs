@@ -18,7 +18,20 @@ namespace AntJob.Extensions;
 public abstract class DataHandler<TEntity> : DataHandler where TEntity : Entity<TEntity>, new()
 {
     /// <summary>实例化数据处理作业</summary>
-    public DataHandler() => Factory = Entity<TEntity>.Meta.Factory;
+    public DataHandler()
+    {
+        Factory = Entity<TEntity>.Meta.Factory;
+
+        // 自动识别数据分区字段、主时间字段、雪花Id、更新时间字段、创建时间字段
+        var fact = Factory;
+        var field = fact.Fields.FirstOrDefault(e => e.Field != null && e.Field.DataScale.StartsWithIgnoreCase("time", "timeShard"));
+        field ??= fact.Fields.FirstOrDefault(e => e.PrimaryKey && !e.IsIdentity && e.Type == typeof(Int64));
+        field ??= fact.MasterTime;
+        field ??= fact.Fields.FirstOrDefault(e => e.Name.EqualIgnoreCase("UpdateTime"));
+        field ??= fact.Fields.FirstOrDefault(e => e.Name.EqualIgnoreCase("CreateTime"));
+
+        Field = field;
+    }
 
     #region 数据处理
     /// <summary>分批抽取数据，一个任务内多次调用</summary>
