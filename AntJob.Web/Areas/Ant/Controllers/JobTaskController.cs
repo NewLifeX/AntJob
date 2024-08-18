@@ -26,9 +26,14 @@ public class JobTaskController : AntEntityController<JobTask>
     {
         LogOnChange = true;
 
-        ListFields.RemoveField("Server", "ProcessID");
+        ListFields.RemoveField("Server", "ProcessID", "End");
         ListFields.RemoveCreateField();
 
+        {
+            var df = ListFields.GetField("DataTime") as ListField;
+            df.Header = "时间/数据";
+            df.AddService(new MyTitleField());
+        }
         {
             var df = ListFields.GetField("Success") as ListField;
             df.AddService(new ColorNumberField { Color = "green" });
@@ -62,21 +67,18 @@ public class JobTaskController : AntEntityController<JobTask>
         ListFields.TraceUrl();
     }
 
-    class MyStatusField : ILinkExtend
+    class MyTitleField : ILinkExtend
     {
         public String Resolve(DataField field, IModel data)
         {
             var task = data as JobTask;
-            return task.Status switch
+            var mode = task?.Job?.Mode ?? JobModes.Time;
+            return mode switch
             {
-                JobStatus.就绪 => $"<font color=text-center>{task.Status}</font>",
-                JobStatus.抽取中 => $"<font color=warning>{task.Status}</font>",
-                JobStatus.处理中 => $"<font color=info>{task.Status}</font>",
-                JobStatus.错误 => $"<font color=danger>{task.Status}</font>",
-                JobStatus.完成 => $"<font color=success>{task.Status}</font>",
-                JobStatus.取消 => $"<font color=active>{task.Status}</font>",
-                JobStatus.延迟 => $"<font color=active>{task.Status}</font>",
-                _ => $"<font color=info>{task.Status}</font>",
+                JobModes.Data => $"({task.DataTime:MM-dd HH:mm:ss} - {task.End:HH:mm:ss})",
+                JobModes.Time => task.DataTime.ToFullString(),
+                JobModes.Message => task.Data?.Cut(64, ".."),
+                _ => task.DataTime.ToFullString(),
             };
         }
     }

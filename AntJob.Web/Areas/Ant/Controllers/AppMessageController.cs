@@ -2,6 +2,7 @@
 using AntJob.Data.Entity;
 using NewLife.Cube;
 using NewLife.Cube.Extensions;
+using NewLife.Cube.ViewModels;
 using NewLife.Web;
 
 namespace AntJob.Web.Areas.Ant.Controllers;
@@ -15,6 +16,13 @@ public class AppMessageController : AntEntityController<AppMessage>
     static AppMessageController()
     {
         LogOnChange = true;
+
+        ListFields.RemoveField("CreateIP", "UpdateIP");
+
+        {
+            var df = ListFields.AddListField("Data", null, "Topic");
+            df.TextAlign = TextAligns.Nowrap;
+        }
 
         ListFields.TraceUrl();
     }

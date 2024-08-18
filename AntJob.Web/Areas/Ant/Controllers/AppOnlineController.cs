@@ -16,6 +16,8 @@ public class AppOnlineController : AntEntityController<AppOnline>
     {
         //AppOnline.Meta.Table.DataTable.InsertOnly = true;
 
+        ListFields.RemoveField("End");
+
         ListFields.TraceUrl();
     }
 
