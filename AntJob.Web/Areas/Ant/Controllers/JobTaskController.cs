@@ -75,10 +75,10 @@ public class JobTaskController : AntEntityController<JobTask>
             var mode = task?.Job?.Mode ?? JobModes.Time;
             return mode switch
             {
-                JobModes.Data => $"({task.DataTime:MM-dd HH:mm:ss} - {task.End:HH:mm:ss})",
-                JobModes.Time => task.DataTime.ToFullString(),
-                JobModes.Message => task.Data?.Cut(64, ".."),
-                _ => task.DataTime.ToFullString(),
+                JobModes.Data => $"<font color=blue><b>({task.DataTime:MM-dd HH:mm:ss} - {task.End:HH:mm:ss})</b></font>",
+                JobModes.Time => $"<font color=DarkVoilet><b>{task.DataTime.ToFullString()}</b></font>",
+                JobModes.Message => $"<font color=green><b>{task.Data?.Cut(64, "..")}</b></font>",
+                _ => $"<b>{task.DataTime.ToFullString("")}</b>",
             };
         }
     }

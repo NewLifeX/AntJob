@@ -22,7 +22,8 @@ public class JobController : AntEntityController<Job>
     {
         LogOnChange = true;
 
-        ListFields.RemoveField("ClassName", "", "Cron", "Topic", "MessageCount", "Time", "End");
+        ListFields.RemoveField("ClassName", "Step", "Cron", "Topic", "MessageCount", "Time", "End");
+        ListFields.RemoveField("Times", "Speed");
         ListFields.RemoveField("MaxError", "MaxRetry", "MaxTime", "MaxRetain", "MaxIdle", "ErrorDelay", "Deadline");
         ListFields.RemoveCreateField().RemoveUpdateField();
         ListFields.AddListField("UpdateTime");
@@ -47,18 +48,18 @@ public class JobController : AntEntityController<Job>
             //df.GetClass = e => "text-center text-primary font-weight-bold";
             df.AddService(new ColorField { Color = "Magenta", GetValue = e => ((DateTime)e).ToFullString("") });
         }
-        {
-            var df = ListFields.GetField("Step");
-            df.DataVisible = e => (e as Job).Mode == JobModes.Data;
-        }
+        //{
+        //    var df = ListFields.GetField("Step");
+        //    df.DataVisible = e => (e as Job).Mode == JobModes.Data;
+        //}
         {
             var df = ListFields.GetField("BatchSize");
             df.DataVisible = e => (e as Job).Mode != JobModes.Time;
         }
-        {
-            var df = ListFields.GetField("MaxTask");
-            df.DataVisible = e => (e as Job).Mode != JobModes.Message;
-        }
+        //{
+        //    var df = ListFields.GetField("MaxTask");
+        //    df.DataVisible = e => (e as Job).Mode != JobModes.Message;
+        //}
         {
             var df = ListFields.GetField("Success");
             df.AddService(new ColorNumberField { Color = "green" });
@@ -112,6 +113,12 @@ public class JobController : AntEntityController<Job>
 
         public String Resolve(DataField field, IModel data)
         {
+            if (data is Job job)
+            {
+                if (job.Mode == JobModes.Message) return "";
+                if (job.Mode == JobModes.Data) return $"+{TimeSpan.FromSeconds(job.Step)}";
+            }
+
             var value = data[field.Name];
             if (GetValue != null) value = GetValue(value);
             return $"<font color={Color}><b>{value}</b></font>";

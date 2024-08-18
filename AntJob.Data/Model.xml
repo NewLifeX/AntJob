@@ -131,7 +131,7 @@
         <Column Name="MessageCount" DataType="Int32" Description="消息数" />
         <Column Name="DataTime" DataType="DateTime" Description="数据时间。下一次处理数据的时间，默认从当前时间开始" />
         <Column Name="End" DataType="DateTime" Description="结束。到该时间停止调度作业，默认不设置时永不停止" />
-        <Column Name="Step" DataType="Int32" Description="步进。切分任务的时间区间，秒" />
+        <Column Name="Step" DataType="Int32" ItemType="TimeSpan" Description="步进。切分任务的时间区间，秒" />
         <Column Name="BatchSize" DataType="Int32" Description="批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用" />
         <Column Name="Offset" DataType="Int32" ItemType="TimeSpan" Description="偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒" />
         <Column Name="MaxTask" DataType="Int32" Description="并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度" Category="控制参数" />

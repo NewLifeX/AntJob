@@ -123,7 +123,7 @@ public partial class Job
     [DisplayName("步进")]
     [Description("步进。切分任务的时间区间，秒")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("Step", "步进。切分任务的时间区间，秒", "")]
+    [BindColumn("Step", "步进。切分任务的时间区间，秒", "", ItemType = "TimeSpan")]
     public Int32 Step { get => _Step; set { if (OnPropertyChanging("Step", value)) { _Step = value; OnPropertyChanged("Step"); } } }
 
     private Int32 _BatchSize;

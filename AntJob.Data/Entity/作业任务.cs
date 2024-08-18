@@ -349,6 +349,16 @@ public partial class JobTask
 
         return FindAll(_.JobID == jobId);
     }
+
+    /// <summary>根据数据时间查找</summary>
+    /// <param name="dataTime">数据时间</param>
+    /// <returns>实体列表</returns>
+    public static IList<JobTask> FindAllByDataTime(DateTime dataTime)
+    {
+        if (dataTime.Year < 1000) return [];
+
+        return FindAll(_.DataTime == dataTime);
+    }
     #endregion
 
     #region 数据清理
