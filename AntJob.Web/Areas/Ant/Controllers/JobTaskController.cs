@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Web;
 using AntJob.Data;
 using AntJob.Data.Entity;
 using AntJob.Server.Services;
@@ -77,7 +78,7 @@ public class JobTaskController : AntEntityController<JobTask>
             {
                 JobModes.Data => $"<font color=blue><b>({task.DataTime:MM-dd HH:mm:ss} - {task.End:HH:mm:ss})</b></font>",
                 JobModes.Time => $"<font color=DarkVoilet><b>{task.DataTime.ToFullString()}</b></font>",
-                JobModes.Message => $"<font color=green><b>{task.Data?.Cut(64, "..")}</b></font>",
+                JobModes.Message => $"<font color=green title=\"{HttpUtility.HtmlEncode(task.Data)}\"><b>{task.Data?.Cut(64, "..")}</b></font>",
                 _ => $"<b>{task.DataTime.ToFullString("")}</b>",
             };
         }
