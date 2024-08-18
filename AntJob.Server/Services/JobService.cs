@@ -252,11 +252,11 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             var pending = cache.Get<DateTime>(pendingKey);
             if (pending.Year > 2000) next = pending;
         }
-        if (next < now)
+        if (next <= now)
         {
             var online = _appService.GetOnline(app, ip);
 
-            next = now.AddSeconds(60);
+            next = now.AddSeconds(15);
             list.AddRange(AcquireDelay(job, online.Server, ip, online.ProcessId, count, cache));
 
             if (list.Count > 0)
@@ -692,7 +692,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         return true;
     }
 
-    /// <summary>申请延迟任务</summary>
+    /// <summary>申请延迟/取消任务</summary>
     /// <param name="server">申请任务的服务端</param>
     /// <param name="ip">申请任务的IP</param>
     /// <param name="pid">申请任务的服务端进程ID</param>

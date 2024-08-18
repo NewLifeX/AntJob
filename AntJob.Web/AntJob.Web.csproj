@@ -31,11 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Remove="Areas\Ant\Views\AppHistory\_List_Data.cshtml" />
-    <Content Remove="Areas\Ant\Views\AppMessage\_List_Data.cshtml" />
-    <Content Remove="Areas\Ant\Views\AppMessage\_List_Search.cshtml" />
     <Content Remove="Areas\Ant\Views\App\_List_Data.cshtml" />
-    <Content Remove="Areas\Ant\Views\JobError\_List_Data.cshtml" />
-    <Content Remove="Areas\Ant\Views\JobError\_List_Search.cshtml" />
     <Content Remove="Areas\Ant\Views\JobTask\_List_Data.cshtml" />
     <Content Remove="Areas\Ant\Views\Job\_List_Data.cshtml" />
   </ItemGroup>
@@ -57,8 +53,6 @@
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\Ant\Views\AppMessage\" />
-    <Folder Include="Areas\Ant\Views\JobError\" />
     <Folder Include="Common\" />
     <Folder Include="Services\" />
   </ItemGroup>
