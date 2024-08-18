@@ -47,7 +47,8 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="6.1.2024.728-beta1411" />
+    <PackageReference Include="NewLife.Cube.Core" Version="6.1.2024.815" />
+    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.0.2024.805" />
     <PackageReference Include="NewLife.Stardust.Extensions" Version="3.0.2024.806" />
   </ItemGroup>
   <ItemGroup>

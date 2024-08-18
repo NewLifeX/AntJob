@@ -10,13 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NewLife;
-using NewLife.Caching;
 using NewLife.Cube;
 using NewLife.Log;
 using NewLife.Remoting;
 using NewLife.Remoting.Models;
 using NewLife.Serialization;
 using NewLife.Web;
+using ApiFilterAttribute = NewLife.Remoting.Extensions.ApiFilterAttribute;
 using IActionFilter = Microsoft.AspNetCore.Mvc.Filters.IActionFilter;
 
 namespace AntJob.Web.Controllers;
