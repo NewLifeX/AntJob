@@ -13,6 +13,8 @@ public partial class AppHistory : EntityBase<AppHistory>
     #region 对象操作
     static AppHistory()
     {
+        Meta.Table.DataTable.InsertOnly = true;
+
         // 累加字段
         //var df = Meta.Factory.AdditionalFields;
         //df.Add(__.AppID);

@@ -15,7 +15,7 @@ public class AppHistoryController : AntEntityController<AppHistory>
 {
     static AppHistoryController()
     {
-        AppOnline.Meta.Table.DataTable.InsertOnly = true;
+        //AppHistory.Meta.Table.DataTable.InsertOnly = true;
 
         ListFields.RemoveField("Id", "Version", "CompileTime", "");
         ListFields.AddListField("Remark", null, "TraceId");
