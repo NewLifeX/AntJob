@@ -361,10 +361,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
             jm.CreateTime = jm.UpdateTime = now;
 
-            // 雪花Id直接指定消息在未来的消费时间
             if (model.DelayTime > 0)
             {
-                jm.Id = snow.NewId(dTime);
                 jm.UpdateTime = dTime;
             }
 
