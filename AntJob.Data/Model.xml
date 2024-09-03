@@ -230,6 +230,7 @@
         <Column Name="JobID" DataType="Int32" Map="Job@ID@$" Description="作业。生产消息的作业" />
         <Column Name="Topic" DataType="String" Description="主题。区分作业下多种消息" />
         <Column Name="Data" DataType="String" Length="2000" Description="数据。可以是Json数据，比如StatID" />
+        <Column Name="DelayTime" DataType="DateTime" Description="延迟时间。延迟到该时间执行" />
         <Column Name="TraceId" DataType="String" Length="200" Description="追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链" Category="扩展" />
         <Column Name="CreateIP" DataType="String" Description="创建地址" Category="扩展" />
         <Column Name="CreateTime" DataType="DateTime" Description="创建时间" Category="扩展" />
@@ -238,6 +239,7 @@
       </Columns>
       <Indexes>
         <Index Columns="AppID,Topic,UpdateTime" />
+        <Index Columns="AppID,Topic,DelayTime" />
       </Indexes>
     </Table>
   </Tables>

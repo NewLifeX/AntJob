@@ -119,7 +119,7 @@ public partial class AppMessage : EntityBase<AppMessage>
     /// <returns></returns>
     public static IList<AppMessage> GetTopic(Int32 appid, String topic, DateTime endTime, Int32 count)
     {
-        return FindAll(_.AppID == appid & _.Topic == topic & _.Id <= Meta.Factory.Snow.GetId(endTime), _.Id.Asc(), null, 0, count);
+        return FindAll(_.AppID == appid & _.Topic == topic & _.DelayTime <= endTime, _.Id.Asc(), null, 0, count);
     }
 
     /// <summary>去重过滤</summary>

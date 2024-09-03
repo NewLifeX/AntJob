@@ -18,6 +18,7 @@ namespace AntJob.Data.Entity;
 [DataObject]
 [Description("应用消息。消息调度，某些作业负责生产消息，供其它作业进行消费处理")]
 [BindIndex("IX_AppMessage_AppID_Topic_UpdateTime", false, "AppID,Topic,UpdateTime")]
+[BindIndex("IX_AppMessage_AppID_Topic_DelayTime", false, "AppID,Topic,DelayTime")]
 [BindTable("AppMessage", Description = "应用消息。消息调度，某些作业负责生产消息，供其它作业进行消费处理", ConnName = "Ant", DbType = DatabaseType.None)]
 public partial class AppMessage
 {
@@ -61,6 +62,14 @@ public partial class AppMessage
     [DataObjectField(false, false, true, 2000)]
     [BindColumn("Data", "数据。可以是Json数据，比如StatID", "")]
     public String Data { get => _Data; set { if (OnPropertyChanging("Data", value)) { _Data = value; OnPropertyChanged("Data"); } } }
+
+    private DateTime _DelayTime;
+    /// <summary>延迟时间。延迟到该时间执行</summary>
+    [DisplayName("延迟时间")]
+    [Description("延迟时间。延迟到该时间执行")]
+    [DataObjectField(false, false, true, 0)]
+    [BindColumn("DelayTime", "延迟时间。延迟到该时间执行", "")]
+    public DateTime DelayTime { get => _DelayTime; set { if (OnPropertyChanging("DelayTime", value)) { _DelayTime = value; OnPropertyChanged("DelayTime"); } } }
 
     private String _TraceId;
     /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
@@ -121,6 +130,7 @@ public partial class AppMessage
             "JobID" => _JobID,
             "Topic" => _Topic,
             "Data" => _Data,
+            "DelayTime" => _DelayTime,
             "TraceId" => _TraceId,
             "CreateIP" => _CreateIP,
             "CreateTime" => _CreateTime,
@@ -137,6 +147,7 @@ public partial class AppMessage
                 case "JobID": _JobID = value.ToInt(); break;
                 case "Topic": _Topic = Convert.ToString(value); break;
                 case "Data": _Data = Convert.ToString(value); break;
+                case "DelayTime": _DelayTime = value.ToDateTime(); break;
                 case "TraceId": _TraceId = Convert.ToString(value); break;
                 case "CreateIP": _CreateIP = Convert.ToString(value); break;
                 case "CreateTime": _CreateTime = value.ToDateTime(); break;
@@ -177,6 +188,16 @@ public partial class AppMessage
 
         return Find(_.Id == id);
     }
+
+    /// <summary>根据应用查找</summary>
+    /// <param name="appId">应用</param>
+    /// <returns>实体列表</returns>
+    public static IList<AppMessage> FindAllByAppID(Int32 appId)
+    {
+        if (appId < 0) return [];
+
+        return FindAll(_.AppID == appId);
+    }
     #endregion
 
     #region 数据清理
@@ -208,6 +229,9 @@ public partial class AppMessage
 
         /// <summary>数据。可以是Json数据，比如StatID</summary>
         public static readonly Field Data = FindByName("Data");
+
+        /// <summary>延迟时间。延迟到该时间执行</summary>
+        public static readonly Field DelayTime = FindByName("DelayTime");
 
         /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
         public static readonly Field TraceId = FindByName("TraceId");
@@ -244,6 +268,9 @@ public partial class AppMessage
 
         /// <summary>数据。可以是Json数据，比如StatID</summary>
         public const String Data = "Data";
+
+        /// <summary>延迟时间。延迟到该时间执行</summary>
+        public const String DelayTime = "DelayTime";
 
         /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
         public const String TraceId = "TraceId";

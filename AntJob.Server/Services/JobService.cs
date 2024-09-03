@@ -361,10 +361,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
             jm.CreateTime = jm.UpdateTime = now;
 
-            if (model.DelayTime > 0)
-            {
-                jm.UpdateTime = dTime;
-            }
+            if (model.DelayTime > 0) jm.DelayTime = dTime;
 
             ms.Add(jm);
         }
