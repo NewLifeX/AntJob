@@ -96,6 +96,9 @@ public abstract class DataHandler : Handler
 
     /// <summary>选择列</summary>
     public String Selects { get; set; }
+
+    /// <summary>每次都只查第一页</summary>
+    public bool KeepFirstPage { get; set; }
     #endregion
 
     #region 构造
@@ -231,7 +234,7 @@ public abstract class DataHandler : Handler
 
         if (!Where.IsNullOrEmpty()) exp &= Where;
 
-        var list = Factory.FindAll(exp, OrderBy, Selects, row, task.BatchSize);
+        var list = Factory.FindAll(exp, OrderBy, Selects, this.KeepFirstPage ? 0 : row, task.BatchSize);
 
         // 取到数据，需要滑动窗口
         if (list.Count > 0) row += list.Count;
