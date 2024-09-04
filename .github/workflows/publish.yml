@@ -25,7 +25,7 @@ jobs:
         dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob/AntJob.csproj
         dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob.Extensions/AntJob.Extensions.csproj
         dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob.Data/AntJob.Data.csproj
-        dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob.Web/AntJob.Web.csproj
+        dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntWeb/AntWeb.csproj
     - name: Publish
       run: |
         dotnet nuget push ./out/*.nupkg --skip-duplicate --source https://nuget.pkg.github.com/NewLifeX/index.json --api-key ${{ github.token }}
