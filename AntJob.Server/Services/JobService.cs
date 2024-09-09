@@ -482,8 +482,9 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         job.Total += task.Total;
         job.Success += task.Success;
-        job.Error += task.Error;
+        //job.Error += task.Error;
         job.Times++;
+        if (task.Status == JobStatus.错误) job.Error++;
 
         var ths = job.MaxTask;
 
