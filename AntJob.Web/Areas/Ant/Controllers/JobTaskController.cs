@@ -6,7 +6,6 @@ using AntJob.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using NewLife;
 using NewLife.Cube;
-using NewLife.Cube.Entity;
 using NewLife.Cube.Extensions;
 using NewLife.Cube.ViewModels;
 using NewLife.Data;
@@ -137,16 +136,19 @@ public class JobTaskController : AntEntityController<JobTask>
         var jobid = p["JobID"].ToInt(-1);
         var appid = p["AppID"].ToInt(-1);
         var status = (JobStatus)p["Status"].ToInt(-1);
+        var client = p["Client"];
+
+        var dataStart = p["dataStart"].ToDateTime();
+        var dataEnd = p["dataEnd"].ToDateTime();
         var start = p["dtStart"].ToDateTime();
         var end = p["dtEnd"].ToDateTime();
-        var client = p["Client"];
 
         if (jobid > 0)
         {
             ListFields.RemoveField("JobID");
         }
 
-        return JobTask.Search(id, appid, jobid, status, start, end, client, p["q"], p);
+        return JobTask.Search(id, appid, jobid, status, dataStart, dataEnd, start, end, client, p["q"], p);
     }
 
     /// <summary>修改状态</summary>

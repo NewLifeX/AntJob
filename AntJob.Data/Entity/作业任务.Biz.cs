@@ -137,13 +137,15 @@ public partial class JobTask : EntityBase<JobTask>
     /// <param name="appid"></param>
     /// <param name="jobid"></param>
     /// <param name="status"></param>
+    /// <param name="dataStart"></param>
+    /// <param name="dataEnd"></param>
     /// <param name="start"></param>
     /// <param name="end"></param>
     /// <param name="client"></param>
     /// <param name="key"></param>
     /// <param name="p"></param>
     /// <returns></returns>
-    public static IEnumerable<JobTask> Search(Int32 id, Int32 appid, Int32 jobid, JobStatus status, DateTime start, DateTime end, String client, String key, PageParameter p)
+    public static IEnumerable<JobTask> Search(Int32 id, Int32 appid, Int32 jobid, JobStatus status, DateTime dataStart, DateTime dataEnd, DateTime start, DateTime end, String client, String key, PageParameter p)
     {
         var exp = new WhereExpression();
 
@@ -153,6 +155,8 @@ public partial class JobTask : EntityBase<JobTask>
         if (status >= JobStatus.就绪) exp &= _.Status == status;
         if (!client.IsNullOrEmpty()) exp &= _.Client == client;
         if (!key.IsNullOrEmpty()) exp &= _.Data.Contains(key) | _.Message.Contains(key) | _.Key == key;
+
+        exp &= _.DataTime.Between(dataStart, dataEnd);
         exp &= _.DataTime.Between(start, end);
 
         return FindAll(exp, p);
@@ -180,7 +184,7 @@ public partial class JobTask : EntityBase<JobTask>
         if (start.Year > 2000) exp &= _.UpdateTime >= start;
         if (end.Year > 2000) exp &= _.UpdateTime < end;
 
-        return FindAll(exp, _.ID.Asc(), null, 0, count);
+        return FindAll(exp, _.UpdateTime.Asc(), null, 0, count);
     }
     #endregion
 
