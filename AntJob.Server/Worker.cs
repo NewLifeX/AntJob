@@ -145,6 +145,9 @@ public class Worker : IHostedService
             p += list.Count;
         }
 
+        // 删除作业已不存在的任务
+        rs += JobTask.DeleteNoJob();
+
         if (rs > 0)
         {
             sw.Stop();

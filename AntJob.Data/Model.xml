@@ -195,8 +195,9 @@
       </Columns>
       <Indexes>
         <Index Columns="JobID,DataTime" />
-        <Index Columns="AppID,Client,Status" />
         <Index Columns="JobID,CreateTime" />
+        <Index Columns="JobID,UpdateTime" />
+        <Index Columns="AppID,Client,Status" />
       </Indexes>
     </Table>
     <Table Name="JobError" Description="作业错误。计算作业在执行过程中所发生的错误">

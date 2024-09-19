@@ -18,8 +18,9 @@ namespace AntJob.Data.Entity;
 [DataObject]
 [Description("作业任务。计算作业在执行过程中生成的任务实例，具有该次执行所需参数")]
 [BindIndex("IX_JobTask_JobID_DataTime", false, "JobID,DataTime")]
-[BindIndex("IX_JobTask_AppID_Client_Status", false, "AppID,Client,Status")]
 [BindIndex("IX_JobTask_JobID_CreateTime", false, "JobID,CreateTime")]
+[BindIndex("IX_JobTask_JobID_UpdateTime", false, "JobID,UpdateTime")]
+[BindIndex("IX_JobTask_AppID_Client_Status", false, "AppID,Client,Status")]
 [BindTable("JobTask", Description = "作业任务。计算作业在执行过程中生成的任务实例，具有该次执行所需参数", ConnName = "Ant", DbType = DatabaseType.None)]
 public partial class JobTask
 {

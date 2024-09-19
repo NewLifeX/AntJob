@@ -4,6 +4,7 @@ using NewLife;
 using NewLife.Data;
 using NewLife.Threading;
 using XCode;
+using XCode.DataAccessLayer;
 
 namespace AntJob.Data.Entity;
 

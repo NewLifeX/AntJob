@@ -150,14 +150,14 @@ public partial class JobTask : EntityBase<JobTask>
         var exp = new WhereExpression();
 
         if (id > 0) exp &= _.ID == id;
-        if (appid > 0) exp &= _.AppID == appid;
-        if (jobid > 0) exp &= _.JobID == jobid;
+        if (appid >= 0) exp &= _.AppID == appid;
+        if (jobid >= 0) exp &= _.JobID == jobid;
         if (status >= JobStatus.就绪) exp &= _.Status == status;
         if (!client.IsNullOrEmpty()) exp &= _.Client == client;
         if (!key.IsNullOrEmpty()) exp &= _.Data.Contains(key) | _.Message.Contains(key) | _.Key == key;
 
         exp &= _.DataTime.Between(dataStart, dataEnd);
-        exp &= _.DataTime.Between(start, end);
+        exp &= _.UpdateTime.Between(start, end);
 
         return FindAll(exp, p);
     }
@@ -206,6 +206,10 @@ public partial class JobTask : EntityBase<JobTask>
     public static Int32 DeleteByID(Int32 jobid, Int64 maxid) => maxid <= 0 ? 0 : Delete(_.JobID == jobid & _.ID <= maxid);
 
     //public static Int32 DeleteByAppId(Int32 appid) => Delete(_.AppID == appid);
+
+    /// <summary>删除作业已不存在的任务</summary>
+    /// <returns></returns>
+    public static Int32 DeleteNoJob() => Delete(_.JobID.NotIn(Entity.Job.FindSQLWithKey()));
 
     /// <summary>转模型类</summary>
     /// <returns></returns>
