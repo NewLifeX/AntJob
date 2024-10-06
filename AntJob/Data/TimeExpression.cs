@@ -131,7 +131,7 @@ public class TimeExpressionItem
         if (value.IsNullOrEmpty() || value.Length < 3) return false;
 
         Level = value[^1..];
-        Value = value[..^1].ToInt();
+        Value = value[..^1].TrimStart('+').ToInt();
 
         return true;
     }
