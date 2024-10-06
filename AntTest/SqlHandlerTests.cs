@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using AntJob;
 using AntJob.Data;
 using AntJob.Extensions;
-using NewLife.Reflection;
 using XCode.DataAccessLayer;
 using XCode.Membership;
 using Xunit;
@@ -44,11 +42,13 @@ public class SqlHandlerTests
             Task = task,
         };
 
-        var method = handler.GetType().GetMethodEx("OnProcess", typeof(JobContext));
-        method.Invoke(handler, new Object[] { ctx });
+        //var method = handler.GetType().GetMethodEx("OnProcess", typeof(JobContext));
+        //method.Invoke(handler, new Object[] { ctx });
+        var rs = handler.Execute(ctx);
 
         Assert.Equal(4, ctx.Total);
         //Assert.Equal(4, ctx.Success);
-        Assert.True(ctx.Success > 0);
+        Assert.Equal(8, rs);
+        //Assert.True(ctx.Success > 0);
     }
 }

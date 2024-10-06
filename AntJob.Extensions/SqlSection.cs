@@ -32,6 +32,12 @@ public class SqlSection
     public String Sql { get; set; }
     #endregion
 
+    #region 构造
+    /// <summary>已重载</summary>
+    /// <returns></returns>
+    public override String ToString() => $"{ConnName}[{Action}]:{Sql}";
+    #endregion
+
     #region 解析
     /// <summary>分析sql语句集合，得到片段集合，以双换行分隔</summary>
     /// <param name="sqls"></param>
@@ -103,9 +109,25 @@ public class SqlSection
         // 解析数据表，如果目标表不存在，则返回
         var tableName = "";
         if (Sql.StartsWithIgnoreCase("delete "))
-            tableName = Sql.Substring(" from ", " ")?.Trim();
-        else if (Sql.StartsWithIgnoreCase("udpate "))
-            tableName = Sql.Substring("udpate ", " ")?.Trim();
+        {
+            var sep = " from ";
+            var p1 = Sql.IndexOf(sep);
+            if (p1 < 0) throw new InvalidDataException();
+
+            p1 += sep.Length;
+            var p2 = Sql.IndexOf(" ", p1);
+            tableName = p2 > 0 ? Sql[p1..p2].Trim() : Sql[p1..].Trim();
+        }
+        else if (Sql.StartsWithIgnoreCase("update "))
+        {
+            var sep = "update ";
+            var p1 = Sql.IndexOf(sep);
+            if (p1 < 0) throw new InvalidDataException();
+
+            p1 += sep.Length;
+            var p2 = Sql.IndexOf(" ", p1);
+            tableName = p2 > 0 ? Sql[p1..p2].Trim() : Sql[p1..].Trim();
+        }
 
         if (!tableName.IsNullOrEmpty())
         {

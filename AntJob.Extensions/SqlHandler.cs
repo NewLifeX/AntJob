@@ -26,8 +26,8 @@ public class SqlHandler : Handler
     /// <returns></returns>
     public override Int32 Execute(JobContext ctx)
     {
-        //var sqls = ctx.Task.Data as String;
-        var sqls = Job.Data;
+        var sqls = ctx.Task.Data;
+        //var sqls = Job.Data;
         sqls = TemplateHelper.Build(sqls, ctx.Task.DataTime, ctx.Task.End);
         // 向调度中心返回解析后的Sql语句
         ctx.Remark = sqls;
@@ -54,12 +54,17 @@ public class SqlHandler : Handler
 
         // 打开事务
         foreach (var item in sections)
-            if (item.Action != SqlActions.Query) DAL.Create(item.ConnName).BeginTransaction();
+        {
+            if (item.Action != SqlActions.Query)
+                DAL.Create(item.ConnName).BeginTransaction();
+        }
+
         try
         {
             // 按顺序执行处理Sql语句
             DbTable dt = null;
             foreach (var section in sections)
+            {
                 switch (section.Action)
                 {
                     case SqlActions.Query:
@@ -79,16 +84,23 @@ public class SqlHandler : Handler
                     default:
                         break;
                 }
+            }
 
             // 提交事务
             foreach (var item in sections)
-                if (item.Action != SqlActions.Query) DAL.Create(item.ConnName).Commit();
+            {
+                if (item.Action != SqlActions.Query)
+                    DAL.Create(item.ConnName).Commit();
+            }
         }
         catch
         {
             // 回滚事务
             foreach (var item in sections)
-                if (item.Action != SqlActions.Query) DAL.Create(item.ConnName).Rollback();
+            {
+                if (item.Action != SqlActions.Query)
+                    DAL.Create(item.ConnName).Rollback();
+            }
 
             throw;
         }
