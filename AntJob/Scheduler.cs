@@ -47,11 +47,18 @@ public class Scheduler : DisposeBase
     /// <typeparam name="T"></typeparam>
     public void AddHandler<T>() where T : Handler
     {
-        var services = ObjectContainer.Current;
-        var prv = ObjectContainer.Provider;
-        services.AddTransient<T>();
+        var prv = ServiceProvider;
+        if (prv == null)
+        {
+            var services = ObjectContainer.Current;
+            prv = ObjectContainer.Provider;
+            services.AddTransient<T>();
+        }
 
-        Handlers.Add(prv.GetService<T>());
+        // 马上实例化
+        var handler = prv.GetService<T>() ?? prv.CreateInstance(typeof(T)) as T;
+
+        Handlers.Add(handler);
     }
     #endregion
 
