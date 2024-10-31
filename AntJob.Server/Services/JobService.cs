@@ -83,6 +83,12 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             if (job.Cron.IsNullOrEmpty()) job.Cron = model.Cron;
             if (job.Topic.IsNullOrEmpty()) job.Topic = model.Topic;
 
+            // 定时调度和数据调度，自动设置DataTime
+            if (job.Mode is JobModes.Time or JobModes.Data)
+            {
+                if (job.DataTime.Year < 2000) job.DataTime = DateTime.Today;
+            }
+
             // 添加定时作业时，计算下一次执行时间
             if (job.ID == 0 && job.Mode == JobModes.Time)
             {
