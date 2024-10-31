@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NewLife.Cube.Core" Version="6.1.2024.1025-beta1556" />
-    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.0.2024.1025-beta1552" />
+    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.0.2024.1031-beta0000" />
     <PackageReference Include="NewLife.Stardust.Extensions" Version="3.1.2024.1025-beta1552" />
   </ItemGroup>
   <ItemGroup>
