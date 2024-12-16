@@ -12,12 +12,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Setup dotNET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: |
-          6.0.x
-          7.0.x
+          6.x
+          7.x
           8.x
+          9.x
     - name: Get Version
       run: echo "VERSION=$(date '+%Y.%m%d')" >> $GITHUB_ENV
     - name: Build
@@ -25,7 +26,7 @@ jobs:
         dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob/AntJob.csproj
         dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob.Extensions/AntJob.Extensions.csproj
         dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob.Data/AntJob.Data.csproj
-        dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntWeb/AntWeb.csproj
+        dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob.Web/AntJob.Web.csproj
     - name: Publish
       run: |
         dotnet nuget push ./out/*.nupkg --skip-duplicate --source https://nuget.pkg.github.com/NewLifeX/index.json --api-key ${{ github.token }}
