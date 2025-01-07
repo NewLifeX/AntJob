@@ -4,7 +4,7 @@
     <AssemblyTitle>蚂蚁数据</AssemblyTitle>
     <Description>蚂蚁调度系统数据库结构</Description>
     <Company>新生命开发团队</Company>
-    <Copyright>版权所有(C) 新生命开发团队 2024</Copyright>
+    <Copyright>版权所有(C) 新生命开发团队 2025</Copyright>
     <VersionPrefix>3.4</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
@@ -37,7 +37,7 @@
     <None Remove="Build.tt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="11.16.2024.1202" />
+    <PackageReference Include="NewLife.XCode" Version="11.17.2025.101" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Build.log">

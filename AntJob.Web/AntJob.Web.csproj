@@ -5,7 +5,7 @@
     <AssemblyTitle>蚂蚁调度控制台</AssemblyTitle>
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累</Description>
     <Company>新生命开发团队</Company>
-    <Copyright>版权所有(C) 新生命开发团队 2023</Copyright>
+    <Copyright>版权所有(C) 新生命开发团队 2025</Copyright>
     <VersionPrefix>3.4</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
@@ -44,9 +44,9 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="6.2.2024.1212" />
-    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.2.2024.1206" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.2.2024.1211" />
+    <PackageReference Include="NewLife.Cube.Core" Version="6.3.2025.101" />
+    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.2.2025.101" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.2.2025.101" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
