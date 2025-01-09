@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using AntJob.Data.Entity;
+using NewLife;
 using NewLife.Cube;
 using NewLife.Cube.Extensions;
 using NewLife.Cube.ViewModels;

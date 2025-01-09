@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using NewLife;
 using XCode;
 using XCode.Configuration;
 using XCode.DataAccessLayer;

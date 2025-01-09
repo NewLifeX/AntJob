@@ -1,5 +1,6 @@
 ﻿using System;
 using AntJob.Data;
+using NewLife;
 using Xunit;
 
 namespace AntTest;
