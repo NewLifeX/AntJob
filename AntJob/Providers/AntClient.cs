@@ -102,7 +102,7 @@ public class AntClient : ClientBase
     /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
     /// <param name="job"></param>
     /// <returns></returns>
-    public IJob SetJob(IDictionary<String, Object> job) => InvokeAsync<JobModel>(nameof(SetJob), job).Result;
+    public IJob SetJob(IDictionary<String, Object> job) => Invoke<JobModel>(nameof(SetJob), job);
 
     /// <summary>申请作业任务</summary>
     /// <param name="job">作业</param>
@@ -119,7 +119,7 @@ public class AntClient : ClientBase
     /// <summary>生产消息</summary>
     /// <param name="model">模型</param>
     /// <returns></returns>
-    public Int32 Produce(ProduceModel model) => InvokeAsync<Int32>(nameof(Produce), model).Result;
+    public Int32 Produce(ProduceModel model) => Invoke<Int32>(nameof(Produce), model);
 
     /// <summary>报告状态（进度、成功、错误）</summary>
     /// <param name="task"></param>

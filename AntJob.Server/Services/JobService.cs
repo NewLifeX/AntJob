@@ -324,6 +324,13 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         var messages = model?.Messages?.Where(e => !e.IsNullOrEmpty()).Distinct().ToArray();
         if (messages == null || messages.Length == 0) return 0;
 
+        var target = app;
+        if (!model.AppId.IsNullOrEmpty())
+        {
+            target = App.FindByName(model.AppId);
+            if (target == null) throw new XException($"找不到目标应用[{model.AppId}]");
+        }
+
         // 去重过滤
         if (model.Unique)
         {
@@ -333,14 +340,14 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
                 var msgs = new List<String>();
                 foreach (var item in messages)
                 {
-                    var key = $"antjob:{app.ID}:{model.Topic}:{item}";
+                    var key = $"antjob:{target.ID}:{model.Topic}:{item}";
                     if (_cacheProvider.Cache.Add(key, item, 2 * 3600)) msgs.Add(item);
                 }
                 messages = msgs.ToArray();
             }
             else
             {
-                messages = AppMessage.Filter(app.ID, model.Topic, messages);
+                messages = AppMessage.Filter(target.ID, model.Topic, messages);
                 if (messages.Length == 0) return 0;
             }
         }
@@ -352,14 +359,15 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         // 延迟需要基于任务开始时间，而不能用使用当前时间，防止回头跑数据时无法快速执行
         var dTime = now.AddSeconds(model.DelayTime);
 
-        var jb = Job.FindByAppIDAndName(app.ID, model.Job);
+        //var jb = Job.FindByAppIDAndName(app.ID, model.Job);
+        var jb = app.Jobs.FirstOrDefault(e => e.Name == model.Job);
         var snow = AppMessage.Meta.Factory.Snow;
         foreach (var item in messages)
         {
             var jm = new AppMessage
             {
                 Id = snow.NewId(),
-                AppID = app.ID,
+                AppID = target.ID,
                 JobID = jb == null ? 0 : jb.ID,
                 Topic = model.Topic,
                 Data = item,
@@ -382,15 +390,15 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         if (total < 0) total = messages.Length;
         if (total > 0)
         {
-            var job2 = app.Jobs?.FirstOrDefault(e => e.Topic == model.Topic);
+            var job2 = target.Jobs?.FirstOrDefault(e => e.Topic == model.Topic);
             if (job2 != null)
             {
                 job2.MessageCount += total;
                 job2.SaveAsync();
             }
 
-            app.MessageCount += total;
-            app.SaveAsync();
+            target.MessageCount += total;
+            target.SaveAsync();
         }
 
         return total;

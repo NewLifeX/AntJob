@@ -225,6 +225,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         {
             model.DelayTime = option.DelayTime;
             model.Unique = option.Unique;
+            model.AppId = option.AppId;
         }
 
         return Ant.Produce(model);

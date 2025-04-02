@@ -227,6 +227,19 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// <returns></returns>
     public virtual Int32 Produce(String topic, String[] messages, MessageOption option = null) => Provider.Produce(Job?.Name, topic, messages, option);
 
+    /// <summary>生产消息</summary>
+    /// <param name="appId">发布消息到目标应用。留空发布当前应用</param>
+    /// <param name="topic">主题</param>
+    /// <param name="messages">消息集合</param>
+    /// <param name="option">消息选项</param>
+    /// <returns></returns>
+    public virtual Int32 Produce(String appId, String topic, String[] messages, MessageOption option = null)
+    {
+        option ??= new();
+        option.AppId = appId;
+        return Provider.Produce(Job?.Name, topic, messages, option);
+    }
+
     /// <summary>延迟执行，指定下一次执行时间</summary>
     /// <param name="ctx"></param>
     /// <param name="nextTime"></param>

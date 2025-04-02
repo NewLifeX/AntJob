@@ -3,6 +3,10 @@
 /// <summary>生成消息的模型</summary>
 public class ProduceModel
 {
+    /// <summary>应用标识</summary>
+    /// <remarks>要发布消息的目标应用。默认为空，发布到当前应用</remarks>
+    public String AppId { get; set; }
+
     /// <summary>作业名</summary>
     public String Job { get; set; }
 
