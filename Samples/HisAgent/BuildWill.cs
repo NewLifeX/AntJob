@@ -20,13 +20,13 @@ class BuildWill : DataHandler
         job.BatchSize = 1000;
     }
 
-    public override Boolean Start()
+    public override void Init()
     {
         // 指定要抽取数据的实体类以及时间字段
         Factory = ZYBH0.Meta.Factory;
         Field = ZYBH0._.CreateTime;
 
-        return base.Start();
+        base.Init();
     }
 
     public override Boolean ProcessItem(JobContext ctx, IEntity entity)

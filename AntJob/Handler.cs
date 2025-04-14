@@ -16,7 +16,7 @@ namespace AntJob;
 /// 
 /// 定时调度只要当前时间达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑。
 /// 
-/// 调度器控制方法：Start|Stop|Acquire
+/// 调度器控制方法：Init|Start|Stop|Acquire
 /// 任务处理流程：Process->OnProcess->Execute->OnFinish
 /// 任务控制方法：Produce|Delay
 /// </remarks>

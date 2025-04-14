@@ -110,7 +110,7 @@ public abstract class DataHandler : Handler
     /// <summary>初始化。作业处理器启动之前</summary>
     public override void Init()
     {
-        if (Factory == null) throw new ArgumentNullException(nameof(Factory));
+        if (Factory == null) throw new ArgumentNullException(nameof(Factory), $"{GetType().FullName}的参数错误");
 
         // 自动识别雪花Id字段
         if (Field == null)
