@@ -67,6 +67,9 @@ public partial class Job : EntityBase<Job>
                 Cron = $"0 0 0/{step / 3600} * * ?";
             else if (step % 60 == 0 && step / 60 < 60)
                 Cron = $"0 0/{step / 60} * * * ?";
+
+            // 默认按天刷历史数据
+            HistoryCron = "0 0 0 *";
         }
 
         var app = App;
@@ -247,6 +250,19 @@ public partial class Job : EntityBase<Job>
                         var dt = cron.GetNext(time);
                         if (dt < next) next = dt;
                     }
+
+                    // 如果下次时间属于历史，则使用历史Cron以便快速前进
+                    if (next < DateTime.Now)
+                    {
+                        var historyCron = HistoryCron;
+                        if (!historyCron.IsNullOrEmpty())
+                        {
+                            var cron = new Cron(historyCron);
+                            var next2 = cron.GetNext(time);
+                            if (next2 < DateTime.Now) next = next2;
+                        }
+                    }
+
                     return next;
                     //return NewLife.Threading.Cron.GetNext(Cron.Split(";"), time);
                 }

@@ -127,6 +127,7 @@
         <Column Name="Enable" DataType="Boolean" Description="启用" />
         <Column Name="Mode" DataType="Int32" Description="调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑" Type="JobModes" />
         <Column Name="Cron" DataType="String" Description="执行频次。定时调度的Cron表达式" />
+        <Column Name="HistoryCron" DataType="String" Description="回刷数据。定时调度回刷数据时使用的Cron表达式，一般分钟或小时级作业，回刷历史数据时，可能每天只需要跑一次" />
         <Column Name="Topic" DataType="String" Description="主题。消息调度时消费的主题" />
         <Column Name="MessageCount" DataType="Int32" Description="消息数" />
         <Column Name="DataTime" DataType="DateTime" Description="数据时间。下一次处理数据的时间，默认从当前时间开始" />
@@ -149,7 +150,7 @@
         <Column Name="Speed" DataType="Int32" Description="速度" Category="统计" />
         <Column Name="LastStatus" DataType="Int32" Description="最后状态。最后一次状态" Category="统计" Type="JobStatus" />
         <Column Name="LastTime" DataType="DateTime" Description="最后时间。最后一次时间" Category="统计" />
-        <Column Name="Data" DataType="String" Length="-1" Description="数据。Sql模板或C#模板" />
+        <Column Name="Data" DataType="String" Length="-1" Description="附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板" />
         <Column Name="CreateUserID" DataType="Int32" Description="创建人" Category="扩展" />
         <Column Name="CreateUser" DataType="String" Description="创建者" Category="扩展" />
         <Column Name="CreateTime" DataType="DateTime" Description="创建时间" Category="扩展" />

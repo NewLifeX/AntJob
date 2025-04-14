@@ -86,6 +86,14 @@ public partial class Job
     [BindColumn("Cron", "执行频次。定时调度的Cron表达式", "")]
     public String Cron { get => _Cron; set { if (OnPropertyChanging("Cron", value)) { _Cron = value; OnPropertyChanged("Cron"); } } }
 
+    private String _HistoryCron;
+    /// <summary>回刷数据。定时调度回刷数据时使用的Cron表达式，一般分钟或小时级作业，回刷历史数据时，可能每天只需要跑一次</summary>
+    [DisplayName("回刷数据")]
+    [Description("回刷数据。定时调度回刷数据时使用的Cron表达式，一般分钟或小时级作业，回刷历史数据时，可能每天只需要跑一次")]
+    [DataObjectField(false, false, true, 50)]
+    [BindColumn("HistoryCron", "回刷数据。定时调度回刷数据时使用的Cron表达式，一般分钟或小时级作业，回刷历史数据时，可能每天只需要跑一次", "")]
+    public String HistoryCron { get => _HistoryCron; set { if (OnPropertyChanging("HistoryCron", value)) { _HistoryCron = value; OnPropertyChanged("HistoryCron"); } } }
+
     private String _Topic;
     /// <summary>主题。消息调度时消费的主题</summary>
     [DisplayName("主题")]
@@ -278,11 +286,11 @@ public partial class Job
     public DateTime LastTime { get => _LastTime; set { if (OnPropertyChanging("LastTime", value)) { _LastTime = value; OnPropertyChanged("LastTime"); } } }
 
     private String _Data;
-    /// <summary>数据。Sql模板或C#模板</summary>
-    [DisplayName("数据")]
-    [Description("数据。Sql模板或C#模板")]
+    /// <summary>附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板</summary>
+    [DisplayName("附加数据")]
+    [Description("附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板")]
     [DataObjectField(false, false, true, -1)]
-    [BindColumn("Data", "数据。Sql模板或C#模板", "")]
+    [BindColumn("Data", "附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板", "")]
     public String Data { get => _Data; set { if (OnPropertyChanging("Data", value)) { _Data = value; OnPropertyChanged("Data"); } } }
 
     private Int32 _CreateUserID;
@@ -383,6 +391,7 @@ public partial class Job
             "Enable" => _Enable,
             "Mode" => _Mode,
             "Cron" => _Cron,
+            "HistoryCron" => _HistoryCron,
             "Topic" => _Topic,
             "MessageCount" => _MessageCount,
             "DataTime" => _DataTime,
@@ -429,6 +438,7 @@ public partial class Job
                 case "Enable": _Enable = value.ToBoolean(); break;
                 case "Mode": _Mode = (JobModes)value.ToInt(); break;
                 case "Cron": _Cron = Convert.ToString(value); break;
+                case "HistoryCron": _HistoryCron = Convert.ToString(value); break;
                 case "Topic": _Topic = Convert.ToString(value); break;
                 case "MessageCount": _MessageCount = value.ToInt(); break;
                 case "DataTime": _DataTime = value.ToDateTime(); break;
@@ -509,6 +519,9 @@ public partial class Job
         /// <summary>执行频次。定时调度的Cron表达式</summary>
         public static readonly Field Cron = FindByName("Cron");
 
+        /// <summary>回刷数据。定时调度回刷数据时使用的Cron表达式，一般分钟或小时级作业，回刷历史数据时，可能每天只需要跑一次</summary>
+        public static readonly Field HistoryCron = FindByName("HistoryCron");
+
         /// <summary>主题。消息调度时消费的主题</summary>
         public static readonly Field Topic = FindByName("Topic");
 
@@ -575,7 +588,7 @@ public partial class Job
         /// <summary>最后时间。最后一次时间</summary>
         public static readonly Field LastTime = FindByName("LastTime");
 
-        /// <summary>数据。Sql模板或C#模板</summary>
+        /// <summary>附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板</summary>
         public static readonly Field Data = FindByName("Data");
 
         /// <summary>创建人</summary>
@@ -634,6 +647,9 @@ public partial class Job
 
         /// <summary>执行频次。定时调度的Cron表达式</summary>
         public const String Cron = "Cron";
+
+        /// <summary>回刷数据。定时调度回刷数据时使用的Cron表达式，一般分钟或小时级作业，回刷历史数据时，可能每天只需要跑一次</summary>
+        public const String HistoryCron = "HistoryCron";
 
         /// <summary>主题。消息调度时消费的主题</summary>
         public const String Topic = "Topic";
@@ -701,7 +717,7 @@ public partial class Job
         /// <summary>最后时间。最后一次时间</summary>
         public const String LastTime = "LastTime";
 
-        /// <summary>数据。Sql模板或C#模板</summary>
+        /// <summary>附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板</summary>
         public const String Data = "Data";
 
         /// <summary>创建人</summary>

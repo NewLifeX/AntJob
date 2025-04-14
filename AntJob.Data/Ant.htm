@@ -794,6 +794,17 @@
         </tr>
 
         <tr>
+            <td>HistoryCron</td>
+            <td>回刷数据</td>
+            <td>String</td>
+            <td>50</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>定时调度回刷数据时使用的Cron表达式，一般分钟或小时级作业，回刷历史数据时，可能每天只需要跑一次</td>
+        </tr>
+
+        <tr>
             <td>Topic</td>
             <td>主题</td>
             <td>String</td>
@@ -1037,13 +1048,13 @@
 
         <tr>
             <td>Data</td>
-            <td>数据</td>
+            <td>附加数据</td>
             <td>String</td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
-            <td>Sql模板或C#模板</td>
+            <td>执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板</td>
         </tr>
 
         <tr>
