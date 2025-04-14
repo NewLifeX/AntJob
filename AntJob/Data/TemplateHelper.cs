@@ -58,7 +58,7 @@ public static class TemplateHelper
             p = ti.End + 1;
         }
 
-        return sb.Put(true);
+        return sb.Return(true);
     }
 
     private static VarItem Find(String str, String key, Int32 p)
@@ -118,6 +118,6 @@ public static class TemplateHelper
             p = p1 + "{Message}".Length;
         }
 
-        return sb.Put(true);
+        return sb.Return(true);
     }
 }

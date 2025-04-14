@@ -612,8 +612,9 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
                 UpdateTime = DateTime.Now
             };
 
-            //// 如果有模板，则进行计算替换
-            //if (!Data.IsNullOrEmpty()) ti.Data = TemplateHelper.Build(Data, ti.DataTime, ti.End);
+            // 如果有模板，则进行计算替换
+            if (!task.Data.IsNullOrEmpty() && task.DataTime.Year > 1)
+                task.Data = TemplateHelper.Build(task.Data, task.DataTime, task.End);
 
             // 重复切片判断
             var key = $"job:task:{job.ID}:{start:yyyyMMddHHmmss}";
