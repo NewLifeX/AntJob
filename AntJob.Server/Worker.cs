@@ -66,7 +66,7 @@ public class Worker : IHostedService
         _clearItemTimer = new TimerX(ClearItems, null, 10_000, 3600_000) { Async = true };
 
         // 启用星尘注册中心，向注册中心注册服务，服务消费者将自动更新服务端地址列表
-        if (_registry != null) await _registry.RegisterAsync("AntServer", $"tcp://*:{server.Port}");
+        _registry?.RegisterAsync("AntServer", $"tcp://*:{server.Port}");
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
