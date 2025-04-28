@@ -59,6 +59,8 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
             // 初始化处理器
             try
             {
+                handler.Tracer ??= Tracer;
+                handler.Log ??= Log;
                 handler.Init();
             }
             catch (Exception ex)

@@ -185,8 +185,8 @@ public class Scheduler : DisposeBase
             if (job != null && job.Mode == 0) job.Mode = handler.Mode;
             handler.Job = job;
 
-            handler.Tracer = Tracer;
-            handler.Log = Log;
+            handler.Tracer ??= Tracer;
+            handler.Log ??= Log;
 
             try
             {
@@ -264,6 +264,8 @@ public class Scheduler : DisposeBase
             {
                 try
                 {
+                    handler.Tracer ??= Tracer;
+                    handler.Log ??= Log;
                     handler.Start();
                 }
                 catch (Exception ex)
@@ -337,8 +339,8 @@ public class Scheduler : DisposeBase
                             if (handler is MessageHandler messageHandler && !job.Topic.IsNullOrEmpty())
                                 messageHandler.Topic = job.Topic;
 
-                            handler.Log = Log;
-                            handler.Tracer = Tracer;
+                            handler.Log ??= Log;
+                            handler.Tracer ??= Tracer;
                             handler.Start();
 
                             handlers.Add(handler);
