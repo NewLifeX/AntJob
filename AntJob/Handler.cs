@@ -74,11 +74,8 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
             Offset = 15,
             Mode = JobModes.Time,
             Cron = "0/30 * * *",
+            MaxTask = 1,
         };
-
-        // 默认并发数为核心数
-        job.MaxTask = Environment.ProcessorCount;
-        if (job.MaxTask < 8) job.MaxTask = 8;
 
         Job = job;
     }
@@ -86,7 +83,20 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
     #region 基本方法
     /// <summary>初始化。作业处理器启动之前</summary>
-    public virtual void Init() { }
+    public virtual void Init()
+    {
+        var job = Job;
+
+        // 定时任务默认最大任务数为1
+        if (job.Mode == JobModes.Time)
+            job.MaxTask = 1;
+        else
+        {
+            // 默认并发数为核心数
+            job.MaxTask = Environment.ProcessorCount;
+            if (job.MaxTask < 8) job.MaxTask = 8;
+        }
+    }
 
     /// <summary>开始</summary>
     public virtual Boolean Start()
