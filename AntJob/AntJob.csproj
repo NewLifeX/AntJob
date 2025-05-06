@@ -6,7 +6,7 @@
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>©2002-2025 NewLife</Copyright>
-    <VersionPrefix>4.0</VersionPrefix>
+    <VersionPrefix>4.1</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(Version)</FileVersion>
@@ -28,7 +28,7 @@
     <RepositoryUrl>https://github.com/NewLifeX/AntJob</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>新生命团队;X组件;NewLife;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes>架构升级</PackageReleaseNotes>
+    <PackageReleaseNotes>支持定时任务设置独立的回刷数据Cron；支持跨应用发布消息</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -49,9 +49,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="11.4.2025.401" />
-    <PackageReference Include="NewLife.Remoting" Version="3.3.2025.401" />
-    <PackageReference Include="NewLife.Stardust" Version="3.3.2025.401" />
+    <PackageReference Include="NewLife.Core" Version="11.5.2025.501" />
+    <PackageReference Include="NewLife.Remoting" Version="3.3.2025.501" />
+    <PackageReference Include="NewLife.Stardust" Version="3.3.2025.506" />
   </ItemGroup>
   
   <ItemGroup>
