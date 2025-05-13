@@ -98,7 +98,7 @@ public abstract class JobProvider : DisposeBase, IJobProvider, ITracerFeature, I
     public ITracer Tracer { get; set; }
 
     /// <summary>日志</summary>
-    public ILog Log { get; set; } = Logger.Null;
+    public ILog Log { get; set; }
 
     /// <summary>写日志</summary>
     /// <param name="format"></param>
