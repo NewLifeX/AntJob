@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NewLife;
 using NewLife.Cube;
+using NewLife.Data;
 using NewLife.Log;
 using NewLife.Remoting;
 using NewLife.Remoting.Models;
@@ -104,7 +105,8 @@ public class AntJobController : ControllerBase, IActionFilter
     {
         if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
-        var (app, online, rs) = _appService.Login(model, UserHost);
+        var sessionId = $"{model.Code}@{UserHost}";
+        var (app, online, rs) = _appService.Login(model, sessionId, UserHost);
 
         return rs;
     }
@@ -124,7 +126,8 @@ public class AntJobController : ControllerBase, IActionFilter
             // 密码模式
             if (model.grant_type == "password")
             {
-                var (app, online, rs) = _appService.Login(new LoginModel { Code = model.UserName, Secret = model.Password }, ip);
+                var sessionId = $"{model.UserName}@{ip}";
+                var (app, online, rs) = _appService.Login(new LoginModel { Code = model.UserName, Secret = model.Password }, sessionId, ip);
 
                 var tokenModel = _appService.IssueToken(app.Name, set);
 
@@ -218,7 +221,8 @@ public class AntJobController : ControllerBase, IActionFilter
     {
         if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 
-        return _jobService.Report(_App, task, UserHost);
+        var sessionId = $"{_App.Name}@{UserHost}";
+        return _jobService.Report(_App, task, sessionId, UserHost);
     }
     #endregion
 }

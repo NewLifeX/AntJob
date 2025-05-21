@@ -4,6 +4,7 @@ using AntJob.Models;
 using NewLife;
 using NewLife.Caching;
 using NewLife.Log;
+using NewLife.Net;
 using NewLife.Reflection;
 using NewLife.Serialization;
 using NewLife.Threading;
@@ -133,7 +134,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     /// <summary>申请作业任务</summary>
     /// <param name="model">模型</param>
     /// <returns></returns>
-    public ITask[] Acquire(App app, AcquireModel model, String ip)
+    public ITask[] Acquire(App app, AcquireModel model, NetUri remote)
     {
         var jobName = model.Job?.Trim();
         if (jobName.IsNullOrEmpty()) return [];
@@ -159,14 +160,15 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         if (job.DataTime.Year <= 2000) throw new XException("作业[{0}/{1}]未设置数据时间", job.ID, job.Name);
 
         // 应用在线，但可能禁止向其分配任务
-        var online = _appService.GetOnline(app, ip);
+        var ip = remote?.Host;
+        var online = _appService.GetOnline(app, remote + "", ip);
         if (!online.Enable) return [];
 
         var list = new List<JobTask>();
 
         // 首先检查延迟任务和错误任务
-        CheckDelayTask(app, job, model.Count, list, ip);
-        CheckOldTask(app, job, model.Count, list, ip);
+        CheckDelayTask(app, job, model.Count, list, online);
+        CheckOldTask(app, job, model.Count, list, online);
 
         // 错误项不够时，增加切片
         if (list.Count < model.Count)
@@ -244,7 +246,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         return rs.ToArray();
     }
 
-    private void CheckDelayTask(App app, Job job, Int32 count, List<JobTask> list, String ip)
+    private void CheckDelayTask(App app, Job job, Int32 count, List<JobTask> list, AppOnline online)
     {
         // 获取下一次检查时间
         var cache = _cacheProvider.Cache;
@@ -260,10 +262,10 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         }
         if (next <= now)
         {
-            var online = _appService.GetOnline(app, ip);
+            //var online = _appService.GetOnline(app, ip);
 
             next = now.AddSeconds(15);
-            list.AddRange(AcquireDelay(job, online.Server, ip, online.ProcessId, count, cache));
+            list.AddRange(AcquireDelay(job, online.Server, online.UpdateIP, online.ProcessId, count, cache));
 
             if (list.Count > 0)
             {
@@ -277,7 +279,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         }
     }
 
-    private void CheckOldTask(App app, Job job, Int32 count, List<JobTask> list, String ip)
+    private void CheckOldTask(App app, Job job, Int32 count, List<JobTask> list, AppOnline online)
     {
         // 每分钟检查一下错误任务和中断任务
         var cache = _cacheProvider.Cache;
@@ -286,10 +288,10 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         var next = cache.Get<DateTime>(nextKey);
         if (next < now)
         {
-            var online = _appService.GetOnline(app, ip);
+            //var online = _appService.GetOnline(app, ip);
 
             next = now.AddSeconds(60);
-            list.AddRange(AcquireOld(job, online.Server, ip, online.ProcessId, count, cache));
+            list.AddRange(AcquireOld(job, online.Server, online.UpdateIP, online.ProcessId, count, cache));
 
             if (list.Count > 0)
             {
@@ -409,7 +411,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     /// <summary>报告状态（进度、成功、错误）</summary>
     /// <param name="result"></param>
     /// <returns></returns>
-    public Boolean Report(App app, TaskResult result, String ip)
+    public Boolean Report(App app, TaskResult result, String sessionId, String ip)
     {
         if (result == null || result.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + result?.ID);
 
@@ -442,7 +444,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             SetJobFinish(job, task);
 
             // 记录状态
-            _appService.UpdateOnline(app, task, ip);
+            _appService.UpdateOnline(app, task, sessionId, ip);
         }
         else if (result.Status == JobStatus.错误)
         {
@@ -456,7 +458,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             CheckMaxError(app, job);
 
             // 记录状态
-            _appService.UpdateOnline(app, task, ip);
+            _appService.UpdateOnline(app, task, sessionId, ip);
         }
         else if (result.Status == JobStatus.延迟)
         {

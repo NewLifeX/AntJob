@@ -28,7 +28,7 @@ public class AppService
     /// <summary>应用登录</summary>
     /// <param name="model">模型</param>
     /// <returns></returns>
-    public (App, AppOnline, LoginResponse) Login(LoginModel model, String ip)
+    public (App, AppOnline, LoginResponse) Login(LoginModel model, String sessionId, String ip)
     {
         if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
@@ -66,8 +66,10 @@ public class AppService
         app.Save();
 
         // 应用上线
-        var online = CreateOnline(app, ip, model.ClientId);
+        if (!model.ClientId.IsNullOrEmpty()) sessionId = model.ClientId;
+        var online = GetOnline(app, sessionId, ip);
         online.Name = model.Machine;
+        online.Client = model.ClientId;
         online.ProcessId = model.ProcessId;
         online.Version = model.Version;
         online.CompileTime = compile;
@@ -127,7 +129,7 @@ public class AppService
     {
         if (app != null)
         {
-            online ??= GetOnline(app, ip);
+            //online ??= GetOnline(app, ip);
             if (online != null)
             {
                 WriteHistory(app, "注销", true, reason, ip);
@@ -145,7 +147,7 @@ public class AppService
     {
         if (app != null)
         {
-            online ??= GetOnline(app, ip);
+            //online ??= GetOnline(app, ip);
             if (online != null)
             {
                 if (request is PingRequest req)
@@ -173,30 +175,23 @@ public class AppService
         return olts.Select(e => e.ToModel()).ToArray();
     }
 
-    AppOnline CreateOnline(App app, String ip, String clientId)
+    public AppOnline GetOnline(App app, String sessionId, String ip)
     {
-        var online = GetOnline(app, ip);
-        online.Client = clientId;
-        online.UpdateIP = ip;
+        if (sessionId.IsNullOrEmpty()) sessionId = $"{app.Name}@{ip}";
 
+        var online = AppOnline.GetOrAdd(sessionId);
+        online.AppID = app.ID;
         online.Server = Environment.MachineName;
 
-        return online;
-    }
-
-    public AppOnline GetOnline(App app, String ip)
-    {
-        var ins = $"{app.Name}@{ip}";
-        var online = AppOnline.FindByInstance(ins) ?? new AppOnline { Enable = true, CreateIP = ip };
-        online.AppID = app.ID;
-        online.Instance = ins;
+        if (online.CreateIP.IsNullOrEmpty()) online.CreateIP = ip;
+        online.UpdateIP = ip;
 
         return online;
     }
 
-    public void UpdateOnline(App app, JobTask ji, String ip)
+    public void UpdateOnline(App app, JobTask ji, String sessionId, String ip)
     {
-        var online = GetOnline(app, ip);
+        var online = GetOnline(app, sessionId, ip);
         online.Total += ji.Total;
         online.Success += ji.Success;
         online.Error += ji.Error;

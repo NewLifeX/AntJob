@@ -57,8 +57,8 @@ class AntService : IApi, IActionFilter
         {
             _App = app;
 
-            var ip = _Net.Remote.Host;
-            var online = _appService.GetOnline(app, ip);
+            var remote = _Net.Remote;
+            var online = _appService.GetOnline(app, remote + "", remote.Host);
             online.UpdateTime = TimerX.Now;
             online.SaveAsync();
         }
@@ -102,7 +102,8 @@ class AntService : IApi, IActionFilter
 
         if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
-        var (app, online, rs) = _appService.Login(model, _Net.Remote.Host);
+        var remote = _Net.Remote;
+        var (app, online, rs) = _appService.Login(model, remote + "", remote.Host);
 
         // 记录当前用户
         Session["App"] = app;
@@ -117,6 +118,9 @@ class AntService : IApi, IActionFilter
         var app = Session["App"] as App;
         var online = Session["AppOnline"] as AppOnline;
 
+        var remote = _Net.Remote;
+        online ??= _appService.GetOnline(app, remote + "", remote.Host);
+
         return _appService.Logout(app, online, reason, _Net.Remote.Host);
     }
 
@@ -125,6 +129,9 @@ class AntService : IApi, IActionFilter
     {
         var app = Session["App"] as App;
         var online = Session["AppOnline"] as AppOnline;
+
+        var remote = _Net.Remote;
+        online ??= _appService.GetOnline(app, remote + "", remote.Host);
 
         return _appService.Ping(app, online, request, _Net.Remote.Host);
     }
@@ -196,8 +203,8 @@ class AntService : IApi, IActionFilter
     {
         if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 
-        var ip = _Net.Remote.Host;
-        return _jobService.Report(_App, task, ip);
+        var remote = _Net.Remote;
+        return _jobService.Report(_App, task, remote + "", remote.Host);
     }
     #endregion
 }
