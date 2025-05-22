@@ -440,7 +440,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         task.Success = result.Success;
         task.Cost = (Int32)Math.Round(result.Cost / 1000d);
         task.Key = result.Key;
-        task.Message = result.Message;
+        task.Remark = result.Remark;
 
         var traceId = result.TraceId ?? DefaultSpan.Current + "";
         // 已终结的任务，汇总统计
@@ -549,9 +549,9 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             UpdateTime = DateTime.Now,
         };
 
-        var msg = task.Message;
+        var msg = task.Remark;
         if (!msg.IsNullOrEmpty() && msg.Contains("Exception:")) msg = msg.Substring("Exception:").Trim();
-        err.Message = msg;
+        err.Remark = msg;
 
         err.Insert();
 

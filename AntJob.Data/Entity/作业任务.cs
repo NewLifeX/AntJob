@@ -185,14 +185,6 @@ public partial class JobTask
     [BindColumn("Data", "数据。可以是Json数据，比如StatID", "")]
     public String Data { get => _Data; set { if (OnPropertyChanging("Data", value)) { _Data = value; OnPropertyChanged("Data"); } } }
 
-    private String _Message;
-    /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
-    [DisplayName("消息内容")]
-    [Description("消息内容。Handler内记录的异常信息或其它任务消息")]
-    [DataObjectField(false, false, true, -1)]
-    [BindColumn("Message", "消息内容。Handler内记录的异常信息或其它任务消息", "")]
-    public String Message { get => _Message; set { if (OnPropertyChanging("Message", value)) { _Message = value; OnPropertyChanged("Message"); } } }
-
     private String _TraceId;
     /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
     [Category("扩展")]
@@ -237,6 +229,15 @@ public partial class JobTask
     [DataObjectField(false, false, true, 0)]
     [BindColumn("UpdateTime", "更新时间", "")]
     public DateTime UpdateTime { get => _UpdateTime; set { if (OnPropertyChanging("UpdateTime", value)) { _UpdateTime = value; OnPropertyChanged("UpdateTime"); } } }
+
+    private String _Remark;
+    /// <summary>备注</summary>
+    [Category("扩展")]
+    [DisplayName("备注")]
+    [Description("备注")]
+    [DataObjectField(false, false, true, -1)]
+    [BindColumn("Remark", "备注", "")]
+    public String Remark { get => _Remark; set { if (OnPropertyChanging("Remark", value)) { _Remark = value; OnPropertyChanged("Remark"); } } }
     #endregion
 
     #region 获取/设置 字段值
@@ -267,12 +268,12 @@ public partial class JobTask
             "ProcessID" => _ProcessID,
             "Key" => _Key,
             "Data" => _Data,
-            "Message" => _Message,
             "TraceId" => _TraceId,
             "CreateIP" => _CreateIP,
             "CreateTime" => _CreateTime,
             "UpdateIP" => _UpdateIP,
             "UpdateTime" => _UpdateTime,
+            "Remark" => _Remark,
             _ => base[name]
         };
         set
@@ -299,12 +300,12 @@ public partial class JobTask
                 case "ProcessID": _ProcessID = value.ToInt(); break;
                 case "Key": _Key = Convert.ToString(value); break;
                 case "Data": _Data = Convert.ToString(value); break;
-                case "Message": _Message = Convert.ToString(value); break;
                 case "TraceId": _TraceId = Convert.ToString(value); break;
                 case "CreateIP": _CreateIP = Convert.ToString(value); break;
                 case "CreateTime": _CreateTime = value.ToDateTime(); break;
                 case "UpdateIP": _UpdateIP = Convert.ToString(value); break;
                 case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
+                case "Remark": _Remark = Convert.ToString(value); break;
                 default: base[name] = value; break;
             }
         }
@@ -439,9 +440,6 @@ public partial class JobTask
         /// <summary>数据。可以是Json数据，比如StatID</summary>
         public static readonly Field Data = FindByName("Data");
 
-        /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
-        public static readonly Field Message = FindByName("Message");
-
         /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
         public static readonly Field TraceId = FindByName("TraceId");
 
@@ -456,6 +454,9 @@ public partial class JobTask
 
         /// <summary>更新时间</summary>
         public static readonly Field UpdateTime = FindByName("UpdateTime");
+
+        /// <summary>备注</summary>
+        public static readonly Field Remark = FindByName("Remark");
 
         static Field FindByName(String name) => Meta.Table.FindByName(name);
     }
@@ -523,9 +524,6 @@ public partial class JobTask
         /// <summary>数据。可以是Json数据，比如StatID</summary>
         public const String Data = "Data";
 
-        /// <summary>消息内容。Handler内记录的异常信息或其它任务消息</summary>
-        public const String Message = "Message";
-
         /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
         public const String TraceId = "TraceId";
 
@@ -540,6 +538,9 @@ public partial class JobTask
 
         /// <summary>更新时间</summary>
         public const String UpdateTime = "UpdateTime";
+
+        /// <summary>备注</summary>
+        public const String Remark = "Remark";
     }
     #endregion
 }

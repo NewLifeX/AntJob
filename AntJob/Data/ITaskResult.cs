@@ -10,5 +10,5 @@ public interface ITaskResult
     JobStatus Status { get; set; }
 
     /// <summary>消息内容。异常信息或其它任务消息</summary>
-    String Message { get; set; }
+    String Remark { get; set; }
 }

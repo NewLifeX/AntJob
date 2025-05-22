@@ -26,9 +26,9 @@ public partial class JobError : EntityBase<JobError>
         // 如果没有脏数据，则不需要进行任何处理
         if (!HasDirty) return;
 
-        // 截断错误信息，避免过长
-        var len = _.Message.Length;
-        if (!Message.IsNullOrEmpty() && len > 0 && Message.Length > len) Message = Message.Substring(0, len);
+        //// 截断错误信息，避免过长
+        //var len = _.Message.Length;
+        //if (!Message.IsNullOrEmpty() && len > 0 && Message.Length > len) Message = Message.Substring(0, len);
     }
     #endregion
 
@@ -115,7 +115,7 @@ public partial class JobError : EntityBase<JobError>
         if (appid > 0) exp &= _.AppID == appid;
         if (jobid > 0) exp &= _.JobID == jobid;
         if (!client.IsNullOrEmpty()) exp &= _.Client == client;
-        if (!key.IsNullOrEmpty()) exp &= _.Message.Contains(key);
+        if (!key.IsNullOrEmpty()) exp &= _.Remark.Contains(key);
         exp &= _.DataTime.Between(start, end);
 
         return FindAll(exp, p);

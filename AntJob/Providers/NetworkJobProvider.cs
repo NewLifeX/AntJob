@@ -281,7 +281,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
                 var msg = ctx.Error.GetMessage();
                 var p = msg.IndexOf("Exception:");
                 if (p >= 0) msg = msg.Substring(p + "Exception:".Length).Trim();
-                task.Message = msg;
+                task.Remark = msg;
             }
         }
         else if (ctx.Status == JobStatus.延迟)
@@ -294,7 +294,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         }
 
         task.Cost = (Int32)Math.Round(ctx.Cost);
-        if (task.Message.IsNullOrEmpty()) task.Message = ctx.Remark;
+        if (task.Remark.IsNullOrEmpty()) task.Remark = ctx.Remark;
 
         task.Key = ctx.Key;
 

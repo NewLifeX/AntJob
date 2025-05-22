@@ -187,12 +187,12 @@
         <Column Name="ProcessID" DataType="Int32" Description="进程" />
         <Column Name="Key" DataType="String" Description="最后键。Handler内记录作为样本的数据" />
         <Column Name="Data" DataType="String" Length="-1" Description="数据。可以是Json数据，比如StatID" />
-        <Column Name="Message" DataType="String" Length="-1" Description="消息内容。Handler内记录的异常信息或其它任务消息" />
         <Column Name="TraceId" DataType="String" Length="200" Description="追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链" Category="扩展" />
         <Column Name="CreateIP" DataType="String" Description="创建地址" Category="扩展" />
         <Column Name="CreateTime" DataType="DateTime" Description="创建时间" Category="扩展" />
         <Column Name="UpdateIP" DataType="String" Description="更新地址" Category="扩展" />
         <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" Category="扩展" />
+        <Column Name="Remark" DataType="String" Length="-1" Description="备注" Category="扩展" />
       </Columns>
       <Indexes>
         <Index Columns="JobID,DataTime" />
@@ -213,12 +213,12 @@
         <Column Name="Data" DataType="String" Length="2000" Description="数据" />
         <Column Name="Server" DataType="String" Description="服务器" />
         <Column Name="ProcessID" DataType="Int32" Description="进程" />
-        <Column Name="Message" DataType="String" Length="2000" Description="内容" />
         <Column Name="TraceId" DataType="String" Length="200" Description="追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链" Category="扩展" />
         <Column Name="CreateIP" DataType="String" Description="创建地址" Category="扩展" />
         <Column Name="CreateTime" DataType="DateTime" Description="创建时间" Category="扩展" />
         <Column Name="UpdateIP" DataType="String" Description="更新地址" Category="扩展" />
         <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" Category="扩展" />
+        <Column Name="Remark" DataType="String" Length="-1" Description="备注" Category="扩展" />
       </Columns>
       <Indexes>
         <Index Columns="AppID,ID" />

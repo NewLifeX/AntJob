@@ -103,14 +103,6 @@ public partial class JobError
     [BindColumn("ProcessID", "进程", "")]
     public Int32 ProcessID { get => _ProcessID; set { if (OnPropertyChanging("ProcessID", value)) { _ProcessID = value; OnPropertyChanged("ProcessID"); } } }
 
-    private String _Message;
-    /// <summary>内容</summary>
-    [DisplayName("内容")]
-    [Description("内容")]
-    [DataObjectField(false, false, true, 2000)]
-    [BindColumn("Message", "内容", "")]
-    public String Message { get => _Message; set { if (OnPropertyChanging("Message", value)) { _Message = value; OnPropertyChanged("Message"); } } }
-
     private String _TraceId;
     /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
     [Category("扩展")]
@@ -155,6 +147,15 @@ public partial class JobError
     [DataObjectField(false, false, true, 0)]
     [BindColumn("UpdateTime", "更新时间", "")]
     public DateTime UpdateTime { get => _UpdateTime; set { if (OnPropertyChanging("UpdateTime", value)) { _UpdateTime = value; OnPropertyChanged("UpdateTime"); } } }
+
+    private String _Remark;
+    /// <summary>备注</summary>
+    [Category("扩展")]
+    [DisplayName("备注")]
+    [Description("备注")]
+    [DataObjectField(false, false, true, -1)]
+    [BindColumn("Remark", "备注", "")]
+    public String Remark { get => _Remark; set { if (OnPropertyChanging("Remark", value)) { _Remark = value; OnPropertyChanged("Remark"); } } }
     #endregion
 
     #region 获取/设置 字段值
@@ -175,12 +176,12 @@ public partial class JobError
             "Data" => _Data,
             "Server" => _Server,
             "ProcessID" => _ProcessID,
-            "Message" => _Message,
             "TraceId" => _TraceId,
             "CreateIP" => _CreateIP,
             "CreateTime" => _CreateTime,
             "UpdateIP" => _UpdateIP,
             "UpdateTime" => _UpdateTime,
+            "Remark" => _Remark,
             _ => base[name]
         };
         set
@@ -197,12 +198,12 @@ public partial class JobError
                 case "Data": _Data = Convert.ToString(value); break;
                 case "Server": _Server = Convert.ToString(value); break;
                 case "ProcessID": _ProcessID = value.ToInt(); break;
-                case "Message": _Message = Convert.ToString(value); break;
                 case "TraceId": _TraceId = Convert.ToString(value); break;
                 case "CreateIP": _CreateIP = Convert.ToString(value); break;
                 case "CreateTime": _CreateTime = value.ToDateTime(); break;
                 case "UpdateIP": _UpdateIP = Convert.ToString(value); break;
                 case "UpdateTime": _UpdateTime = value.ToDateTime(); break;
+                case "Remark": _Remark = Convert.ToString(value); break;
                 default: base[name] = value; break;
             }
         }
@@ -273,9 +274,6 @@ public partial class JobError
         /// <summary>进程</summary>
         public static readonly Field ProcessID = FindByName("ProcessID");
 
-        /// <summary>内容</summary>
-        public static readonly Field Message = FindByName("Message");
-
         /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
         public static readonly Field TraceId = FindByName("TraceId");
 
@@ -290,6 +288,9 @@ public partial class JobError
 
         /// <summary>更新时间</summary>
         public static readonly Field UpdateTime = FindByName("UpdateTime");
+
+        /// <summary>备注</summary>
+        public static readonly Field Remark = FindByName("Remark");
 
         static Field FindByName(String name) => Meta.Table.FindByName(name);
     }
@@ -327,9 +328,6 @@ public partial class JobError
         /// <summary>进程</summary>
         public const String ProcessID = "ProcessID";
 
-        /// <summary>内容</summary>
-        public const String Message = "Message";
-
         /// <summary>追踪。链路追踪，用于APM性能追踪定位，还原该事件的调用链</summary>
         public const String TraceId = "TraceId";
 
@@ -344,6 +342,9 @@ public partial class JobError
 
         /// <summary>更新时间</summary>
         public const String UpdateTime = "UpdateTime";
+
+        /// <summary>备注</summary>
+        public const String Remark = "Remark";
     }
     #endregion
 }
