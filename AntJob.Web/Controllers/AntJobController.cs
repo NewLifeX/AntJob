@@ -184,7 +184,7 @@ public class AntJobController : ControllerBase, IActionFilter
     [HttpPost(nameof(AddJobs))]
     public String[] AddJobs(JobModel[] jobs)
     {
-        if (jobs == null || jobs.Length == 0) return new String[0];
+        if (jobs == null || jobs.Length == 0) return [];
 
         return _jobService.AddJobs(_App, jobs);
     }
@@ -196,9 +196,12 @@ public class AntJobController : ControllerBase, IActionFilter
     public ITask[] Acquire(AcquireModel model)
     {
         var job = model.Job?.Trim();
-        if (job.IsNullOrEmpty()) return new TaskModel[0];
+        if (job.IsNullOrEmpty()) return [];
 
-        return _jobService.Acquire(_App, model, UserHost);
+        var sessionId = $"{_App.Name}@{UserHost}";
+        var online = _appService.GetOnline(_App, sessionId, UserHost);
+
+        return _jobService.Acquire(_App, model, online);
     }
 
     /// <summary>生产消息</summary>
@@ -222,7 +225,8 @@ public class AntJobController : ControllerBase, IActionFilter
         if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 
         var sessionId = $"{_App.Name}@{UserHost}";
-        return _jobService.Report(_App, task, sessionId, UserHost);
+        var online = _appService.GetOnline(_App, sessionId, UserHost);
+        return _jobService.Report(_App, task, online);
     }
     #endregion
 }

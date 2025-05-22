@@ -28,6 +28,7 @@ class AntService : IApi, IActionFilter
     public IApiSession Session { get; set; }
 
     private App _App;
+    private AppOnline _Online;
     private INetSession _Net;
     private readonly AppService _appService;
     private readonly JobService _jobService;
@@ -53,19 +54,21 @@ class AntService : IApi, IActionFilter
         var act = filterContext.ActionName;
         if (act == nameof(Login)) return;
 
-        if (Session["App"] is App app)
-        {
-            _App = app;
-
-            var remote = _Net.Remote;
-            var online = _appService.GetOnline(app, remote + "", remote.Host);
-            online.UpdateTime = TimerX.Now;
-            online.SaveAsync();
-        }
-        else
-        {
+        if (Session["App"] is not App app)
             throw new ApiException(ApiCode.Unauthorized, $"{_Net.Remote}未登录！不能执行{act}");
+
+        _App = app;
+
+        if (Session["AppOnline"] is not AppOnline online)
+        {
+            var remote = _Net.Remote;
+            online = _appService.GetOnline(app, remote + "", remote.Host);
         }
+
+        _Online = online;
+
+        online.UpdateTime = TimerX.Now;
+        online.SaveAsync();
     }
 
     void IActionFilter.OnActionExecuted(ControllerContext filterContext)
@@ -103,7 +106,7 @@ class AntService : IApi, IActionFilter
         if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
         var remote = _Net.Remote;
-        var (app, online, rs) = _appService.Login(model, remote + "", remote.Host);
+        var (app, online, rs) = _appService.Login(model, null, remote.Host);
 
         // 记录当前用户
         Session["App"] = app;
@@ -113,28 +116,10 @@ class AntService : IApi, IActionFilter
     }
 
     [Api(nameof(Logout))]
-    public ILogoutResponse Logout(String reason)
-    {
-        var app = Session["App"] as App;
-        var online = Session["AppOnline"] as AppOnline;
-
-        var remote = _Net.Remote;
-        online ??= _appService.GetOnline(app, remote + "", remote.Host);
-
-        return _appService.Logout(app, online, reason, _Net.Remote.Host);
-    }
+    public ILogoutResponse Logout(String reason) => _appService.Logout(_App, _Online, reason, _Net.Remote.Host);
 
     [Api(nameof(Ping))]
-    public IPingResponse Ping(PingRequest request)
-    {
-        var app = Session["App"] as App;
-        var online = Session["AppOnline"] as AppOnline;
-
-        var remote = _Net.Remote;
-        online ??= _appService.GetOnline(app, remote + "", remote.Host);
-
-        return _appService.Ping(app, online, request, _Net.Remote.Host);
-    }
+    public IPingResponse Ping(PingRequest request) => _appService.Ping(_App, _Online, request, _Net.Remote.Host);
 
     /// <summary>获取当前应用的所有在线实例</summary>
     /// <returns></returns>
@@ -176,8 +161,9 @@ class AntService : IApi, IActionFilter
         var job = model.Job?.Trim();
         if (job.IsNullOrEmpty()) return [];
 
-        var ip = _Net.Remote.Host;
-        var tasks = _jobService.Acquire(_App, model, ip);
+        var tasks = _jobService.Acquire(_App, model, _Online);
+
+        // 记录申请到的任务数
         if (span != null) span.Value = tasks?.Length ?? 0;
 
         return tasks;
@@ -203,8 +189,7 @@ class AntService : IApi, IActionFilter
     {
         if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 
-        var remote = _Net.Remote;
-        return _jobService.Report(_App, task, remote + "", remote.Host);
+        return _jobService.Report(_App, task, _Online);
     }
     #endregion
 }

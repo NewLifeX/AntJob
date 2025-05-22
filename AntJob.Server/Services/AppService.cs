@@ -65,8 +65,9 @@ public class AppService
 
         app.Save();
 
-        // 应用上线
-        if (!model.ClientId.IsNullOrEmpty()) sessionId = model.ClientId;
+        // 应用上线。RPC用ClientId，Web用AppName@IP
+        //if (!model.ClientId.IsNullOrEmpty()) sessionId = model.ClientId;
+        if (sessionId.IsNullOrEmpty()) sessionId = model.ClientId;
         var online = GetOnline(app, sessionId, ip);
         online.Name = model.Machine;
         online.Client = model.ClientId;
@@ -189,9 +190,9 @@ public class AppService
         return online;
     }
 
-    public void UpdateOnline(App app, JobTask ji, String sessionId, String ip)
+    public void UpdateOnline(App app, JobTask ji, AppOnline online)
     {
-        var online = GetOnline(app, sessionId, ip);
+        //var online = GetOnline(app, sessionId, ip);
         online.Total += ji.Total;
         online.Success += ji.Success;
         online.Error += ji.Error;

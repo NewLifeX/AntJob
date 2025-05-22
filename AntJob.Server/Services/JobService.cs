@@ -134,7 +134,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     /// <summary>申请作业任务</summary>
     /// <param name="model">模型</param>
     /// <returns></returns>
-    public ITask[] Acquire(App app, AcquireModel model, NetUri remote)
+    public ITask[] Acquire(App app, AcquireModel model, AppOnline online)
     {
         var jobName = model.Job?.Trim();
         if (jobName.IsNullOrEmpty()) return [];
@@ -160,8 +160,9 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         if (job.DataTime.Year <= 2000) throw new XException("作业[{0}/{1}]未设置数据时间", job.ID, job.Name);
 
         // 应用在线，但可能禁止向其分配任务
-        var ip = remote?.Host;
-        var online = _appService.GetOnline(app, remote + "", ip);
+        var ip = online.UpdateIP;
+        //var ip = remote?.Host;
+        //var online = _appService.GetOnline(app, remote + "", ip);
         if (!online.Enable) return [];
 
         var list = new List<JobTask>();
@@ -411,7 +412,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     /// <summary>报告状态（进度、成功、错误）</summary>
     /// <param name="result"></param>
     /// <returns></returns>
-    public Boolean Report(App app, TaskResult result, String sessionId, String ip)
+    public Boolean Report(App app, TaskResult result, AppOnline online)
     {
         if (result == null || result.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + result?.ID);
 
@@ -444,7 +445,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             SetJobFinish(job, task);
 
             // 记录状态
-            _appService.UpdateOnline(app, task, sessionId, ip);
+            _appService.UpdateOnline(app, task, online);
         }
         else if (result.Status == JobStatus.错误)
         {
@@ -452,13 +453,13 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             task.Error++;
             //ji.Message = err.Message;
 
-            SetJobError(job, task, ip);
+            SetJobError(job, task, online.UpdateIP);
 
             // 出错时判断如果超过最大错误数，则停止作业
             CheckMaxError(app, job);
 
             // 记录状态
-            _appService.UpdateOnline(app, task, sessionId, ip);
+            _appService.UpdateOnline(app, task, online);
         }
         else if (result.Status == JobStatus.延迟)
         {
