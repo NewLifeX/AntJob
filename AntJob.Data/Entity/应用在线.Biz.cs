@@ -153,6 +153,6 @@ public partial class AppOnline : EntityBase<AppOnline>
     /// <summary>根据编码查询或添加</summary>
     /// <param name="sessionid"></param>
     /// <returns></returns>
-    public static AppOnline GetOrAdd(String sessionid) => GetOrAdd(sessionid, FindByInstance, k => new AppOnline { Instance = k });
+    public static AppOnline GetOrAdd(String sessionid) => GetOrAdd(sessionid, FindByInstance, k => new AppOnline { Instance = k, Enable = true });
     #endregion
 }
