@@ -65,7 +65,7 @@ public abstract class MessageHandler : Handler
         var span = DefaultSpan.Current;
         if (span != null) span.Value = ctx.Total;
 
-        Execute(ctx);
+        ctx.Success = Execute(ctx);
     }
 
     /// <summary>根据解码后的消息执行任务</summary>
