@@ -44,9 +44,9 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="6.4.2025.513" />
-    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.3.2025.521-beta1200" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.3.2025.516-beta1457" />
+    <PackageReference Include="NewLife.Cube.Core" Version="6.5.2025.601" />
+    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.3.2025.601" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.4.2025.601" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
