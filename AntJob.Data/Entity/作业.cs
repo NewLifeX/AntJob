@@ -285,6 +285,14 @@ public partial class Job
     [BindColumn("LastTime", "最后时间。最后一次时间", "")]
     public DateTime LastTime { get => _LastTime; set { if (OnPropertyChanging("LastTime", value)) { _LastTime = value; OnPropertyChanged("LastTime"); } } }
 
+    private String _QuietTime;
+    /// <summary>免打扰。设置免打扰时间段，例如09:00-12:00,13:00-18:00</summary>
+    [DisplayName("免打扰")]
+    [Description("免打扰。设置免打扰时间段，例如09:00-12:00,13:00-18:00")]
+    [DataObjectField(false, false, true, 50)]
+    [BindColumn("QuietTime", "免打扰。设置免打扰时间段，例如09:00-12:00,13:00-18:00", "")]
+    public String QuietTime { get => _QuietTime; set { if (OnPropertyChanging("QuietTime", value)) { _QuietTime = value; OnPropertyChanged("QuietTime"); } } }
+
     private String _Data;
     /// <summary>附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板</summary>
     [DisplayName("附加数据")]
@@ -414,6 +422,7 @@ public partial class Job
             "Speed" => _Speed,
             "LastStatus" => _LastStatus,
             "LastTime" => _LastTime,
+            "QuietTime" => _QuietTime,
             "Data" => _Data,
             "CreateUserID" => _CreateUserID,
             "CreateUser" => _CreateUser,
@@ -461,6 +470,7 @@ public partial class Job
                 case "Speed": _Speed = value.ToInt(); break;
                 case "LastStatus": _LastStatus = (JobStatus)value.ToInt(); break;
                 case "LastTime": _LastTime = value.ToDateTime(); break;
+                case "QuietTime": _QuietTime = Convert.ToString(value); break;
                 case "Data": _Data = Convert.ToString(value); break;
                 case "CreateUserID": _CreateUserID = value.ToInt(); break;
                 case "CreateUser": _CreateUser = Convert.ToString(value); break;
@@ -587,6 +597,9 @@ public partial class Job
 
         /// <summary>最后时间。最后一次时间</summary>
         public static readonly Field LastTime = FindByName("LastTime");
+
+        /// <summary>免打扰。设置免打扰时间段，例如09:00-12:00,13:00-18:00</summary>
+        public static readonly Field QuietTime = FindByName("QuietTime");
 
         /// <summary>附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板</summary>
         public static readonly Field Data = FindByName("Data");
@@ -716,6 +729,9 @@ public partial class Job
 
         /// <summary>最后时间。最后一次时间</summary>
         public const String LastTime = "LastTime";
+
+        /// <summary>免打扰。设置免打扰时间段，例如09:00-12:00,13:00-18:00</summary>
+        public const String QuietTime = "QuietTime";
 
         /// <summary>附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板</summary>
         public const String Data = "Data";

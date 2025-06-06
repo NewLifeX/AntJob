@@ -355,5 +355,39 @@ public partial class Job : EntityBase<Job>
             Mode = Mode,
         };
     }
+
+    /// <summary>检查是否免打扰模式</summary>
+    /// <returns></returns>
+    public Boolean CheckQuiet(DateTime time)
+    {
+        var qt = QuietTime;
+        if (qt.IsNullOrEmpty()) return false;
+
+        foreach (var item in qt.Split(",", StringSplitOptions.RemoveEmptyEntries))
+        {
+            var ss = item.Split("-");
+            if (ss.Length != 2) continue;
+
+            if (TimeSpan.TryParse(ss[0], out var start) &&
+                TimeSpan.TryParse(ss[1], out var end))
+            {
+                // 如果时间在免打扰时间段内，则返回true。需要判断time.TimeOfDay是否在start和end之间，注意跨天的情况
+                if (start < end)
+                {
+                    // 正常时间段，不跨天
+                    if (time.TimeOfDay >= start && time.TimeOfDay < end)
+                        return true;
+                }
+                else
+                {
+                    // 跨天时间段
+                    if (time.TimeOfDay >= start || time.TimeOfDay < end)
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
     #endregion
 }

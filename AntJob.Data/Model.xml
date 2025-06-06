@@ -150,6 +150,7 @@
         <Column Name="Speed" DataType="Int32" Description="速度" Category="统计" />
         <Column Name="LastStatus" DataType="Int32" Description="最后状态。最后一次状态" Category="统计" Type="JobStatus" />
         <Column Name="LastTime" DataType="DateTime" Description="最后时间。最后一次时间" Category="统计" />
+        <Column Name="QuietTime" DataType="String" Description="免打扰。设置免打扰时间段，该时间段内不生成作业任务，例如09:00-12:00,13:00-18:00" />
         <Column Name="Data" DataType="String" Length="-1" Description="附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板" />
         <Column Name="CreateUserID" DataType="Int32" Description="创建人" Category="扩展" />
         <Column Name="CreateUser" DataType="String" Description="创建者" Category="扩展" />
