@@ -38,6 +38,10 @@ public partial class TaskResult : ITaskResult
     public String TraceId { get; set; }
 
     /// <summary>消息内容。异常信息或其它任务消息</summary>
+    [Obsolete]
+    public String Message { get; set; }
+
+    /// <summary>消息内容。异常信息或其它任务消息</summary>
     public String Remark { get; set; }
     #endregion
 }

@@ -441,6 +441,9 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         task.Cost = (Int32)Math.Round(result.Cost / 1000d);
         task.Key = result.Key;
         task.Remark = result.Remark;
+#pragma warning disable CS0612 // 类型或成员已过时
+        if (result.Remark.IsNullOrEmpty()) task.Remark = result.Message; // 兼容旧版，Message字段已废弃
+#pragma warning restore CS0612 // 类型或成员已过时
 
         var traceId = result.TraceId ?? DefaultSpan.Current + "";
         // 已终结的任务，汇总统计
