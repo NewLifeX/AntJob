@@ -145,7 +145,9 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         app = App.FindByID(app.ID) ?? app;
         if (!app.Enable) return [];
 
+        // 作业是否启用，是否处于免打扰时间
         var job = app.Jobs.FirstOrDefault(e => e.Name == jobName);
+        if (job != null && (!job.Enable || job.CheckQuiet(DateTime.Now))) return [];
 
         // 全局锁，确保单个作业只有一个线程在分配作业
         using var ck = _cacheProvider.AcquireLock($"antjob:lock:{job.ID}", 15_000);

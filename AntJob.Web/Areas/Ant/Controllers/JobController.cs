@@ -23,7 +23,7 @@ public class JobController : AntEntityController<Job>
         LogOnChange = true;
 
         ListFields.RemoveField("ClassName", "Step", "Cron", "Topic", "MessageCount", "Time", "End");
-        ListFields.RemoveField("Times", "Speed");
+        ListFields.RemoveField("Times", "Speed", "QuietTime");
         ListFields.RemoveField("MaxError", "MaxRetry", "MaxTime", "MaxRetain", "MaxIdle", "ErrorDelay", "Deadline");
         ListFields.RemoveCreateField().RemoveUpdateField();
         ListFields.AddListField("UpdateTime");
