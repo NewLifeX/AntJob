@@ -10,8 +10,6 @@ XTrace.UseConsole();
 var services = ObjectContainer.Current;
 services.AddStardust();
 
-services.AddSingleton(AntSetting.Current);
-
 services.AddAntJob()
     .AddHandler<HelloJob>()
     .AddHandler<BuildPatient>()

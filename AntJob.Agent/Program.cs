@@ -10,9 +10,6 @@ XTrace.UseConsole();
 var services = ObjectContainer.Current;
 services.AddStardust();
 
-var set = AntSetting.Current;
-services.AddSingleton(set);
-
 // 实例化调度器
 services.AddAntJob()
     .AddHandler<SqlHandler>()

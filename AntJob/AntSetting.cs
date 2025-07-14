@@ -21,23 +21,23 @@ public class AntSetting : Config<AntSetting>, IClientSetting
 
     /// <summary>应用标识。调度中心以此隔离应用，默认当前应用</summary>
     [Description("应用标识。调度中心以此隔离应用，默认当前应用")]
-    public String AppID { get; set; }
+    public String AppId { get; set; }
 
     /// <summary>应用密钥。</summary>
     [Description("应用密钥。")]
     public String Secret { get; set; }
 
-    String IClientSetting.Code { get => AppID; set => AppID = value; }
+    String IClientSetting.Code { get => AppId; set => AppId = value; }
     #endregion
 
     #region 方法
     /// <summary>重载</summary>
     protected override void OnLoaded()
     {
-        if (AppID.IsNullOrEmpty())
+        if (AppId.IsNullOrEmpty())
         {
             var asm = Assembly.GetEntryAssembly();
-            if (asm != null) AppID = asm.GetName().Name;
+            if (asm != null) AppId = asm.GetName().Name;
         }
 
         base.OnLoaded();
