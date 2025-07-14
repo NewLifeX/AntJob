@@ -12,9 +12,11 @@ services.AddStardust();
 
 services.AddSingleton(AntSetting.Current);
 
+services.AddAntJob()
+    .AddHandler<HelloJob>()
+    .AddHandler<BuildPatient>()
+    .AddHandler<BuildWill>();
+
 // 友好退出
 var host = services.BuildHost();
-
-host.Add<JobHost>();
-
 await host.RunAsync();

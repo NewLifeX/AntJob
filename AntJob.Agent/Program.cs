@@ -11,23 +11,12 @@ var services = ObjectContainer.Current;
 services.AddStardust();
 
 var set = AntSetting.Current;
+services.AddSingleton(set);
 
 // 实例化调度器
-var scheduler = new Scheduler
-{
-    ServiceProvider = services.BuildServiceProvider(),
-    Log = XTrace.Log,
-};
-
-scheduler.Join(set);
-
-// 添加作业处理器
-//sc.Handlers.Add(new CSharpHandler());
-scheduler.AddHandler<SqlHandler>();
-scheduler.AddHandler<SqlMessage>();
-
-// 启动调度引擎，调度器内部多线程处理
-scheduler.StartAsync();
+services.AddAntJob()
+    .AddHandler<SqlHandler>()
+    .AddHandler<SqlMessage>();
 
 // 友好退出
 var host = services.BuildHost();

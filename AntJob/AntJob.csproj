@@ -6,7 +6,7 @@
     <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>©2002-2025 NewLife</Copyright>
-    <VersionPrefix>4.1</VersionPrefix>
+    <VersionPrefix>4.2</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(Version)</FileVersion>
@@ -49,9 +49,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="11.5.2025.701" />
-    <PackageReference Include="NewLife.Remoting" Version="3.3.2025.701" />
-    <PackageReference Include="NewLife.Stardust" Version="3.4.2025.701" />
+    <PackageReference Include="NewLife.Core" Version="11.5.2025.713-beta1307" />
+    <PackageReference Include="NewLife.Remoting" Version="3.4.2025.713-beta1545" />
+    <PackageReference Include="NewLife.Stardust" Version="3.4.2025.713-beta1409" />
   </ItemGroup>
   
   <ItemGroup>

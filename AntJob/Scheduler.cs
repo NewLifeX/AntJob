@@ -41,11 +41,16 @@ public class Scheduler : DisposeBase
     #region 处理器
     /// <summary>添加处理器</summary>
     /// <param name="handler"></param>
-    public void AddHandler(Handler handler) => Handlers.Add(handler);
+    public Scheduler AddHandler(Handler handler)
+    {
+        Handlers.Add(handler);
+
+        return this;
+    }
 
     /// <summary>按类型添加处理器，支持依赖注入</summary>
     /// <typeparam name="T"></typeparam>
-    public void AddHandler<T>() where T : Handler
+    public Scheduler AddHandler<T>() where T : Handler
     {
         var prv = ServiceProvider;
         if (prv == null)
@@ -59,6 +64,8 @@ public class Scheduler : DisposeBase
         var handler = prv.GetService<T>() ?? prv.CreateInstance(typeof(T)) as T;
 
         Handlers.Add(handler);
+
+        return this;
     }
     #endregion
 
