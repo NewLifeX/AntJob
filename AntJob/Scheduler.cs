@@ -1,4 +1,5 @@
-﻿using AntJob.Data;
+﻿using System;
+using AntJob.Data;
 using AntJob.Handlers;
 using AntJob.Providers;
 using NewLife;
@@ -8,6 +9,7 @@ using NewLife.Model;
 using NewLife.Reflection;
 using NewLife.Threading;
 using Stardust.Registry;
+using static NewLife.Remoting.ApiHttpClient;
 
 namespace AntJob;
 
@@ -52,18 +54,9 @@ public class Scheduler : DisposeBase
     /// <typeparam name="T"></typeparam>
     public Scheduler AddHandler<T>() where T : Handler
     {
-        var prv = ServiceProvider;
-        if (prv == null)
-        {
-            var services = ObjectContainer.Current;
-            prv = ObjectContainer.Provider;
-            services.AddTransient<T>();
-        }
-
-        // 马上实例化
-        var handler = prv.GetService<T>() ?? prv.CreateInstance(typeof(T)) as T;
-
-        Handlers.Add(handler);
+        // 把服务类型注册到容器中，以便后续获取
+        var ioc = ServiceProvider?.GetService<IObjectContainer>() ?? ObjectContainer.Current;
+        ioc.AddTransient<Handler, T>();
 
         return this;
     }
@@ -154,6 +147,21 @@ public class Scheduler : DisposeBase
 
     private void OnStart()
     {
+        // 从容器中获取所有服务
+        foreach (var item in ServiceProvider.GetServices<Handler>())
+        {
+            Handlers.Add(item);
+        }
+        // 有可能DI中注入IObjectContainer，后者再次注册Handler
+        var ioc = ServiceProvider?.GetService<IObjectContainer>();
+        if (ioc != null && ioc.GetType().Namespace != ServiceProvider?.GetType().Namespace)
+        {
+            foreach (var item in ServiceProvider.GetServices<Handler>())
+            {
+                Handlers.Add(item);
+            }
+        }
+
         // 检查本地添加的处理器
         var hs = Handlers;
         if (hs.Count == 0) throw new ArgumentNullException(nameof(Handlers), "没有可用处理器");
