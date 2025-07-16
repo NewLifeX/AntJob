@@ -87,6 +87,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             // 定时调度和数据调度，自动设置DataTime
             if (job.Mode is JobModes.Time or JobModes.Data)
             {
+                if (job.DataTime.Year < 2000) job.DataTime = model.DataTime.ToLocalTime();
                 if (job.DataTime.Year < 2000) job.DataTime = DateTime.Today;
             }
 
