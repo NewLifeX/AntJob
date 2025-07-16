@@ -1,5 +1,4 @@
-﻿using System;
-using AntJob.Data;
+﻿using AntJob.Data;
 using AntJob.Handlers;
 using AntJob.Providers;
 using NewLife;
@@ -9,7 +8,6 @@ using NewLife.Model;
 using NewLife.Reflection;
 using NewLife.Threading;
 using Stardust.Registry;
-using static NewLife.Remoting.ApiHttpClient;
 
 namespace AntJob;
 
@@ -153,10 +151,10 @@ public class Scheduler : DisposeBase
             Handlers.Add(item);
         }
         // 有可能DI中注入IObjectContainer，后者再次注册Handler
-        var ioc = ServiceProvider?.GetService<IObjectContainer>();
+        var ioc = ServiceProvider?.GetService<IObjectContainer>() ?? ObjectContainer.Current;
         if (ioc != null && ioc.GetType().Namespace != ServiceProvider?.GetType().Namespace)
         {
-            foreach (var item in ServiceProvider.GetServices<Handler>())
+            foreach (var item in ioc.BuildServiceProvider().GetServices<Handler>())
             {
                 Handlers.Add(item);
             }
