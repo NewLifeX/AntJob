@@ -98,12 +98,18 @@ public abstract class DataHandler : Handler
     public String Selects { get; set; }
 
     /// <summary>每次都只查第一页</summary>
-    public bool KeepFirstPage { get; set; }
+    public Boolean KeepFirstPage { get; set; }
     #endregion
 
     #region 构造
     /// <summary>实例化数据库处理器</summary>
-    public DataHandler() => Mode = JobModes.Data;
+    public DataHandler()
+    {
+        Mode = JobModes.Data;
+
+        // 逼着Init中查询最小时间
+        Job.DataTime = DateTime.MinValue;
+    }
     #endregion
 
     #region 方法
@@ -124,7 +130,7 @@ public abstract class DataHandler : Handler
         var job = Job;
         if (job.Step == 0) job.Step = 30;
 
-        //todo 如果DataTime为空，则自动获取最小时间，并设置到DataTime，以减轻平台设置负担
+        // 如果DataTime为空，则自动获取最小时间，并设置到DataTime，以减轻平台设置负担
 
         // 获取最小数据时间
         if (job.DataTime.Year < 2000)
@@ -160,7 +166,7 @@ public abstract class DataHandler : Handler
     #endregion
 
     #region 数据处理
-    /// <summary>处理任务。内部分批处理</summary>
+    /// <summary>处理任务。由Process执行，内部分批Fetch数据并调用Execute</summary>
     /// <param name="ctx"></param>
     protected override void OnProcess(JobContext ctx)
     {
@@ -191,8 +197,9 @@ public abstract class DataHandler : Handler
             // 批量处理
             ctx.Success += Execute(ctx);
 
-            // 报告进度
+            // 较慢的作业，及时报告进度
             ctx.Status = JobStatus.抽取中;
+            if (Speed < 10) Report(ctx, JobStatus.抽取中);
 
             // 不满一批，结束
             if (list != null && list.Count < ctx.Task.BatchSize) break;
@@ -234,7 +241,7 @@ public abstract class DataHandler : Handler
 
         if (!Where.IsNullOrEmpty()) exp &= Where;
 
-        var list = Factory.FindAll(exp, OrderBy, Selects, this.KeepFirstPage ? 0 : row, task.BatchSize);
+        var list = Factory.FindAll(exp, OrderBy, Selects, KeepFirstPage ? 0 : row, task.BatchSize);
 
         // 取到数据，需要滑动窗口
         if (list.Count > 0) row += list.Count;
@@ -242,7 +249,7 @@ public abstract class DataHandler : Handler
         return list;
     }
 
-    /// <summary>处理一批数据</summary>
+    /// <summary>处理一批数据。由OnProcess执行</summary>
     /// <param name="ctx">上下文</param>
     /// <returns></returns>
     public override Int32 Execute(JobContext ctx)
@@ -256,7 +263,7 @@ public abstract class DataHandler : Handler
         return count;
     }
 
-    /// <summary>处理一个数据对象</summary>
+    /// <summary>处理一个数据对象。由Execute执行，每个实体对象调用一次</summary>
     /// <param name="ctx">上下文</param>
     /// <param name="entity"></param>
     /// <returns></returns>

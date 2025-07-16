@@ -92,39 +92,39 @@ public class AntClient : ClientBase
     #region 核心方法
     /// <summary>获取指定名称的作业</summary>
     /// <returns></returns>
-    public IJob[] GetJobs() => InvokeAsync<JobModel[]>(nameof(GetJobs)).Result;
+    public async Task<IJob[]> GetJobs() => await InvokeAsync<JobModel[]>(nameof(GetJobs));
 
     /// <summary>批量添加作业</summary>
     /// <param name="jobs"></param>
     /// <returns></returns>
-    public String[] AddJobs(IJob[] jobs) => InvokeAsync<String[]>(nameof(AddJobs), new { jobs }).Result;
+    public Task<String[]> AddJobs(IJob[] jobs) => InvokeAsync<String[]>(nameof(AddJobs), new { jobs });
 
     /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
     /// <param name="job"></param>
     /// <returns></returns>
-    public IJob SetJob(IDictionary<String, Object> job) => Invoke<JobModel>(nameof(SetJob), job);
+    public async Task<IJob> SetJob(IDictionary<String, Object> job) => await InvokeAsync<JobModel>(nameof(SetJob), job);
 
     /// <summary>申请作业任务</summary>
     /// <param name="job">作业</param>
     /// <param name="topic">主题</param>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public ITask[] Acquire(String job, String topic, Int32 count) => InvokeAsync<TaskModel[]>(nameof(Acquire), new AcquireModel
+    public async Task<ITask[]> Acquire(String job, String topic, Int32 count) => await InvokeAsync<TaskModel[]>(nameof(Acquire), new AcquireModel
     {
         Job = job,
         Topic = topic,
         Count = count,
-    }).Result;
+    });
 
     /// <summary>生产消息</summary>
     /// <param name="model">模型</param>
     /// <returns></returns>
-    public Int32 Produce(ProduceModel model) => Invoke<Int32>(nameof(Produce), model);
+    public Task<Int32> Produce(ProduceModel model) => InvokeAsync<Int32>(nameof(Produce), model);
 
     /// <summary>报告状态（进度、成功、错误）</summary>
     /// <param name="task"></param>
     /// <returns></returns>
-    public Boolean Report(ITaskResult task)
+    public async Task<Boolean> Report(ITaskResult task)
     {
         var retry = 3;
         var lastex = new Exception();
@@ -132,7 +132,7 @@ public class AntClient : ClientBase
         {
             try
             {
-                return InvokeAsync<Boolean>(nameof(Report), task).Result;
+                return await InvokeAsync<Boolean>(nameof(Report), task);
             }
             catch (Exception ex)
             {
@@ -145,6 +145,6 @@ public class AntClient : ClientBase
 
     /// <summary>获取当前应用的所有在线实例</summary>
     /// <returns></returns>
-    public IPeer[] GetPeers() => InvokeAsync<PeerModel[]>(nameof(GetPeers)).Result;
+    public async Task<IPeer[]> GetPeers() => await InvokeAsync<PeerModel[]>(nameof(GetPeers));
     #endregion
 }

@@ -24,7 +24,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     {
         base.Dispose(disposing);
 
-        Stop();
+        Stop().Wait(5_000);
 
         _timer.TryDispose();
         _timer = null;
@@ -33,7 +33,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
 
     #region 启动停止
     /// <summary>开始</summary>
-    public override void Start()
+    public override async Task Start()
     {
         WriteLog("正在连接调度中心：{0}", setting.Server);
 
@@ -43,10 +43,14 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
             Tracer = Tracer,
             Log = Log,
         };
-        ant.Login().Wait();
+        await ant.Login();
 
         // 断开前一个连接
-        Ant.TryDispose();
+        if (Ant != null)
+        {
+            await Ant.Logout("new Start");
+            Ant.TryDispose();
+        }
         Ant = ant;
 
         var bs = Schedule?.Handlers;
@@ -97,9 +101,9 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         {
             WriteLog("注册作业[{0}]：{1}", list.Count, list.Join(",", e => e.Name));
 
-            var rs = Ant.AddJobs(list.ToArray());
+            var rs = await Ant.AddJobs(list.ToArray());
 
-            WriteLog("注册成功[{0}]：{1}", rs?.Length, rs.Join());
+            WriteLog("新增作业[{0}]：{1}", rs?.Length, rs.Join());
         }
 
         // 通信完成，改回来本地时间
@@ -119,13 +123,17 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     }
 
     /// <summary>停止</summary>
-    public override void Stop()
+    public override async Task Stop()
     {
-        Ant?.Logout(nameof(Stop)).Wait(1_000);
+        var ant = Ant;
+        if (ant != null)
+        {
+            await ant.Logout(nameof(Stop));
 
-        // 断开前一个连接
-        Ant.TryDispose();
-        Ant = null;
+            // 断开前一个连接
+            ant.TryDispose();
+            Ant = null;
+        }
     }
     #endregion
 
@@ -135,7 +143,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     private DateTime _NextGetJobs;
     /// <summary>获取所有作业名称</summary>
     /// <returns></returns>
-    public override IJob[] GetJobs()
+    public override async Task<IJob[]> GetJobs()
     {
         // 周期性获取，避免请求过快
         var now = TimerX.Now;
@@ -143,11 +151,10 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         {
             _NextGetJobs = now.AddSeconds(5);
 
-            _jobs = Ant.GetJobs();
-
-            if (_jobs != null)
+            var jobs = await Ant.GetJobs();
+            if (jobs != null)
             {
-                foreach (var job in _jobs)
+                foreach (var job in jobs)
                 {
                     // 通信约定UTC，收到后需转为本地时间
                     job.DataTime = job.DataTime.ToLocalTime();
@@ -156,8 +163,10 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
                 }
 
                 // 备份一份，用于比较
-                _baks = _jobs.Select(e => ((ICloneable)e).Clone() as IJob).ToArray();
+                _baks = jobs.Select(e => ((ICloneable)e).Clone() as IJob).ToArray();
             }
+
+            _jobs = jobs;
         }
 
         return _jobs;
@@ -166,7 +175,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
     /// <param name="job"></param>
     /// <returns></returns>
-    public override IJob SetJob(IJob job)
+    public override Task<IJob> SetJob(IJob job)
     {
         var dic = job.ToDictionary();
         var old = _baks?.FirstOrDefault(e => e.Name == job.Name);
@@ -190,9 +199,9 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     /// <param name="topic">主题</param>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public override ITask[] Acquire(IJob job, String topic, Int32 count)
+    public override async Task<ITask[]> Acquire(IJob job, String topic, Int32 count)
     {
-        var rs = Ant.Acquire(job.Name, topic, count);
+        var rs = await Ant.Acquire(job.Name, topic, count);
         if (rs != null)
         {
             foreach (var task in rs)
@@ -213,7 +222,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     /// <param name="messages">消息集合</param>
     /// <param name="option">消息选项</param>
     /// <returns></returns>
-    public override Int32 Produce(String job, String topic, String[] messages, MessageOption option = null)
+    public override async Task<Int32> Produce(String job, String topic, String[] messages, MessageOption option = null)
     {
         if (topic.IsNullOrEmpty() || messages == null || messages.Length < 1) return 0;
 
@@ -230,14 +239,14 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
             model.AppId = option.AppId;
         }
 
-        return Ant.Produce(model);
+        return await Ant.Produce(model);
     }
     #endregion
 
     #region 报告状态
     /// <summary>报告进度，每个任务多次调用</summary>
     /// <param name="ctx">上下文</param>
-    public override void Report(JobContext ctx)
+    public override async Task Report(JobContext ctx)
     {
         // 不用上报抽取中
         if (ctx.Status == JobStatus.抽取中) return;
@@ -253,12 +262,12 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
 
         if (ctx.NextTime.Year > 2000) task.NextTime = ctx.NextTime.ToUniversalTime();
 
-        Report(ctx.Handler.Job, task);
+        await Report(ctx.Handler.Job, task);
     }
 
     /// <summary>完成任务，每个任务只调用一次</summary>
     /// <param name="ctx">上下文</param>
-    public override void Finish(JobContext ctx)
+    public override async Task Finish(JobContext ctx)
     {
         if (ctx?.Result is not TaskResult task) return;
 
@@ -298,14 +307,14 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
 
         task.Key = ctx.Key;
 
-        Report(ctx.Handler.Job, task);
+        await Report(ctx.Handler.Job, task);
     }
 
-    private void Report(IJob job, ITaskResult task)
+    private async Task Report(IJob job, ITaskResult task)
     {
         try
         {
-            Ant.Report(task);
+            await Ant.Report(task);
         }
         catch (Exception ex)
         {
@@ -317,9 +326,9 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     #region 邻居
     private TimerX _timer;
 
-    private void DoCheckPeer(Object state)
+    private async Task DoCheckPeer(Object state)
     {
-        var ps = Ant?.GetPeers();
+        var ps = await Ant?.GetPeers();
         if (ps == null || ps.Length == 0) return;
 
         var old = (Peers ?? []).ToList();

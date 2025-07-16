@@ -22,6 +22,7 @@ public abstract class MessageHandler : Handler
 
         var job = Job;
         job.BatchSize = 8;
+        job.DataTime = DateTime.MinValue;
     }
     #endregion
 
@@ -41,7 +42,7 @@ public abstract class MessageHandler : Handler
     /// </remarks>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public override ITask[] Acquire(Int32 count)
+    public override Task<ITask[]> Acquire(Int32 count)
     {
         // 消费模式，设置Topic值
         var prv = Provider;
@@ -50,7 +51,7 @@ public abstract class MessageHandler : Handler
         return prv.Acquire(job, Topic, count);
     }
 
-    /// <summary>解码一批消息，处理任务</summary>
+    /// <summary>解码一批消息，由Process执行，内部调用Execute处理任务</summary>
     /// <param name="ctx"></param>
     protected override void OnProcess(JobContext ctx)
     {
@@ -68,7 +69,7 @@ public abstract class MessageHandler : Handler
         ctx.Success = Execute(ctx);
     }
 
-    /// <summary>根据解码后的消息执行任务</summary>
+    /// <summary>根据解码后的消息执行任务。由OnProcess执行</summary>
     /// <param name="ctx">上下文</param>
     /// <returns></returns>
     public override Int32 Execute(JobContext ctx)
@@ -82,7 +83,7 @@ public abstract class MessageHandler : Handler
         return count;
     }
 
-    /// <summary>处理一个数据对象</summary>
+    /// <summary>处理一个数据对象。由Execute执行，每条消息调用一次</summary>
     /// <param name="ctx">上下文</param>
     /// <param name="message">消息</param>
     /// <returns></returns>

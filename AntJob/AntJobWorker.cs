@@ -16,12 +16,16 @@ class AntJobWorker(Scheduler scheduler, IServiceProvider serviceProvider) : Back
         scheduler.Log = serviceProvider.GetService<ILog>();
         scheduler.Tracer = serviceProvider.GetService<ITracer>();
 
-        if (scheduler.Provider == null)
-        {
-            var set = serviceProvider.GetService<AntSetting>();
-            set ??= AntSetting.Current;
-            scheduler.Join(set);
-        }
+        var set = serviceProvider.GetService<AntSetting>();
+        set ??= AntSetting.Current;
+        scheduler.Setting = set;
+
+        //if (scheduler.Provider == null)
+        //{
+        //    var set = serviceProvider.GetService<AntSetting>();
+        //    set ??= AntSetting.Current;
+        //    scheduler.Join(set);
+        //}
 
         // 添加作业
         //scheduler.AddHandler<HelloJob>();

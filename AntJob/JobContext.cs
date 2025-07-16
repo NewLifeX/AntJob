@@ -58,7 +58,7 @@ public class JobContext : IExtend
 
     #region 扩展属性
     /// <summary>处理速度</summary>
-    public Int32 Speed => (Cost <= 0 || Total == 0) ? 0 : (Int32)Math.Min(Total * 1000L / Cost, Int32.MaxValue);
+    public Int32 Speed => (Cost <= 0 || Total == 0) ? 0 : (Int32)Math.Round(Total * 1000L / Cost);
     #endregion
 
     #region 方法

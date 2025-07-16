@@ -45,7 +45,8 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// <summary>正在处理中的任务数</summary>
     public Int32 Busy => _Busy;
 
-    private Int32 _speed;
+    /// <summary>处理速度。调度器可根据处理速度来调节</summary>
+    protected Int32 Speed { get; set; }
     #endregion
 
     #region 索引器
@@ -65,7 +66,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     {
         Name = GetType().Name.TrimEnd(nameof(Handler));
 
-        // 默认本月1号
+        // 默认今天
         var now = DateTime.Now;
         var job = new JobModel
         {
@@ -82,7 +83,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     #endregion
 
     #region 基本方法
-    /// <summary>初始化。作业处理器启动之前</summary>
+    /// <summary>初始化。作业处理器启动之前，这里设置Job作业属性后，将会提交给调度平台</summary>
     public virtual void Init()
     {
         var job = Job;
@@ -136,7 +137,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// </remarks>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public virtual ITask[] Acquire(Int32 count)
+    public virtual Task<ITask[]> Acquire(Int32 count)
     {
         var prv = Provider;
         var job = Job;
@@ -151,7 +152,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// <param name="task"></param>
     internal void Prepare(ITask task) => Interlocked.Increment(ref _Busy);
 
-    /// <summary>处理一项新任务</summary>
+    /// <summary>处理一项新任务。每个作业任务的顶级函数，由线程池执行，内部调用OnProcess</summary>
     /// <param name="task"></param>
     public virtual void Process(ITask task)
     {
@@ -170,7 +171,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         result.TraceId = span?.TraceId;
 
         // 较慢的作业，及时报告进度
-        if (_speed < 10) Report(ctx, JobStatus.处理中);
+        if (Speed < 10) Report(ctx, JobStatus.处理中);
 
         var sw = Stopwatch.StartNew();
         try
@@ -194,15 +195,13 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
         sw.Stop();
         ctx.Cost = sw.Elapsed.TotalMilliseconds;
-        _speed = ctx.Speed;
+        Speed = ctx.Speed;
 
         OnFinish(ctx);
         Schedule?.OnFinish(ctx);
-
-        //ctx.Items.Clear();
     }
 
-    /// <summary>处理任务。内部分批处理</summary>
+    /// <summary>处理任务。内部分批处理，由Process执行，内部调用Execute</summary>
     /// <param name="ctx"></param>
     protected virtual void OnProcess(JobContext ctx)
     {
@@ -221,7 +220,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
     /// <summary>整个任务完成</summary>
     /// <param name="ctx"></param>
-    protected virtual void OnFinish(JobContext ctx) => Provider?.Finish(ctx);
+    protected virtual void OnFinish(JobContext ctx) => Provider?.Finish(ctx).Wait();
     #endregion
 
     #region 数据处理
@@ -235,7 +234,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// <param name="messages">消息集合</param>
     /// <param name="option">消息选项</param>
     /// <returns></returns>
-    public virtual Int32 Produce(String topic, String[] messages, MessageOption option = null) => Provider.Produce(Job?.Name, topic, messages, option);
+    public virtual Task<Int32> Produce(String topic, String[] messages, MessageOption option = null) => Provider.Produce(Job?.Name, topic, messages, option);
 
     /// <summary>生产消息</summary>
     /// <param name="appId">发布消息到目标应用。留空发布当前应用</param>
@@ -243,7 +242,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// <param name="messages">消息集合</param>
     /// <param name="option">消息选项</param>
     /// <returns></returns>
-    public virtual Int32 Produce(String appId, String topic, String[] messages, MessageOption option = null)
+    public virtual Task<Int32> Produce(String appId, String topic, String[] messages, MessageOption option = null)
     {
         option ??= new();
         option.AppId = appId;

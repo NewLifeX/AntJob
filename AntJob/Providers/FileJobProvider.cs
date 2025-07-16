@@ -4,6 +4,9 @@ using NewLife;
 using NewLife.Log;
 using NewLife.Reflection;
 using NewLife.Xml;
+#if !NET45
+using TaskEx = System.Threading.Tasks.Task;
+#endif
 
 namespace AntJob.Providers;
 
@@ -22,7 +25,7 @@ public class FileJobProvider : JobProvider
     }
 
     /// <summary>开始</summary>
-    public override void Start()
+    public override Task Start()
     {
         var jf = _File = JobFile.Current;
 
@@ -66,12 +69,12 @@ public class FileJobProvider : JobProvider
         }
         jf.Save();
 
-        base.Start();
+        return base.Start();
     }
 
     /// <summary>获取所有作业名称</summary>
     /// <returns></returns>
-    public override IJob[] GetJobs()
+    public override Task<IJob[]> GetJobs()
     {
         var jf = _File = JobFile.Current;
 
@@ -85,24 +88,24 @@ public class FileJobProvider : JobProvider
             }
         }
 
-        return list.ToArray();
+        return Task.FromResult(list.ToArray());
     }
 
     /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
     /// <param name="job"></param>
     /// <returns></returns>
-    public override IJob SetJob(IJob job) => null;
+    public override Task<IJob> SetJob(IJob job) => Task.FromResult((IJob)null);
 
     /// <summary>申请任务</summary>
     /// <param name="job">作业</param>
     /// <param name="topic">主题</param>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public override ITask[] Acquire(IJob job, String topic, Int32 count)
+    public override Task<ITask[]> Acquire(IJob job, String topic, Int32 count)
     {
         var list = new List<ITask>();
 
-        if (!job.Enable) return list.ToArray();
+        if (!job.Enable) return Task.FromResult(list.ToArray());
 
         // 当前时间减去偏移量，作为当前时间。数据抽取不许超过该时间
         var now = DateTime.Now.AddSeconds(-job.Offset);
@@ -155,12 +158,12 @@ public class FileJobProvider : JobProvider
             _File.SaveAsync();
         }
 
-        return list.ToArray();
+        return Task.FromResult(list.ToArray());
     }
 
     /// <summary>完成任务，每个任务只调用一次</summary>
     /// <param name="ctx">上下文</param>
-    public override void Finish(JobContext ctx)
+    public override Task Finish(JobContext ctx)
     {
         var ex = ctx.Error?.GetTrue();
         if (ex != null) XTrace.WriteException(ex);
@@ -180,6 +183,8 @@ public class FileJobProvider : JobProvider
 
             XTrace.WriteLine(msg);
         }
+
+        return TaskEx.CompletedTask;
     }
 
     #region 静态扫描

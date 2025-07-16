@@ -24,7 +24,10 @@ public class Scheduler : DisposeBase
     /// <summary>服务提供者</summary>
     public IServiceProvider ServiceProvider { get; set; }
 
-    private ICache _cache = MemoryCache.Default;
+    /// <summary>配置信息</summary>
+    public AntSetting Setting { get; set; }
+
+    private readonly ICache _cache = MemoryCache.Default;
     #endregion
 
     #region 构造
@@ -64,19 +67,30 @@ public class Scheduler : DisposeBase
     /// <summary>加入调度中心，从注册中心获取地址，自动识别RPC/Http</summary>
     /// <param name="set"></param>
     /// <returns></returns>
+    [Obsolete("=>JoinAsync")]
     public IJobProvider Join(AntSetting set)
+    {
+        JoinAsync(set).Wait();
+
+        return Provider;
+    }
+
+    /// <summary>加入调度中心，从注册中心获取地址，自动识别RPC/Http</summary>
+    /// <param name="set"></param>
+    /// <returns></returns>
+    public async Task JoinAsync(AntSetting set)
     {
         var server = set.Server;
 
         var registry = ServiceProvider?.GetService<IRegistry>();
         if (registry != null)
         {
-            var rs = registry.ResolveAsync("AntServer").Result;
-            var svrs = registry.ResolveAddressAsync("AntServer").Result;
+            //var rs = registry.ResolveAsync("AntServer").Result;
+            var svrs = await registry.ResolveAddressAsync("AntServer");
             if (svrs != null && svrs.Length > 0) server = svrs.Join();
         }
 
-        if (server.IsNullOrEmpty()) return null;
+        if (server.IsNullOrEmpty()) return;
         set.Server = server;
 
         // 根据地址决定用Http还是RPC
@@ -106,14 +120,15 @@ public class Scheduler : DisposeBase
 
             Provider = rpc;
         }
-
-        return Provider;
     }
 
-    /// <summary>开始</summary>
+    /// <summary>开始调度。推荐使用StartAsync</summary>
+    [Obsolete("=>StartAsync")]
     public void Start()
     {
-        OnStart();
+        if (Setting != null) Join(Setting);
+
+        OnStart().Wait();
     }
 
     /// <summary>异步开始。使用定时器尝试连接服务端</summary>
@@ -124,13 +139,15 @@ public class Scheduler : DisposeBase
 
     private Boolean _inited;
     private TimerX _timerStart;
-    private void CheckStart(Object state)
+    private async Task CheckStart(Object state)
     {
         if (!_inited)
         {
             try
             {
-                OnStart();
+                if (Setting != null) await JoinAsync(Setting);
+
+                await OnStart();
 
                 _inited = true;
             }
@@ -143,7 +160,7 @@ public class Scheduler : DisposeBase
         if (_inited) _timerStart.TryDispose();
     }
 
-    private void OnStart()
+    private async Task OnStart()
     {
         // 从容器中获取所有服务
         foreach (var item in ServiceProvider.GetServices<Handler>())
@@ -176,10 +193,10 @@ public class Scheduler : DisposeBase
         if (prv is ITracerFeature tf) tf.Tracer = Tracer;
         if (prv is ILogFeature lf) lf.Log = Log;
 
-        prv.Start();
+        await prv.Start();
 
         // 获取本应用在调度中心管理的所有作业
-        var jobs = prv.GetJobs() ?? [];
+        var jobs = await prv.GetJobs();
         //if (jobs == null || jobs.Length == 0) throw new Exception("调度中心没有可用作业");
 
         // 输出日志
@@ -190,16 +207,15 @@ public class Scheduler : DisposeBase
         {
             handler.Schedule = this;
             handler.Provider = prv;
+            handler.Tracer ??= Tracer;
+            handler.Log ??= Log;
 
             // 查找作业参数，分配给处理器
-            var job = jobs.FirstOrDefault(e => e.Name == handler.Name);
+            var job = jobs?.FirstOrDefault(e => e.Name == handler.Name);
             if (job == null || !job.Enable) continue;
 
             if (job != null && job.Mode == 0) job.Mode = handler.Mode;
             handler.Job = job;
-
-            handler.Tracer ??= Tracer;
-            handler.Log ??= Log;
 
             try
             {
@@ -223,8 +239,6 @@ public class Scheduler : DisposeBase
         _timer.TryDispose();
         _timer = null;
 
-        Provider?.Stop();
-
         foreach (var handler in Handlers)
         {
             try
@@ -236,27 +250,29 @@ public class Scheduler : DisposeBase
                 Log?.Error("作业[{0}]停止失败！{1}", handler.GetType().FullName, ex.Message);
             }
         }
+
+        Provider?.Stop().Wait();
     }
 
     /// <summary>任务调度</summary>
     /// <returns></returns>
-    public Boolean Process()
+    public async Task<Boolean> Process()
     {
         var prv = Provider;
 
         // 查询所有处理器
-        var hs = Handlers;
+        var handlers = Handlers;
 
         // 拿到处理器对应的作业
-        var jobs = prv.GetJobs();
+        var jobs = await prv.GetJobs();
         if (jobs == null) return false;
 
         // 运行时动态往集合里面加处理器，为了配合Sql+C#
-        CheckHandlers(prv, jobs, hs);
+        CheckHandlers(prv, jobs, handlers);
 
         var flag = false;
         // 遍历处理器，给空闲的增加任务
-        foreach (var handler in hs)
+        foreach (var handler in handlers)
         {
             var job = jobs.FirstOrDefault(e => e.Name == handler.Name);
             // 找不到或者已停用
@@ -302,7 +318,7 @@ public class Scheduler : DisposeBase
             if (count > 0)
             {
                 // 循环申请任务，喂饱处理器
-                var ts = handler.Acquire(count);
+                var ts = await handler.Acquire(count);
 
                 // 送给处理器处理
                 for (var i = 0; i < count && ts != null && i < ts.Length; i++)
@@ -354,6 +370,7 @@ public class Scheduler : DisposeBase
 
                             handler.Log ??= Log;
                             handler.Tracer ??= Tracer;
+                            handler.Init();
                             handler.Start();
 
                             handlers.Add(handler);
@@ -381,10 +398,10 @@ public class Scheduler : DisposeBase
 
     private TimerX _timer;
 
-    private void Loop(Object state)
+    private async Task Loop(Object state)
     {
         // 任务调度
-        var rs = Process();
+        var rs = await Process();
 
         // 如果有数据，马上开始下一轮
         if (rs) TimerX.Current.SetNext(-1);
