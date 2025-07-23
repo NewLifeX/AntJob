@@ -160,7 +160,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             job = Job.FindByAppIDAndName(app.ID, jobName);
 
         if (job == null) throw new XException($"应用[{app.ID}/{app.Name}]下未找到作业[{jobName}]");
-        if (job.DataTime.Year <= 2000) throw new XException("作业[{0}/{1}]未设置数据时间", job.ID, job.Name);
+        if (job.DataTime.Year <= 2000 && job.Mode is JobModes.Time or JobModes.Data)
+            throw new XException("作业[{0}/{1}]未设置数据时间", job.ID, job.Name);
 
         // 应用在线，但可能禁止向其分配任务
         var ip = online.UpdateIP;
