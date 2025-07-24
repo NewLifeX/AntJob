@@ -3,7 +3,6 @@ using AntJob.Data.Entity;
 using NewLife;
 using NewLife.Cube;
 using NewLife.Cube.Extensions;
-using NewLife.Cube.ViewModels;
 using NewLife.Web;
 
 namespace AntJob.Web.Areas.Ant.Controllers;
@@ -17,7 +16,7 @@ public class JobErrorController : AntEntityController<JobError>
     static JobErrorController()
     {
         ListFields.RemoveField("DataTime", "End");
-        ListFields.AddListField("Message", null, "TraceId");
+        ListFields.AddListField("Remark", null, "TraceId");
 
         ListFields.TraceUrl();
     }

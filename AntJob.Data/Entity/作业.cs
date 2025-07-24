@@ -286,11 +286,11 @@ public partial class Job
     public DateTime LastTime { get => _LastTime; set { if (OnPropertyChanging("LastTime", value)) { _LastTime = value; OnPropertyChanged("LastTime"); } } }
 
     private String _QuietTime;
-    /// <summary>免打扰。设置免打扰时间段，例如09:00-12:00,13:00-18:00</summary>
+    /// <summary>免打扰。设置免打扰时间段，该时间段内不生成作业任务，例如09:00-12:00,13:00-18:00</summary>
     [DisplayName("免打扰")]
-    [Description("免打扰。设置免打扰时间段，例如09:00-12:00,13:00-18:00")]
+    [Description("免打扰。设置免打扰时间段，该时间段内不生成作业任务，例如09:00-12:00,13:00-18:00")]
     [DataObjectField(false, false, true, 50)]
-    [BindColumn("QuietTime", "免打扰。设置免打扰时间段，例如09:00-12:00,13:00-18:00", "")]
+    [BindColumn("QuietTime", "免打扰。设置免打扰时间段，该时间段内不生成作业任务，例如09:00-12:00,13:00-18:00", "")]
     public String QuietTime { get => _QuietTime; set { if (OnPropertyChanging("QuietTime", value)) { _QuietTime = value; OnPropertyChanged("QuietTime"); } } }
 
     private String _Data;
@@ -598,7 +598,7 @@ public partial class Job
         /// <summary>最后时间。最后一次时间</summary>
         public static readonly Field LastTime = FindByName("LastTime");
 
-        /// <summary>免打扰。设置免打扰时间段，例如09:00-12:00,13:00-18:00</summary>
+        /// <summary>免打扰。设置免打扰时间段，该时间段内不生成作业任务，例如09:00-12:00,13:00-18:00</summary>
         public static readonly Field QuietTime = FindByName("QuietTime");
 
         /// <summary>附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板</summary>
@@ -730,7 +730,7 @@ public partial class Job
         /// <summary>最后时间。最后一次时间</summary>
         public const String LastTime = "LastTime";
 
-        /// <summary>免打扰。设置免打扰时间段，例如09:00-12:00,13:00-18:00</summary>
+        /// <summary>免打扰。设置免打扰时间段，该时间段内不生成作业任务，例如09:00-12:00,13:00-18:00</summary>
         public const String QuietTime = "QuietTime";
 
         /// <summary>附加数据。执行作业任务时附带的数据，可以是Json配置，也可以是Sql模板或C#模板</summary>

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using NewLife;
 using NewLife.Data;
 using XCode;
-using XCode.Membership;
 
 namespace AntJob.Data.Entity;
 
@@ -25,6 +24,8 @@ public partial class JobError : EntityBase<JobError>
     {
         // 如果没有脏数据，则不需要进行任何处理
         if (!HasDirty) return;
+
+        this.TrimExtraLong(__.Remark);
 
         //// 截断错误信息，避免过长
         //var len = _.Message.Length;
