@@ -151,12 +151,12 @@ public partial class Job
     public Int32 Offset { get => _Offset; set { if (OnPropertyChanging("Offset", value)) { _Offset = value; OnPropertyChanged("Offset"); } } }
 
     private Int32 _MaxTask;
-    /// <summary>并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度</summary>
+    /// <summary>并行度。每个实例允许多少个任务并行处理，多执行端时叠加</summary>
     [Category("控制参数")]
     [DisplayName("并行度")]
-    [Description("并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度")]
+    [Description("并行度。每个实例允许多少个任务并行处理，多执行端时叠加")]
     [DataObjectField(false, false, false, 0)]
-    [BindColumn("MaxTask", "并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度", "")]
+    [BindColumn("MaxTask", "并行度。每个实例允许多少个任务并行处理，多执行端时叠加", "")]
     public Int32 MaxTask { get => _MaxTask; set { if (OnPropertyChanging("MaxTask", value)) { _MaxTask = value; OnPropertyChanged("MaxTask"); } } }
 
     private Int32 _MaxError;
@@ -553,7 +553,7 @@ public partial class Job
         /// <summary>偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒</summary>
         public static readonly Field Offset = FindByName("Offset");
 
-        /// <summary>并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度</summary>
+        /// <summary>并行度。每个实例允许多少个任务并行处理，多执行端时叠加</summary>
         public static readonly Field MaxTask = FindByName("MaxTask");
 
         /// <summary>最大错误。连续错误达到最大错误数时停止</summary>
@@ -685,7 +685,7 @@ public partial class Job
         /// <summary>偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒</summary>
         public const String Offset = "Offset";
 
-        /// <summary>并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度</summary>
+        /// <summary>并行度。每个实例允许多少个任务并行处理，多执行端时叠加</summary>
         public const String MaxTask = "MaxTask";
 
         /// <summary>最大错误。连续错误达到最大错误数时停止</summary>

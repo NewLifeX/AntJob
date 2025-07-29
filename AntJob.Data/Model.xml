@@ -135,7 +135,7 @@
         <Column Name="Step" DataType="Int32" ItemType="TimeSpan" Description="步进。切分任务的时间区间，秒" />
         <Column Name="BatchSize" DataType="Int32" Description="批大小。数据调度每次抽取数据的分页大小，或消息调度每次处理的消息数，定时调度不适用" />
         <Column Name="Offset" DataType="Int32" ItemType="TimeSpan" Description="偏移。距离AntServer当前时间的秒数，避免因服务器之间的时间误差而错过部分数据，秒" />
-        <Column Name="MaxTask" DataType="Int32" Description="并行度。一共允许多少个任务并行处理，多执行端时平均分配，确保该作业整体并行度" Category="控制参数" />
+        <Column Name="MaxTask" DataType="Int32" Description="并行度。每个实例允许多少个任务并行处理，多执行端时叠加" Category="控制参数" />
         <Column Name="MaxError" DataType="Int32" Description="最大错误。连续错误达到最大错误数时停止" Category="控制参数" />
         <Column Name="MaxRetry" DataType="Int32" Description="最大重试。默认10次，超过该次数后将不再重试" Category="控制参数" />
         <Column Name="MaxTime" DataType="Int32" ItemType="TimeSpan" Description="最大执行时间。默认600秒，超过该时间则认为执行器故障，将会把该任务分配给其它执行器" Category="控制参数" />

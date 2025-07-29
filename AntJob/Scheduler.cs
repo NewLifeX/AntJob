@@ -304,17 +304,18 @@ public class Scheduler : DisposeBase
             }
 
             // 如果正在处理任务数没达到最大并行度，则继续安排任务
-            var max = job.MaxTask;
-            if (prv is NetworkJobProvider nprv)
-            {
-                // 如果是网络提供者，则根据在线节点数平分并行度
-                var ps = nprv.Peers;
-                if (ps != null && ps.Length > 0)
-                {
-                    max = max < ps.Length ? 1 : (Int32)Math.Round((Double)max / ps.Length);
-                }
-            }
-            var count = max - handler.Busy;
+            //var max = job.MaxTask;
+            //if (prv is NetworkJobProvider nprv)
+            //{
+            //    // 如果是网络提供者，则根据在线节点数平分并行度
+            //    var ps = nprv.Peers;
+            //    if (ps != null && ps.Length > 0)
+            //    {
+            //        max = max < ps.Length ? 1 : (Int32)Math.Round((Double)max / ps.Length);
+            //    }
+            //}
+            //var count = max - handler.Busy;
+            var count = job.MaxTask - handler.Busy;
             if (count > 0)
             {
                 // 循环申请任务，喂饱处理器
