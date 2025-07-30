@@ -122,7 +122,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         if (!Active) return false;
 
         using var span = Tracer?.NewSpan($"job:{Name}:Stop", reason);
-        WriteLog("停止工作");
+        WriteLog("停止工作 {0}", reason);
 
         Active = false;
 
