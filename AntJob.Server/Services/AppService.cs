@@ -195,11 +195,14 @@ public class AppService
         //var online = GetOnline(app, sessionId, ip);
         online.Total += ji.Total;
         online.Success += ji.Success;
-        online.Error += ji.Error;
+        //online.Error += ji.Error;
         online.Cost += ji.Cost;
         online.Speed = ji.Speed;
         online.LastKey = ji.Key;
-        online.SaveAsync();
+
+        if (ji.Status == JobStatus.错误) online.Error++;
+
+        online.Update();
     }
     #endregion
 

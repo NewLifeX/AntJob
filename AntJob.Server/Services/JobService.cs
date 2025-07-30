@@ -470,7 +470,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             SetJobError(job, task, online.UpdateIP);
 
             // 出错时判断如果超过最大错误数，则停止作业
-            CheckMaxError(app, job);
+            CheckMaxError(app, job, online);
 
             // 记录状态
             _appService.UpdateOnline(app, task, online);
@@ -565,7 +565,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         return err;
     }
 
-    private void CheckMaxError(App app, Job job)
+    private void CheckMaxError(App app, Job job, AppOnline online)
     {
         // 出错时判断如果超过最大错误数，则停止作业
         var maxError = job.MaxError <= 0 ? 100 : job.MaxError;
@@ -575,7 +575,13 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             job.Enable = false;
 
             //job.SaveAsync();
-            (job as IEntity).Update();
+            job.Update();
+        }
+
+        if (online.Enable && online.Error > maxError)
+        {
+            online.Enable = false;
+            online.Update();
         }
     }
     #endregion
