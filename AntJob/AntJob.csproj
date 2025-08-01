@@ -49,9 +49,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="11.5.2025.713-beta1307" />
-    <PackageReference Include="NewLife.Remoting" Version="3.4.2025.713-beta1545" />
-    <PackageReference Include="NewLife.Stardust" Version="3.4.2025.713-beta1409" />
+    <PackageReference Include="NewLife.Core" Version="11.6.2025.801" />
+    <PackageReference Include="NewLife.Remoting" Version="3.4.2025.801" />
+    <PackageReference Include="NewLife.Stardust" Version="3.4.2025.801" />
   </ItemGroup>
   
   <ItemGroup>
