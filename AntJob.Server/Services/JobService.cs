@@ -137,6 +137,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     /// <returns></returns>
     public ITask[] Acquire(App app, AcquireModel model, AppOnline online)
     {
+        using var span = _tracer?.NewSpan(nameof(Acquire), new { app = app?.Name, job = model.Job, count = model.Count, topic = model.Topic, online.Client });
+
         var jobName = model.Job?.Trim();
         if (jobName.IsNullOrEmpty()) return [];
 
@@ -148,7 +150,14 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         // 作业是否启用，是否处于免打扰时间
         var job = app.Jobs.FirstOrDefault(e => e.Name == jobName);
-        if (job != null && (!job.Enable || job.CheckQuiet(DateTime.Now))) return [];
+        if (job != null && (!job.Enable || job.CheckQuiet(DateTime.Now)))
+        {
+            if (!job.Enable)
+                span?.AppendTag("作业停用");
+            else
+                span?.AppendTag($"免打扰时间：{job.QuietTime}");
+            return [];
+        }
 
         // 全局锁，确保单个作业只有一个线程在分配作业
         using var ck = _cacheProvider.AcquireLock($"antjob:lock:{job.ID}", 15_000);
@@ -167,7 +176,11 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         var ip = online.UpdateIP;
         //var ip = remote?.Host;
         //var online = _appService.GetOnline(app, remote + "", ip);
-        if (!online.Enable) return [];
+        if (!online.Enable)
+        {
+            span?.AppendTag("应用在线实例停止分配任务");
+            return [];
+        }
 
         var list = new List<JobTask>();
 
@@ -737,7 +750,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     /// <returns></returns>
     public IList<JobTask> AcquireDelay(Job job, String server, String client, Int32 count, ICache cache)
     {
-        using var span = _tracer?.NewSpan(nameof(AcquireDelay), new { job.Name, server, client, count });
+        using var span = _tracer?.NewSpan(nameof(AcquireDelay), new { job.Name, server, client, job.MaxRetry, job.MaxError, count });
 
         using var ts = Job.Meta.CreateTrans();
 
@@ -758,7 +771,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         ts.Commit();
 
         // 记录任务数
-        span?.AppendTag(null, list.Count);
+        span?.AppendTag($"now={now.ToFullString()} maxError={maxError}", list.Count);
 
         return list;
     }
@@ -772,18 +785,19 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     /// <returns></returns>
     public IList<JobTask> AcquireOld(Job job, String server, String client, Int32 count, ICache cache)
     {
-        using var span = _tracer?.NewSpan(nameof(AcquireOld), new { job.Name, server, client, count });
+        using var span = _tracer?.NewSpan(nameof(AcquireOld), new { job.Name, server, client, job.MaxRetry, job.MaxError, count });
 
         using var ts = Job.Meta.CreateTrans();
         var list = new List<JobTask>();
 
         var now = DateTime.Now;
+        var end = now;
         var maxError = job.MaxError - job.Error;
 
         // 查找历史错误任务
         if (job.ErrorDelay > 0)
         {
-            var end = now.AddSeconds(-job.ErrorDelay);
+            end = now.AddSeconds(-job.ErrorDelay);
             var list2 = JobTask.Search(job.ID, now.AddDays(-7), end, job.MaxRetry, maxError, [JobStatus.错误], count);
             if (list2.Count > 0) list.AddRange(list2);
         }
@@ -791,7 +805,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         // 查找历史中断任务，持续10分钟仍然未完成
         if (job.MaxTime > 0 && list.Count < count)
         {
-            var end = now.AddSeconds(-job.MaxTime);
+            end = now.AddSeconds(-job.MaxTime);
             var list2 = JobTask.Search(job.ID, now.AddDays(-7), end, job.MaxRetry, maxError, [JobStatus.就绪, JobStatus.抽取中, JobStatus.处理中], count - list.Count);
             if (list2.Count > 0) list.AddRange(list2);
         }
@@ -812,7 +826,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         ts.Commit();
 
         // 记录任务数
-        span?.AppendTag(null, list.Count);
+        span?.AppendTag($"now={now.ToFullString()} end={end.ToFullString()} maxError={maxError}", list.Count);
 
         return list;
     }
