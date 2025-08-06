@@ -32,6 +32,10 @@ public class JobController : AntEntityController<Job>
             var df = ListFields.GetField("Name") as ListField;
             df.Url = "/Ant/JobTask?appid={AppID}&jobId={ID}";
         }
+        {
+            var df = ListFields.GetField("DisplayName") as ListField;
+            df.Title = "{Remark}";
+        }
         //{
         //    var df = ListFields.AddListField("Task", "Enable");
         //    df.DisplayName = "任务";

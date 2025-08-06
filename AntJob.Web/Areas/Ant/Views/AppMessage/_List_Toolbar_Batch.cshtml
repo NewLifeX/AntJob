@@ -1,0 +1,19 @@
+﻿@using NewLife.Common;
+@using System.Collections.Generic;
+@{
+    var set = ViewBag.PageSetting as PageSetting;
+    var page = ViewBag.Page as Pager;
+}
+@if (set.EnableSelect)
+{
+    <button type="button" class="btn btn-success btn-sm" data-action="action" data-url="@Url.Action("ClearDelay")" data-fields="keys" disabled>
+        清空延迟
+    </button>
+    <div class="form-group">
+        <label for="delayTime" class="control-label">延迟时间：</label>
+        @Html.TextBox("delayTime", page["delayTime"], new { @class = "form-control form_datetime", style = "width:106px", autocomplete = "off" })
+    </div>
+    <button type="button" class="btn btn-purple btn-sm" data-action="action" data-method="POST" data-url="@Url.Action("SetDelay")" data-fields="keys,delayTime" disabled>
+        设置延迟
+    </button>
+}

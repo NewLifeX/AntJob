@@ -30,6 +30,10 @@ public class JobTaskController : AntEntityController<JobTask>
         ListFields.RemoveCreateField();
 
         {
+            var df = ListFields.GetField("Client") as ListField;
+            df.Url = "?appId={AppID}&jobId={page:jobId}&status={page:status}&client={Client}";
+        }
+        {
             var df = ListFields.GetField("DataTime") as ListField;
             df.Header = "时间/数据";
             df.AddService(new MyTitleField());
