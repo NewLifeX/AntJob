@@ -101,7 +101,7 @@ public partial class AppMessage : EntityBase<AppMessage>
 
         if (appid > 0) exp &= _.AppID == appid;
         if (jobid > 0) exp &= _.JobID == jobid;
-        if (!key.IsNullOrEmpty()) exp &= _.Topic.Contains(key) | _.Data.Contains(key);
+        if (!key.IsNullOrEmpty()) exp &= SearchWhereByKeys(key);
 
         exp &= _.Id.Between(start, end, Meta.Factory.Snow);
         //exp &= _.UpdateTime.Between(start, end);

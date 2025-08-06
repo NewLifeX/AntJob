@@ -164,7 +164,7 @@ public partial class JobTask : EntityBase<JobTask>
         if (jobid >= 0) exp &= _.JobID == jobid;
         if (status >= JobStatus.就绪) exp &= _.Status == status;
         if (!client.IsNullOrEmpty()) exp &= _.Client == client;
-        if (!key.IsNullOrEmpty()) exp &= _.Data.Contains(key) | _.Remark.Contains(key) | _.Key == key;
+        if (!key.IsNullOrEmpty()) exp &= SearchWhereByKeys(key);
 
         exp &= _.DataTime.Between(dataStart, dataEnd);
         exp &= _.UpdateTime.Between(start, end);

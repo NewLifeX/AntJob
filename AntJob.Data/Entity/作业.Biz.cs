@@ -202,7 +202,7 @@ public partial class Job : EntityBase<Job>
         if (id > 0) exp &= _.ID == id;
         if (appid > 0) exp &= _.AppID == appid;
         if (mode > 0) exp &= _.Mode == mode;
-        if (!key.IsNullOrEmpty()) exp &= _.Name.Contains(key);
+        if (!key.IsNullOrEmpty()) exp &= SearchWhereByKeys(key);
         exp &= _.CreateTime.Between(start, end);
 
         return FindAll(exp, p);

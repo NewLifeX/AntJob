@@ -116,7 +116,7 @@ public partial class JobError : EntityBase<JobError>
         if (appid > 0) exp &= _.AppID == appid;
         if (jobid > 0) exp &= _.JobID == jobid;
         if (!client.IsNullOrEmpty()) exp &= _.Client == client;
-        if (!key.IsNullOrEmpty()) exp &= _.Remark.Contains(key);
+        if (!key.IsNullOrEmpty()) exp &= SearchWhereByKeys(key);
         exp &= _.DataTime.Between(start, end);
 
         return FindAll(exp, p);

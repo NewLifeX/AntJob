@@ -87,7 +87,7 @@ public partial class App : EntityBase<App>
         if (enable != null) exp &= _.Enable == enable;
         if (!category.IsNullOrEmpty()) exp &= _.Category == category;
 
-        if (!key.IsNullOrEmpty()) exp &= _.Name.Contains(key) | _.DisplayName.Contains(key);
+        if (!key.IsNullOrEmpty()) exp &= SearchWhereByKeys(key);
 
         return FindAll(exp, p);
     }

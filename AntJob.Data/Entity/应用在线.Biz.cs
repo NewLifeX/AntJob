@@ -100,7 +100,7 @@ public partial class AppOnline : EntityBase<AppOnline>
         var exp = new WhereExpression();
 
         if (appid > 0) exp &= _.AppID == appid.ToInt();
-        if (!key.IsNullOrEmpty()) exp &= _.Name.Contains(key) | _.Instance.Contains(key);
+        if (!key.IsNullOrEmpty()) exp &= SearchWhereByKeys(key);
         exp &= _.CreateTime.Between(start, end);
 
         return FindAll(exp, p);

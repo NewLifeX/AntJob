@@ -93,10 +93,7 @@ public partial class AppHistory : EntityBase<AppHistory>
         exp &= _.Id.Between(start, end, Meta.Factory.Snow);
         //exp &= _.CreateTime.Between(start, end);
 
-        if (!key.IsNullOrEmpty())
-        {
-            exp &= (_.Name.Contains(key) | _.Remark.Contains(key) | _.CreateIP.Contains(key));
-        }
+        if (!key.IsNullOrEmpty()) exp &= SearchWhereByKeys(key);
 
         return FindAll(exp, page);
     }
