@@ -163,15 +163,18 @@ public class Scheduler : DisposeBase
     private async Task OnStart()
     {
         // 从容器中获取所有服务
-        foreach (var item in ServiceProvider.GetServices<Handler>())
+        var serviceProvider = ServiceProvider;
+        foreach (var item in serviceProvider.GetServices<Handler>())
         {
             Handlers.Add(item);
         }
         // 有可能DI中注入IObjectContainer，后者再次注册Handler
-        var ioc = ServiceProvider?.GetService<IObjectContainer>() ?? ObjectContainer.Current;
-        if (ioc != null && ioc.GetType().Namespace != ServiceProvider?.GetType().Namespace)
+        var ioc = serviceProvider?.GetService<IObjectContainer>() ?? ObjectContainer.Current;
+        if (ioc != null && ioc.GetType().Namespace != serviceProvider?.GetType().Namespace)
         {
-            foreach (var item in ioc.BuildServiceProvider().GetServices<Handler>())
+            // 内外容器混合，创建新的服务提供者来解析作业处理器。作业处理器所依赖的服务，可能由外部服务提供者提供
+            var serviceProvider2 = ioc.BuildServiceProvider(serviceProvider);
+            foreach (var item in serviceProvider2.GetServices<Handler>())
             {
                 Handlers.Add(item);
             }
@@ -182,7 +185,7 @@ public class Scheduler : DisposeBase
         if (hs.Count == 0) throw new ArgumentNullException(nameof(Handlers), "没有可用处理器");
 
         // 埋点
-        Tracer ??= ServiceProvider?.GetService<ITracer>();
+        Tracer ??= serviceProvider?.GetService<ITracer>();
         using var span = Tracer?.NewSpan("job:SchedulerStart");
 
         // 启动作业提供者
