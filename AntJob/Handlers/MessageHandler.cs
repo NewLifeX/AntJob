@@ -27,8 +27,8 @@ public abstract class MessageHandler : Handler
     #endregion
 
     #region 方法
-    /// <summary>参数检查</summary>
-    /// <returns></returns>
+    /// <summary>开始工作</summary>
+    /// <remarks>调度器通知处理器开始工作，处理器可以做最后的检查，然后进入工作状态</remarks>
     public override Boolean Start()
     {
         if (Topic.IsNullOrEmpty()) throw new ArgumentNullException(nameof(Topic), "消息调度要求设置主题");

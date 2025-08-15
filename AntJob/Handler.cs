@@ -83,7 +83,8 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     #endregion
 
     #region 基本方法
-    /// <summary>初始化。作业处理器启动之前，这里设置Job作业属性后，将会提交给调度平台</summary>
+    /// <summary>初始化</summary>
+    /// <remarks>作业处理器启动之前，这里设置Job作业属性后，将会提交给调度平台</remarks>
     public virtual void Init()
     {
         var job = Job;
@@ -99,7 +100,8 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         }
     }
 
-    /// <summary>开始</summary>
+    /// <summary>开始工作</summary>
+    /// <remarks>调度器通知处理器开始工作，处理器可以做最后的检查，然后进入工作状态</remarks>
     public virtual Boolean Start()
     {
         if (Active) return false;
@@ -201,7 +203,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         Schedule?.OnFinish(ctx);
     }
 
-    /// <summary>处理任务。内部分批处理，由Process执行，内部调用Execute</summary>
+    /// <summary>处理任务。内部分批调用Excute处理数据，由Process执行</summary>
     /// <param name="ctx"></param>
     protected virtual void OnProcess(JobContext ctx)
     {
