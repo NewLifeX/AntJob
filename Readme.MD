@@ -12,265 +12,352 @@
 
 ![Ant](Doc/ant.png)  
 
-# 蚂蚁调度AntJob-分布式任务调度系统
+> EN: AntJob is a high-throughput distributed job scheduling & near real-time computing platform for .NET, focusing on massive (10^11+) task slicing, reliable retry and elastic horizontal scaling. Chinese documentation below is the canonical version.
 
-分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累！面向中小企业大数据分析场景。  
+# 蚂蚁调度 AntJob - 分布式任务/数据调度系统
+
+分布式任务调度系统，纯 .NET 打造的重量级大数据实时计算平台，万亿级调度经验积累！面向中小企业乃至大型集团大数据分析与实时 / 离线混合计算场景。  
 
 开源地址：[https://github.com/NewLifeX/AntJob](https://github.com/NewLifeX/AntJob)  
 使用教程：[https://newlifex.com/blood/antjob](https://newlifex.com/blood/antjob)  
-体验地址：[http://ant.newlifex.com](http://ant.newlifex.com/)  
+体验地址（托管演示环境）：[http://ant.newlifex.com](http://ant.newlifex.com/)  
 
-## 快速拥有
+---
+## 目录 (Table of Contents)
+1. 背景与定位
+2. 核心特性速览
+3. 架构与组成组件
+4. 调度模式详解
+5. 快速开始（模板 / 最小示例 / Docker / Web）
+6. 典型部署拓扑
+7. 目录结构说明
+8. 配置说明 & 参数要点
+9. 扩展机制（Handler / Provider / 动态脚本）
+10. 可靠性与一致性保证
+11. 性能与容量规划
+12. 与常见调度系统对比
+13. 常见问题 (FAQ)
+14. Roadmap（除 v4 升级外的后续规划）
+15. 核心概念回顾
+16. 设计示例（定时调度 Sample）
+17. 新生命项目矩阵（保持原样）
+18. 开发团队
 
-​	使用NewLife组件的最简便方式是从Nuget引用，例如在项目Nuget管理中搜索`NewLife.AntJob` 并引入。
+---
+## 1. 背景与定位
+AntJob 以 “蚂蚁搬家” 思想把任意大任务切分成可并行的小片段，天然适合：
+- 海量日志 / 订单 / 交易 / 设备数据持续抽取与实时计算
+- 按时间窗口（秒 / 分 / 小时 / 天 / 自定义 Cron）滚动汇总
+- 数据补算 / 重算 / 回溯修复
+- 分布式跨多机房、弹性节点数的高并发批处理
 
-​	NewLife组件由社区共创20多年，使用MIT开源协议，**任何人可任意修改并再次发行**（无需声明来源）！许多企业基于此构建内部开发框架时，甚至可通过批量替换源码中所有`NewLife`字符串为贵公司名实现私有化定制。
+`蚂蚁搬家` 思想诞生于 2008 年金融危机期间的上海陆家嘴，回应金融机构对低成本、高效率数据分析能力的紧急诉求。  
 
-​	团队始终秉承开放态度，不仅支持VisualStudio（最新正式版）打开解决方案编译，也兼容`dotnet build`命令行编译，项目文件摒弃复杂功能以追求简单易用，真正做到开箱即用。
+对标类：XxlJob、Quartz、Hangfire、Airflow（部分场景）、自研定时脚本集群等；但 AntJob 更强调“数据/时间切片+重试+多模式统一”和对企业内已有 .NET 生态的无侵入集成。
 
-​	我们公开强命名证书`newlife.snk`以支持独自编译替换程序集。
+---
+## 2. 核心特性速览
+- 多调度模式：定时 (Time)、数据窗口 (Data)、消息 (Message)、Cron、SQL 语句、C# 动态脚本
+- 作业时间/数据切片：精细到秒级，支持追赶、回溯补齐、批量重置
+- 任务可靠投递：失败自动延迟重试（容忍暂时性依赖失败）
+- 集群弹性：天然无状态执行节点，可随时扩缩容
+- 通信协议：基于 NewLife.Remoting (TCP) + 规划中的 WebSocket/Http 轻量接入
+- 监控可视化：Web 控制台实时查看作业曲线、任务状态、节点在线
+- 可插拔提供者 (IJobProvider)：网络、文件、本地自定义源
+- 轻依赖：核心依赖 NewLife 自家生态（日志、配置、追踪），减少外部复杂度
+- 跨平台 & 多 TFM：支持从 .NET Framework 4.5 到 .NET 8/9
+- 强命名 & 长期兼容：方便企业私有化与二次封装
 
+---
+## 3. 架构与组成组件
+```
++----------------------+            +-------------------------+
+|   执行节点 (Agent)   |  RPC/TCP   |   调度中心 (Server)     |
+|  - Scheduler         | <--------> | - JobService / Task逻辑 |
+|  - Handlers(业务)    |            | - 状态 & 元数据存储      |
++----------+-----------+            +-----------+-------------+
+           |  同步日志/追踪 (可选对接 Stardust)  |
+           v                                          
+    +-------------+      Web UI / API      +------------------+
+    | 数据库/存储 |  <------------------>  |  Web 控制台 AntWeb |
+    +-------------+                         +------------------+
+```
+组件说明：
+- AntJob.Server：调度中心服务端逻辑（Job & Task 元数据、分片、分配、重试策略）
+- AntJob.Web：基于 NewLife.Cube 的可视化管理平台（多租户 App 隔离、权限、监控）
+- AntJob（库）：客户端 SDK（Scheduler + Handler 抽象、网络通信、上下文封装）
+- AntJob.Extensions：扩展调度类型（SqlMessage、DataHandler、MessageHandler、CSharpHandler 等）
+- Samples：示例（HisAgent、HisData、HisWeb 等）
 
+---
+## 4. 调度模式详解
+| 模式 | 适用场景 | 触发粒度 | 关键字段 | 说明 |
+|------|----------|----------|----------|------|
+| Time / Cron | 通用周期性任务 | 秒 ~ Cron | Job.Time / Cron | 支持 Cron 表达式、替代 Start+Step 固定间隔 |
+| Data (时间窗口) | 按时间分片处理新增数据 | 秒 ~ 任意窗口 | Start / End | 自动补齐窗口，适合流水表、日志表滚动计算 |
+| Message | 被动消息驱动 | 实时 | Body | 外部推送/队列消息转成任务 |
+| SQL / 数据驱动 | 扫描数据表按主键/时间切片 | 批 | 自定义 | 扩展组件，常用于历史补算或批量迁移 |
+| C# 动态脚本 | 快速试验、小逻辑热更 | 同上 | 脚本 | 运行时编译执行（受权限/沙箱限制） |
 
-​	命令行中运行以下命令快速体验NewLife组件：
-
+---
+## 5. 快速开始
+### 5.1 模板方式（推荐）
 ```
 dotnet new install NewLife.Templates
+# 创建一个带 AntJob 示例的工程
 dotnet new antjob --name TestJob
 cd TestJob
 dotnet run
 ```
+### 5.2 手工最小示例
+参见下文 “设计示例” 段落。
 
-## 核心功能模块
-1. **调度器(Scheduler)**: 作业调度的核心引擎，管理处理器生命周期和任务分发
-2. **处理器(Handler)**: 作业处理器基类，每个业务模块继承实现Execute方法
-3. **作业提供者(IJobProvider)**: 任务来源提供者，支持网络调度、本地文件等
-4. **任务上下文(JobContext)**: 封装任务执行环境和状态信息
-5. **调度模式**: 支持定时调度(Timer)、数据调度(Data)、消息调度(Message)、Cron表达式
-6. **分布式通信**: 基于NewLife.Remoting实现调度中心与执行节点的通信
+### 5.3 仅本地文件调度（离线 / 单机测试）
+不配置 NetworkJobProvider 时使用默认本地 Provider，适合调试。
 
-## 核心概念
-- **作业(Job)**: 业务处理单元的抽象，包含调度参数和执行配置
-- **任务(Task)**: 作业按时间或数据切片后的执行单元
-- **处理器(Handler)**: 具体业务逻辑的实现类，继承Handler基类
-- **调度中心**: 集中管理作业配置、任务分发和执行监控
-- **执行节点**: 部署处理器的客户端，接收并执行任务
+### 5.4 引入 Web 控制台
+部署 AntJob.Web（IIS / Kestrel / Docker）后修改客户端配置 Server 指向其服务地址即可。
 
+### 5.5 Docker（示意）
+> 官方暂未提供镜像，可在企业内封装：
+```
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+COPY ./publish/ .
+ENTRYPOINT ["dotnet","AntJob.Web.dll"]
+```
 
-# v4架构升级
-v4版本是对v3版本的重构，主要是为了解决v3版本的一些问题，以及提供更多的功能。  
-v4版本亮点：
-1. []新增Http接入，由AntWeb提供调度服务，无需部署AntServer，满足轻量级项目需要。（进行中，等NewLife.Remoting提供WebsocketClient）
-2. [x]增强定时调度，支持指定Cron表达式，逐步替代Start+Step的恒定间隔定时调度
-3. []提前生成任务，提前下发给执行器，到时间后马上执行，提高任务执行时间精度。（待重新评估）
-4. []支持任务主动延迟，任务在执行中发现数据条件未满足时，可以向调度中心请求延迟一段时间后再执行，增加执行次数但不增加错误次数
-5. []扩充调度模式，常态化部署AntAgent，正式把Sql调度和C#调度加入主线，将来增加数据抽取和数据推送等多种调度模式
+---
+## 6. 典型部署拓扑
+1. 单实例（开发机）：Web + Server + JobApp 同机部署，适合开发测试
+2. 双中心高可用：两个调度中心地址逗号分隔（主备切换），客户端自动 Failover
+3. 多执行集群：若干执行节点（按业务或负载分组），统一连接调度中心
+4. 混合：生产使用双中心 + 多执行节点；测试/预发独立集群
 
-# 功能特点
-AntJob的核心是**蚂蚁算法**：**把任意大数据拆分成为小块，采用蚂蚁搬家策略计算每一块！**  
-（蚂蚁搬家，一个馒头掉在地上，众多小蚂蚁会把馒头掰成小块小块往家里般！）  
+---
+## 7. 目录结构说明（摘取关键）
+```
+AntJob/                 客户端核心库
+AntJob.Extensions/      扩展处理器/消息/SQL等
+AntJob.Server/          调度中心核心服务逻辑 (JobService 等)
+AntJob.Web/             Razor Pages + Cube 管理后台
+AntJob.Data/            基础数据模型 (实体层)
+Samples/                示例项目（HisAgent/HisData/HisWeb）
+AntTest/                单元/集成测试
+Doc/                    文档与资源
+```
 
-该算法设计于2008年，最开始用于处理基金公司的短信/邮件/传真群发（每批两百万）和电话话费分析（上百种国际长途计费规则），数据量不算大，但是有一定复杂度，并且要求支持持续处理（实时计算）以及出错重试。  
+---
+## 8. 配置说明
+核心客户端配置类：`AntSetting`
+- Server：调度中心地址，支持多地址 `tcp://a:9999,tcp://b:9999`
+- AppID / Secret：应用隔离凭据（可自动注册或手动分发）
+- Debug：调试开关，输出更详细日志
 
-2016年在中通快递某产品项目中使用该算法进行大数据实时计算，成功挑战每日1200万的订单。并进一步发展衍生成为重量级实时计算平台，集分布式计算、集群调度、配置中心、负载均衡、故障转移、跨机房冗余、作业监控告警、百亿级数据清洗、超大Redis缓存（>2T）于一身，于2019年达到每年万亿级计算量（2019年双十一日订单量破亿）。  
+Web/Server 侧：
+- 数据库连接通过 XCode 自动反向工程创建表
+- 可对接 Stardust 获取注册中心、APM、配置中心能力
 
-AntJob是开源简化版，仅提供分布式计算和集中调度能力，支持百亿级调度。  
+---
+## 9. 扩展机制
+1. 编写自定义 Handler：继承 `Handler`，重写 `Execute(JobContext ctx)` 返回成功处理数量
+2. 自定义数据来源 Provider：实现 `IJobProvider`（如：Kafka / Redis Stream / REST）
+3. 消息调度：`MessageHandler` 推送任意消息体形成任务
+4. SQL/数据驱动：`SqlMessage` + `DataHandler` 扫描数据并切片
+5. 动态脚本：`CSharpHandler` 允许以脚本方式快速试错（生产需限制权限）
+6. 插件化：由于强命名与多 TFM 支持，可在独立程序集封装处理器后热插拔
 
-AntJob主要功能点：
-1. 作业处理器。每一个最小业务模块实现一个处理器类，用于处理这一类作业。例如同步数据表时，每张表写一个处理器类，并在调度中心注册一个作业，调度中心按照作业时间切片得到任务，然后把任务（主要包含时间区间）分派给各个计算节点上的处理器类执行。又如，每天汇总计算是一个作业，而每月汇总计算又是另一个作业；
-1. 任务上下文。作业处理器类实例化以后，将反复向调度中心申请任务来执行，每个任务的上下文核心数据是时间区间（数据调度）、时间点（定时调度）、消息体（消息调度）。调度中心记录任务处理结果；
-1. 数据切片。支持按照时间区间（如5秒）把大数据切分为小片，也即是数据调度，处理过最大单表60亿行；
-1. 定时调度。支持定时执行（秒级）指定业务逻辑，每个执行时间点得到一个任务；
-1. 任务重试。每个任务完整记录处理结果，失败任务在延迟一段时间后将会自动重新分派（可能由原节点或其它节点执行）；
-1. 任务重置。支持批量重置已执行完成的任务，让其再次执行处理；
-1. 作业面板。在Web控制台上可查看每个应用所有作业的运行状态，或修改参数；
-1. 作业重置。调整作业参数，让其再次处理某段时间的任务数据，例如重算过去一个月的数据；
+---
+## 10. 可靠性 & 一致性
+- 任务原子分配：同一任务 ID 只会被一个节点获取
+- 状态机：就绪 → 处理中 → 完成 / 错误 / 取消
+- 自动重试：失败后按延迟（默认 1 分钟）重试，最多 N 次（可配置）
+- 重置机制：批量重置历史区间重新计算（补算 / 校正）
+- 幂等性：业务层建议基于主键/时间窗口实现幂等写入
+- 心跳与在线表：实时发现节点上下线，支持弹性扩容
 
+---
+## 11. 性能与容量规划
+- 单作业切片规模：可达百亿级任务历史记录（视数据库能力）
+- 单节点吞吐：依据 Handler 业务逻辑；框架调度开销极低（内存级调度控制）
+- 低 GC 压力：内部使用对象池/缓存（依赖 NewLife.Core 优化）
+- 调优建议：
+  - 适度控制切片粒度（过细增加调度元数据开销）
+  - 使用批量 IO 或缓存减少数据库压力
+  - 大计算窗口优先 Data 模式 + 子窗口循环
 
-# 定时调度
-以下源码位于 [https://github.com/NewLifeX/AntJob/tree/master/Samples/HisAgent](https://github.com/NewLifeX/AntJob/tree/master/Samples/HisAgent) 
+---
+## 12. 对比（概述）
+| 系统 | 特点 | AntJob 差异点 |
+|------|------|---------------|
+| Quartz.NET | 纯定时/Cron | AntJob 追加数据/消息切片、重算、集群分片简单 |
+| Hangfire | 持久化后台任务 | AntJob 专注“时间/数据”连续切片而非一次性任务队列 |
+| XXL-JOB | Java 生态 | AntJob .NET 原生 + 多模式统一 + 动态脚本 |
+| Airflow | DAG 编排 | AntJob 更轻量，聚焦高频窗口处理；可与 Airflow 互补 |
 
-## 新建项目
-新建.net core 3.1项目，从nuget引用 AntJob。实例化一个调度器Scheduler，配置网络提供者。  
+---
+## 13. 常见问题 (FAQ)
+Q: 作业注册后为什么默认停止?  
+A: 防止未配置参数即大量启动；需在 Web 控制台手动启用。  
+
+Q: 如何回溯重算一个月数据?  
+A: 在作业面板修改开始时间/重置指定时间段或批量选择任务重置。  
+
+Q: 任务失败是否会阻塞后续?  
+A: 不会；失败任务延迟重试，其它窗口继续调度。  
+
+Q: 能否只用 Http/WebSocket 接入?  
+A: v4 规划中（待 Remoting WebSocketClient），届时轻量场景无需独立 AntServer。  
+
+Q: 如何限制脚本风险?  
+A: 关闭未使用的 CSharpHandler；或隔离运行进程 + 最小权限配置。  
+
+---
+## 14. Roadmap（补充 v4 外）
+- WebSocket/Http Provider （无 TCP 端口环境支持）
+- 任务主动延迟 API（执行中评估延时再执行而不计错）
+- 可插拔告警渠道（邮件 / Webhook / 企业微信等）
+- 多维度监控指标导出（Prometheus/OpenTelemetry）
+- DAG / 依赖编排的可选扩展层（在核心稳定后）
+
+---
+## 15. 核心概念回顾
+- Job：作业配置（时间/步进/Cron/模式/并发限制等）
+- Task：作业实例化后的最小执行单元（带时间点或区间、消息体）
+- Handler：业务逻辑载体；生命周期由 Scheduler 管理
+- JobContext：一次任务执行上下文（含 Task、统计、日志辅助）
+- IJobProvider：任务来源提供者（网络/本地/自定义）
+
+---
+## 16. 设计示例（定时调度）
+以下源码位于 [Samples/HisAgent](https://github.com/NewLifeX/AntJob/tree/master/Samples/HisAgent) 
+
+### 新建项目
+新建 .NET Core 3.1+ 项目，从 NuGet 引用 AntJob。实例化一个调度器 Scheduler，配置网络提供者。  
 ```csharp
-using System;
 using AntJob;
-using AntJob.Providers;
+using HisAgent;
 using NewLife.Log;
+using NewLife.Model;
+using Stardust;
 
-namespace HisAgent
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            XTrace.UseConsole();
+// 启用控制台日志，拦截所有异常
+XTrace.UseConsole();
 
-            var set = AntSetting.Current;
+var services = ObjectContainer.Current;
+services.AddStardust();
 
-            // 实例化调度器
-            var sc = new Scheduler();
+services.AddAntJob()
+    .AddHandler<HelloJob>();
 
-            // 使用分布式调度引擎替换默认的本地文件调度
-            sc.Provider = new NetworkJobProvider
-            {
-                Server = set.Server,
-                AppID = set.AppID,
-                Secret = set.Secret,
-            };
-
-            // 添加作业处理器
-            sc.Handlers.Add(new HelloJob());
-
-            // 启动调度引擎，调度器内部多线程处理
-            sc.Start();
-
-            Console.WriteLine("OK!");
-            Console.ReadKey();
-        }
-    }
-}
+// 友好退出
+var host = services.BuildHost();
+await host.RunAsync();
 ```
-然后添加第一个定时调度的作业处理器  
+添加第一个定时调度作业处理器：
 ```csharp
 using System;
 using AntJob;
 
-namespace HisAgent
+internal class HelloJob : Handler
 {
-    internal class HelloJob : Handler
+    public HelloJob() => Job.Cron = "7/30 * * * * ?";
+
+    public override Int32 Execute(JobContext ctx)
     {
-        public HelloJob()
-        {
-            // 今天零点开始，每10秒一次
-            var job = Job;
-            job.Time = DateTime.Today;
-            job.Step = 10;
-        }
-
-        protected override Int32 Execute(JobContext ctx)
-        {
-            // 当前任务时间
-            var time = ctx.Task.Time;
-            WriteLog("新生命蚂蚁调度系统！当前任务时间：{0}", time);
-
-            // 成功处理数据量
-            return 1;
-        }
+        // 当前任务时间
+        var time = ctx.Task.Time;
+        WriteLog("新生命蚂蚁调度系统！当前任务时间：{0}", time);
+        return 1; // 成功处理数据量
     }
 }
 ```
-作业处理器必须继承自Handler，并且重写Execute实现业务逻辑。  
-我们这里的业务逻辑就是输出一行日志，其中的ctx.Task就是切分得到的任务上下文，Start是时间点。  
-构造函数中设定的开始时间和步进Step，仅用于首次注册作业到调度中心，后面就没有用处了。  
+作业处理器必须继承 `Handler` 并重写 `Execute` 实现业务逻辑。构造函数中设定的 Time、Step 仅首次注册使用，后续修改在控制台完成。  
 
-为了编译观察，修改项目输出目录，在项目文件上点右键选“编辑项目文件”  
-```xml
-<PropertyGroup>
-  <OutputType>Exe</OutputType>
-  <TargetFramework>netcoreapp3.1</TargetFramework>
-  <AssemblyVersion>1.0.*</AssemblyVersion>
-  <Deterministic>false</Deterministic>
-  <OutputPath>..\..\Bin\HisAgent</OutputPath>
-  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-</PropertyGroup>
-```
-
-## 编译执行
-代码能编译通过，先跑起来看看  
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1144030/1586439204543-396a9f07-3340-4bd0-80c2-782c628cba0d.png#align=left&display=inline&height=192&name=image.png&originHeight=384&originWidth=1468&size=93962&status=done&style=none&width=734)  
-可以看到，调度器首先连接 tcp://127.0.0.1:9999，其次 tcp://ant.newlifex.com:9999 ，而上面代码中并没有提及这两个地址。其实这就是调度中心地址，默认本地用于调试，如果链接失败再连接公开版调度中心，位于配置文件中：  
-
+或者使用异步处理的定时调度作业处理器：
 ```csharp
-/// <summary>蚂蚁配置。主要用于网络型调度系统</summary>
-[Config("Ant")]
-public class AntSetting : Config<AntSetting>
+using System;
+using AntJob;
+
+internal class HelloJob : Handler
 {
-    #region 属性
-    /// <summary>调试开关。默认false</summary>
-    [Description("调试开关。默认false")]
-    public Boolean Debug { get; set; }
+    public HelloJob() => Job.Cron = "7/30 * * * * ?";
 
-    /// <summary>调度中心。逗号分隔多地址，主备架构</summary>
-    [Description("调度中心。逗号分隔多地址，主备架构")]
-    public String Server { get; set; } = "tcp://127.0.0.1:9999,tcp://ant.newlifex.com:9999";
-
-    /// <summary>应用标识。调度中心以此隔离应用，默认当前应用</summary>
-    [Description("应用标识。调度中心以此隔离应用，默认当前应用")]
-    public String AppID { get; set; }
-
-    /// <summary>应用密钥。</summary>
-    [Description("应用密钥。")]
-    public String Secret { get; set; }
-    #endregion
-
-    #region 方法
-    /// <summary>重载</summary>
-    protected override void OnLoaded()
+    public override async Task<Int32> ExecuteAsync(JobContext ctx)
     {
-        if (AppID.IsNullOrEmpty())
+        using var span = Tracer?.NewSpan("HelloJob", ctx.Task.DataTime);
+
+        // 当前任务时间
+        var time = ctx.Task.DataTime;
+        WriteLog("新生命蚂蚁调度系统！当前任务时间：{0}", time);
+        if (!ctx.Task.Data.IsNullOrEmpty()) WriteLog("数据：{0}", ctx.Task.Data);
+
+        var state = Rand.NextString(16);
+        var http = new HttpClient { BaseAddress = new Uri("https://newlifex.com") };
+        http.SetUserAgent();
+        var rs = await http.GetAsync<IDictionary<String, Object>>("/cube/info", new { state });
+
+        if (rs.TryGetValue("state", out var value) && value is String str)
         {
-            var asm = Assembly.GetEntryAssembly();
-            if (asm != null) AppID = asm.GetName().Name;
+            Trace.Assert(state == str, "返回状态不一致");
         }
 
-        base.OnLoaded();
+        // 成功处理数据量
+        return 1;
     }
-    #endregion
 }
 ```
 
-其实上面Main函数中已经看到从配置文件里面读取Server+AppID+Secret，该配置类读取的配置文件在这：  
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1144030/1586439584880-ea4aa91c-460d-4893-b849-8ac8b0995311.png#align=left&display=inline&height=340&name=image.png&originHeight=680&originWidth=1075&size=127959&status=done&style=none&width=537.5)  
-AppID默认取本应用名，Secret由调度中心生成并下发。  
-调度中心默认打开自动注册AutoRegistry，任意应用登录时自动注册，省去人工配置应用账号的麻烦。  
-企业内部正式场景使用时，为安全起见，建议关闭自动注册。  
+### 编译 & 运行
+首次运行会自动尝试连接 `tcp://127.0.0.1:9999` 与 `tcp://ant.newlifex.com:9999`（主备机制），来源于 `AntSetting` 配置。
 
-再来看看前面跑起来的日志  
+日志示例：
 ```sql
 21:33:08.470  1 N - 启动任务调度引擎[AntJob.Providers.NetworkJobProvider]，作业[1]项，定时5秒
 21:33:08.471  1 N - HelloJob 开始工作 False 区间（2020-04-09 00:00:00, 0001-01-01 00:00:00） Offset=15 Step=10 MaxTask=8
-21:33:08.587  5 Y Job HelloJob 停止工作
-21:33:09.467  7 Y T [180.174.185.180:53926]上线！X3
 ```
-启动了调度引擎，带有一个作业；  
-作业HelloJob，就是我们通过 `sc.Handlers.Add(new HelloJob())`` `添加进去的作业处理器实例；  
-HelloJob状态False，处于停止工作状态，那是因为作业注册后，默认都是停止状态，需要去web控制台配置参数后手工开启；  
-最后一个xxx上线，这是蚂蚁调度的Peers功能，可以探测得到当前应用下所有已连接节点的状态。当HisAgent部署于多个服务器时，每个进程都可以通过Peers得知其它节点的存在；  
+### Web 作业管理与重置
+在 Web 控制台启用作业后，调度中心将按时间点切分任务并分发。可查看任务明细、错误重试、批量重置以回溯计算。
 
-## 作业管理
-不用关闭HistAgent客户端窗口，我们去线上web控制台看看 [http://ant.newlifex.com/](http://ant.newlifex.com/)  
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1144030/1586440482188-a895c1b9-8c03-4966-ade8-f15d39d4bb68.png#align=left&display=inline&height=245&name=image.png&originHeight=491&originWidth=1359&size=93355&status=done&style=none&width=679.5)  
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1144030/1586440526419-b2edc421-9ecb-4d4c-9879-fdaea412908f.png#align=left&display=inline&height=171&name=image.png&originHeight=342&originWidth=1616&size=82675&status=done&style=none&width=808)  
-可以看到应用节点在线，点击应用名进去作业面板  
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1144030/1586440600271-416571eb-8604-4a3c-9907-3fa5ebe1f6d6.png#align=left&display=inline&height=99&name=image.png&originHeight=197&originWidth=1631&size=55947&status=done&style=none&width=815.5)  
-这就是我们的HelloJob作业，对应HisAgent中的HelloJob作业处理器。  
-它处于停用状态，下一次执行时间是 00:00:00 ，也就是今天零点，加上10秒步进，也远小于当前时间，因此，只要启用该作业，调度中心将会马上开始切分任务，并分派给客户都执行。  
-我们来点击红色叉叉，让它改变为启用状态  
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1144030/1586440804204-a7a232d5-e640-4de7-b108-1155045edbb6.png#align=left&display=inline&height=394&name=image.png&originHeight=788&originWidth=1769&size=344111&status=done&style=none&width=884.5)  
-几秒后，客户端HisAgent欢快地跑起来！它正在以10秒间隔不断切分并执行任务。  
+### 分布式并行
+多开若干 Agent，任务由调度中心分派，任一任务只会被一个节点执行；失败将按策略重试，提升整体吞吐与稳定性。
 
-刷新作业面板，可以看到，开始时间已经变为当前附近的时间，右边也有了执行次数。  
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1144030/1586441093138-8b1c59fb-4277-4e45-a928-0c99465dba70.png#align=left&display=inline&height=95&name=image.png&originHeight=189&originWidth=1642&size=59847&status=done&style=none&width=821)  
+---
+## 17. 核心功能模块（简表）
+1. 调度器 (Scheduler)：作业调度核心引擎，管理处理器生命周期和任务分发
+2. 处理器 (Handler)：作业处理器基类，每个业务模块继承实现 Execute/ExecuteAsync 方法
+3. 作业提供者 (IJobProvider)：任务来源，支持网络、本地等
+4. 任务上下文 (JobContext)：封装任务执行环境与状态
+5. 调度模式：定时 (Timer)、数据 (Data)、消息 (Message)、Cron 表达式、SQL/C# 扩展
+6. 分布式通信：基于 NewLife.Remoting 实现调度中心与执行节点通信
 
-点击作业名HelloJob，进去查看任务明细  
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1144030/1586441195402-c2005a03-8298-4300-a6be-598d34ca1469.png#align=left&display=inline&height=602&name=image.png&originHeight=1204&originWidth=2156&size=353044&status=done&style=none&width=1078)  
-任务切分后，插入作业任务表，此时状态为“就绪”，等待分发给客户端执行。  
-客户端执行后，向调度中心报告执行结果，可能“完成”，可能“错误”。  
-错误的任务，会在1分钟后，重新执行，最多连续错误10次。  
+---
+## 18. v4 架构升级 (进展)
+v4 亮点：
+1. [] 新增 Http 接入（AntWeb 提供调度服务，无需 AntServer）
+2. [x] 增强定时调度：支持 Cron 表达式，逐步替代 Start+Step 固定步进
+3. [] 提前生成任务：到点即执行（精度提升，待评估）
+4. [x] 任务主动延迟：执行中请求延迟但不计失败，提高鲁棒性
+5. [] 扩充调度模式：常态化 AntAgent，纳入 Sql 调度 / C# 调度，后续增加抽取、推送等模式
 
-## 双跑，沸腾吧，分布式计算
-再开两个HisAgent进程，查看应用在线表，可以看到有三个节点在线。  
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1144030/1586442033394-770585b2-9fcd-41d4-a27d-afcfd32dfff9.png#align=left&display=inline&height=446&name=image.png&originHeight=892&originWidth=2053&size=482186&status=done&style=none&width=1026.5)  
-HisAgent控制台中，可以看到各自都有机会分配了任务，每个任务有且仅有一个节点执行。  
+---
+## 19. 功能特点（算法与能力）
+蚂蚁算法：把任意大数据拆分成小块并行计算（类似“馒头被蚂蚁搬家”）。2008 年诞生，历经基金短信群发、快递 1200 万/日订单处理、百亿级数据清洗、万亿级年度调度实践打磨。聚焦分布式切片与集中调度能力，已验证百亿级调度规模。
 
-刷新作业HelloJob的任务列表，可以看到不同客户端执行了不同的任务。  
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1144030/1586442181551-b4cd0691-0e74-45ae-bf5f-d005a6ebcf2c.png#align=left&display=inline&height=249&name=image.png&originHeight=497&originWidth=1799&size=140083&status=done&style=none&width=899.5)  
+主要功能点（回顾）：
+- 作业处理器：最小业务模块单元
+- 任务上下文：时间区间 / 时间点 / 消息体
+- 数据切片：按区间（秒/分）切分（单表验证 60 亿行）
+- 定时调度：秒级 / Cron 粒度
+- 任务重试：延迟重派，跨节点兜底
+- 任务/作业重置：批量回放 / 补算指定时间段
+- 作业面板：参数动态调整 + 运行态统计
 
-### 设计概要  
-计算型应用（实现IJob）  
+---
+## 20. 设计概要 & 系统架构（原示意）
+计算型应用（实现 IJob）
 
-```sequence{theme="simple"}
+```sequence
 计算应用->调度中心: app登录
 note over 调度中心: app/secret
 计算应用-->>调度中心: 注册作业
@@ -278,20 +365,20 @@ note over 调度中心: app/secret
 Web控制台->调度中心: 设置参数
 Web控制台->调度中心: 启动作业
 
-计算应用->调度中心: 申请作业分片
-调度中心->计算应用: 返回分片
+计算应用->调度中心: 申请作业任务
+调度中心->计算应用: 返回任务
 note over 计算应用: 多线程处理任务
 
 计算应用-->调度中心: 上报局部状态
 note over Web控制台: 作业状态看板
 计算应用->调度中心: 处理成功
 计算应用-->调度中心: 处理失败
+计算应用-->调度中心: 延迟处理
 ```
 
-### 系统架构  
-调度中心主从架构  
+调度中心主从架构
 
-```sequence{theme="simple"}
+```sequence
 计算应用->调度中心: 登录
 调度中心->数据库: 连接
 计算应用-->>调度中心2: 故障转移
@@ -304,7 +391,8 @@ note over Web控制台: 作业状态看板
 Web控制台-->调度中心: 监控
 ```
 
-## 新生命项目矩阵
+---
+## 21. 新生命项目矩阵
 各项目默认支持net9.0/netstandard2.1/netstandard2.0/net4.62/net4.5，旧版（2024.0801）支持net4.0/net2.0  
 
 |                               项目                               | 年份  | 说明                                                                                        |
