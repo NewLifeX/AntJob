@@ -12,7 +12,7 @@
 
 ![Ant](Doc/ant.png)  
 
-> EN: AntJob is a high-throughput distributed job scheduling & near real-time computing platform for .NET, focusing on massive (10^11+) task slicing, reliable retry and elastic horizontal scaling. Chinese documentation below is the canonical version.
+> EN: AntJob is a high-throughput distributed job scheduling & real-time computing platform for .NET, focusing on massive (10^11+) task slicing, reliable retry and elastic horizontal scaling. Chinese documentation below is the canonical version.
 
 # 蚂蚁调度 AntJob - 分布式任务/数据调度系统
 
@@ -142,7 +142,7 @@ AntJob.Extensions/      扩展处理器/消息/SQL等
 AntJob.Server/          调度中心核心服务逻辑 (JobService 等)
 AntJob.Web/             Razor Pages + Cube 管理后台
 AntJob.Data/            基础数据模型 (实体层)
-Samples/                示例项目（HisAgent/HisData/HisWeb）
+Samples/                示例项目（HisAgent、HisData、HisWeb）
 AntTest/                单元/集成测试
 Doc/                    文档与资源
 ```
@@ -357,38 +357,53 @@ v4 亮点：
 ## 20. 设计概要 & 系统架构（原示意）
 计算型应用（实现 IJob）
 
-```sequence
-计算应用->调度中心: app登录
-note over 调度中心: app/secret
-计算应用-->>调度中心: 注册作业
+```mermaid
+sequenceDiagram
+    participant App as 作业应用
+    participant Server as 调度中心AntServer
+    participant Web as 控制台AntWeb
 
-Web控制台->调度中心: 设置参数
-Web控制台->调度中心: 启动作业
+    App->>Server: app登录
+    Note over Server: app/secret
+    App-->>Server: 注册作业
 
-计算应用->调度中心: 申请作业任务
-调度中心->计算应用: 返回任务
-note over 计算应用: 多线程处理任务
+    Web->>Server: 设置参数
+    Web->>Server: 启动作业
 
-计算应用-->调度中心: 上报局部状态
-note over Web控制台: 作业状态看板
-计算应用->调度中心: 处理成功
-计算应用-->调度中心: 处理失败
-计算应用-->调度中心: 延迟处理
+    App->>Server: 申请作业任务
+    Server-->>App: 返回任务
+    Note over App: 多线程处理任务
+
+    App-->>Server: 上报局部状态
+    Note over Web: 作业状态看板
+    App->>Server: 处理成功
+    App-->>Server: 处理失败
+    App-->>Server: 延迟处理
 ```
 
 调度中心主从架构
 
-```sequence
-计算应用->调度中心: 登录
-调度中心->数据库: 连接
-计算应用-->>调度中心2: 故障转移
-调度中心2->数据库: 连接
+```mermaid
+sequenceDiagram
+    participant App1 as 作业应用
+    participant Server1 as 调度中心
+    participant DB as 数据库
+    participant Server2 as 调度中心2
+    participant App2 as 作业应用2
+    participant App3 as 作业应用3
+    participant App4 as 作业应用4
+    participant Web as Web控制台
 
-计算应用2->调度中心: 登录
-计算应用3->调度中心: 登录
-计算应用4->调度中心: 登录
+    App1->>Server1: 登录
+    Server1->>DB: 连接
+    App1-->>Server2: 故障转移
+    Server2->>DB: 连接
 
-Web控制台-->调度中心: 监控
+    App2->>Server1: 登录
+    App3->>Server1: 登录
+    App4->>Server1: 登录
+
+    Web-->>Server1: 监控
 ```
 
 ---
