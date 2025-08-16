@@ -330,8 +330,27 @@ public class Scheduler : DisposeBase
                     // 准备就绪，增加Busy，避免超额分配
                     handler.Prepare(ts[i]);
 
-                    // 使用线程池调度，避免Task排队影响使用
-                    ThreadPool.QueueUserWorkItem(s => handler.Process(s as ITask), ts[i]);
+                    // 自动检测并选择同步或异步调用路径
+                    if (handler.SupportsAsync)
+                    {
+                        // 回调函数内不能用ts[i]，因为i会变
+                        ThreadPool.QueueUserWorkItem(async s =>
+                        {
+                            try
+                            {
+                                await handler.ProcessAsync(s as ITask).ConfigureAwait(false);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log?.Error("异步作业[{0}]执行失败！{1}", handler.GetType().FullName, ex.Message);
+                            }
+                        }, ts[i]);
+                    }
+                    else
+                    {
+                        // 使用线程池调度，避免Task排队影响使用
+                        ThreadPool.QueueUserWorkItem(s => handler.Process(s as ITask), ts[i]);
+                    }
                 }
 
                 if (ts != null && ts.Length > 0) flag = true;

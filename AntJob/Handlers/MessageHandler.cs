@@ -50,7 +50,9 @@ public abstract class MessageHandler : Handler
 
         return prv.Acquire(job, Topic, count);
     }
+    #endregion
 
+    #region 同步数据处理
     /// <summary>解码一批消息，由Process执行，内部调用Execute处理任务</summary>
     /// <param name="ctx"></param>
     protected override void OnProcess(JobContext ctx)
@@ -88,5 +90,45 @@ public abstract class MessageHandler : Handler
     /// <param name="message">消息</param>
     /// <returns></returns>
     public virtual Boolean ProcessItem(JobContext ctx, String message) => true;
+    #endregion
+
+    #region 异步数据处理
+    /// <summary>解码一批消息，由ProcessAsync执行，内部调用ExecuteAsync处理任务</summary>
+    /// <param name="ctx"></param>
+    protected override async Task OnProcessAsync(JobContext ctx)
+    {
+        if (ctx.Task.Data.IsNullOrEmpty()) return;
+
+        var ss = ctx.Task.Data.ToJsonEntity<String[]>();
+        if (ss == null || ss.Length == 0) return;
+
+        ctx.Total = ss.Length;
+        ctx.Data = ss;
+
+        var span = DefaultSpan.Current;
+        if (span != null) span.Value = ctx.Total;
+
+        ctx.Success = await ExecuteAsync(ctx);
+    }
+
+    /// <summary>根据解码后的消息执行任务。由OnProcessAsync执行</summary>
+    /// <param name="ctx">上下文</param>
+    /// <returns></returns>
+    public override async Task<Int32> ExecuteAsync(JobContext ctx)
+    {
+        var count = 0;
+        foreach (String item in ctx.Data as IEnumerable)
+        {
+            if (await ProcessItemAsync(ctx, item)) count++;
+        }
+
+        return count;
+    }
+
+    /// <summary>处理一个数据对象。由ExecuteAsync执行，每条消息调用一次</summary>
+    /// <param name="ctx">上下文</param>
+    /// <param name="message">消息</param>
+    /// <returns></returns>
+    public virtual Task<Boolean> ProcessItemAsync(JobContext ctx, String message) => Task.Run(() => ProcessItem(ctx, message));
     #endregion
 }

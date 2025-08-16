@@ -1,7 +1,14 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Net.Http;
+using System.Threading.Tasks;
 using AntJob;
 using NewLife;
+using NewLife.Http;
+using NewLife.Remoting;
 using NewLife.Security;
 
 namespace HisAgent;
@@ -26,6 +33,29 @@ internal class HelloJob : Handler
 
         //// 一定几率抛出异常
         //if (Rand.Next(2) == 0) throw new Exception("Error");
+
+        // 成功处理数据量
+        return 1;
+    }
+
+    public override async Task<Int32> ExecuteAsync(JobContext ctx)
+    {
+        using var span = Tracer?.NewSpan("HelloJob", ctx.Task.DataTime);
+
+        // 当前任务时间
+        var time = ctx.Task.DataTime;
+        WriteLog("新生命蚂蚁调度系统！当前任务时间：{0}", time);
+        if (!ctx.Task.Data.IsNullOrEmpty()) WriteLog("数据：{0}", ctx.Task.Data);
+
+        var state = Rand.NextString(16);
+        var http = new HttpClient { BaseAddress = new Uri("https://newlifex.com") };
+        http.SetUserAgent();
+        var rs = await http.GetAsync<IDictionary<String, Object>>("/cube/info", new { state });
+
+        if (rs.TryGetValue("state", out var value) && value is String str)
+        {
+            Trace.Assert(state == str, "返回状态不一致");
+        }
 
         // 成功处理数据量
         return 1;

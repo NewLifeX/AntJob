@@ -5,7 +5,7 @@
     <Description>蚂蚁调度系统数据库结构</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2025</Copyright>
-    <VersionPrefix>4.3</VersionPrefix>
+    <VersionPrefix>4.4</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(Version)</FileVersion>

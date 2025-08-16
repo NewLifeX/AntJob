@@ -47,6 +47,20 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
     /// <summary>处理速度。调度器可根据处理速度来调节</summary>
     protected Int32 Speed { get; set; }
+
+    private Boolean? _supportsAsync;
+    /// <summary>是否支持异步执行（自动检测）</summary>
+    public Boolean SupportsAsync
+    {
+        get
+        {
+            if (_supportsAsync == null)
+            {
+                _supportsAsync = IsExecuteAsyncOverridden();
+            }
+            return _supportsAsync.Value;
+        }
+    }
     #endregion
 
     #region 索引器
@@ -79,6 +93,29 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         };
 
         Job = job;
+    }
+    #endregion
+
+    #region 异步检测
+    /// <summary>检测是否重写了ExecuteAsync方法</summary>
+    private Boolean IsExecuteAsyncOverridden()
+    {
+        var currentType = GetType();
+        var baseType = typeof(Handler);
+
+        // 获取当前类型的所有方法，目标方法任意之一被重写即可
+        var names = new[] { "ProcessAsync", "OnProcessAsync", "ExecuteAsync", "ProcessItemAsync" };
+        var methods = currentType.GetMethods();
+        foreach (var method in methods)
+        {
+            if (!names.Contains(method.Name)) continue;
+
+            // 如果当前方法的声明类型不是Handler基类，说明被重写了
+            if (method.DeclaringType != baseType)
+                return true;
+        }
+
+        return false;
     }
     #endregion
 
@@ -225,11 +262,98 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     protected virtual void OnFinish(JobContext ctx) => Provider?.Finish(ctx).Wait();
     #endregion
 
+    #region 异步调度
+    /// <summary>异步处理一项新任务。每个作业任务的顶级函数，由线程池执行，内部调用OnProcessAsync</summary>
+    /// <param name="task"></param>
+    public virtual async Task ProcessAsync(ITask task)
+    {
+        if (task == null) return;
+
+        //// 默认实现：将同步Process包装为异步
+        //await Task.Run(() => Process(task)).ConfigureAwait(false);
+
+        var result = new TaskResult { ID = task.ID };
+        var ctx = new JobContext
+        {
+            Handler = this,
+            Task = task,
+            Result = result,
+        };
+
+        // APM埋点
+        using var span = Schedule?.Tracer?.NewSpan($"job:{Name}", task.Data ?? $"({task.DataTime.ToFullString()}, {task.End.ToFullString()})");
+        result.TraceId = span?.TraceId;
+
+        // 较慢的作业，及时报告进度
+        if (Speed < 10) await ReportAsync(ctx, JobStatus.处理中);
+
+        var sw = Stopwatch.StartNew();
+        try
+        {
+            await OnProcessAsync(ctx);
+
+            if (span != null) span.Value = ctx.Total;
+        }
+        catch (Exception ex)
+        {
+            ctx.Error = ex;
+            span?.SetError(ex, task);
+
+            XTrace.WriteException(ex);
+        }
+        finally
+        {
+            Interlocked.Decrement(ref _Busy);
+            //span?.Dispose();
+        }
+
+        sw.Stop();
+        ctx.Cost = sw.Elapsed.TotalMilliseconds;
+        Speed = ctx.Speed;
+
+        await OnFinishAsync(ctx);
+        Schedule?.OnFinish(ctx);
+    }
+
+    /// <summary>异步处理任务。内部分批调用ExecuteAsync处理数据，由ProcessAsync执行</summary>
+    /// <param name="ctx"></param>
+    protected virtual async Task OnProcessAsync(JobContext ctx)
+    {
+        ctx.Total = 1;
+        ctx.Success = await ExecuteAsync(ctx).ConfigureAwait(false);
+    }
+
+    /// <summary>异步报告任务状态</summary>
+    /// <param name="ctx"></param>
+    /// <param name="status"></param>
+    protected virtual async Task ReportAsync(JobContext ctx, JobStatus status)
+    {
+        ctx.Status = status;
+        if (Provider != null) await Provider.Report(ctx).ConfigureAwait(false);
+    }
+
+    /// <summary>异步完成整个任务</summary>
+    /// <param name="ctx"></param>
+    protected virtual async Task OnFinishAsync(JobContext ctx)
+    {
+        if (Provider != null) await Provider.Finish(ctx).ConfigureAwait(false);
+    }
+    #endregion
+
     #region 数据处理
     /// <summary>处理一批数据，一个任务内多次调用</summary>
     /// <param name="ctx">上下文</param>
     /// <returns></returns>
-    public abstract Int32 Execute(JobContext ctx);
+    public virtual Int32 Execute(JobContext ctx) => 0;
+
+    /// <summary>异步处理一批数据，一个任务内多次调用</summary>
+    /// <param name="ctx">上下文</param>
+    /// <returns></returns>
+    public virtual async Task<Int32> ExecuteAsync(JobContext ctx)
+    {
+        // 默认实现：将同步Execute包装为异步
+        return await Task.Run(() => Execute(ctx)).ConfigureAwait(false);
+    }
 
     /// <summary>生产消息</summary>
     /// <param name="topic">主题</param>

@@ -165,7 +165,7 @@ public abstract class DataHandler : Handler
     }
     #endregion
 
-    #region 数据处理
+    #region 同步数据处理
     /// <summary>处理任务。由Process执行，内部分批Fetch数据并调用Execute</summary>
     /// <param name="ctx"></param>
     protected override void OnProcess(JobContext ctx)
@@ -268,5 +268,76 @@ public abstract class DataHandler : Handler
     /// <param name="entity"></param>
     /// <returns></returns>
     public virtual Boolean ProcessItem(JobContext ctx, IEntity entity) => true;
+    #endregion
+
+    #region 异步数据处理
+    /// <summary>处理任务。由ProcessAsync执行，内部分批FetchAsync数据并调用ExecuteAsync</summary>
+    /// <param name="ctx"></param>
+    protected override async Task OnProcessAsync(JobContext ctx)
+    {
+        var span = DefaultSpan.Current;
+        var row = 0;
+        while (true)
+        {
+            ctx.Data = null;
+            ctx.Error = null;
+
+            // 分批抽取
+            var data = await FetchAsync(ctx, ref row);
+
+            var list = data as IList;
+            if (list != null)
+            {
+                ctx.Total += list.Count;
+                if (span != null) span.Value = ctx.Total;
+            }
+            ctx.Data = data;
+
+            if (data == null || list != null && list.Count == 0) break;
+
+            // 报告进度
+            await ReportAsync(ctx, JobStatus.处理中);
+
+            // 批量处理
+            ctx.Success += await ExecuteAsync(ctx);
+
+            // 较慢的作业，及时报告进度
+            ctx.Status = JobStatus.抽取中;
+            if (Speed < 10) await ReportAsync(ctx, JobStatus.抽取中);
+
+            // 不满一批，结束
+            if (list != null && list.Count < ctx.Task.BatchSize) break;
+        }
+    }
+
+    /// <summary>分批抽取数据，一个任务内多次调用</summary>
+    /// <param name="ctx">上下文</param>
+    /// <param name="row">开始行数</param>
+    /// <returns></returns>
+    protected virtual Task<Object> FetchAsync(JobContext ctx, ref Int32 row)
+    {
+        var list = Fetch(ctx, ref row);
+        return Task.FromResult(list);
+    }
+
+    /// <summary>处理一批数据。由OnProcessAsync执行</summary>
+    /// <param name="ctx">上下文</param>
+    /// <returns></returns>
+    public override async Task<Int32> ExecuteAsync(JobContext ctx)
+    {
+        var count = 0;
+        foreach (var item in ctx.Data as IEnumerable)
+        {
+            if (await ProcessItemAsync(ctx, item as IEntity)) count++;
+        }
+
+        return count;
+    }
+
+    /// <summary>处理一个数据对象。由ExecuteAsync执行，每个实体对象调用一次</summary>
+    /// <param name="ctx">上下文</param>
+    /// <param name="entity"></param>
+    /// <returns></returns>
+    public virtual Task<Boolean> ProcessItemAsync(JobContext ctx, IEntity entity) => Task.Run(() => ProcessItem(ctx, entity));
     #endregion
 }
