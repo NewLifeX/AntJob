@@ -277,6 +277,7 @@ public class Scheduler : DisposeBase
             // 更新作业参数，并启动处理器
             handler.Job = job;
             if (job.Mode == 0) job.Mode = handler.Mode;
+            if (job.MaxTime > 0) handler.MaxInactiveTime = job.MaxTime * 2;
             if (!handler.Active)
             {
                 try

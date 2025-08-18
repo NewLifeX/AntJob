@@ -30,6 +30,9 @@ public interface IJob
     /// <summary>并行度。最大同时执行任务数</summary>
     Int32 MaxTask { get; set; }
 
+    /// <summary>最大执行时间。超过该时间则认为执行器故障，将会把该任务分配给其它执行器</summary>
+    Int32 MaxTime { get; set; }
+
     /// <summary>调度模式。定时调度只要达到时间片开头就可以跑，数据调度要求达到时间片末尾才可以跑</summary>
     JobModes Mode { get; set; }
 
