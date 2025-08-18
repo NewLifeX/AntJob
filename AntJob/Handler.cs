@@ -197,10 +197,11 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     internal void Prepare(ITask task) => Interlocked.Increment(ref _Busy);
 
     /// <summary>处理一项新任务。每个作业任务的顶级函数，由线程池执行，内部调用OnProcess</summary>
+    /// <remarks>公开该方法，便于为业务处理器编写单元测试</remarks>
     /// <param name="task"></param>
-    public virtual void Process(ITask task)
+    public JobContext Process(ITask task)
     {
-        if (task == null) return;
+        if (task == null) return null;
 
         var result = new TaskResult { ID = task.ID };
         var ctx = new JobContext
@@ -243,6 +244,8 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
         OnFinish(ctx);
         Schedule?.OnFinish(ctx);
+
+        return ctx;
     }
 
     /// <summary>处理任务。内部分批调用Excute处理数据，由Process执行</summary>
@@ -269,13 +272,11 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
     #region 异步调度
     /// <summary>异步处理一项新任务。每个作业任务的顶级函数，由线程池执行，内部调用OnProcessAsync</summary>
+    /// <remarks>公开该方法，便于为业务处理器编写单元测试</remarks>
     /// <param name="task"></param>
-    public virtual async Task ProcessAsync(ITask task)
+    public async Task<JobContext> ProcessAsync(ITask task)
     {
-        if (task == null) return;
-
-        //// 默认实现：将同步Process包装为异步
-        //await Task.Run(() => Process(task)).ConfigureAwait(false);
+        if (task == null) return null;
 
         var result = new TaskResult { ID = task.ID };
         var ctx = new JobContext
@@ -318,6 +319,8 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
         await OnFinishAsync(ctx);
         Schedule?.OnFinish(ctx);
+
+        return ctx;
     }
 
     /// <summary>异步处理任务。内部分批调用ExecuteAsync处理数据，由ProcessAsync执行</summary>
