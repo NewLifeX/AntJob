@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using AntJob.Data;
 using AntJob.Providers;
 using NewLife;
@@ -54,13 +55,13 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     {
         get
         {
-            if (_supportsAsync == null)
-            {
-                _supportsAsync = IsExecuteAsyncOverridden();
-            }
+            _supportsAsync ??= IsExecuteAsyncOverridden();
             return _supportsAsync.Value;
         }
     }
+
+    /// <summary>最大不活跃时间（秒）。单个任务从开始执行超过该时间仍未结束，视为僵死。默认0表示禁用检测</summary>
+    public Int32 MaxInactiveTime { get; set; }
     #endregion
 
     #region 索引器
@@ -94,9 +95,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
         Job = job;
     }
-    #endregion
 
-    #region 异步检测
     /// <summary>检测是否重写了ExecuteAsync方法</summary>
     private Boolean IsExecuteAsyncOverridden()
     {
@@ -165,6 +164,17 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
         Active = false;
 
+        // 等待正在执行的任务结束，最多15秒。用于配合僵死检测安全退出
+        if (_Busy > 0)
+        {
+            var end = DateTime.UtcNow.AddSeconds(15);
+            while (_Busy > 0 && DateTime.UtcNow < end)
+            {
+                Thread.Sleep(100);
+            }
+            if (_Busy > 0) WriteLog("仍有{0}个任务未结束（可能僵死），放弃等待", _Busy);
+        }
+
         return true;
     }
     #endregion
@@ -192,9 +202,35 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     #endregion
 
     #region 整体调度
+    // 正在执行任务开始时间跟踪，用于僵死检测
+    private readonly ConcurrentDictionary<Int32, DateTime> _taskTimes = new();
+
     /// <summary>准备就绪，增加Busy，避免超额分配</summary>
     /// <param name="task"></param>
-    internal void Prepare(ITask task) => Interlocked.Increment(ref _Busy);
+    internal void Prepare(ITask task)
+    {
+        Interlocked.Increment(ref _Busy);
+        if (task != null) _taskTimes[task.ID] = DateTime.UtcNow;
+    }
+
+    /// <summary>检查处理器是否存活。若启用最大不活跃时间且存在超时未结束任务，则返回false</summary>
+    /// <returns>是否仍被视为存活</returns>
+    public Boolean CheckAlive()
+    {
+        if (MaxInactiveTime <= 0) return true;
+        if (_Busy == 0) return true;
+
+        var threshold = DateTime.UtcNow.AddSeconds(-MaxInactiveTime);
+        foreach (var item in _taskTimes)
+        {
+            if (item.Value <= threshold)
+            {
+                WriteLog("检测到任务[{0}]超过最大不活跃时间{1}s，标记作业僵死", item.Key, MaxInactiveTime);
+                return false;
+            }
+        }
+        return true;
+    }
 
     /// <summary>处理一项新任务。每个作业任务的顶级函数，由线程池执行，内部调用OnProcess</summary>
     /// <remarks>公开该方法，便于为业务处理器编写单元测试</remarks>
@@ -235,7 +271,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         finally
         {
             Interlocked.Decrement(ref _Busy);
-            //span?.Dispose();
+            if (task != null) _taskTimes.TryRemove(task.ID, out _);
         }
 
         sw.Stop();
@@ -310,7 +346,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         finally
         {
             Interlocked.Decrement(ref _Busy);
-            //span?.Dispose();
+            if (task != null) _taskTimes.TryRemove(task.ID, out _);
         }
 
         sw.Stop();

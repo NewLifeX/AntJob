@@ -6,6 +6,7 @@ using NewLife.Caching;
 using NewLife.Log;
 using NewLife.Model;
 using NewLife.Reflection;
+using NewLife.Remoting.Clients;
 using NewLife.Threading;
 using Stardust.Registry;
 
@@ -85,7 +86,6 @@ public class Scheduler : DisposeBase
         var registry = ServiceProvider?.GetService<IRegistry>();
         if (registry != null)
         {
-            //var rs = registry.ResolveAsync("AntServer").Result;
             var svrs = await registry.ResolveAddressAsync("AntServer");
             if (svrs != null && svrs.Length > 0) server = svrs.Join();
         }
@@ -93,28 +93,6 @@ public class Scheduler : DisposeBase
         if (server.IsNullOrEmpty()) return;
         set.Server = server;
 
-        // 根据地址决定用Http还是RPC
-        //var servers = server.Split(",");
-        //if (servers.Any(e => e.StartsWithIgnoreCase("http://", "https://")))
-        //{
-        //    var http = new HttpJobProvider
-        //    {
-        //        Debug = debug,
-        //        Server = server,
-        //        AppId = appId,
-        //        Secret = secret,
-        //    };
-
-        //    // 如果有注册中心，则使用注册中心的服务发现
-        //    if (registry != null)
-        //    {
-        //        //http.Client = registry.CreateForService("AntServer") as ApiHttpClient;
-        //        //http.Client.RoundRobin = false;
-        //    }
-
-        //    Provider = http;
-        //}
-        //else
         {
             var rpc = new NetworkJobProvider(set);
 
@@ -200,7 +178,6 @@ public class Scheduler : DisposeBase
 
         // 获取本应用在调度中心管理的所有作业
         var jobs = await prv.GetJobs();
-        //if (jobs == null || jobs.Length == 0) throw new Exception("调度中心没有可用作业");
 
         // 输出日志
         WriteLog($"启动任务调度引擎[{prv}]，作业[{hs.Count}]项，定时{Period}秒");
@@ -274,6 +251,7 @@ public class Scheduler : DisposeBase
         CheckHandlers(prv, jobs, handlers);
 
         var flag = false;
+        Handler? inactive = null;
         // 遍历处理器，给空闲的增加任务
         foreach (var handler in handlers)
         {
@@ -288,6 +266,13 @@ public class Scheduler : DisposeBase
             // 可能外部添加的Worker并不完整
             handler.Schedule = this;
             handler.Provider = prv;
+
+            // 僵死检测：如果处理器不再存活，立即停止调度并退出进程
+            if (!handler.CheckAlive())
+            {
+                inactive = handler;
+                continue;
+            }
 
             // 更新作业参数，并启动处理器
             handler.Job = job;
@@ -357,6 +342,22 @@ public class Scheduler : DisposeBase
             }
         }
 
+        // 如果存在僵尸处理器，立即停止调度并退出进程
+        if (inactive != null)
+        {
+            WriteLog("检测到作业[{0}]出现僵死，停止调度并退出进程", inactive.Name);
+            var ev = ServiceProvider?.GetService<IEventProvider>();
+            ev?.WriteErrorEvent("AntJob", $"检测到作业[{inactive.Name}]出现僵死，停止调度并退出进程");
+            try
+            {
+                Stop();
+            }
+            finally
+            {
+                Environment.Exit(250);
+            }
+        }
+
         return flag;
     }
 
@@ -403,7 +404,6 @@ public class Scheduler : DisposeBase
                 catch (Exception ex)
                 {
                     span?.SetError(ex, null);
-                    //XTrace.WriteException(ex);
                     Log?.Error("作业[{0}]启动失败！{1}", handler?.GetType().FullName, ex.Message);
                 }
             }
