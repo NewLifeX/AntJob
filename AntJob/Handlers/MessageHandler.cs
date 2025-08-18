@@ -42,13 +42,18 @@ public abstract class MessageHandler : Handler
     /// </remarks>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public override Task<ITask[]> Acquire(Int32 count)
+    public override async Task<ITask[]> Acquire(Int32 count)
     {
         // 消费模式，设置Topic值
         var prv = Provider;
         var job = Job;
 
-        return prv.Acquire(job, Topic, count);
+        using var span = Tracer?.NewSpan($"job:{Name}:Acquire", new { count, maxTask = job.MaxTask, Busy, Topic });
+
+        var rs = await prv.Acquire(job, Topic, count);
+        if (span != null) span.Value = rs?.Length ?? 0;
+
+        return rs;
     }
     #endregion
 

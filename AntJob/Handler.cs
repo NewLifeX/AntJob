@@ -176,13 +176,18 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// </remarks>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public virtual Task<ITask[]> Acquire(Int32 count)
+    public virtual async Task<ITask[]> Acquire(Int32 count)
     {
         var prv = Provider;
         var job = Job;
 
+        using var span = Tracer?.NewSpan($"job:{Name}:Acquire", new { count, maxTask = job.MaxTask, Busy });
+
         // 循环申请任务，喂饱处理器
-        return prv.Acquire(job, null, count);
+        var rs = await prv.Acquire(job, null, count);
+        if (span != null) span.Value = rs?.Length ?? 0;
+
+        return rs;
     }
     #endregion
 

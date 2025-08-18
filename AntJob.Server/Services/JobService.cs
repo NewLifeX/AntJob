@@ -137,12 +137,12 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     /// <returns></returns>
     public ITask[] Acquire(App app, AcquireModel model, AppOnline online)
     {
-        using var span = _tracer?.NewSpan(nameof(Acquire), new { app = app?.Name, job = model.Job, count = model.Count, topic = model.Topic, online.Client });
+        if (app == null) return [];
 
         var jobName = model.Job?.Trim();
         if (jobName.IsNullOrEmpty()) return [];
 
-        if (app == null) return [];
+        using var span = _tracer?.NewSpan($"job:{app}:{jobName}:Acquire", new { app = app?.Name, job = model.Job, count = model.Count, topic = model.Topic, online.Client });
 
         // 应用停止发放作业
         app = App.FindByID(app.ID) ?? app;
@@ -263,6 +263,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             rs.Add(model2);
         }
 
+        if (span != null) span.Value = rs.Count;
+
         return rs.ToArray();
     }
 
@@ -271,7 +273,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         // 获取下一次检查时间
         var cache = _cacheProvider.Cache;
         var nextKey = $"antjob:NextDelay_{job.ID}";
-        var now = TimerX.Now;
+        var now = DateTime.Now;
         var next = cache.Get<DateTime>(nextKey);
         if (next >= now)
         {
@@ -306,7 +308,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         // 每分钟检查一下错误任务和中断任务
         var cache = _cacheProvider.Cache;
         var nextKey = $"antjob:NextOld_{job.ID}";
-        var now = TimerX.Now;
+        var now = DateTime.Now;
         var next = cache.Get<DateTime>(nextKey);
         if (next < now)
         {
