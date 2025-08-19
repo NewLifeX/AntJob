@@ -5,6 +5,7 @@ using AntJob.Providers;
 using NewLife;
 using NewLife.Data;
 using NewLife.Log;
+using NewLife.Reflection;
 
 namespace AntJob;
 
@@ -101,16 +102,20 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     {
         var currentType = GetType();
         var baseType = typeof(Handler);
+        var baseType2 = "DataHandler".GetTypeEx();
 
         // 获取当前类型的所有方法，目标方法任意之一被重写即可
         var names = new[] { "ProcessAsync", "OnProcessAsync", "ExecuteAsync", "ProcessItemAsync" };
+        //var types = new[] { "Handler", "MessageHandler", "CSharpHandler", "DataHandler", "SqlHandler" };
         var methods = currentType.GetMethods();
         foreach (var method in methods)
         {
             if (!names.Contains(method.Name)) continue;
 
             // 如果当前方法的声明类型不是Handler基类，说明被重写了
-            if (method.DeclaringType != baseType)
+            var dtype = method.DeclaringType;
+            if (dtype != baseType && dtype != baseType2 && /*!types.Contains(dtype.Name) &&*/
+                dtype.Assembly != baseType.Assembly && dtype.Assembly != baseType2?.Assembly)
                 return true;
         }
 
