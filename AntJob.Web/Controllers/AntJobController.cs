@@ -198,8 +198,8 @@ public class AntJobController : ControllerBase, IActionFilter
         var job = model.Job?.Trim();
         if (job.IsNullOrEmpty()) return [];
 
-        var sessionId = $"{_App.Name}@{UserHost}";
-        var online = _appService.GetOnline(_App, sessionId, UserHost);
+        //var sessionId = $"{_App.Name}@{UserHost}";
+        var online = _appService.GetOnline(_App, null, UserHost);
 
         return _jobService.Acquire(_App, model, online);
     }
@@ -224,8 +224,8 @@ public class AntJobController : ControllerBase, IActionFilter
     {
         if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 
-        var sessionId = $"{_App.Name}@{UserHost}";
-        var online = _appService.GetOnline(_App, sessionId, UserHost);
+        //var sessionId = $"{_App.Name}@{UserHost}";
+        var online = _appService.GetOnline(_App, null, UserHost);
         return _jobService.Report(_App, task, online);
     }
     #endregion

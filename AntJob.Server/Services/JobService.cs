@@ -174,8 +174,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         // 应用在线，但可能禁止向其分配任务
         var ip = online.UpdateIP;
-        //var ip = remote?.Host;
-        //var online = _appService.GetOnline(app, remote + "", ip);
+        //online = _appService.GetOnline(app, null, ip) ?? online;
+        online = AppOnline.FindByID(online.ID) ?? _appService.GetOnline(app, null, ip) ?? online;
         if (!online.Enable)
         {
             span?.AppendTag("应用在线实例停止分配任务");

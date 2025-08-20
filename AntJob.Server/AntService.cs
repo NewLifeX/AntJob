@@ -45,14 +45,15 @@ class AntService(AppService appService, JobService jobService) : IApi, IActionFi
 
         _App = app;
 
+        var ip = _Net.Remote.Host;
         if (Session["AppOnline"] is not AppOnline online)
         {
-            var remote = _Net.Remote;
-            online = appService.GetOnline(app, remote + "", remote.Host);
+            online = appService.GetOnline(app, null, ip);
         }
 
         _Online = online;
 
+        online.UpdateIP = ip;
         online.UpdateTime = TimerX.Now;
         online.SaveAsync();
     }
