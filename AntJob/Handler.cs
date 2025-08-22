@@ -260,6 +260,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         if (Speed < 10) Report(ctx, JobStatus.处理中);
 
         var sw = Stopwatch.StartNew();
+        ctx.Stopwatch = sw;
         try
         {
             OnProcess(ctx);
@@ -290,7 +291,8 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     }
 
     /// <summary>处理任务。内部分批调用Excute处理数据，由Process执行</summary>
-    /// <param name="ctx"></param>
+    /// <remarks>仅用于框架内部使用，用户不应该重载该方法，推荐使用Execute</remarks>
+    /// <param name="ctx">作业上下文</param>
     protected virtual void OnProcess(JobContext ctx)
     {
         ctx.Total = 1;
@@ -298,16 +300,17 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     }
 
     /// <summary>报告任务状态</summary>
-    /// <param name="ctx"></param>
+    /// <param name="ctx">作业上下文</param>
     /// <param name="status"></param>
     protected virtual void Report(JobContext ctx, JobStatus status)
     {
         ctx.Status = status;
+        ctx.Cost = ctx.Stopwatch?.Elapsed.TotalMilliseconds ?? 0;
         Provider?.Report(ctx);
     }
 
     /// <summary>整个任务完成</summary>
-    /// <param name="ctx"></param>
+    /// <param name="ctx">作业上下文</param>
     protected virtual void OnFinish(JobContext ctx) => Provider?.Finish(ctx).Wait();
     #endregion
 
@@ -335,6 +338,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         if (Speed < 10) await ReportAsync(ctx, JobStatus.处理中);
 
         var sw = Stopwatch.StartNew();
+        ctx.Stopwatch = sw;
         try
         {
             await OnProcessAsync(ctx);
@@ -365,7 +369,8 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     }
 
     /// <summary>异步处理任务。内部分批调用ExecuteAsync处理数据，由ProcessAsync执行</summary>
-    /// <param name="ctx"></param>
+    /// <remarks>仅用于框架内部使用，用户不应该重载该方法，推荐使用ExecuteAsync</remarks>
+    /// <param name="ctx">作业上下文</param>
     protected virtual async Task OnProcessAsync(JobContext ctx)
     {
         ctx.Total = 1;
@@ -373,16 +378,17 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     }
 
     /// <summary>异步报告任务状态</summary>
-    /// <param name="ctx"></param>
+    /// <param name="ctx">作业上下文</param>
     /// <param name="status"></param>
     protected virtual async Task ReportAsync(JobContext ctx, JobStatus status)
     {
         ctx.Status = status;
+        ctx.Cost = ctx.Stopwatch?.Elapsed.TotalMilliseconds ?? 0;
         if (Provider != null) await Provider.Report(ctx).ConfigureAwait(false);
     }
 
     /// <summary>异步完成整个任务</summary>
-    /// <param name="ctx"></param>
+    /// <param name="ctx">作业上下文</param>
     protected virtual async Task OnFinishAsync(JobContext ctx)
     {
         if (Provider != null) await Provider.Finish(ctx).ConfigureAwait(false);
@@ -411,7 +417,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// <returns></returns>
     public virtual Task<Int32> Produce(String topic, String[] messages, MessageOption option = null) => Provider.Produce(Job?.Name, topic, messages, option);
 
-    /// <summary>生产消息</summary>
+    /// <summary>跨应用生产消息</summary>
     /// <param name="appId">发布消息到目标应用。留空发布当前应用</param>
     /// <param name="topic">主题</param>
     /// <param name="messages">消息集合</param>
@@ -425,7 +431,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     }
 
     /// <summary>延迟执行，指定下一次执行时间</summary>
-    /// <param name="ctx"></param>
+    /// <param name="ctx">作业上下文</param>
     /// <param name="nextTime"></param>
     public virtual void Delay(JobContext ctx, DateTime nextTime)
     {

@@ -4,10 +4,8 @@ using AntJob.Models;
 using NewLife;
 using NewLife.Caching;
 using NewLife.Log;
-using NewLife.Net;
 using NewLife.Reflection;
 using NewLife.Serialization;
-using NewLife.Threading;
 using XCode;
 using XCode.DataAccessLayer;
 
@@ -454,10 +452,10 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         // 只有部分字段允许客户端修改
         if (result.Status > 0) task.Status = result.Status;
 
-        task.Speed = result.Speed;
         task.Total = result.Total;
         task.Success = result.Success;
         task.Cost = (Int32)Math.Round(result.Cost / 1000d);
+        task.Speed = result.Cost <= 0 ? 0 : (Int32)Math.Round(result.Total * 1000d / result.Cost);
         task.Key = result.Key;
         task.Remark = result.Remark;
 #pragma warning disable CS0612 // 类型或成员已过时
@@ -479,8 +477,6 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         {
             task.Times++;
             task.Error++;
-
-            job.Error++;
 
             SetJobError(job, task, online.UpdateIP);
 
@@ -551,6 +547,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     private JobError SetJobError(Job job, JobTask task, String ip)
     {
         using var span = _tracer?.NewSpan(nameof(SetJobError), new { job.Name, task.DataTime });
+
+        job.Error++;
 
         var err = new JobError
         {

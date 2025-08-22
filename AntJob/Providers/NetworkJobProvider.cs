@@ -256,9 +256,13 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         // 区分抽取和处理
         task.Status = ctx.Status;
 
-        task.Speed = ctx.Speed;
         task.Total = ctx.Total;
         task.Success = ctx.Success;
+        task.Cost = (Int32)Math.Round(ctx.Cost);
+        //task.Speed = ctx.Speed;
+
+        task.Key = ctx.Key;
+        task.Remark = ctx.Remark;
 
         if (ctx.NextTime.Year > 2000) task.NextTime = ctx.NextTime.ToUniversalTime();
 
@@ -271,17 +275,18 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     {
         if (ctx?.Result is not TaskResult task) return;
 
-        task.Speed = ctx.Speed;
         task.Total = ctx.Total;
         task.Success = ctx.Success;
-        task.Times++;
+        //task.Times++;
+        task.Cost = (Int32)Math.Round(ctx.Cost);
+        //task.Speed = ctx.Speed;
 
         if (ctx.NextTime.Year > 2000) task.NextTime = ctx.NextTime.ToUniversalTime();
 
         // 区分正常完成还是错误终止
         if (ctx.Error != null)
         {
-            task.Error++;
+            //task.Error++;
             task.Status = JobStatus.错误;
 
             var ex = ctx.Error?.GetTrue();
@@ -302,7 +307,6 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
             task.Status = JobStatus.完成;
         }
 
-        task.Cost = (Int32)Math.Round(ctx.Cost);
         if (task.Remark.IsNullOrEmpty()) task.Remark = ctx.Remark;
 
         task.Key = ctx.Key;

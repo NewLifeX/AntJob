@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using AntJob.Data;
 using NewLife.Collections;
 using NewLife.Data;
@@ -44,6 +45,9 @@ public class JobContext : IExtend
 
     /// <summary>任务备注消息。可用于保存到任务项内容字段</summary>
     public String Remark { get; set; }
+
+    /// <summary>计时器。用于计算耗时</summary>
+    public Stopwatch Stopwatch { get; set; } = null!;
     #endregion
 
     #region 索引器

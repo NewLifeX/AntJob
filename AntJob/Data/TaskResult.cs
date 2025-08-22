@@ -16,14 +16,14 @@ public partial class TaskResult : ITaskResult
     /// <summary>耗时，毫秒</summary>
     public Int32 Cost { get; set; }
 
-    /// <summary>错误</summary>
-    public Int32 Error { get; set; }
+    ///// <summary>错误</summary>
+    //public Int32 Error { get; set; }
 
-    /// <summary>次数</summary>
-    public Int32 Times { get; set; }
+    ///// <summary>次数</summary>
+    //public Int32 Times { get; set; }
 
-    /// <summary>速度。每秒处理数据量</summary>
-    public Int32 Speed { get; set; }
+    ///// <summary>速度。每秒处理数据量</summary>
+    //public Int32 Speed { get; set; }
 
     /// <summary>状态</summary>
     public JobStatus Status { get; set; }
