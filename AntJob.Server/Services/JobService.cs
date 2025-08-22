@@ -591,11 +591,12 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             job.Update();
         }
 
-        if (online.Enable && online.Error > maxError)
-        {
-            online.Enable = false;
-            online.Update();
-        }
+        //!!! 设备在线状态不再自动停止作业，因为在线错误是连续累计值
+        //if (online.Enable && online.Error > maxError)
+        //{
+        //    online.Enable = false;
+        //    online.Update();
+        //}
     }
     #endregion
 
