@@ -248,8 +248,8 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     /// <param name="ctx">上下文</param>
     public override async Task Report(JobContext ctx)
     {
-        // 不用上报抽取中
-        if (ctx.Status == JobStatus.抽取中) return;
+        //// 不用上报抽取中
+        //if (ctx.Status == JobStatus.抽取中) return;
 
         if (ctx?.Result is not TaskResult task) return;
 

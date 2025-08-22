@@ -24,7 +24,7 @@ public class CSharpHandler : Handler
     #endregion
 
     /// <summary>执行</summary>
-    /// <param name="ctx"></param>
+    /// <param name="ctx">作业上下文</param>
     /// <returns></returns>
     public override Int32 Execute(JobContext ctx)
     {

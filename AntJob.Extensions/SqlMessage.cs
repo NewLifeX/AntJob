@@ -40,7 +40,7 @@ public class SqlMessage : MessageHandler
 
     /// <summary>根据查询结果生产消息</summary>
     /// <param name="dt"></param>
-    /// <param name="ctx"></param>
+    /// <param name="ctx">作业上下文</param>
     public static void ProduceMessage(DbTable dt, JobContext ctx)
     {
         if (dt == null || dt.Columns == null || dt.Columns.Length == 0 || dt.Rows == null || dt.Rows.Count == 0) return;

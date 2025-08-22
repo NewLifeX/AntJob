@@ -412,7 +412,7 @@ public class Scheduler : DisposeBase
     }
 
     /// <summary>已完成</summary>
-    /// <param name="ctx"></param>
+    /// <param name="ctx">作业上下文</param>
     internal protected virtual void OnFinish(JobContext ctx) => _timer?.SetNext(-1);
     #endregion
 

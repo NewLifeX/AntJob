@@ -59,7 +59,8 @@ public abstract class MessageHandler : Handler
 
     #region 同步数据处理
     /// <summary>解码一批消息，由Process执行，内部调用Execute处理任务</summary>
-    /// <param name="ctx"></param>
+    /// <remarks>仅用于框架内部使用，用户不应该重载该方法，推荐使用Execute</remarks>
+    /// <param name="ctx">作业上下文</param>
     protected override void OnProcess(JobContext ctx)
     {
         if (ctx.Task.Data.IsNullOrEmpty()) return;
@@ -99,7 +100,8 @@ public abstract class MessageHandler : Handler
 
     #region 异步数据处理
     /// <summary>解码一批消息，由ProcessAsync执行，内部调用ExecuteAsync处理任务</summary>
-    /// <param name="ctx"></param>
+    /// <remarks>仅用于框架内部使用，用户不应该重载该方法，推荐使用Execute</remarks>
+    /// <param name="ctx">作业上下文</param>
     protected override async Task OnProcessAsync(JobContext ctx)
     {
         if (ctx.Task.Data.IsNullOrEmpty()) return;

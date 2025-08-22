@@ -22,7 +22,7 @@ public class SqlHandler : Handler
     #endregion
 
     /// <summary>执行</summary>
-    /// <param name="ctx"></param>
+    /// <param name="ctx">作业上下文</param>
     /// <returns></returns>
     public override Int32 Execute(JobContext ctx)
     {
@@ -42,7 +42,7 @@ public class SqlHandler : Handler
 
     /// <summary>执行Sql集合</summary>
     /// <param name="sections"></param>
-    /// <param name="ctx"></param>
+    /// <param name="ctx">作业上下文</param>
     /// <param name="callback"></param>
     /// <returns></returns>
     public static Int32 ExecuteSql(SqlSection[] sections, JobContext ctx, Action<SqlSection, DbTable> callback = null)

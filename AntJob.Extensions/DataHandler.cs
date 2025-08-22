@@ -167,7 +167,8 @@ public abstract class DataHandler : Handler
 
     #region 同步数据处理
     /// <summary>处理任务。由Process执行，内部分批Fetch数据并调用Execute</summary>
-    /// <param name="ctx"></param>
+    /// <remarks>仅用于框架内部使用，用户不应该重载该方法，推荐使用Execute</remarks>
+    /// <param name="ctx">作业上下文</param>
     protected override void OnProcess(JobContext ctx)
     {
         var span = DefaultSpan.Current;
@@ -191,14 +192,13 @@ public abstract class DataHandler : Handler
 
             if (data == null || list != null && list.Count == 0) break;
 
-            // 报告进度
-            Report(ctx, JobStatus.处理中);
+            // 较慢的作业，及时报告进度
+            if (Speed < 10) Report(ctx, JobStatus.处理中);
 
             // 批量处理
             ctx.Success += Execute(ctx);
 
             // 较慢的作业，及时报告进度
-            ctx.Status = JobStatus.抽取中;
             if (Speed < 10) Report(ctx, JobStatus.抽取中);
 
             // 不满一批，结束
@@ -272,7 +272,8 @@ public abstract class DataHandler : Handler
 
     #region 异步数据处理
     /// <summary>处理任务。由ProcessAsync执行，内部分批FetchAsync数据并调用ExecuteAsync</summary>
-    /// <param name="ctx"></param>
+    /// <remarks>仅用于框架内部使用，用户不应该重载该方法，推荐使用Execute</remarks>
+    /// <param name="ctx">作业上下文</param>
     protected override async Task OnProcessAsync(JobContext ctx)
     {
         var span = DefaultSpan.Current;
@@ -295,14 +296,13 @@ public abstract class DataHandler : Handler
 
             if (data == null || list != null && list.Count == 0) break;
 
-            // 报告进度
-            await ReportAsync(ctx, JobStatus.处理中);
+            // 较慢的作业，及时报告进度
+            if (Speed < 10) await ReportAsync(ctx, JobStatus.处理中);
 
             // 批量处理
             ctx.Success += await ExecuteAsync(ctx);
 
             // 较慢的作业，及时报告进度
-            ctx.Status = JobStatus.抽取中;
             if (Speed < 10) await ReportAsync(ctx, JobStatus.抽取中);
 
             // 不满一批，结束
