@@ -351,6 +351,7 @@ public partial class Job : EntityBase<Job>
             Step = Step,
             BatchSize = BatchSize,
             MaxTask = MaxTask,
+            MaxTime = MaxTime,
 
             Mode = Mode,
         };

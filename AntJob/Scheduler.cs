@@ -346,12 +346,19 @@ public class Scheduler : DisposeBase
         // 如果存在僵尸处理器，立即停止调度并退出进程
         if (inactive != null)
         {
+            using var span = Tracer?.NewSpan("job:HandlerInactive", inactive.Name);
+
             WriteLog("检测到作业[{0}]出现僵死，停止调度并退出进程", inactive.Name);
             var ev = ServiceProvider?.GetService<IEventProvider>();
             ev?.WriteErrorEvent("AntJob", $"检测到作业[{inactive.Name}]出现僵死，停止调度并退出进程");
             try
             {
                 Stop();
+            }
+            catch (Exception ex)
+            {
+                span?.SetError(ex, null);
+                Log?.Error("调度器停止失败！{0}", ex.Message);
             }
             finally
             {
