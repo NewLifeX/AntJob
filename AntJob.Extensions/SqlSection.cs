@@ -48,7 +48,7 @@ public class SqlSection
         if (sqls.IsNullOrEmpty()) return list.ToArray();
 
         // 两个换行隔开片段
-        var ss = sqls.Split(new[] { "\r\n\r", "\r\r", "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
+        var ss = sqls.Split(["\r\n\r\n", "\r\n\r", "\r\r", "\n\n"], StringSplitOptions.RemoveEmptyEntries);
         var connName = "";
         foreach (var item in ss)
         {
@@ -61,7 +61,7 @@ public class SqlSection
             else
                 connName = section.ConnName;
 
-            if (section.ConnName.IsNullOrEmpty()) throw new Exception("未指定连接名！");
+            if (section.ConnName.IsNullOrEmpty()) throw new XException($"未指定连接名！{section.Sql}");
 
             list.Add(section);
         }
@@ -154,7 +154,7 @@ public class SqlSection
         if (table == null)
         {
             var ioc = ObjectContainer.Current;
-            table = ioc.Resolve<IDataTable>();
+            table = ioc.GetService<IDataTable>();
             table.TableName = tableName;
 
             for (var i = 0; i < dt.Columns.Length; i++)
