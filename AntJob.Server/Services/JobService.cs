@@ -429,6 +429,22 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         return total;
     }
+
+    /// <summary>生产消息</summary>
+    public Int32 Produce(String appId, String topic, String[] messages)
+    {
+        var app = App.FindByName("Route.Gbm");
+        if (app == null || !app.Enable) throw new XException("应用未启用");
+
+        var model = new ProduceModel
+        {
+            AppId = appId,
+            Topic = topic,
+            Messages = messages
+        };
+
+        return Produce(app, model);
+    }
     #endregion
 
     #region 状态报告
