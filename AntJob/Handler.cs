@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Reflection;
 using AntJob.Data;
 using AntJob.Providers;
 using NewLife;
@@ -102,12 +103,12 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     {
         var currentType = GetType();
         var baseType = typeof(Handler);
-        var baseType2 = "DataHandler".GetTypeEx();
+        var baseType2 = "AntJob.Extensions.DataHandler".GetTypeEx();
 
         // 获取当前类型的所有方法，目标方法任意之一被重写即可
         var names = new[] { "ProcessAsync", "OnProcessAsync", "ExecuteAsync", "ProcessItemAsync" };
         //var types = new[] { "Handler", "MessageHandler", "CSharpHandler", "DataHandler", "SqlHandler" };
-        var methods = currentType.GetMethods();
+        var methods = currentType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         foreach (var method in methods)
         {
             if (!names.Contains(method.Name)) continue;
