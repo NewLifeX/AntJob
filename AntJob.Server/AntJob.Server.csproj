@@ -29,7 +29,7 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Redis" Version="6.4.2025.1113" />
+    <PackageReference Include="NewLife.Redis" Version="6.4.2026.111-beta1644" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
