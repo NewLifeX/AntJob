@@ -2,11 +2,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <AssemblyName>AntAgent</AssemblyName>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyTitle>蚂蚁代理</AssemblyTitle>
     <Description>调度中心下发C#或Sql给蚂蚁代理执行</Description>
     <Company>新生命开发团队</Company>
-    <Copyright>版权所有(C) 新生命开发团队 2025</Copyright>
+    <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
     <VersionPrefix>4.4</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
