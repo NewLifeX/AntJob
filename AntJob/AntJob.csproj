@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0;net461;net45</TargetFrameworks>
@@ -28,7 +28,7 @@
     <RepositoryUrl>https://github.com/NewLifeX/AntJob</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>新生命团队;X组件;NewLife;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes>调度通信全部使用异步处理</PackageReleaseNotes>
+    <PackageReleaseNotes>升级XCode拦截器架构；升级.NET10.0支持；更新基础组件到最新版本</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -51,7 +51,7 @@
   <ItemGroup>
     <PackageReference Include="NewLife.Core" Version="11.11.2026.201" />
     <PackageReference Include="NewLife.Remoting" Version="3.7.2026.201" />
-    <PackageReference Include="NewLife.Stardust" Version="3.6.2026.113-beta1339" />
+    <PackageReference Include="NewLife.Stardust" Version="3.7.2026.201" />
   </ItemGroup>
   
   <ItemGroup>

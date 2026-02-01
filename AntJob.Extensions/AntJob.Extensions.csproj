@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0;net45</TargetFrameworks>
@@ -28,7 +28,7 @@
     <RepositoryUrl>https://github.com/NewLifeX/AntJob</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>新生命团队;X组件;NewLife;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes>修正RPC粘包处理问题</PackageReleaseNotes>
+    <PackageReleaseNotes>升级XCode拦截器架构；升级.NET10.0支持；更新基础组件到最新版本</PackageReleaseNotes>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>

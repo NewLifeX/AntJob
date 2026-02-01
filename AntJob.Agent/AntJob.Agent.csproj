@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <AssemblyName>AntAgent</AssemblyName>
@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Stardust" Version="3.6.2026.113-beta1339" />
+    <PackageReference Include="NewLife.Stardust" Version="3.7.2026.201" />
   </ItemGroup>
 
   <ItemGroup>

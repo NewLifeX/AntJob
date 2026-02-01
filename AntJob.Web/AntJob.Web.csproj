@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <AssemblyName>AntWeb</AssemblyName>
     <TargetFramework>net10.0</TargetFramework>
@@ -46,7 +46,7 @@
   <ItemGroup>
     <PackageReference Include="NewLife.Cube.Core" Version="6.8.2026.113-beta0744" />
     <PackageReference Include="NewLife.Remoting.Extensions" Version="3.7.2026.201" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.6.2026.113-beta1339" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.7.2026.201" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
