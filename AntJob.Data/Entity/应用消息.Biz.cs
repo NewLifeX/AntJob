@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -16,10 +16,10 @@ public partial class AppMessage : EntityBase<AppMessage>
     #region 对象操作
     static AppMessage()
     {
-        // 过滤器 UserModule、TimeModule、IPModule
-        Meta.Modules.Add<IPModule>();
-        Meta.Modules.Add<TimeModule>();
-        Meta.Modules.Add<TraceModule>();
+        // 过滤器 UserInterceptor、TimeInterceptor、IPInterceptor
+        Meta.Interceptors.Add<IPInterceptor>();
+        Meta.Interceptors.Add<TimeInterceptor>();
+        Meta.Interceptors.Add<TraceInterceptor>();
     }
     #endregion
 

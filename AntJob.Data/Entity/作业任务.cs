@@ -363,16 +363,45 @@ public partial class JobTask
     }
     #endregion
 
+    #region 高级查询
+    /// <summary>高级查询</summary>
+    /// <param name="appId">应用</param>
+    /// <param name="jobId">作业</param>
+    /// <param name="client">客户端。IP加进程</param>
+    /// <param name="status">状态</param>
+    /// <param name="createTime">创建时间</param>
+    /// <param name="updateTime">更新时间</param>
+    /// <param name="start">数据时间开始</param>
+    /// <param name="end">数据时间结束</param>
+    /// <param name="key">关键字</param>
+    /// <param name="page">分页参数信息。可携带统计和数据权限扩展查询等信息</param>
+    /// <returns>实体列表</returns>
+    public static IList<JobTask> Search(Int32 appId, Int32 jobId, String client, JobStatus status, DateTime createTime, DateTime updateTime, DateTime start, DateTime end, String key, PageParameter page)
+    {
+        var exp = new WhereExpression();
+
+        if (appId >= 0) exp &= _.AppID == appId;
+        if (jobId >= 0) exp &= _.JobID == jobId;
+        if (!client.IsNullOrEmpty()) exp &= _.Client == client;
+        if (status >= 0) exp &= _.Status == status;
+        exp &= _.DataTime.Between(start, end);
+        if (!key.IsNullOrEmpty()) exp &= SearchWhereByKeys(key);
+
+        return FindAll(exp, page);
+    }
+    #endregion
+
     #region 数据清理
     /// <summary>清理指定时间段内的数据</summary>
     /// <param name="start">开始时间。未指定时清理小于指定时间的所有数据</param>
     /// <param name="end">结束时间</param>
+    /// <param name="maximumRows">最大删除行数。清理历史数据时，避免一次性删除过多导致数据库IO跟不上，0表示所有</param>
     /// <returns>清理行数</returns>
-    public static Int32 DeleteWith(DateTime start, DateTime end)
+    public static Int32 DeleteWith(DateTime start, DateTime end, Int32 maximumRows = 0)
     {
         if (start == end) return Delete(_.DataTime == start);
 
-        return Delete(_.DataTime.Between(start, end));
+        return Delete(_.DataTime.Between(start, end), maximumRows);
     }
     #endregion
 

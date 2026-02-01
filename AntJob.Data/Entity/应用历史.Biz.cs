@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using NewLife;
 using NewLife.Data;
@@ -19,10 +19,10 @@ public partial class AppHistory : EntityBase<AppHistory>
         //var df = Meta.Factory.AdditionalFields;
         //df.Add(__.AppID);
 
-        // 过滤器 UserModule、TimeModule、IPModule
-        Meta.Modules.Add<TimeModule>();
-        Meta.Modules.Add<IPModule>();
-        Meta.Modules.Add<TraceModule>();
+        // 过滤器 UserInterceptor、TimeInterceptor、IPInterceptor
+        Meta.Interceptors.Add<TimeInterceptor>();
+        Meta.Interceptors.Add<IPInterceptor>();
+        Meta.Interceptors.Add<TraceInterceptor>();
     }
 
     /// <summary>验证数据</summary>

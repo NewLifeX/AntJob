@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NewLife;
@@ -19,9 +19,9 @@ public partial class JobTask : EntityBase<JobTask>
         df.Add(__.Error);
         df.Add(__.Times);
 
-        Meta.Modules.Add<IPModule>();
-        Meta.Modules.Add<TimeModule>();
-        Meta.Modules.Add<TraceModule>();
+        Meta.Interceptors.Add<IPInterceptor>();
+        Meta.Interceptors.Add<TimeInterceptor>();
+        Meta.Interceptors.Add<TraceInterceptor>();
     }
 
     /// <summary>验证数据，通过抛出异常的方式提示验证失败。</summary>

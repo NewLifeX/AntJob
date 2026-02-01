@@ -240,6 +240,30 @@ public partial class JobError
     #region 扩展查询
     #endregion
 
+    #region 高级查询
+    /// <summary>高级查询</summary>
+    /// <param name="appId">应用</param>
+    /// <param name="jobId">作业</param>
+    /// <param name="taskId">作业项</param>
+    /// <param name="start">更新时间开始</param>
+    /// <param name="end">更新时间结束</param>
+    /// <param name="key">关键字</param>
+    /// <param name="page">分页参数信息。可携带统计和数据权限扩展查询等信息</param>
+    /// <returns>实体列表</returns>
+    public static IList<JobError> Search(Int32 appId, Int32 jobId, Int32 taskId, DateTime start, DateTime end, String key, PageParameter page)
+    {
+        var exp = new WhereExpression();
+
+        if (appId >= 0) exp &= _.AppID == appId;
+        if (jobId >= 0) exp &= _.JobID == jobId;
+        if (taskId >= 0) exp &= _.TaskID == taskId;
+        exp &= _.UpdateTime.Between(start, end);
+        if (!key.IsNullOrEmpty()) exp &= SearchWhereByKeys(key);
+
+        return FindAll(exp, page);
+    }
+    #endregion
+
     #region 字段名
     /// <summary>取得作业错误字段信息的快捷方式</summary>
     public partial class _
