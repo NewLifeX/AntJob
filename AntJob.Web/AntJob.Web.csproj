@@ -20,22 +20,6 @@
     <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Areas\Ant\Views\AppConfig\**" />
-    <Content Remove="Areas\Ant\Views\AppConfig\**" />
-    <EmbeddedResource Remove="Areas\Ant\Views\AppConfig\**" />
-    <None Remove="Areas\Ant\Views\AppConfig\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Areas\Ant\Controllers\AppConfigController.cs" />
-    <Compile Remove="Common\ApiFilterAttribute.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Remove="Areas\Ant\Views\AppHistory\_List_Data.cshtml" />
-    <Content Remove="Areas\Ant\Views\App\_List_Data.cshtml" />
-    <Content Remove="Areas\Ant\Views\JobTask\_List_Data.cshtml" />
-    <Content Remove="Areas\Ant\Views\Job\_List_Data.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\AntJob.Server\Services\AppService.cs" Link="Services\AppService.cs" />
     <Compile Include="..\AntJob.Server\Services\JobService.cs" Link="Services\JobService.cs" />
     <Compile Include="..\AntJob.Server\Setting.cs" Link="Setting.cs" />
@@ -53,10 +37,6 @@
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Common\" />
     <Folder Include="Services\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Areas\Ant\Views\Shared\_App_Nav.cshtml" />
   </ItemGroup>
 </Project>
