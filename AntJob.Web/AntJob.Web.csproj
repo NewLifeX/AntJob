@@ -2,8 +2,8 @@
   <PropertyGroup>
     <AssemblyName>AntWeb</AssemblyName>
     <TargetFramework>net10.0</TargetFramework>
-    <AssemblyTitle>蚂蚁调度控制台</AssemblyTitle>
-    <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累</Description>
+    <AssemblyTitle>蚂蚁调度管理</AssemblyTitle>
+    <Description>AntJob 可视化管理平台，提供任务调度、监控、日志查询和集群管理功能。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
     <VersionPrefix>4.4</VersionPrefix>

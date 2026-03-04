@@ -3,8 +3,8 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>AntServer</AssemblyName>
     <TargetFramework>net10.0</TargetFramework>
-    <AssemblyTitle>蚂蚁分布式调度</AssemblyTitle>
-    <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累</Description>
+    <AssemblyTitle>蚂蚁调度服务器</AssemblyTitle>
+    <Description>AntJob 分布式调度中心，负责任务分片、分配、调度和监控，支持集群弹性伸缩。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
     <VersionPrefix>4.4</VersionPrefix>

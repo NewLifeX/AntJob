@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
-    <AssemblyTitle>蚂蚁数据</AssemblyTitle>
-    <Description>蚂蚁调度系统数据库结构</Description>
+    <AssemblyTitle>蚂蚁调度数据</AssemblyTitle>
+    <Description>AntJob 分布式调度系统的数据层，包含任务、日志和状态管理的数据模型与存储接口。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
     <VersionPrefix>4.4</VersionPrefix>

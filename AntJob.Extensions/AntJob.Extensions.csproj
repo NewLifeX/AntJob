@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0;net45</TargetFrameworks>
-    <AssemblyTitle>蚂蚁数据调度SDK</AssemblyTitle>
-    <Description>分布式任务调度系统，纯NET打造的重量级大数据实时计算平台，万亿级调度经验积累。</Description>
+    <AssemblyTitle>蚂蚁调度扩展库</AssemblyTitle>
+    <Description>AntJob 扩展组件库，支持 SQL 数据驱动、消息驱动、动态脚本等多种调度模式。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>©2002-2026 NewLife</Copyright>
     <VersionPrefix>4.4</VersionPrefix>
