@@ -2,29 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Build.tt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Build.tt">
-      <LastGenOutput>Build.log</LastGenOutput>
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="NewLife.XCode" Version="11.25.2026.302" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Build.log">
-      <DependentUpon>Build.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

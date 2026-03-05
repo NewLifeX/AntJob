@@ -1,128 +1,170 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Tables Version="9.16.7398.1902" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="http://www.newlifex.com http://www.newlifex.com/Model2020.xsd" NameSpace="HisData" ConnName="His" Output="Entity" BaseClass="Entity" IgnoreNameCase="True" xmlns="http://www.newlifex.com/Model2020.xsd">
-  <Table Name="ZYBH0" Description="病人基本信息" IgnoreNameCase="False">
-    <Columns>
-      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="Bhid" ColumnName="BHID" DataType="Int32" Master="True" Description="病人ID" />
-      <Column Name="XM" DataType="String" Description="姓名" />
-      <Column Name="Ryrq" ColumnName="RYRQ" DataType="DateTime" Description="入院日期" />
-      <Column Name="Cyrq" ColumnName="CYRQ" DataType="DateTime" Description="出院日期" />
-      <Column Name="Sfzh" ColumnName="SFZH" DataType="String" Description="身份证号" />
-      <Column Name="FB" DataType="String" Description="费用类别" />
-      <Column Name="State" ColumnName="STATE" DataType="Int32" Description="状态" />
-      <Column Name="Flag" ColumnName="FLAG" DataType="Int32" Description="标记" />
-      <Column Name="Remark" DataType="String" Length="500" Description="内容" />
-      <Column Name="CreateUser" DataType="String" Description="创建者" />
-      <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateUser" DataType="String" Description="更新者" />
-      <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
-    </Columns>
-    <Indexes>
-      <Index Columns="BHID" Unique="True" />
-      <Index Columns="CreateTime" />
-    </Indexes>
-  </Table>
-  <Table Name="ZYBHYZ0" Description="病人医嘱信息" IgnoreNameCase="False">
-    <Columns>
-      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="Bhid" ColumnName="BHID" DataType="Int32" Description="病人ID" />
-      <Column Name="Mgroupid" ColumnName="MGROUPID" DataType="Int32" Master="True" Description="医嘱组号" />
-      <Column Name="Kyzrq" ColumnName="KYZRQ" DataType="DateTime" Description="开医嘱日期" />
-      <Column Name="Tyzrq" ColumnName="TYZRQ" DataType="DateTime" Description="停医嘱日期" />
-      <Column Name="Kyzys" ColumnName="KYZYS" DataType="String" Description="开医嘱医生" />
-      <Column Name="State" ColumnName="STATE" DataType="Int32" Description="状态" />
-      <Column Name="CreateUser" DataType="String" Description="创建者" />
-      <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateUser" DataType="String" Description="更新者" />
-      <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
-    </Columns>
-    <Indexes>
-      <Index Columns="BHID,MGROUPID" Unique="True" />
-      <Index Columns="BHID" />
-    </Indexes>
-  </Table>
-  <Table Name="ZYBHYZ1" Description="病人医嘱明细信息" IgnoreNameCase="False">
-    <Columns>
-      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="Dgroupid" ColumnName="DGROUPID" DataType="Int32" Master="True" Description="医嘱组号" />
-      <Column Name="Yzbm" ColumnName="YZBM" DataType="String" Description="医嘱编码" />
-      <Column Name="Yzmc" ColumnName="YZMC" DataType="String" Description="医嘱名称" />
-      <Column Name="DJ" DataType="Decimal" Description="单价" />
-      <Column Name="SL" DataType="Double" Description="数量" />
-      <Column Name="FY" DataType="Decimal" Description="费用" />
-      <Column Name="State" ColumnName="STATE" DataType="Int32" Description="状态" />
-      <Column Name="CreateUser" DataType="String" Description="创建者" />
-      <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateUser" DataType="String" Description="更新者" />
-      <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
-    </Columns>
-    <Indexes>
-      <Index Columns="DGROUPID,YZBM" Unique="True" />
-      <Index Columns="DGROUPID" />
-    </Indexes>
-  </Table>
-  <Table Name="ZYYFQLD" Description="病人药房请领单分月表202001" IgnoreNameCase="False">
-    <Columns>
-      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="Qlrq" ColumnName="QLRQ" DataType="Int32" Description="请领日期" />
-      <Column Name="Qlsj" ColumnName="QLSJ" DataType="Int32" Description="请领时间" />
-      <Column Name="Ksbm" ColumnName="KSBM" DataType="String" Description="请领科室" />
-      <Column Name="Yzgroupid" ColumnName="YZGROUPID" DataType="Int32" Description="医嘱ID" />
-      <Column Name="Bhid" ColumnName="BHID" DataType="Int32" Description="病人ID" />
-      <Column Name="Yzbm" ColumnName="YZBM" DataType="String" Description="药品编码" />
-      <Column Name="DJ" DataType="Decimal" Description="单价" />
-      <Column Name="SL" DataType="Double" Description="请领数量" />
-      <Column Name="Yfbm" ColumnName="YFBM" DataType="String" Description="发药药房" />
-      <Column Name="Fyrq" ColumnName="FYRQ" DataType="Int32" Description="发药日期" />
-      <Column Name="State" ColumnName="STATE" DataType="Int32" Description="状态" />
-      <Column Name="Remark" DataType="String" Length="500" Description="内容" />
-      <Column Name="CreateUser" DataType="String" Description="创建者" />
-      <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateUser" DataType="String" Description="更新者" />
-      <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
-    </Columns>
-    <Indexes>
-      <Index Columns="BHID" />
-    </Indexes>
-  </Table>
-  <Table Name="ZDSF" Description="收费字典" IgnoreNameCase="False">
-    <Columns>
-      <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
-      <Column Name="BM" DataType="String" Master="True" Nullable="False" Description="编码" />
-      <Column Name="DH" DataType="String" Description="拼音码" />
-      <Column Name="MC" DataType="String" Description="名称" />
-      <Column Name="DJ" DataType="Decimal" Description="单价" />
-      <Column Name="DW" DataType="String" Description="单位" />
-      <Column Name="Mzyflb" ColumnName="MZYFLB" DataType="Int32" Description="门诊费用类别" />
-      <Column Name="Zyfylb" ColumnName="ZYFYLB" DataType="Int32" Description="住院费用类别" />
-      <Column Name="Zfbl" ColumnName="ZFBL" DataType="Double" Description="自费比例" />
-      <Column Name="CreateUser" DataType="String" Description="创建者" />
-      <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
-      <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
-      <Column Name="CreateIP" DataType="String" Description="创建地址" />
-      <Column Name="UpdateUser" DataType="String" Description="更新者" />
-      <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
-      <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
-      <Column Name="UpdateIP" DataType="String" Description="更新地址" />
-    </Columns>
-    <Indexes>
-      <Index Columns="BM" Unique="True" />
-    </Indexes>
-  </Table>
-</Tables>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<EntityModel xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:schemaLocation="https://newlifex.com https://newlifex.com/Model202509.xsd" Version="9.16.7398.1902" ModelVersion="2.0.2026.130" Document="https://newlifex.com/xcode/model" xmlns="https://newlifex.com/Model202509.xsd">
+  <Option>
+    <!--类名模板。其中{name}替换为Table.Name，如{name}Model/I{name}Dto等-->
+    <ClassNameTemplate />
+    <!--显示名模板。其中{displayName}替换为Table.DisplayName-->
+    <DisplayNameTemplate />
+    <!--基类。可能包含基类和接口，其中{name}替换为Table.Name-->
+    <BaseClass>Entity</BaseClass>
+    <!--命名空间-->
+    <Namespace>HisData</Namespace>
+    <!--引用命名空间-->
+    <ExtendNameSpace />
+    <!--输出目录-->
+    <Output>Entity</Output>
+    <!--是否使用中文文件名。默认false-->
+    <ChineseFileName>True</ChineseFileName>
+    <!--用于生成Copy函数的参数类型。例如{name}或I{name}-->
+    <ModelNameForCopy />
+    <!--带有索引器。实现IModel接口-->
+    <HasIModel>False</HasIModel>
+    <!--可为null上下文。生成String?等-->
+    <Nullable>False</Nullable>
+    <!--数据库连接名-->
+    <ConnName>His</ConnName>
+    <!--模型类模版。设置后生成模型类，用于接口数据传输，例如{name}Model-->
+    <ModelClass />
+    <!--模型类输出目录。默认当前目录的Models子目录-->
+    <ModelsOutput>.\Models\</ModelsOutput>
+    <!--模型接口模版。设置后生成模型接口，用于约束模型类和实体类，例如I{name}-->
+    <ModelInterface />
+    <!--模型接口输出目录。默认当前目录的Interfaces子目录-->
+    <InterfacesOutput>.\Interfaces\</InterfacesOutput>
+    <!--用户实体转为模型类的模型类。例如{name}或{name}DTO-->
+    <ModelNameForToModel />
+    <!--命名格式。Default/Upper/Lower/Underline-->
+    <NameFormat>Default</NameFormat>
+    <!--魔方区域显示名-->
+    <DisplayName />
+    <!--魔方控制器输出目录-->
+    <CubeOutput />
+  </Option>
+  <Tables>
+    <Table Name="ZYBH0" Description="病人基本信息" IgnoreNameCase="False">
+      <Columns>
+        <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+        <Column Name="Bhid" DataType="Int32" Master="True" Description="病人ID" />
+        <Column Name="XM" DataType="String" Description="姓名" />
+        <Column Name="Ryrq" DataType="DateTime" Description="入院日期" />
+        <Column Name="Cyrq" DataType="DateTime" Description="出院日期" />
+        <Column Name="Sfzh" DataType="String" Description="身份证号" />
+        <Column Name="FB" DataType="String" Description="费用类别" />
+        <Column Name="State" DataType="Int32" Description="状态" />
+        <Column Name="Flag" DataType="Int32" Description="标记" />
+        <Column Name="Remark" DataType="String" Length="500" Description="内容" />
+        <Column Name="CreateUser" DataType="String" Description="创建者" />
+        <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="CreateIP" DataType="String" Description="创建地址" />
+        <Column Name="UpdateUser" DataType="String" Description="更新者" />
+        <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+        <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+      </Columns>
+      <Indexes>
+        <Index Columns="BHID" Unique="True" />
+        <Index Columns="CreateTime" />
+      </Indexes>
+    </Table>
+    <Table Name="ZYBHYZ0" Description="病人医嘱信息" IgnoreNameCase="False">
+      <Columns>
+        <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+        <Column Name="Bhid" DataType="Int32" Description="病人ID" />
+        <Column Name="Mgroupid" DataType="Int32" Master="True" Description="医嘱组号" />
+        <Column Name="Kyzrq" DataType="DateTime" Description="开医嘱日期" />
+        <Column Name="Tyzrq" DataType="DateTime" Description="停医嘱日期" />
+        <Column Name="Kyzys" DataType="String" Description="开医嘱医生" />
+        <Column Name="State" DataType="Int32" Description="状态" />
+        <Column Name="CreateUser" DataType="String" Description="创建者" />
+        <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="CreateIP" DataType="String" Description="创建地址" />
+        <Column Name="UpdateUser" DataType="String" Description="更新者" />
+        <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+        <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+      </Columns>
+      <Indexes>
+        <Index Columns="BHID,MGROUPID" Unique="True" />
+        <Index Columns="BHID" />
+      </Indexes>
+    </Table>
+    <Table Name="ZYBHYZ1" Description="病人医嘱明细信息" IgnoreNameCase="False">
+      <Columns>
+        <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+        <Column Name="Dgroupid" DataType="Int32" Master="True" Description="医嘱组号" />
+        <Column Name="Yzbm" DataType="String" Description="医嘱编码" />
+        <Column Name="Yzmc" DataType="String" Description="医嘱名称" />
+        <Column Name="DJ" DataType="Decimal" Description="单价" />
+        <Column Name="SL" DataType="Double" Description="数量" />
+        <Column Name="FY" DataType="Decimal" Description="费用" />
+        <Column Name="State" DataType="Int32" Description="状态" />
+        <Column Name="CreateUser" DataType="String" Description="创建者" />
+        <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="CreateIP" DataType="String" Description="创建地址" />
+        <Column Name="UpdateUser" DataType="String" Description="更新者" />
+        <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+        <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+      </Columns>
+      <Indexes>
+        <Index Columns="DGROUPID,YZBM" Unique="True" />
+        <Index Columns="DGROUPID" />
+      </Indexes>
+    </Table>
+    <Table Name="ZYYFQLD" Description="病人药房请领单分月表202001" IgnoreNameCase="False">
+      <Columns>
+        <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+        <Column Name="Qlrq" DataType="Int32" Description="请领日期" />
+        <Column Name="Qlsj" DataType="Int32" Description="请领时间" />
+        <Column Name="Ksbm" DataType="String" Description="请领科室" />
+        <Column Name="Yzgroupid" DataType="Int32" Description="医嘱ID" />
+        <Column Name="Bhid" DataType="Int32" Description="病人ID" />
+        <Column Name="Yzbm" DataType="String" Description="药品编码" />
+        <Column Name="DJ" DataType="Decimal" Description="单价" />
+        <Column Name="SL" DataType="Double" Description="请领数量" />
+        <Column Name="Yfbm" DataType="String" Description="发药药房" />
+        <Column Name="Fyrq" DataType="Int32" Description="发药日期" />
+        <Column Name="State" DataType="Int32" Description="状态" />
+        <Column Name="Remark" DataType="String" Length="500" Description="内容" />
+        <Column Name="CreateUser" DataType="String" Description="创建者" />
+        <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="CreateIP" DataType="String" Description="创建地址" />
+        <Column Name="UpdateUser" DataType="String" Description="更新者" />
+        <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+        <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+      </Columns>
+      <Indexes>
+        <Index Columns="BHID" />
+      </Indexes>
+    </Table>
+    <Table Name="ZDSF" Description="收费字典" IgnoreNameCase="False">
+      <Columns>
+        <Column Name="ID" DataType="Int32" Identity="True" PrimaryKey="True" Description="编号" />
+        <Column Name="BM" DataType="String" Master="True" Nullable="False" Description="编码" />
+        <Column Name="DH" DataType="String" Description="拼音码" />
+        <Column Name="MC" DataType="String" Description="名称" />
+        <Column Name="DJ" DataType="Decimal" Description="单价" />
+        <Column Name="DW" DataType="String" Description="单位" />
+        <Column Name="Mzyflb" DataType="Int32" Description="门诊费用类别" />
+        <Column Name="Zyfylb" DataType="Int32" Description="住院费用类别" />
+        <Column Name="Zfbl" DataType="Double" Description="自费比例" />
+        <Column Name="CreateUser" DataType="String" Description="创建者" />
+        <Column Name="CreateUserID" DataType="Int32" Description="创建者" />
+        <Column Name="CreateTime" DataType="DateTime" Description="创建时间" />
+        <Column Name="CreateIP" DataType="String" Description="创建地址" />
+        <Column Name="UpdateUser" DataType="String" Description="更新者" />
+        <Column Name="UpdateUserID" DataType="Int32" Description="更新者" />
+        <Column Name="UpdateTime" DataType="DateTime" Description="更新时间" />
+        <Column Name="UpdateIP" DataType="String" Description="更新地址" />
+      </Columns>
+      <Indexes>
+        <Index Columns="BM" Unique="True" />
+      </Indexes>
+    </Table>
+  </Tables>
+</EntityModel>
