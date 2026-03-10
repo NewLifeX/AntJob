@@ -29,6 +29,7 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="NewLife.MySql" Version="1.0.2026.302" />
     <PackageReference Include="NewLife.Redis" Version="6.5.2026.303" />
   </ItemGroup>
   <ItemGroup>
