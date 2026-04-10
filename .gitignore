@@ -32,3 +32,4 @@ bld/
 /BinAgent
 /Samples/HisData/Config
 /AntJob.Web/.config
+*.csproj.lscache

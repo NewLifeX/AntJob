@@ -29,10 +29,10 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="6.9.2026.303" />
-    <PackageReference Include="NewLife.MySql" Version="1.0.2026.302" />
-    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.7.2026.302" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.7.2026.307" />
+    <PackageReference Include="NewLife.Cube.Core" Version="6.10.2026.404" />
+    <PackageReference Include="NewLife.MySql" Version="1.0.2026.402" />
+    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.7.2026.402" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.7.2026.403" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
