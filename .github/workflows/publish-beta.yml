@@ -34,7 +34,6 @@ jobs:
       run: |
         dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob/AntJob.csproj
         dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob.Extensions/AntJob.Extensions.csproj
-        dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob.Data/AntJob.Data.csproj
         WebPackTargetFrameworks='net8.0;net10.0' dotnet pack --version-suffix ${{ env.VERSION }} -c Release -o out AntJob.Web/AntJob.Web.csproj
     - name: Publish
       run: |

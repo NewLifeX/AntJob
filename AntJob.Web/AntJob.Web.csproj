@@ -35,9 +35,22 @@
     <PackageReference Include="NewLife.Stardust.Extensions" Version="3.7.2026.403" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
+    <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj">
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeDataBuildOutput</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+  <Target Name="IncludeDataBuildOutput">
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(OutputPath)AntJob.Data.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)AntJob.Data.xml" />
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
     <Folder Include="Services\" />
   </ItemGroup>
