@@ -19,6 +19,7 @@
     <LangVersion>latest</LangVersion>
     <IsPackable>true</IsPackable>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
+    <PackageReleaseNotes>内嵌AntJob.Data无需单独发包，简化用户依赖；支持多目标框架按环境变量控制；更新基础组件到最新版本</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\AntJob.Server\Services\AppService.cs" Link="Services\AppService.cs" />
@@ -30,9 +31,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NewLife.Cube.Core" Version="6.10.2026.404" />
-    <PackageReference Include="NewLife.MySql" Version="1.0.2026.402" />
-    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.7.2026.402" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.7.2026.403" />
+    <PackageReference Include="NewLife.MySql" Version="1.1.2026.501" />
+    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.7.2026.501" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.7.2026.501" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj">

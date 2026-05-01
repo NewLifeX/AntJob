@@ -29,8 +29,8 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.MySql" Version="1.0.2026.402" />
-    <PackageReference Include="NewLife.Redis" Version="6.5.2026.403" />
+    <PackageReference Include="NewLife.MySql" Version="1.1.2026.501" />
+    <PackageReference Include="NewLife.Redis" Version="6.5.2026.501" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />

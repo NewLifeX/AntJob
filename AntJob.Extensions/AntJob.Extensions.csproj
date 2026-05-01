@@ -28,7 +28,7 @@
     <RepositoryUrl>https://github.com/NewLifeX/AntJob</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>新生命团队;X组件;NewLife;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes>升级XCode拦截器架构；升级.NET10.0支持；更新基础组件到最新版本</PackageReleaseNotes>
+    <PackageReleaseNotes>AntJob.Web内嵌AntJob.Data，简化NuGet依赖；增强多目标打包及CI输出路径灵活性；更新基础组件到最新版本</PackageReleaseNotes>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
@@ -36,14 +36,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.103">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.203">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="11.25.2026.302" />
+    <PackageReference Include="NewLife.XCode" Version="11.26.2026.501" />
   </ItemGroup>
 
   <ItemGroup>
