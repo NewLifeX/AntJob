@@ -81,7 +81,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// <summary>实例化</summary>
     public Handler()
     {
-        Name = GetType().Name.TrimEnd(nameof(Handler));
+        Name = GetType().Name.TrimSuffix(nameof(Handler));
 
         // 默认今天
         var now = DateTime.Now;

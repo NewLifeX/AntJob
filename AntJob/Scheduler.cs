@@ -251,7 +251,7 @@ public class Scheduler : DisposeBase
         CheckHandlers(prv, jobs, handlers);
 
         var flag = false;
-        Handler? inactive = null;
+        Handler inactive = null;
         // 遍历处理器，给空闲的增加任务
         foreach (var handler in handlers)
         {

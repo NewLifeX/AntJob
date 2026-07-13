@@ -35,6 +35,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageReadmeFile>Readme.MD</PackageReadmeFile>
+    <EnableSourceLink>false</EnableSourceLink>
   </PropertyGroup>
   
   <ItemGroup>

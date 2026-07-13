@@ -11,7 +11,7 @@ namespace AntJob.Web.Areas.Ant;
 [DisplayName("蚂蚁调度")]
 public class AntArea : AreaBase
 {
-    public AntArea() : base(nameof(AntArea).TrimEnd("Area")) { }
+    public AntArea() : base(nameof(AntArea).TrimSuffix("Area")) { }
 
     static AntArea() => RegisterArea<AntArea>();
 }

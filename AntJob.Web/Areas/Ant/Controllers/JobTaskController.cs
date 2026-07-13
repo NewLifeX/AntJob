@@ -91,7 +91,7 @@ public class JobTaskController : AntEntityController<JobTask>
     {
         public String Color { get; set; }
 
-        public Func<Object, String> GetValue;
+        public Func<Object, String> GetValue { get; set; }
 
         public String Resolve(DataField field, IModel data)
         {

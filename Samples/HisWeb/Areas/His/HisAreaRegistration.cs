@@ -8,7 +8,7 @@ namespace HisWeb.Areas.His
     [DisplayName("医院管理")]
     public class HisArea : AreaBase
     {
-        public HisArea() : base(nameof(HisArea).TrimEnd("Area")) { }
+        public HisArea() : base(nameof(HisArea).TrimSuffix("Area")) { }
 
         static HisArea() => RegisterArea<HisArea>();
     }
