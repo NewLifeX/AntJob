@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <AssemblyVersion>1.0.*</AssemblyVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\..\Bin\HisWeb</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

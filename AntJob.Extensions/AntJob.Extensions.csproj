@@ -9,7 +9,7 @@
     <VersionPrefix>4.4</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
-    <FileVersion>$(Version)</FileVersion>
+    <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>
     <AssemblyVersion>$(VersionPrefix).*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin</OutputPath>

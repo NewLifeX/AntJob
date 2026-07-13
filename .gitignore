@@ -33,3 +33,4 @@ bld/
 /Samples/HisData/Config
 /AntJob.Web/.config
 *.csproj.lscache
+/out
