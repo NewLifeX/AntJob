@@ -1,7 +1,10 @@
 using System;
 using System.IO;
 using System.Linq;
+using AntJob;
+using AntJob.Data;
 using AntJob.Data.Entity;
+using AntJob.Extensions;
 using NewLife;
 using NewLife.Log;
 using XCode;
@@ -170,4 +173,64 @@ public class DataLayerTests : IDisposable
         Assert.Equal(1000, found.Total);
         Assert.Equal(999, found.Success);
     }
+
+    [Fact]
+    public void DataHandler_Init_SetsFactory()
+    {
+        var handler = new TestAppHandler();
+        handler.Init();
+
+        Assert.NotNull(handler.Factory);
+        Assert.Equal(JobModes.Data, handler.Mode);
+    }
+
+    [Fact]
+    public void DataHandler_Init_AutoDetectsField()
+    {
+        var handler = new TestAppHandler();
+        handler.Init();
+
+        // App 表没有雪花Id，没有MasterTime，应该使用 CreateTime
+        Assert.NotNull(handler.Field);
+    }
+
+    [Fact]
+    public void DataHandler_Init_GetMinDataTime()
+    {
+        // 先插入测试数据
+        for (var i = 0; i < 3; i++)
+        {
+            new App { Name = $"BulkApp_{i}", Enable = true }.Insert();
+        }
+
+        var handler = new TestAppHandler();
+        handler.Init();
+
+        var min = handler.GetMinDataTime();
+        Assert.NotEqual(DateTime.MinValue, min);
+        Assert.True(min.Year > 2000);
+    }
+
+    [Fact]
+    public void DataHandler_Execute_ReturnsValue()
+    {
+        var handler = new TestAppHandler();
+        handler.Init();
+
+        var ctx = new JobContext
+        {
+            Handler = handler,
+            Task = new TaskModel(),
+        };
+
+        var result = handler.Execute(ctx);
+        Assert.Equal(1, result);
+    }
+}
+
+/// <summary>测试用 App 数据处理器（DataHandler 集成测试用）</summary>
+internal class TestAppHandler : AntJob.Extensions.DataHandler<App>
+{
+    /// <summary>执行</summary>
+    public override Int32 Execute(JobContext ctx) => 1;
 }
