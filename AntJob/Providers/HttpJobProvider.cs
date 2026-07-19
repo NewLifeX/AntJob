@@ -6,10 +6,17 @@ using NewLife.Http;
 using NewLife.Log;
 using NewLife.Remoting;
 using NewLife.Threading;
+#if !NET45
+using TaskEx = System.Threading.Tasks.Task;
+#endif
 
 namespace AntJob.Providers;
 
-/// <summary>Http任务提供者</summary>
+/// <summary>Http任务提供者。通过 HTTP REST API 与调度中心通信，适用于无 TCP 端口的环境</summary>
+/// <remarks>
+/// 与 NetworkJobProvider（TCP RPC）功能等价，但基于 HTTP 协议。
+/// 需配合 AntJob.Web 提供的 /AntJob/* HTTP API 使用。
+/// </remarks>
 public class HttpJobProvider : JobProvider
 {
     #region 属性
@@ -31,8 +38,6 @@ public class HttpJobProvider : JobProvider
     /// <summary>邻居伙伴。用于应用判断自身有多少个实例在运行</summary>
     public IPeer[] Peers { get; private set; }
 
-    /// <summary>性能跟踪器</summary>
-    public ITracer Tracer { get; set; }
     #endregion
 
     #region 构造
@@ -71,15 +76,14 @@ public class HttpJobProvider : JobProvider
         Client = client;
     }
 
-    /// <summary>开始</summary>
-    public override void Start()
+    /// <summary>异步开始</summary>
+    public override async Task Start()
     {
         if (Client == null) Init();
 
         var bs = Schedule?.Handlers;
 
         // 遍历所有处理器，添加作业到调度中心
-        //var jobs = GetJobs(ws.Select(e => e.Name).ToArray());
         var list = new List<IJob>();
         foreach (var handler in bs)
         {
@@ -102,27 +106,29 @@ public class HttpJobProvider : JobProvider
 
             list.Add(job);
         }
-        if (list.Count > 0) Client.Post<Object>("/AntJob/AddJobs", new { jobs = list.ToArray() });
+        if (list.Count > 0) await Client.PostAsync<Object>("/AntJob/AddJobs", new { jobs = list.ToArray() });
 
         // 定时更新邻居
         _timer = new TimerX(DoCheckPeer, null, 1_000, 30_000) { Async = true };
     }
 
-    /// <summary>停止</summary>
-    public override void Stop()
+    /// <summary>异步停止</summary>
+    public override Task Stop()
     {
         // 断开前一个连接
         Client.TryDispose();
         Client = null;
+
+        return TaskEx.CompletedTask;
     }
     #endregion
 
     #region 作业消息控制
     private IJob[] _jobs;
     private DateTime _NextGetJobs;
-    /// <summary>获取所有作业名称</summary>
+    /// <summary>异步获取所有作业</summary>
     /// <returns></returns>
-    public override IJob[] GetJobs()
+    public override async Task<IJob[]> GetJobs()
     {
         // 周期性获取，避免请求过快
         var now = TimerX.Now;
@@ -130,26 +136,31 @@ public class HttpJobProvider : JobProvider
         {
             _NextGetJobs = now.AddSeconds(5);
 
-            _jobs = Client.Get<JobModel[]>("/AntJob/GetJobs");
+            _jobs = await Client.GetAsync<JobModel[]>("/AntJob/GetJobs");
         }
 
         return _jobs;
     }
 
-    /// <summary>申请任务</summary>
+    /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
+    /// <param name="job"></param>
+    /// <returns></returns>
+    public override async Task<IJob> SetJob(IJob job) => await Client.PostAsync<JobModel>("/AntJob/SetJob", job);
+
+    /// <summary>异步申请任务</summary>
     /// <param name="job">作业</param>
     /// <param name="topic">主题</param>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public override ITask[] Acquire(IJob job, String topic, Int32 count) => Client.Post<TaskModel[]>("/AntJob/Acquire", new AcquireModel { Job = job.Name, Topic = topic, Count = count });
+    public override async Task<ITask[]> Acquire(IJob job, String topic, Int32 count) => await Client.PostAsync<TaskModel[]>("/AntJob/Acquire", new AcquireModel { Job = job.Name, Topic = topic, Count = count });
 
-    /// <summary>生产消息</summary>
+    /// <summary>异步生产消息</summary>
     /// <param name="job">作业</param>
     /// <param name="topic">主题</param>
     /// <param name="messages">消息集合</param>
     /// <param name="option">消息选项</param>
     /// <returns></returns>
-    public override Int32 Produce(String job, String topic, String[] messages, MessageOption option = null)
+    public override async Task<Int32> Produce(String job, String topic, String[] messages, MessageOption option = null)
     {
         if (topic.IsNullOrEmpty() || messages == null || messages.Length < 1) return 0;
 
@@ -165,47 +176,41 @@ public class HttpJobProvider : JobProvider
             model.Unique = option.Unique;
         }
 
-        return Client.Post<Int32>("/AntJob/Product", model);
+        return await Client.PostAsync<Int32>("/AntJob/Product", model);
     }
     #endregion
 
     #region 报告状态
-    /// <summary>报告进度，每个任务多次调用</summary>
+    /// <summary>异步报告进度，每个任务多次调用</summary>
     /// <param name="ctx">上下文</param>
-    public override void Report(JobContext ctx)
+    public override async Task Report(JobContext ctx)
     {
         // 不用上报抽取中
         if (ctx.Status == JobStatus.抽取中) return;
 
         if (ctx?.Result is not TaskResult task) return;
 
-        // 区分抽取和处理
         task.Status = ctx.Status;
-
-        task.Speed = ctx.Speed;
         task.Total = ctx.Total;
         task.Success = ctx.Success;
 
         if (ctx.NextTime.Year > 2000) task.NextTime = ctx.NextTime.ToUniversalTime();
 
-        Report(ctx.Handler.Job, task);
+        await Report(ctx.Handler.Job, task);
     }
 
-    /// <summary>完成任务，每个任务只调用一次</summary>
+    /// <summary>异步完成任务，每个任务只调用一次</summary>
     /// <param name="ctx">上下文</param>
-    public override void Finish(JobContext ctx)
+    public override async Task Finish(JobContext ctx)
     {
         if (ctx?.Result is not TaskResult task) return;
 
-        task.Speed = ctx.Speed;
         task.Total = ctx.Total;
         task.Success = ctx.Success;
-        task.Times++;
 
         // 区分正常完成还是错误终止
         if (ctx.Error != null)
         {
-            task.Error++;
             task.Status = JobStatus.错误;
 
             var ex = ctx.Error?.GetTrue();
@@ -213,26 +218,26 @@ public class HttpJobProvider : JobProvider
             {
                 var msg = ctx.Error.GetMessage();
                 if (msg.Contains("Exception:")) msg = msg.Substring("Exception:").Trim();
-                task.Message = msg;
+                task.Remark = msg;
             }
         }
         else if (task.Status <= JobStatus.处理中)
         {
             task.Status = JobStatus.完成;
         }
-        task.Cost = (Int32)Math.Round(ctx.Cost / 1000);
-        if (task.Message.IsNullOrEmpty()) task.Message = ctx.Remark;
+
+        if (task.Remark.IsNullOrEmpty()) task.Remark = ctx.Remark;
 
         task.Key = ctx.Key;
 
-        Report(ctx.Handler.Job, task);
+        await Report(ctx.Handler.Job, task);
     }
 
-    private void Report(IJob job, ITaskResult task)
+    private async Task Report(IJob job, ITaskResult task)
     {
         try
         {
-            Client.Post<Boolean>("/AntJob/Report", task);
+            await Client.PostAsync<Boolean>("/AntJob/Report", task);
         }
         catch (Exception ex)
         {

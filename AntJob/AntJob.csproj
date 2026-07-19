@@ -39,10 +39,6 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <Compile Remove="Providers\HttpJobProvider.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.300">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
