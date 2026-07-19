@@ -12,6 +12,14 @@ using XCode;
 
 namespace AntJob.Server;
 
+/// <summary>蚂蚁调度中心后台服务。负责启动ApiServer、定时清理、星尘注册</summary>
+/// <remarks>
+/// 被 Program.cs 注册为 HostedService，负责：
+/// 1. 初始化数据库（InitData）
+/// 2. 启动 ApiServer（TCP 9999），注册 AntService
+/// 3. 定时清理过期在线和任务数据
+/// 4. 向星尘注册中心注册服务
+/// </remarks>
 public class Worker : IHostedService
 {
     private readonly IRegistry _registry;
@@ -20,6 +28,11 @@ public class Worker : IHostedService
     private readonly AntJobSetting _setting;
     private readonly ITracer _tracer;
 
+    /// <summary>实例化后台服务</summary>
+    /// <param name="cacheProvider">缓存提供者，用于分布式锁</param>
+    /// <param name="provider">服务提供者</param>
+    /// <param name="setting">蚂蚁配置</param>
+    /// <param name="tracer">性能跟踪器</param>
     public Worker(ICacheProvider cacheProvider, IServiceProvider provider, AntJobSetting setting, ITracer tracer)
     {
         _cacheProvider = cacheProvider;
@@ -29,6 +42,9 @@ public class Worker : IHostedService
         _registry = provider.GetService<IRegistry>();
     }
 
+    /// <summary>异步启动。初始化数据、启动 RPC 服务、定时清理、注册到星尘</summary>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns></returns>
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         InitData();
@@ -51,15 +67,6 @@ public class Worker : IHostedService
         // 本地结点
         AntService.Local = new IPEndPoint(NetHelper.MyIP(), set.Port);
 
-        //// 数据缓存，也用于全局锁，支持MemoryCache和Redis
-        //if (_cacheProvider.Cache is not FullRedis && !set.RedisCache.IsNullOrEmpty())
-        //{
-        //    var redis = new Redis { Timeout = 5_000 + 1_000 };
-        //    redis.Init(set.RedisCache);
-
-        //    _cacheProvider.Cache = redis;
-        //}
-
         server.Start();
 
         _clearOnlineTimer = new TimerX(ClearOnline, null, 1000, 10 * 1000) { Async = true };
@@ -69,6 +76,9 @@ public class Worker : IHostedService
         _registry?.RegisterAsync("AntServer", $"tcp://*:{server.Port}");
     }
 
+    /// <summary>异步停止。释放定时器资源</summary>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns></returns>
     public Task StopAsync(CancellationToken cancellationToken)
     {
         _clearOnlineTimer.TryDispose();

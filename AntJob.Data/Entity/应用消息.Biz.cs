@@ -60,11 +60,9 @@ public partial class AppMessage : EntityBase<AppMessage>
         return Find(_.Id == id);
     }
 
-    /// <summary>
-    /// 查询当前应用的消息数
-    /// </summary>
-    /// <param name="appid"></param>
-    /// <returns></returns>
+    /// <summary>查询当前应用的消息数</summary>
+    /// <param name="appid">应用编号</param>
+    /// <returns>消息数量</returns>
     public static Int32 FindCountByAppID(Int32 appid)
     {
         if (appid == 0) return 0;

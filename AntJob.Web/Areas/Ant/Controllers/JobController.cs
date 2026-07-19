@@ -187,9 +187,7 @@ public class JobController : AntEntityController<Job>
         return Job.Search(id, appid, start, end, mode, p["q"], p);
     }
 
-    /// <summary>
-    /// 重置时间
-    /// </summary>
+    /// <summary>重置时间</summary>
     /// <param name="days"></param>
     /// <returns></returns>
     [EntityAuthorize(PermissionFlags.Update)]
