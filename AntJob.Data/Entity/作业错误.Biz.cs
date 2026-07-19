@@ -98,9 +98,7 @@ public partial class JobError : EntityBase<JobError>
     #endregion
 
     #region 高级查询
-    /// <summary>
-    /// 高级查询
-    /// </summary>
+    /// <summary>高级查询</summary>
     /// <param name="appid"></param>
     /// <param name="jobid"></param>
     /// <param name="client"></param>
@@ -138,9 +136,7 @@ public partial class JobError : EntityBase<JobError>
     #endregion
 
     #region 业务操作
-    /// <summary>
-    /// 根据应用删除错误信息
-    /// </summary>
+    /// <summary>根据应用删除错误信息</summary>
     /// <param name="appid"></param>
     /// <returns></returns>
     public static Int32 DeleteByAppId(Int32 appid) => Delete(_.AppID == appid);

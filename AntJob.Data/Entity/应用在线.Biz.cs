@@ -86,9 +86,7 @@ public partial class AppOnline : EntityBase<AppOnline>
     #endregion
 
     #region 高级查询
-    /// <summary>
-    /// 高级查询
-    /// </summary>
+    /// <summary>高级查询</summary>
     /// <param name="appid"></param>
     /// <param name="start"></param>
     /// <param name="end"></param>
@@ -106,9 +104,7 @@ public partial class AppOnline : EntityBase<AppOnline>
         return FindAll(exp, p);
     }
 
-    /// <summary>
-    /// 获取UpdateTime距now，减指定参数分钟的数据
-    /// </summary>
+    /// <summary>获取UpdateTime距now，减指定参数分钟的数据</summary>
     /// <param name="norunMin"></param>
     /// <returns></returns>
     public static IList<AppOnline> GetOnlines(Int32 norunMin = 10)

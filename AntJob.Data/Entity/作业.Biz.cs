@@ -160,9 +160,7 @@ public partial class Job : EntityBase<Job>
         return FindAll(_.AppID == appid);
     }
 
-    /// <summary>
-    /// 直接查库，不查缓存
-    /// </summary>
+    /// <summary>直接查库，不查缓存</summary>
     /// <param name="appid"></param>
     /// <returns></returns>
     public static IList<Job> FindAllByAppID2(Int32 appid)
@@ -172,9 +170,7 @@ public partial class Job : EntityBase<Job>
         return FindAll(_.AppID == appid);
     }
 
-    /// <summary>
-    /// 查询当前应用的作业数
-    /// </summary>
+    /// <summary>查询当前应用的作业数</summary>
     /// <param name="appid"></param>
     /// <returns></returns>
     public static Int32 FindCountByAppID(Int32 appid)

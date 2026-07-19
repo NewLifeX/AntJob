@@ -74,9 +74,7 @@ public partial class JobTask : EntityBase<JobTask>
         return Find(_.ID == id);
     }
 
-    /// <summary>
-    /// 根据应用查询
-    /// </summary>
+    /// <summary>根据应用查询</summary>
     /// <param name="appid"></param>
     /// <returns></returns>
     public static IList<JobTask> FindAllByAppID(Int32 appid)
@@ -86,9 +84,7 @@ public partial class JobTask : EntityBase<JobTask>
         return FindAll(_.AppID == appid);
     }
 
-    /// <summary>
-    /// 根据任务查询个数
-    /// </summary>
+    /// <summary>根据任务查询个数</summary>
     /// <param name="jobid"></param>
     /// <returns></returns>
     public static Int32 FindCountByJobId(Int32 jobid) => (Int32)FindCount(_.JobID == jobid);

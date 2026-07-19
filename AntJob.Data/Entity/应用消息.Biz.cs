@@ -70,9 +70,7 @@ public partial class AppMessage : EntityBase<AppMessage>
         return (Int32)FindCount(_.AppID == appid);
     }
 
-    /// <summary>
-    /// 查询当前作业的消息数
-    /// </summary>
+    /// <summary>查询当前作业的消息数</summary>
     /// <param name="appid"></param>
     /// <param name="topic"></param>
     /// <returns></returns>

@@ -98,10 +98,7 @@ public class AppController : AntEntityController<App>
         return base.OnUpdate(entity);
     }
 
-    /// <summary>
-    /// 重置应用
-    /// 清空作业、作业项、统计、错误,开始时间设为本月一号
-    /// </summary>
+    /// <summary>重置应用，清空作业、作业项、统计、错误,开始时间设为本月一号</summary>
     /// <returns></returns>
     public ActionResult ResetApp()
     {
