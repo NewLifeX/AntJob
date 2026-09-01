@@ -208,14 +208,14 @@ Q: 任务失败是否会阻塞后续?
 A: 不会；失败任务延迟重试，其它窗口继续调度。  
 
 Q: 能否只用 Http/WebSocket 接入?  
-A: v4 规划中（待 Remoting WebSocketClient），届时轻量场景无需独立 AntServer。  
+A: Http 已支持，使用 `HttpJobProvider` 基于 HTTP REST API 与调度中心通信，轻量场景无需独立 AntServer；WebSocket 仍在规划中。  
 
 Q: 如何限制脚本风险?  
 A: 关闭未使用的 CSharpHandler；或隔离运行进程 + 最小权限配置。  
 
 ---
 ## 14. Roadmap（补充 v4 外）
-- WebSocket/Http Provider （无 TCP 端口环境支持）
+- WebSocket Provider（无 TCP 端口环境支持；Http 已通过 HttpJobProvider 实现）
 - 任务主动延迟 API（执行中评估延时再执行而不计错）
 - 可插拔告警渠道（邮件 / Webhook / 企业微信等）
 - 多维度监控指标导出（Prometheus/OpenTelemetry）

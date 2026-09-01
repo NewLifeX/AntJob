@@ -7,7 +7,7 @@
     <Description>AntJob 可视化管理平台，提供任务调度、监控、日志查询和集群管理功能。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
-    <VersionPrefix>4.4</VersionPrefix>
+    <VersionPrefix>4.5</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>
@@ -20,7 +20,7 @@
     <LangVersion>latest</LangVersion>
     <IsPackable>true</IsPackable>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
-    <PackageReleaseNotes>内嵌AntJob.Data无需单独发包，简化用户依赖；支持多目标框架按环境变量控制；更新基础组件到最新版本</PackageReleaseNotes>
+    <PackageReleaseNotes>HttpJobProvider 重构为全异步接口并补全 SetJob 方法，适用于无 TCP 端口环境；补充数据层与处理器 SQLite 集成测试及单元测试，提升测试覆盖率；新增需求、功能清单与架构设计文档；修正版本号生成逻辑，修复 TrimEnd 误用；升级依赖包至最新版</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\AntJob.Server\Services\AppService.cs" Link="Services\AppService.cs" />
@@ -31,10 +31,10 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="6.12.2026.708" />
-    <PackageReference Include="NewLife.MySql" Version="1.3.2026.701" />
-    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.8.2026.706" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.9.2026.708" />
+    <PackageReference Include="NewLife.Cube.Core" Version="6.15.2026.901" />
+    <PackageReference Include="NewLife.MySql" Version="1.4.2026.801" />
+    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.9.2026.901" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.10.2026.901" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj">
