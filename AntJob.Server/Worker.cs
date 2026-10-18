@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Net;
 using AntJob.Data.Entity;
+using AntJob.Server.Services;
 using NewLife;
 using NewLife.Caching;
 using NewLife.Log;
@@ -115,14 +116,7 @@ public class Worker : IHostedService
     private TimerX _clearOnlineTimer;
 
     //每10s清除一次UpdateTime超10分钟未更新的
-    private static void ClearOnline(Object state)
-    {
-        var ls = AppOnline.GetOnlines(10);
-        foreach (var item in ls)
-        {
-            item.Delete();
-        }
-    }
+    private static void ClearOnline(Object state) => AppService.ClearOnline(10);
     #endregion
 
     #region 清理任务项

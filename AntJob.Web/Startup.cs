@@ -3,6 +3,7 @@ using AntJob.Server.Services;
 using AntJob.Web.Services;
 using NewLife.Cube;
 using NewLife.Security;
+using NewLife.Threading;
 using XCode;
 
 namespace AntJob.Web;
@@ -51,6 +52,9 @@ public class Startup
 
         // 修正旧版数据
         Task.Run(() => JobService.FixOld());
+
+        // 定时清理长时间未心跳的在线记录。HTTP 客户端异常退出时不会主动注销
+        _ = new TimerX(s => AppService.ClearOnline(10), null, 10_000, 10_000) { Async = true };
 
         // 使用Cube前添加自己的管道
         if (env.IsDevelopment())

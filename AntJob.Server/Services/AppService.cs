@@ -178,6 +178,20 @@ public class AppService
         };
     }
 
+    /// <summary>清理长时间未更新的在线记录</summary>
+    /// <param name="minutes">超时分钟数，默认10分钟</param>
+    /// <returns>清理条数</returns>
+    public static Int32 ClearOnline(Int32 minutes = 10)
+    {
+        var count = 0;
+        foreach (var item in AppOnline.GetOnlines(minutes))
+        {
+            count += item.Delete();
+        }
+
+        return count;
+    }
+
     /// <summary>获取当前应用的所有在线实例</summary>
     /// <returns></returns>
     public PeerModel[] GetPeers(App app)

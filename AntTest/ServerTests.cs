@@ -43,6 +43,25 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Equal(name, rs.Name);
     }
 
+    [Fact(DisplayName = "清理长时间未心跳的在线记录")]
+    public void AppService_ClearOnline()
+    {
+        var name = "SrvClear_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var online = fixture.AppService.GetOnline(app, $"{name}@stale", "127.0.0.1");
+        online.Save();
+        Assert.True(online.ID > 0);
+
+        // 模拟客户端异常退出后未注销：直接把更新时间改到超时之前
+        AppOnline.Meta.Session.Execute($"Update {AppOnline.Meta.TableName} Set UpdateTime='{DateTime.Now.AddHours(-1):yyyy-MM-dd HH:mm:ss}' Where ID={online.ID}");
+
+        var count = AppService.ClearOnline(10);
+        Assert.True(count >= 1);
+        Assert.Null(AppOnline.Find(AppOnline._.ID == online.ID));
+    }
+
     [Fact]
     public void AppService_GetOnline_And_History()
     {
