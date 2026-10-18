@@ -234,9 +234,11 @@ public class AntJobController : ControllerBase, IActionFilter
 
         using var socket = await HttpContext.WebSockets.AcceptWebSocketAsync();
 
+        // 同一客户端实例重连时使用相同会话编码，SessionManager 会替换旧连接
+        var clientId = HttpContext.Request.Query["clientId"] + "";
         using var session = new WsCommandSession(socket)
         {
-            Code = $"{_App.Name}@{Rand.NextString(8)}",
+            Code = clientId.IsNullOrEmpty() ? $"{_App.Name}@{Rand.NextString(8)}" : $"{_App.Name}@{clientId}",
             ServiceProvider = HttpContext.RequestServices,
             Tracer = HttpContext.RequestServices.GetService<ITracer>(),
         };

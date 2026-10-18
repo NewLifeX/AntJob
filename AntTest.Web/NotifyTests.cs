@@ -44,13 +44,15 @@ public class NotifyTests(WebHostFixture fixture)
         return (token, client);
     }
 
-    private async Task<ClientWebSocket> ConnectAsync(String token)
+    private async Task<ClientWebSocket> ConnectAsync(String token, String clientId = null)
     {
         var ws = new ClientWebSocket();
         ws.Options.SetRequestHeader("Authorization", "Bearer " + token);
 
-        var uri = new Uri(fixture.Server.Replace("http://", "ws://") + "/AntJob/Notify");
-        await ws.ConnectAsync(uri, CancellationToken.None);
+        var url = fixture.Server.Replace("http://", "ws://") + "/AntJob/Notify";
+        if (!clientId.IsNullOrEmpty()) url += "?clientId=" + Uri.EscapeDataString(clientId);
+
+        await ws.ConnectAsync(new Uri(url), CancellationToken.None);
 
         return ws;
     }
@@ -126,6 +128,52 @@ public class NotifyTests(WebHostFixture fixture)
         Assert.Contains("Message", msg);
 
         http.Dispose();
+    }
+
+    [Fact]
+    public async Task Notify_Reconnect_Replaces_Session()
+    {
+        var app = "NotifyReconnectApp_" + Guid.NewGuid().ToString("N")[..6];
+        var (token, http) = await LoginAsync(app);
+        var job = "NotifyReconnectJob";
+        var clientId = "reconnect-" + Guid.NewGuid().ToString("N")[..6];
+
+        var add = await http.PostAsJsonAsync("/AntJob/AddJobs", new[]
+        {
+            new { name = job, mode = 1, enable = true, dataTime = DateTime.Today, step = 30, offset = 15 },
+        });
+        Assert.True(add.IsSuccessStatusCode, await add.Content.ReadAsStringAsync());
+
+        using var ws1 = await ConnectAsync(token, clientId);
+        await Task.Delay(500);
+
+        // 同一客户端标识重连，服务端应关闭旧会话并保留新会话
+        using var ws2 = await ConnectAsync(token, clientId);
+        await Task.Delay(500);
+
+        Assert.True(await IsClosedAsync(ws1, 3), "旧连接未被关闭");
+
+        var rs = await http.PostAsJsonAsync("/AntJob/SetJob", new { name = job, step = 32 });
+        Assert.True(rs.IsSuccessStatusCode, await rs.Content.ReadAsStringAsync());
+
+        var msg = await ReceiveAsync(ws2);
+        Assert.NotNull(msg);
+        Assert.Contains("JobChanged", msg);
+
+        http.Dispose();
+    }
+
+    private static async Task<Boolean> IsClosedAsync(ClientWebSocket ws, Int32 seconds)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(seconds));
+        try
+        {
+            var buf = new Byte[1024];
+            var rs = await ws.ReceiveAsync(new ArraySegment<Byte>(buf), cts.Token);
+            return rs.MessageType == WebSocketMessageType.Close;
+        }
+        catch (OperationCanceledException) { return false; }
+        catch (WebSocketException) { return true; }
     }
 
     [Fact]

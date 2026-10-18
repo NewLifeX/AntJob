@@ -41,9 +41,10 @@ public class AntClient : ClientBase
 
         if (IsHttp)
         {
-            // HTTP 通道通过 WebSocket 接收下行通知
+            // HTTP 通道通过 WebSocket 接收下行通知。携带客户端标识，便于服务端把同一实例的重连映射到同一会话
             Features |= Features.Notify;
             SetActions("AntJob/");
+            Actions[Features.Notify] = "AntJob/Notify?clientId=" + Uri.EscapeDataString(Runtime.ClientId);
         }
         else
             SetActions("");
