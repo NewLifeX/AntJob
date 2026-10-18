@@ -62,6 +62,26 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Null(AppOnline.Find(AppOnline._.ID == online.ID));
     }
 
+    [Fact(DisplayName = "并发登录只产生一条在线记录")]
+    public async Task AppService_Login_Concurrent()
+    {
+        var name = "SrvLoginRace_" + Guid.NewGuid().ToString("N")[..6];
+        var sessionId = $"{name}@127.0.0.1";
+
+        using var barrier = new Barrier(3);
+        var tasks = Enumerable.Range(0, 3).Select(_ => Task.Run(() =>
+        {
+            // 同时进入登录，覆盖并发写入同一在线实例的场景
+            barrier.SignalAndWait();
+            return fixture.AppService.Login(new LoginModel { Code = name, Secret = "" }, sessionId, "127.0.0.1");
+        })).ToArray();
+
+        await Task.WhenAll(tasks);
+
+        Assert.All(tasks, t => Assert.NotNull(t.Result.Item2));
+        Assert.Single(AppOnline.FindAll(AppOnline._.Instance == sessionId));
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {

@@ -80,12 +80,31 @@ public class AppService
         //if (!model.ClientId.IsNullOrEmpty()) sessionId = model.ClientId;
         if (sessionId.IsNullOrEmpty()) sessionId = model.ClientId;
         var online = GetOnline(app, sessionId, ip);
-        online.Name = model.Machine;
-        online.Client = model.ClientId;
-        online.ProcessId = model.ProcessId;
-        online.Version = model.Version;
-        online.CompileTime = compile;
-        online.Save();
+
+        void FillOnline(AppOnline entity)
+        {
+            entity.Name = model.Machine;
+            entity.Client = model.ClientId;
+            entity.ProcessId = model.ProcessId;
+            entity.Version = model.Version;
+            entity.CompileTime = compile;
+        }
+
+        FillOnline(online);
+        try
+        {
+            online.Save();
+        }
+        catch (Exception) when (online.ID == 0)
+        {
+            // 同一实例并发登录时可能同时插入而触发唯一约束，冲突后重新加载已有记录
+            var entity = AppOnline.Find(AppOnline._.Instance == online.Instance);
+            if (entity == null) throw;
+
+            online = entity;
+            FillOnline(online);
+            online.Save();
+        }
 
         WriteHistory(app, autoReg ? "注册" : "登录", true, $"[{model.Code}/{model.Secret}]在[{model.ClientId}]登录[{app}]成功", ip);
 
