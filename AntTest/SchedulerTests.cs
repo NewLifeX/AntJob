@@ -176,9 +176,10 @@ public class SchedulerTests : IDisposable
         Assert.Equal(1, provider.GetJobsCount);
 
         provider.Release.TrySetResult();
-        await first;
 
-        // 首轮结束后恢复调度
+        // 跳过的那一轮会被补偿，首轮返回true提示立即再来一轮
+        Assert.True(await first);
+
         await _scheduler.Process();
         Assert.Equal(2, provider.GetJobsCount);
     }

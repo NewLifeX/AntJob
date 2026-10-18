@@ -280,17 +280,28 @@ public class Scheduler : DisposeBase
     }
 
     private Int32 _processing;
+    private Int32 _pending;
 
     /// <summary>任务调度</summary>
     /// <remarks>定时器异步回调，网络往返超过调度周期时可能重入；上一轮未结束时直接跳过，避免重复申请任务</remarks>
     /// <returns></returns>
     public async Task<Boolean> Process()
     {
-        if (Interlocked.CompareExchange(ref _processing, 1, 0) != 0) return false;
+        if (Interlocked.CompareExchange(ref _processing, 1, 0) != 0)
+        {
+            // 运行期间到达的唤醒不能丢，当前轮结束后立即补跑
+            Interlocked.Exchange(ref _pending, 1);
+            return false;
+        }
 
         try
         {
-            return await ProcessCore().ConfigureAwait(false);
+            var rs = await ProcessCore().ConfigureAwait(false);
+
+            // 有待处理轮次时告知调用方马上再来一轮
+            if (Interlocked.Exchange(ref _pending, 0) != 0) rs = true;
+
+            return rs;
         }
         finally
         {
