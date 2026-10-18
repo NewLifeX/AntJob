@@ -159,6 +159,39 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.NotEmpty(tasks);
     }
 
+    [Fact(DisplayName = "忽略已完成任务的迟到上报")]
+    public void JobService_Report_IgnoresLateReport()
+    {
+        var name = "SrvLateReport_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var jobName = "LateReportJob";
+        fixture.JobService.AddJobs(app, [new JobModel { Name = jobName, Mode = JobModes.Time, Enable = true, DataTime = DateTime.Today.AddHours(-2), Step = 30, Offset = 15 }]);
+
+        var online = fixture.AppService.GetOnline(app, $"{name}@late", "127.0.0.1");
+        var tasks = fixture.JobService.Acquire(app, new AcquireModel { Job = jobName, Count = 1 }, online);
+        Assert.NotEmpty(tasks);
+
+        var id = tasks[0].ID;
+        var done = fixture.JobService.Report(app, new TaskResult { ID = id, Status = JobStatus.完成, Total = 5, Success = 5 }, online);
+        Assert.True(done);
+
+        var job1 = Job.FindByAppIDAndName(app.ID, jobName);
+        var dataTime1 = job1.DataTime;
+
+        // 迟到的中间状态上报不能把已完成任务回退，也不能重复推进作业
+        var late = fixture.JobService.Report(app, new TaskResult { ID = id, Status = JobStatus.处理中, Total = 1, Success = 0 }, online);
+        Assert.True(late);
+
+        var task = JobTask.FindByID(id);
+        Assert.Equal(JobStatus.完成, task.Status);
+        Assert.Equal(5, task.Success);
+
+        var job2 = Job.FindByAppIDAndName(app.ID, jobName);
+        Assert.Equal(dataTime1, job2.DataTime);
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {

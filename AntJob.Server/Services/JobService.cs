@@ -486,6 +486,15 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             throw new InvalidOperationException($"应用[{app}]无权操作作业[{job}#{task}]");
         }
 
+        // 上报可能重复（客户端超时重试）或乱序（中间状态晚于最终状态到达）。
+        // 任务终结后再接受中间状态，会把状态回退并让统计重复累加，进而被当成中断任务重新分配
+        if (task.Status is JobStatus.完成) return true;
+        if (task.Status is JobStatus.错误 && result.Status is not JobStatus.完成)
+        {
+            _log.Debug("任务[{0}]已错误终结，忽略状态[{1}]上报", task.ID, result.Status);
+            return true;
+        }
+
         // 只有部分字段允许客户端修改
         if (result.Status > 0) task.Status = result.Status;
 
