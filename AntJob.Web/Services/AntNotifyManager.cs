@@ -38,8 +38,10 @@ public class AntNotifyManager : SessionManager
         base.Remove(session);
 
         var app = GetApp(session?.Code);
-        // 保留空的应用桶，避免与并发 Add 竞争导致新会话落到已移除的桶里
-        if (!app.IsNullOrEmpty() && _apps.TryGetValue(app, out var bucket)) bucket.TryRemove(session.Code, out _);
+        // 仅移除当前会话，避免旧会话的销毁回调误删同编码的新会话；保留空桶防止并发 Add 落到已移除的桶里
+        if (!app.IsNullOrEmpty() && _apps.TryGetValue(app, out var bucket) &&
+            bucket.TryGetValue(session.Code, out var current) && ReferenceEquals(current, session))
+            bucket.TryRemove(session.Code, out _);
     }
 
     /// <summary>关闭全部会话，同时清空应用索引</summary>
