@@ -60,8 +60,15 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
             case "Reload":
                 // 解析主题，消息通知只唤醒订阅该主题的处理器
                 var topic = "";
-                var dic = JsonParser.Decode(e.Model?.Argument);
-                if (dic != null && dic.TryGetValue("topic", out var value)) topic = value + "";
+                try
+                {
+                    var dic = JsonParser.Decode(e.Model?.Argument);
+                    if (dic != null && dic.TryGetValue("topic", out var value)) topic = value + "";
+                }
+                catch
+                {
+                    // 通知参数异常时按无主题处理，不影响本轮唤醒
+                }
 
                 var handlers = Schedule?.GetHandlers();
                 if (handlers != null)
