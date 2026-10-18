@@ -267,15 +267,12 @@ public class Scheduler : DisposeBase
     {
         var prv = Provider;
 
-        // 查询所有处理器
-        var handlers = Handlers;
-
         // 拿到处理器对应的作业
         var jobs = await prv.GetJobs();
         if (jobs == null) return false;
 
         // 运行时动态往集合里面加处理器，为了配合Sql+C#
-        CheckHandlers(prv, jobs, handlers);
+        CheckHandlers(prv, jobs);
 
         var flag = false;
         Handler inactive = null;
@@ -412,8 +409,9 @@ public class Scheduler : DisposeBase
         return flag;
     }
 
-    private void CheckHandlers(IJobProvider provider, IList<IJob> jobs, IList<Handler> handlers)
+    private void CheckHandlers(IJobProvider provider, IList<IJob> jobs)
     {
+        var handlers = GetHandlers();
         foreach (var job in jobs)
         {
             var handler = handlers.FirstOrDefault(e => e.Name == job.Name);
@@ -448,10 +446,7 @@ public class Scheduler : DisposeBase
                             handler.Init();
                             handler.Start();
 
-                            lock (_handlersLock)
-                            {
-                                handlers.Add(handler);
-                            }
+                            AddHandler(handler);
                         }
                     }
                 }
