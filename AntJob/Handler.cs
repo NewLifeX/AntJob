@@ -178,7 +178,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         if (!Active) return false;
 
         using var span = Tracer?.NewSpan($"job:{Name}:Stop", reason);
-        WriteLog("停止工作 {0}", reason);
+        WriteLog(L.T("Stop working: {0}"), reason);
 
         Active = false;
 
@@ -190,7 +190,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
             {
                 Thread.Sleep(100);
             }
-            if (_Busy > 0) WriteLog("仍有{0}个任务未结束（可能僵死），放弃等待", _Busy);
+            if (_Busy > 0) WriteLog(L.T("{0} tasks are still running (possibly hung); giving up waiting."), _Busy);
         }
 
         return true;
@@ -267,7 +267,7 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         {
             if (item.Value <= threshold)
             {
-                WriteLog("检测到任务[{0}]超过最大不活跃时间{1}s，标记作业僵死", item.Key, MaxInactiveTime);
+                WriteLog(L.T("Task [{0}] exceeded the maximum inactive time of {1}s; marking the job as hung."), item.Key, MaxInactiveTime);
                 return false;
             }
         }

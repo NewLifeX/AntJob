@@ -116,7 +116,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     /// <summary>开始</summary>
     public override async Task Start()
     {
-        WriteLog("正在连接调度中心：{0}", Setting.Server);
+        WriteLog(L.T("Connecting to the scheduling center: {0}"), Setting.Server);
 
         // 使用配置中心账号
         var ant = CreateClient(Setting);
@@ -423,7 +423,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         }
         catch (Exception ex)
         {
-            WriteLog("[{0}]的[{1}]状态报告失败！{2}", job, task.Status, ex.GetTrue().Message);
+            WriteLog(L.T("Status report failed for [{1}] of [{0}]: {2}"), job, task.Status, ex.GetTrue().Message);
         }
     }
     #endregion

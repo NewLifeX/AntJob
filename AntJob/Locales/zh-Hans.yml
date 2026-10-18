@@ -1,0 +1,9 @@
+# 简体中文译文。键为英文源文，缺失时运行期回退英文。
+"Stop working: {0}": "停止工作 {0}"
+"{0} tasks are still running (possibly hung); giving up waiting.": "仍有{0}个任务未结束（可能僵死），放弃等待"
+"Task [{0}] exceeded the maximum inactive time of {1}s; marking the job as hung.": "检测到任务[{0}]超过最大不活跃时间{1}s，标记作业僵死"
+"C# scripting is not supported on net45; use net461 or later.": "net45 不支持C#脚本执行，请使用 net461 及以上版本"
+"Message scheduling requires a topic.": "消息调度要求设置主题"
+"No handler is available.": "没有可用处理器"
+"Connecting to the scheduling center: {0}": "正在连接调度中心：{0}"
+"Status report failed for [{1}] of [{0}]: {2}": "[{0}]的[{1}]状态报告失败！{2}"

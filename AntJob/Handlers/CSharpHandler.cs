@@ -44,7 +44,7 @@ public class CSharpHandler : Handler
         if (code.IsNullOrWhiteSpace()) return -1;
 
 #if NET45
-        throw new NotSupportedException("net45 不支持C#脚本执行，请使用 net461 及以上版本");
+        throw new NotSupportedException(L.T("C# scripting is not supported on net45; use net461 or later."));
 #else
         var script = _cache.GetOrAdd($"CSharpHandler:{code}", CreateScript, 24 * 3600);
         var state = script.RunAsync(new ScriptGlobals { ctx = ctx, Context = ctx }).ConfigureAwait(false).GetAwaiter().GetResult();

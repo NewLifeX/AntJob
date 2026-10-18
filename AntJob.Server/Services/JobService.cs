@@ -187,7 +187,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         if (job == null) throw new XException($"应用[{app.ID}/{app.Name}]下未找到作业[{jobName}]");
         if (job.DataTime.Year <= 2000 && job.Mode is JobModes.Time or JobModes.Data)
-            throw new XException("作业[{0}/{1}]未设置数据时间", job.ID, job.Name);
+            throw new XException(L.T("Job [{0}/{1}] has no data time set."), job.ID, job.Name);
 
         // 单次申请数量上限，避免异常请求一次性切出过多分片
         if (model.Count > MaxAcquireCount) model.Count = MaxAcquireCount;
@@ -471,7 +471,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     public Int32 Produce(String appId, String topic, String[] messages)
     {
         var app = App.FindByName("Route.Gbm");
-        if (app == null || !app.Enable) throw new XException("应用未启用");
+        if (app == null || !app.Enable) throw new XException(L.T("The application is not enabled."));
 
         var model = new ProduceModel
         {

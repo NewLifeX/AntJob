@@ -202,7 +202,7 @@ public class Scheduler : DisposeBase
 
         // 检查本地添加的处理器
         var hs = GetHandlers();
-        if (hs.Length == 0) throw new ArgumentNullException(nameof(Handlers), "没有可用处理器");
+        if (hs.Length == 0) throw new ArgumentNullException(nameof(Handlers), L.T("No handler is available."));
 
         // 埋点
         Tracer ??= serviceProvider?.GetService<ITracer>();

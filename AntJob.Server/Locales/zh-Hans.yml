@@ -1,0 +1,3 @@
+# 简体中文译文。键为英文源文，缺失时运行期回退英文。
+"Job [{0}/{1}] has no data time set.": "作业[{0}/{1}]未设置数据时间"
+"The application is not enabled.": "应用未启用"

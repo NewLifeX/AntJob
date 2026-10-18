@@ -1,0 +1,9 @@
+# 繁體中文譯文。鍵為英文源文，缺失時執行期回退英文。
+"Stop working: {0}": "停止工作 {0}"
+"{0} tasks are still running (possibly hung); giving up waiting.": "仍有{0}個任務未結束（可能僵死），放棄等待"
+"Task [{0}] exceeded the maximum inactive time of {1}s; marking the job as hung.": "檢測到任務[{0}]超過最大不活躍時間{1}s，標記作業僵死"
+"C# scripting is not supported on net45; use net461 or later.": "net45 不支持C#腳本執行，請使用 net461 及以上版本"
+"Message scheduling requires a topic.": "消息調度要求設置主題"
+"No handler is available.": "沒有可用處理器"
+"Connecting to the scheduling center: {0}": "正在連接調度中心：{0}"
+"Status report failed for [{1}] of [{0}]: {2}": "[{0}]的[{1}]狀態報告失敗！{2}"

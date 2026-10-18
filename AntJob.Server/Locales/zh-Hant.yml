@@ -1,0 +1,3 @@
+# 繁體中文譯文。鍵為英文源文，缺失時執行期回退英文。
+"Job [{0}/{1}] has no data time set.": "作業[{0}/{1}]未設置數據時間"
+"The application is not enabled.": "應用未啟用"
