@@ -159,6 +159,30 @@ public class SchedulerTests : IDisposable
         Assert.False(rs);
     }
 
+    [Fact(DisplayName = "上一轮未结束时跳过新的调度轮次")]
+    public async Task Process_Skips_When_Running()
+    {
+        var provider = new BlockingProvider();
+        _scheduler.Provider = provider;
+        provider.Schedule = _scheduler;
+
+        _scheduler.AddHandler(new TestHandler { Name = "BlockJob", Mode = JobModes.Time });
+
+        var first = _scheduler.Process();
+        await provider.Entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+
+        // 首轮阻塞在 GetJobs 时，定时器再次触发不应重复申请
+        Assert.False(await _scheduler.Process().WaitAsync(TimeSpan.FromSeconds(2)));
+        Assert.Equal(1, provider.GetJobsCount);
+
+        provider.Release.TrySetResult();
+        await first;
+
+        // 首轮结束后恢复调度
+        await _scheduler.Process();
+        Assert.Equal(2, provider.GetJobsCount);
+    }
+
     [Fact]
     public async Task Process_Syncs_JobTopic_To_MessageHandler()
     {
@@ -205,6 +229,29 @@ public class SchedulerTests : IDisposable
 
             return [];
         }
+    }
+
+    private class BlockingProvider : NetworkJobProvider
+    {
+        public BlockingProvider() : base(new AntSetting { Server = "http://127.0.0.1:1" }) { }
+
+        public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public TaskCompletionSource Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public Int32 GetJobsCount;
+
+        public override async Task<IJob[]> GetJobs()
+        {
+            Interlocked.Increment(ref GetJobsCount);
+            Entered.TrySetResult();
+
+            await Release.Task;
+
+            return [new JobModel { Name = "BlockJob", Mode = JobModes.Time, Enable = true, MaxTask = 1 }];
+        }
+
+        public override Task<ITask[]> Acquire(IJob job, String topic, Int32 count) => Task.FromResult(Array.Empty<ITask>());
     }
 
     private class CountingProvider : NetworkJobProvider

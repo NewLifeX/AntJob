@@ -279,9 +279,26 @@ public class Scheduler : DisposeBase
         }
     }
 
+    private Int32 _processing;
+
     /// <summary>任务调度</summary>
+    /// <remarks>定时器异步回调，网络往返超过调度周期时可能重入；上一轮未结束时直接跳过，避免重复申请任务</remarks>
     /// <returns></returns>
     public async Task<Boolean> Process()
+    {
+        if (Interlocked.CompareExchange(ref _processing, 1, 0) != 0) return false;
+
+        try
+        {
+            return await ProcessCore().ConfigureAwait(false);
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _processing, 0);
+        }
+    }
+
+    private async Task<Boolean> ProcessCore()
     {
         var prv = Provider;
 
