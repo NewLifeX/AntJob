@@ -223,12 +223,12 @@ public class AppService
     }
 
     /// <summary>清理长时间未更新的在线记录</summary>
-    /// <param name="minutes">超时分钟数，默认10分钟</param>
+    /// <param name="timeout">超时秒数，默认600秒（对应 AntJobSetting.SessionTimeout）</param>
     /// <returns>清理条数</returns>
-    public static Int32 ClearOnline(Int32 minutes = 10)
+    public static Int32 ClearOnline(Int32 timeout = 600)
     {
         // 条件删除由数据库在同一条语句内完成，避免查询后心跳刷新了记录仍被删除
-        return AppOnline.Delete(AppOnline._.UpdateTime <= DateTime.Now.AddMinutes(-minutes));
+        return AppOnline.Delete(AppOnline._.UpdateTime <= DateTime.Now.AddSeconds(-timeout));
     }
 
     /// <summary>获取当前应用的所有在线实例</summary>

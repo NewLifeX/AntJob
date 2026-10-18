@@ -57,7 +57,7 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         // 模拟客户端异常退出后未注销：直接把更新时间改到超时之前
         AppOnline.Meta.Session.Execute($"Update {AppOnline.Meta.TableName} Set UpdateTime='{DateTime.Now.AddHours(-1):yyyy-MM-dd HH:mm:ss}' Where ID={online.ID}");
 
-        var count = AppService.ClearOnline(10);
+        var count = AppService.ClearOnline(600);
         Assert.True(count >= 1);
         Assert.Null(AppOnline.Find(AppOnline._.ID == online.ID));
     }
@@ -127,7 +127,7 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.True(entity.UpdateTime > DateTime.Now.AddMinutes(-1), $"心跳未刷新更新时间：{entity.UpdateTime:O}");
 
         // 条件删除不能误删刚刷新过的记录
-        AppService.ClearOnline(10);
+        AppService.ClearOnline(600);
         Assert.NotNull(AppOnline.Find(AppOnline._.ID == online.ID));
     }
 
@@ -313,6 +313,27 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         var entity = App.FindByName(name);
         Assert.True(entity.JobCount >= 1);
         Assert.Equal(Job.FindCountByAppID(entity.ID), entity.JobCount);
+    }
+
+    [Fact(DisplayName = "按会话超时配置清理在线记录")]
+    public void AppService_ClearOnline_Uses_Timeout()
+    {
+        var name = "SrvClearCfg_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var online = fixture.AppService.GetOnline(app, $"{name}@cfg", "127.0.0.1");
+        online.Save();
+
+        // 记录停在5分钟前：600秒超时下应保留，60秒超时下应清理
+        var old = DateTime.Now.AddMinutes(-5);
+        AppOnline.Meta.Session.Execute($"Update {AppOnline.Meta.TableName} Set UpdateTime='{old:yyyy-MM-dd HH:mm:ss}' Where ID={online.ID}");
+
+        AppService.ClearOnline(600);
+        Assert.NotNull(AppOnline.Find(AppOnline._.ID == online.ID));
+
+        AppService.ClearOnline(60);
+        Assert.Null(AppOnline.Find(AppOnline._.ID == online.ID));
     }
 
     [Fact(DisplayName = "清理作业已不存在的任务")]

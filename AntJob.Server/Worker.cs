@@ -122,8 +122,15 @@ public class Worker : IHostedService
     #region 清理过时
     private TimerX _clearOnlineTimer;
 
-    //每10s清除一次UpdateTime超10分钟未更新的
-    private static void ClearOnline(Object state) => AppService.ClearOnline(10);
+    //每10s清除一次超过会话超时时间未更新的
+    private void ClearOnline(Object state)
+    {
+        var timeout = _setting?.SessionTimeout ?? 0;
+        if (timeout > 0)
+            AppService.ClearOnline(timeout);
+        else
+            AppService.ClearOnline();
+    }
     #endregion
 
     #region 清理任务项
