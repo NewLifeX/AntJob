@@ -37,7 +37,7 @@ public class AntClient : ClientBase
 
     private void InitClient()
     {
-        Features = Features.Login | Features.Ping;
+        Features = Features.Login | Features.Logout | Features.Ping;
 
         if (IsHttp)
         {
@@ -99,6 +99,34 @@ public class AntClient : ClientBase
         {
             Log?.Debug("[{0}]WebSocket心跳失败：{1}", Name, ex.Message);
         }
+    }
+
+    /// <summary>心跳。HTTP 通道通过查询参数携带客户端标识，服务端据此区分同IP多实例</summary>
+    /// <param name="request">心跳请求</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns></returns>
+    protected override Task<IPingResponse> PingAsync(IPingRequest request, CancellationToken cancellationToken)
+    {
+        if (!IsHttp) return base.PingAsync(request, cancellationToken);
+
+        return InvokeAsync<IPingResponse>(Actions[Features.Ping] + "?clientId=" + Runtime.ClientId, request, cancellationToken);
+    }
+
+    /// <summary>注销。HTTP 通道同样携带客户端标识，及时清理对应在线记录</summary>
+    /// <param name="reason">原因</param>
+    /// <param name="cancellationToken">取消令牌</param>
+    /// <returns></returns>
+    protected override Task<ILogoutResponse> LogoutAsync(String reason, CancellationToken cancellationToken)
+    {
+        if (!IsHttp) return base.LogoutAsync(reason, cancellationToken);
+
+        var args = new Dictionary<String, Object>
+        {
+            ["reason"] = reason,
+            ["clientId"] = Runtime.ClientId,
+        };
+
+        return GetAsync<ILogoutResponse>(Actions[Features.Logout], args, cancellationToken);
     }
     #endregion
 

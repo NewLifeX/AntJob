@@ -37,6 +37,11 @@ public class AntJobController : ControllerBase, IActionFilter
     /// <summary>用户主机</summary>
     public String UserHost => HttpContext.GetUserHost();
 
+    /// <summary>获取在线会话标识。优先使用客户端标识，未提供时退化为应用@IP</summary>
+    /// <param name="clientId">客户端标识</param>
+    /// <returns></returns>
+    private String GetSessionId(String clientId) => clientId.IsNullOrEmpty() ? $"{_App.Name}@{UserHost}" : $"{_App.Name}@{clientId}";
+
     private App _App;
     private IDictionary<String, Object> _args;
     private AntJobSetting _setting;
@@ -112,8 +117,8 @@ public class AntJobController : ControllerBase, IActionFilter
     {
         if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
-        // 与心跳、注销使用同一在线会话标识，避免产生重复在线记录
-        var sessionId = $"{model.Code}@{UserHost}";
+        // 与心跳、注销使用同一在线会话标识。优先使用客户端标识，避免同IP多实例互相覆盖
+        var sessionId = model.ClientId.IsNullOrEmpty() ? $"{model.Code}@{UserHost}" : $"{model.Code}@{model.ClientId}";
         var (app, online, rs) = _appService.Login(model, sessionId, UserHost);
 
         // HTTP 通道使用 JWT 令牌，与 RPC 通道的登录语义保持一致
@@ -126,22 +131,24 @@ public class AntJobController : ControllerBase, IActionFilter
 
     /// <summary>注销</summary>
     /// <param name="reason">原因</param>
+    /// <param name="clientId">客户端标识。用于定位同一IP下的不同实例</param>
     /// <returns></returns>
     [HttpGet(nameof(Logout))]
-    public ILogoutResponse Logout(String reason)
+    public ILogoutResponse Logout(String reason, String clientId)
     {
-        var online = _appService.GetOnline(_App, null, UserHost);
+        var online = _appService.GetOnline(_App, GetSessionId(clientId), UserHost);
 
         return _appService.Logout(_App, online, reason, UserHost);
     }
 
     /// <summary>心跳。维持在线状态，临近过期时续发令牌</summary>
     /// <param name="request">心跳请求</param>
+    /// <param name="clientId">客户端标识。用于定位同一IP下的不同实例</param>
     /// <returns></returns>
     [HttpPost(nameof(Ping))]
-    public IPingResponse Ping(PingRequest request)
+    public IPingResponse Ping(PingRequest request, [FromQuery] String clientId)
     {
-        var online = _appService.GetOnline(_App, null, UserHost);
+        var online = _appService.GetOnline(_App, GetSessionId(clientId), UserHost);
         var rs = _appService.Ping(_App, online, request, UserHost);
 
         // 令牌即将过期时重新颁发，客户端会在下一次心跳后更新
@@ -168,8 +175,8 @@ public class AntJobController : ControllerBase, IActionFilter
             // 密码模式
             if (model.grant_type == "password")
             {
-                var sessionId = $"{model.UserName}@{ip}";
-                var (app, online, rs) = _appService.Login(new LoginModel { Code = model.UserName, Secret = model.Password }, sessionId, ip);
+                var sessionId = clientId.IsNullOrEmpty() ? $"{model.UserName}@{ip}" : $"{model.UserName}@{clientId}";
+                var (app, online, rs) = _appService.Login(new LoginModel { Code = model.UserName, Secret = model.Password, ClientId = clientId }, sessionId, ip);
 
                 var tokenModel = _appService.IssueToken(app.Name, set);
 

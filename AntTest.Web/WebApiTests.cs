@@ -69,6 +69,38 @@ public class WebApiTests(WebHostFixture fixture)
     }
 
     [Fact]
+    public async Task Login_And_Ping_Use_ClientId()
+    {
+        var app = "PeerClientApp_" + Guid.NewGuid().ToString("N")[..6];
+        var clientId = "10.0.0.1@1234";
+        using var client = CreateClient();
+
+        var login = await client.PostAsJsonAsync("/AntJob/Login", new { code = app, secret = "", clientId });
+        var body = await login.Content.ReadAsStringAsync();
+        Assert.True(login.IsSuccessStatusCode, body);
+
+        using var doc = JsonDocument.Parse(body);
+        var root = doc.RootElement;
+        if (root.TryGetProperty("data", out var data) && data.ValueKind == JsonValueKind.Object) root = data;
+        var token = GetString(root, "token", "Token");
+        Assert.False(token.IsNullOrEmpty(), body);
+
+        client.DefaultRequestHeaders.Authorization = new("Bearer", token);
+
+        var ping = await client.PostAsJsonAsync($"/AntJob/Ping?clientId={Uri.EscapeDataString(clientId)}", new { time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() });
+        Assert.True(ping.IsSuccessStatusCode, await ping.Content.ReadAsStringAsync());
+
+        var peers = await client.GetStringAsync("/AntJob/GetPeers");
+        Assert.Contains($"{app}@{clientId}", peers);
+
+        var logout = await client.GetAsync($"/AntJob/Logout?reason=test&clientId={Uri.EscapeDataString(clientId)}");
+        Assert.True(logout.IsSuccessStatusCode, await logout.Content.ReadAsStringAsync());
+
+        peers = await client.GetStringAsync("/AntJob/GetPeers");
+        Assert.DoesNotContain($"{app}@{clientId}", peers);
+    }
+
+    [Fact]
     public async Task Request_Without_Token_Returns_403()
     {
         using var client = CreateClient();
