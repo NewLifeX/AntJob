@@ -53,9 +53,21 @@ public class AntService(AppService appService, JobService jobService) : IApi, IA
 
         _Online = online;
 
-        online.UpdateIP = ip;
-        online.UpdateTime = TimerX.Now;
-        online.SaveAsync();
+        // 每个RPC调用都写库代价太高，10秒内只刷新一次在线记录；在线超时是10分钟，足以续命
+        var now = DateTime.Now;
+        var stale = online.UpdateTime < now.AddSeconds(-10);
+        if (stale)
+        {
+            lock (online)
+            {
+                if (online.UpdateTime < now.AddSeconds(-10))
+                {
+                    online.UpdateIP = ip;
+                    online.UpdateTime = now;
+                    online.Update();
+                }
+            }
+        }
     }
 
     void IActionFilter.OnActionExecuted(ControllerContext filterContext)
