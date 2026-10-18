@@ -93,7 +93,9 @@ public class AntService(AppService appService, JobService jobService) : IApi, IA
         if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
         var remote = _Net.Remote;
-        var (app, online, rs) = appService.Login(model, null, remote.Host);
+        // 在线实例编码带上应用名，避免同一进程内多个应用共用 IP@进程 而互相覆盖
+        var sessionId = AppService.BuildSessionId(model.Code, model.ClientId, remote.Host);
+        var (app, online, rs) = appService.Login(model, sessionId, remote.Host);
 
         // 记录当前用户
         Session["App"] = app;

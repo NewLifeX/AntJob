@@ -86,6 +86,31 @@ public class RpcClientTests(RpcServerFixture fixture) : IClassFixture<RpcServerF
         client.Dispose();
     }
 
+    [Fact(DisplayName = "同进程多应用登录各自建立在线实例")]
+    public async Task AntClient_Login_MultipleApps()
+    {
+        var app1 = "RpcMultiA_" + Guid.NewGuid().ToString("N")[..6];
+        var app2 = "RpcMultiB_" + Guid.NewGuid().ToString("N")[..6];
+
+        // 同一进程的两个应用共用 Runtime.ClientId，在线实例编码必须带上应用名
+        using var c1 = new AntClient(CreateSetting(app1)) { ServiceProvider = fixture.Provider };
+        using var c2 = new AntClient(CreateSetting(app2)) { ServiceProvider = fixture.Provider };
+
+        await c1.Login();
+        await c2.Login();
+
+        var a1 = App.FindByName(app1);
+        var a2 = App.FindByName(app2);
+        Assert.NotNull(a1);
+        Assert.NotNull(a2);
+
+        var o1 = AppOnline.FindAll(AppOnline._.AppID == a1.ID);
+        var o2 = AppOnline.FindAll(AppOnline._.AppID == a2.ID);
+        Assert.Single(o1);
+        Assert.Single(o2);
+        Assert.NotEqual(o1[0].Instance, o2[0].Instance);
+    }
+
     [Fact]
     public async Task NetworkJobProvider_Start_And_GetJobs()
     {

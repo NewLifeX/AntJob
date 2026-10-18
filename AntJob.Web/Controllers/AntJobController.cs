@@ -42,12 +42,7 @@ public class AntJobController : ControllerBase, IActionFilter
     /// <param name="clientId">客户端标识</param>
     /// <param name="ip">客户端地址</param>
     /// <returns></returns>
-    private static String BuildSessionId(String app, String clientId, String ip)
-    {
-        var id = clientId.IsNullOrEmpty() ? $"{app}@{ip}" : $"{app}@{clientId}";
-
-        return id.Length > 50 ? id[..50] : id;
-    }
+    private static String BuildSessionId(String app, String clientId, String ip) => AppService.BuildSessionId(app, clientId, ip);
 
     private App _App;
     private IDictionary<String, Object> _args;

@@ -174,6 +174,18 @@ public class AppService
     #endregion
 
     #region 在线状态
+    /// <summary>构建在线会话标识。优先使用客户端标识，未提供时退化为应用@IP，并限制在字段长度内</summary>
+    /// <param name="app">应用名</param>
+    /// <param name="clientId">客户端标识</param>
+    /// <param name="ip">客户端地址</param>
+    /// <returns></returns>
+    public static String BuildSessionId(String app, String clientId, String ip)
+    {
+        var id = clientId.IsNullOrEmpty() ? $"{app}@{ip}" : $"{app}@{clientId}";
+
+        return id.Length > 50 ? id[..50] : id;
+    }
+
     public IPingResponse Ping(App app, AppOnline online, IPingRequest request, String ip)
     {
         if (app != null)
