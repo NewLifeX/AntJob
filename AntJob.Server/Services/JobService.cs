@@ -491,7 +491,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             if (job == null || job.AppID != app.ID)
             {
                 _log.Info(result.ToJson());
-                throw new InvalidOperationException($"应用[{app}]无权操作作业[{job}#{task}]");
+                throw new InvalidOperationException($"应用[{app?.Name}]无权操作作业[{job?.ID}/{job?.Name}]任务[{task.ID}]");
             }
 
             // 上报可能重复（客户端超时重试）或乱序（中间状态晚于最终状态到达）。
@@ -517,6 +517,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 #pragma warning restore CS0612 // 类型或成员已过时
 
             var traceId = result.TraceId ?? DefaultSpan.Current + "";
+            // 记录客户端上报的链路标识，便于把任务执行与客户端链路串起来
+            if (!traceId.IsNullOrEmpty()) task.TraceId = traceId;
             // 已终结的任务，汇总统计
             if (result.Status is JobStatus.完成)
             {

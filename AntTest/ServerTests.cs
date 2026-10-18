@@ -276,6 +276,27 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Equal(1, fixture.JobService.Produce(app, model));
     }
 
+    [Fact(DisplayName = "上报记录客户端链路标识")]
+    public void JobService_Report_StoresTraceId()
+    {
+        var name = "SrvTrace_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var jobName = "TraceJob";
+        fixture.JobService.AddJobs(app, [new JobModel { Name = jobName, Mode = JobModes.Time, Enable = true, DataTime = DateTime.Today.AddHours(-2), Step = 30, Offset = 15 }]);
+
+        var online = fixture.AppService.GetOnline(app, $"{name}@trace", "127.0.0.1");
+        var tasks = fixture.JobService.Acquire(app, new AcquireModel { Job = jobName, Count = 1 }, online);
+        Assert.NotEmpty(tasks);
+
+        var traceId = "trace-" + Guid.NewGuid().ToString("N")[..8];
+        fixture.JobService.Report(app, new TaskResult { ID = tasks[0].ID, Status = JobStatus.完成, Total = 1, Success = 1, TraceId = traceId }, online);
+
+        var task = JobTask.FindByID(tasks[0].ID);
+        Assert.Equal(traceId, task.TraceId);
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {
