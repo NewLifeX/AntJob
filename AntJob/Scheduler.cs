@@ -276,7 +276,6 @@ public class Scheduler : DisposeBase
 
         var flag = false;
         Handler inactive = null;
-        var now = TimerX.Now;
         // 遍历处理器快照，给空闲的增加任务
         foreach (var handler in GetHandlers())
         {
@@ -321,7 +320,7 @@ public class Scheduler : DisposeBase
             }
 
             // 空闲退避：消息型作业在未收到通知前不必每轮都申请
-            if (handler.NextAcquire > now) continue;
+            if (handler.NextAcquire > TimerX.Now) continue;
 
             // 如果正在处理任务数没达到最大并行度，则继续安排任务
             //var max = job.MaxTask;
