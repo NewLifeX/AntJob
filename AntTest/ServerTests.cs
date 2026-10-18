@@ -148,6 +148,30 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
     }
 
     [Fact]
+    public void Job_Insert_Notify_Only_When_Enabled()
+    {
+        var name = "SrvNotify_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+        var app = App.FindByName(name);
+
+        var count = 0;
+        EventHandler<JobChangedEventArgs> handler = (s, e) => count++;
+        Job.Changed += handler;
+        try
+        {
+            new Job { AppID = app.ID, Name = "DisabledJob", Enable = false, Mode = JobModes.Time }.Insert();
+            Assert.Equal(0, count);
+
+            new Job { AppID = app.ID, Name = "EnabledJob", Enable = true, Mode = JobModes.Time }.Insert();
+            Assert.Equal(1, count);
+        }
+        finally
+        {
+            Job.Changed -= handler;
+        }
+    }
+
+    [Fact]
     public void JobService_SetJob_Utc_ConvertsToLocal()
     {
         var name = "SrvUtc_" + Guid.NewGuid().ToString("N")[..6];

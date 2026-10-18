@@ -118,7 +118,8 @@ public partial class Job : EntityBase<Job>
     {
         var rs = base.OnInsert();
 
-        if (rs != 0) NotifyChanged(nameof(OnInsert));
+        // 新增时通常由客户端批量注册，仅启用作业需要通知其它在线实例
+        if (rs != 0 && Enable) NotifyChanged(nameof(OnInsert));
 
         return rs;
     }
