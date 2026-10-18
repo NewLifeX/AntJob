@@ -101,14 +101,20 @@ public class Scheduler : DisposeBase
         var registry = set.UseRegistry ? ServiceProvider?.GetService<IRegistry>() : null;
         if (registry != null)
         {
-            // 按地址协议选择注册中心里的服务名，HTTP 通道对应 AntWeb
-            var svrs = await registry.ResolveAddressAsync(isHttp ? "AntWeb" : "AntServer");
+            // 按地址协议决定服务名优先级；未显式配置地址时优先 HTTP 通道（AntWeb）
+            var names = server.IsNullOrEmpty() || isHttp
+                ? new[] { "AntWeb", "AntServer" }
+                : new[] { "AntServer", "AntWeb" };
 
-            // 未显式配置地址时，再尝试另一个服务名，兼容只部署 Web 的场景
-            if ((svrs == null || svrs.Length == 0) && server.IsNullOrEmpty())
-                svrs = await registry.ResolveAddressAsync(isHttp ? "AntServer" : "AntWeb");
-
-            if (svrs != null && svrs.Length > 0) server = svrs.Join();
+            foreach (var name in names)
+            {
+                var svrs = await registry.ResolveAddressAsync(name);
+                if (svrs != null && svrs.Length > 0)
+                {
+                    server = svrs.Join();
+                    break;
+                }
+            }
         }
 
         if (server.IsNullOrEmpty()) return;
