@@ -196,9 +196,13 @@ public class AppService
                 if (request is PingRequest req)
                 {
                 }
-                online.UpdateIP = ip;
 
-                online.Save();
+                // 同一在线实例被并发上报共用，串行化实体更新，避免计数被覆盖
+                lock (online)
+                {
+                    online.UpdateIP = ip;
+                    online.Save();
+                }
             }
         }
 
@@ -248,17 +252,20 @@ public class AppService
 
     public void UpdateOnline(App app, JobTask ji, AppOnline online)
     {
-        //var online = GetOnline(app, sessionId, ip);
-        online.Total += ji.Total;
-        online.Success += ji.Success;
-        //online.Error += ji.Error;
-        online.Cost += ji.Cost;
-        online.Speed = ji.Speed;
-        online.LastKey = ji.Key;
+        // 同一在线实例被并发上报共用，串行化实体更新，避免计数被覆盖
+        lock (online)
+        {
+            online.Total += ji.Total;
+            online.Success += ji.Success;
+            //online.Error += ji.Error;
+            online.Cost += ji.Cost;
+            online.Speed = ji.Speed;
+            online.LastKey = ji.Key;
 
-        if (ji.Status == JobStatus.错误) online.Error++;
+            if (ji.Status == JobStatus.错误) online.Error++;
 
-        online.Update();
+            online.Update();
+        }
     }
     #endregion
 

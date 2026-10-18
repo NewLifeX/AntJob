@@ -82,6 +82,26 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Single(AppOnline.FindAll(AppOnline._.Instance == sessionId));
     }
 
+    [Fact(DisplayName = "并发上报累计在线统计")]
+    public async Task AppService_UpdateOnline_Concurrent()
+    {
+        var name = "SrvOnlineSum_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var online = fixture.AppService.GetOnline(app, $"{name}@sum", "127.0.0.1");
+        online.Save();
+
+        var tasks = Enumerable.Range(0, 10).Select(_ => Task.Run(() =>
+            fixture.AppService.UpdateOnline(app, new JobTask { Total = 1, Success = 1, Cost = 1, Speed = 1, Status = JobStatus.完成 }, online))).ToArray();
+        await Task.WhenAll(tasks);
+
+        var entity = AppOnline.Find(AppOnline._.ID == online.ID);
+        Assert.NotNull(entity);
+        Assert.Equal(10, entity.Total);
+        Assert.Equal(10, entity.Success);
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {
