@@ -21,8 +21,9 @@ public class AntClient : ClientBase
     /// <summary>是否使用 HTTP 通道。地址以 http/https 开头时启用</summary>
     public Boolean IsHttp => Server.StartsWithIgnoreCase("http://", "https://");
 
+    private volatile Boolean _notifyConnected;
     /// <summary>下行通知通道是否已连接</summary>
-    public Boolean NotifyConnected { get; private set; }
+    public Boolean NotifyConnected => _notifyConnected;
 
     /// <summary>下行通知通道连接成功事件。首次连接或断线重连后触发</summary>
     public event EventHandler NotifyConnectedChanged;
@@ -103,15 +104,15 @@ public class AntClient : ClientBase
             await SendAsync(new ArrayPacket("Ping".GetBytes())).ConfigureAwait(false);
 
             // 首次连接或断线重连成功后，通知提供者立即拉取一次，弥补断线期间可能丢失的通知
-            if (!NotifyConnected)
+            if (!_notifyConnected)
             {
-                NotifyConnected = true;
+                _notifyConnected = true;
                 NotifyConnectedChanged?.Invoke(this, EventArgs.Empty);
             }
         }
         catch (Exception ex)
         {
-            NotifyConnected = false;
+            _notifyConnected = false;
             Log?.Debug("[{0}]WebSocket心跳失败：{1}", Name, ex.Message);
         }
     }

@@ -167,6 +167,7 @@ Doc/                    文档与资源
 - AppID / Secret：应用隔离凭据（可自动注册或手动分发）
 - Debug：调试开关，输出更详细日志
 - UseRegistry：是否使用星尘注册中心解析服务地址，默认 true；经网关直连时建议设为 false
+- MessageIdlePeriod：消息型作业空闲申请周期（秒），默认 15；HTTP 通道收到消息通知会立即唤醒
 
 Web/Server 侧：
 - 数据库连接通过 XCode 自动反向工程创建表
