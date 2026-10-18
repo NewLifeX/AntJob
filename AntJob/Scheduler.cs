@@ -252,19 +252,43 @@ public class Scheduler : DisposeBase
         _timer.TryDispose();
         _timer = null;
 
+        // 各处理器停止时会等待在途任务结束（最长15秒），并行停止避免总耗时随处理器数量线性增长
+        var tasks = new List<Task>();
         foreach (var handler in GetHandlers())
+        {
+            tasks.Add(Task.Run(() =>
+            {
+                try
+                {
+                    handler.Stop("SchedulerStop");
+                }
+                catch (Exception ex)
+                {
+                    Log?.Error("作业[{0}]停止失败！{1}", handler.GetType().FullName, ex.Message);
+                }
+            }));
+        }
+        if (tasks.Count > 0)
         {
             try
             {
-                handler.Stop("SchedulerStop");
+                Task.WaitAll(tasks.ToArray());
             }
-            catch (Exception ex)
+            catch (AggregateException ex)
             {
-                Log?.Error("作业[{0}]停止失败！{1}", handler.GetType().FullName, ex.Message);
+                Log?.Error("处理器停止异常！{0}", ex.GetTrue()?.Message);
             }
         }
 
-        Provider?.Stop().Wait();
+        // 停机不能让进程无限等待，注销超时后直接放弃
+        try
+        {
+            if (Provider?.Stop().Wait(5_000) == false) Log?.Error("停止作业提供者超时，强制继续");
+        }
+        catch (Exception ex)
+        {
+            Log?.Error("停止作业提供者失败！{0}", ex.GetTrue()?.Message);
+        }
     }
 
     /// <summary>申请任务。限制并发度，避免多作业同时请求压垮调度中心</summary>
