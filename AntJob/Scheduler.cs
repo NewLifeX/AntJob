@@ -141,13 +141,22 @@ public class Scheduler : DisposeBase
     /// <summary>异步开始。使用定时器尝试连接服务端</summary>
     public void StartAsync()
     {
-        _timerStart = new TimerX(CheckStart, null, 100, 15000, "Job") { Async = true };
+        _stopped = false;
+
+        _timerStart = new TimerX(CheckStart, null, 100, StartRetryPeriod * 1000, "Job") { Async = true };
     }
 
+    /// <summary>启动重试周期。单位秒，默认15秒</summary>
+    public Int32 StartRetryPeriod { get; set; } = 15;
+
     private Boolean _inited;
+    private volatile Boolean _stopped;
     private TimerX _timerStart;
     private async Task CheckStart(Object state)
     {
+        // 已停止的调度器不再重试连接，否则定时器会把它重新拉起来
+        if (_stopped) return;
+
         if (!_inited)
         {
             try
@@ -248,6 +257,11 @@ public class Scheduler : DisposeBase
     public void Stop()
     {
         using var span = Tracer?.NewSpan("job:SchedulerStop");
+
+        // 标记停止，取消尚未完成的启动重试
+        _stopped = true;
+        _timerStart.TryDispose();
+        _timerStart = null;
 
         _timer.TryDispose();
         _timer = null;
