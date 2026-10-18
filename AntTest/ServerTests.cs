@@ -192,6 +192,31 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Equal(dataTime1, job2.DataTime);
     }
 
+    [Fact(DisplayName = "并发申请累计在线任务数")]
+    public async Task JobService_Acquire_Concurrent_Tasks()
+    {
+        var name = "SrvAcqSum_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var jobName = "AcqSumJob";
+        // 足够长的历史区间，保证并发申请都能切到分片
+        fixture.JobService.AddJobs(app, [new JobModel { Name = jobName, Mode = JobModes.Time, Enable = true, DataTime = DateTime.Today.AddDays(-5), Step = 30, Offset = 15 }]);
+
+        var online = fixture.AppService.GetOnline(app, $"{name}@acq", "127.0.0.1");
+        online.Save();
+
+        var tasks = Enumerable.Range(0, 8).Select(_ => Task.Run(() =>
+            fixture.JobService.Acquire(app, new AcquireModel { Job = jobName, Count = 2 }, online))).ToArray();
+        var results = await Task.WhenAll(tasks);
+
+        var total = results.Sum(e => e.Length);
+
+        var entity = AppOnline.Find(AppOnline._.ID == online.ID);
+        Assert.NotNull(entity);
+        Assert.Equal(total, entity.Tasks);
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {

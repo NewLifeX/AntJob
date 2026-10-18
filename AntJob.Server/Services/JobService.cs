@@ -255,8 +255,11 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         }
 
         // 记录状态
-        online.Tasks += list.Count;
-        online.SaveAsync();
+        lock (online)
+        {
+            online.Tasks += list.Count;
+            online.Update();
+        }
 
         //return list.Select(e => e.ToModel()).ToArray();
 

@@ -91,9 +91,13 @@ public class AppService
         }
 
         FillOnline(online);
+        // 在线实体被同一实例的并发心跳、申请与上报共用，串行化写入避免脏标记互相覆盖
         try
         {
-            online.Save();
+            lock (online)
+            {
+                online.Save();
+            }
         }
         catch (Exception) when (online.ID == 0)
         {
@@ -103,7 +107,10 @@ public class AppService
 
             online = entity;
             FillOnline(online);
-            online.Save();
+            lock (online)
+            {
+                online.Save();
+            }
         }
 
         WriteHistory(app, autoReg ? "注册" : "登录", true, $"[{model.Code}/{model.Secret}]在[{model.ClientId}]登录[{app}]成功", ip);
@@ -238,11 +245,15 @@ public class AppService
         if (sessionId.IsNullOrEmpty()) sessionId = $"{app.Name}@{ip}";
 
         var online = AppOnline.GetOrAdd(sessionId);
-        online.AppID = app.ID;
-        online.Server = Environment.MachineName;
+        // 在线实体被同实例的并发请求共用，属性写入需要串行
+        lock (online)
+        {
+            online.AppID = app.ID;
+            online.Server = Environment.MachineName;
 
-        if (online.CreateIP.IsNullOrEmpty()) online.CreateIP = ip;
-        online.UpdateIP = ip;
+            if (online.CreateIP.IsNullOrEmpty()) online.CreateIP = ip;
+            online.UpdateIP = ip;
+        }
 
         return online;
     }
