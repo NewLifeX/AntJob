@@ -418,7 +418,7 @@ public class Scheduler : DisposeBase
             if (handler == null && job.Enable && !job.ClassName.IsNullOrEmpty())
             {
                 // 遇到废弃作业时，避免反复输出日志
-                if (!_cache.Add($"job:NewHandler:{job.Name}", 1, 3600)) return;
+                if (!_cache.Add($"job:NewHandler:{job.Name}", 1, 3600)) continue;
 
                 using var span = Tracer?.NewSpan($"job:NewHandler", job);
 
