@@ -27,7 +27,9 @@ public class NotifyRoutingTests
         services.AddSingleton<ICacheProvider>(provider);
         using var sp = services.BuildServiceProvider();
 
-        using var manager = new AntNotifyManager(sp);
+        // 使用独立的主题，避免与宿主机中的通知管理器争抢同一事件总线
+        var topic = AntNotifyTopic.Name + ":" + Guid.NewGuid().ToString("N");
+        using var manager = new AntNotifyManager(sp) { Topic = topic, ClearPeriod = 0 };
         var a = new FakeSession("AppX@a");
         var b = new FakeSession("AppX@b");
         var c = new FakeSession("AppY@c");
@@ -36,7 +38,7 @@ public class NotifyRoutingTests
         manager.Add(c);
 
         var command = new CommandModel { Command = "Message", Argument = "{\"app\":\"AppX\"}" };
-        var bus = provider.CreateEventBus<String>(AntNotifyTopic.Name, Runtime.ClientId);
+        var bus = provider.CreateEventBus<String>(topic, Runtime.ClientId);
         Assert.NotNull(bus);
         await bus.PublishAsync($"AppX#{command.ToJson()}");
 
