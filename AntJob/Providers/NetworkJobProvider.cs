@@ -63,7 +63,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
                 var dic = JsonParser.Decode(e.Model?.Argument);
                 if (dic != null && dic.TryGetValue("topic", out var value)) topic = value + "";
 
-                var handlers = Schedule?.Handlers;
+                var handlers = Schedule?.GetHandlers();
                 if (handlers != null)
                 {
                     foreach (var handler in handlers)

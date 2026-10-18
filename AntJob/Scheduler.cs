@@ -29,6 +29,7 @@ public class Scheduler : DisposeBase
     public AntSetting Setting { get; set; }
 
     private readonly ICache _cache = MemoryCache.Default;
+    private readonly Object _handlersLock = new();
     #endregion
 
     #region 构造
@@ -47,9 +48,22 @@ public class Scheduler : DisposeBase
     /// <param name="handler"></param>
     public Scheduler AddHandler(Handler handler)
     {
-        Handlers.Add(handler);
+        lock (_handlersLock)
+        {
+            Handlers.Add(handler);
+        }
 
         return this;
+    }
+
+    /// <summary>获取处理器快照。避免定时线程与下行通知线程并发枚举时集合被修改</summary>
+    /// <returns></returns>
+    internal Handler[] GetHandlers()
+    {
+        lock (_handlersLock)
+        {
+            return Handlers.ToArray();
+        }
     }
 
     /// <summary>按类型添加处理器，支持依赖注入</summary>
@@ -151,7 +165,7 @@ public class Scheduler : DisposeBase
         var serviceProvider = ServiceProvider;
         foreach (var item in serviceProvider.GetServices<Handler>())
         {
-            Handlers.Add(item);
+            AddHandler(item);
         }
         // 有可能DI中注入IObjectContainer，后者再次注册Handler
         var ioc = serviceProvider?.GetService<IObjectContainer>() ?? ObjectContainer.Current;
@@ -161,13 +175,13 @@ public class Scheduler : DisposeBase
             var serviceProvider2 = ioc.BuildServiceProvider(serviceProvider);
             foreach (var item in serviceProvider2.GetServices<Handler>())
             {
-                Handlers.Add(item);
+                AddHandler(item);
             }
         }
 
         // 检查本地添加的处理器
-        var hs = Handlers;
-        if (hs.Count == 0) throw new ArgumentNullException(nameof(Handlers), "没有可用处理器");
+        var hs = GetHandlers();
+        if (hs.Length == 0) throw new ArgumentNullException(nameof(Handlers), "没有可用处理器");
 
         // 埋点
         Tracer ??= serviceProvider?.GetService<ITracer>();
@@ -187,7 +201,7 @@ public class Scheduler : DisposeBase
         var jobs = await prv.GetJobs();
 
         // 输出日志
-        WriteLog($"启动任务调度引擎[{prv}]，作业[{hs.Count}]项，定时{Period}秒");
+        WriteLog($"启动任务调度引擎[{prv}]，作业[{hs.Length}]项，定时{Period}秒");
 
         // 设置日志
         foreach (var handler in hs)
@@ -226,7 +240,7 @@ public class Scheduler : DisposeBase
         _timer.TryDispose();
         _timer = null;
 
-        foreach (var handler in Handlers)
+        foreach (var handler in GetHandlers())
         {
             try
             {
@@ -260,8 +274,8 @@ public class Scheduler : DisposeBase
         var flag = false;
         Handler inactive = null;
         var now = TimerX.Now;
-        // 遍历处理器，给空闲的增加任务
-        foreach (var handler in handlers)
+        // 遍历处理器快照，给空闲的增加任务
+        foreach (var handler in GetHandlers())
         {
             var job = jobs.FirstOrDefault(e => e.Name == handler.Name);
             // 找不到或者已停用
@@ -425,7 +439,10 @@ public class Scheduler : DisposeBase
                             handler.Init();
                             handler.Start();
 
-                            handlers.Add(handler);
+                            lock (_handlersLock)
+                            {
+                                handlers.Add(handler);
+                            }
                         }
                     }
                 }
