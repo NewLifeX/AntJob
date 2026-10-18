@@ -2,9 +2,7 @@ using AntJob.Server.Services;
 using NewLife;
 using NewLife.Log;
 using NewLife.Messaging;
-using NewLife.Remoting.Models;
 using NewLife.Remoting.Services;
-using NewLife.Serialization;
 
 namespace AntJob.Web.Services;
 
@@ -34,16 +32,7 @@ public class AntNotifyManager : SessionManager
         var code = message[..p];
         var json = message[(p + 1)..];
 
-        CommandModel command = null;
-        try
-        {
-            command = json.ToJsonEntity<CommandModel>();
-        }
-        catch
-        {
-            // 命令解析失败时仍然转发原始消息，由客户端决定如何处理
-        }
-
+        // 直接转发原始消息，避免为每个会话重复反序列化
         var prefix = code + "@";
         foreach (var item in Sessions)
         {
@@ -51,7 +40,7 @@ public class AntNotifyManager : SessionManager
 
             try
             {
-                await item.Value.HandleAsync(command, json, cancellationToken).ConfigureAwait(false);
+                await item.Value.HandleAsync(null, json, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
