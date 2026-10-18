@@ -6,6 +6,7 @@ using AntJob.Models;
 using AntJob.Server;
 using AntJob.Server.Services;
 using AntJob.Web.Models;
+using AntJob.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -15,7 +16,9 @@ using NewLife.Cube;
 using NewLife.Data;
 using NewLife.Log;
 using NewLife.Remoting;
+using NewLife.Remoting.Extensions.Services;
 using NewLife.Remoting.Models;
+using NewLife.Security;
 using NewLife.Serialization;
 using NewLife.Web;
 using ApiFilterAttribute = NewLife.Remoting.Extensions.ApiFilterAttribute;
@@ -39,13 +42,15 @@ public class AntJobController : ControllerBase, IActionFilter
     private AntJobSetting _setting;
     private readonly AppService _appService;
     private readonly JobService _jobService;
+    private readonly AntNotifyManager _notifyManager;
 
     #region 构造
-    public AntJobController(AppService appService, JobService jobService, AntJobSetting setting)
+    public AntJobController(AppService appService, JobService jobService, AntJobSetting setting, AntNotifyManager notifyManager)
     {
         _appService = appService;
         _jobService = jobService;
         _setting = setting;
+        _notifyManager = notifyManager;
     }
 
     void IActionFilter.OnActionExecuting(ActionExecutingContext context)
@@ -107,8 +112,42 @@ public class AntJobController : ControllerBase, IActionFilter
     {
         if (model.Code.IsNullOrEmpty()) throw new ArgumentNullException(nameof(model.Code));
 
+        // 与心跳、注销使用同一在线会话标识，避免产生重复在线记录
         var sessionId = $"{model.Code}@{UserHost}";
         var (app, online, rs) = _appService.Login(model, sessionId, UserHost);
+
+        // HTTP 通道使用 JWT 令牌，与 RPC 通道的登录语义保持一致
+        var token = _appService.IssueToken(app.Name, _setting);
+        rs.Token = token.AccessToken;
+        rs.Expire = _setting.TokenExpire;
+
+        return rs;
+    }
+
+    /// <summary>注销</summary>
+    /// <param name="reason">原因</param>
+    /// <returns></returns>
+    [HttpGet(nameof(Logout))]
+    public ILogoutResponse Logout(String reason)
+    {
+        var online = _appService.GetOnline(_App, null, UserHost);
+
+        return _appService.Logout(_App, online, reason, UserHost);
+    }
+
+    /// <summary>心跳。维持在线状态，临近过期时续发令牌</summary>
+    /// <param name="request">心跳请求</param>
+    /// <returns></returns>
+    [HttpPost(nameof(Ping))]
+    public IPingResponse Ping(PingRequest request)
+    {
+        var online = _appService.GetOnline(_App, null, UserHost);
+        var rs = _appService.Ping(_App, online, request, UserHost);
+
+        // 令牌即将过期时重新颁发，客户端会在下一次心跳后更新
+        var token = ApiFilterAttribute.GetToken(HttpContext);
+        var tm = _appService.ValidAndIssueToken(_App.Name, token, _setting);
+        if (tm != null && rs is PingResponse pr) pr.Token = tm.AccessToken;
 
         return rs;
     }
@@ -173,6 +212,40 @@ public class AntJobController : ControllerBase, IActionFilter
     /// <returns></returns>
     [HttpGet(nameof(GetPeers))]
     public PeerModel[] GetPeers() => _appService.GetPeers(_App);
+
+    /// <summary>下行通知。建立WebSocket长连接，接收作业变更与消息到达信号</summary>
+    /// <remarks>信号只用于降低延迟，客户端收到后仍需通过 HTTP 拉取权威数据</remarks>
+    /// <returns></returns>
+    [HttpGet(nameof(Notify))]
+    public async Task Notify()
+    {
+        if (!HttpContext.WebSockets.IsWebSocketRequest)
+        {
+            HttpContext.Response.StatusCode = 400;
+            return;
+        }
+
+        using var socket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+
+        using var session = new WsCommandSession(socket)
+        {
+            Code = $"{_App.Name}@{Rand.NextString(8)}",
+            ServiceProvider = HttpContext.RequestServices,
+            Tracer = HttpContext.RequestServices.GetService<ITracer>(),
+        };
+        _notifyManager.Add(session);
+
+        var context = new DeviceContext
+        {
+            Code = _App.Name,
+            ClientId = session.Code,
+            UserHost = UserHost,
+        };
+        context["HttpContext"] = HttpContext;
+        context["Span"] = DefaultSpan.Current;
+
+        await session.WaitAsync(context, HttpContext.RequestAborted);
+    }
     #endregion
 
     #region 业务

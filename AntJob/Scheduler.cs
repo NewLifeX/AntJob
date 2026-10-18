@@ -82,22 +82,29 @@ public class Scheduler : DisposeBase
     public async Task JoinAsync(AntSetting set)
     {
         var server = set.Server;
+        var isHttp = server.StartsWithIgnoreCase("http://", "https://");
 
         var registry = ServiceProvider?.GetService<IRegistry>();
         if (registry != null)
         {
-            var svrs = await registry.ResolveAddressAsync("AntServer");
+            // 按地址协议选择注册中心里的服务名，HTTP 通道对应 AntWeb
+            var svrs = await registry.ResolveAddressAsync(isHttp ? "AntWeb" : "AntServer");
+
+            // 未显式配置地址时，再尝试另一个服务名，兼容只部署 Web 的场景
+            if ((svrs == null || svrs.Length == 0) && server.IsNullOrEmpty())
+                svrs = await registry.ResolveAddressAsync(isHttp ? "AntServer" : "AntWeb");
+
             if (svrs != null && svrs.Length > 0) server = svrs.Join();
         }
 
         if (server.IsNullOrEmpty()) return;
         set.Server = server;
 
-        {
-            var rpc = new NetworkJobProvider(set);
-
-            Provider = rpc;
-        }
+        isHttp = server.StartsWithIgnoreCase("http://", "https://");
+        if (isHttp)
+            Provider = new HttpJobProvider(set);
+        else
+            Provider = new NetworkJobProvider(set);
     }
 
     /// <summary>开始调度。推荐使用StartAsync</summary>
@@ -428,6 +435,9 @@ public class Scheduler : DisposeBase
     public Int32 Period { get; set; } = 5;
 
     private TimerX _timer;
+
+    /// <summary>唤醒调度。收到服务端通知或需要立即处理时调用</summary>
+    public void WakeUp() => _timer?.SetNext(-1);
 
     private async Task Loop(Object state)
     {

@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
+using NewLife;
 using NewLife.Configuration;
+using NewLife.Security;
 
 namespace AntJob.Server;
 
@@ -35,5 +37,16 @@ public class AntJobSetting : Config<AntJobSetting>
     ///// <summary>Redis缓存。设置用于控制任务切分的分布式锁，默认为空使用本进程内存锁</summary>
     //[Description("Redis缓存。设置用于控制任务切分的分布式锁，默认为空使用本进程内存锁")]
     //public String RedisCache { get; set; }
+    #endregion
+
+    #region 方法
+    /// <summary>加载后修正令牌密钥。未配置时自动生成，避免登录与心跳因空密钥失败</summary>
+    protected override void OnLoaded()
+    {
+        if (TokenSecret.IsNullOrEmpty() || TokenSecret.Split(':').Length != 2)
+            TokenSecret = $"HS256:{Rand.NextString(16)}";
+
+        base.OnLoaded();
+    }
     #endregion
 }

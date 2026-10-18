@@ -1,5 +1,6 @@
 ﻿using AntJob.Server;
 using AntJob.Server.Services;
+using AntJob.Web.Services;
 using NewLife.Cube;
 using NewLife.Security;
 using XCode;
@@ -29,6 +30,10 @@ public class Startup
         services.AddSingleton<AppService>();
         services.AddSingleton<JobService>();
 
+        // 作业变更与消息到达通知，经事件总线分发到本机 WebSocket 会话
+        services.AddSingleton<IJobNotifier, EventBusNotifier>();
+        services.AddSingleton<AntNotifyManager>();
+
         // 注册密码提供者，用于通信过程中保护密钥，避免明文传输
         services.AddSingleton<IPasswordProvider>(new SaltPasswordProvider { Algorithm = "md5", SaltTime = 60 });
 
@@ -57,6 +62,12 @@ public class Startup
         //app.UseHttpsRedirection();
 
         app.UseStaticFiles();
+
+        // 客户端下行通知使用 WebSocket 长连接
+        app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(60) });
+
+        // 提前实例化通知器，确保启动时即订阅作业变更事件
+        app.ApplicationServices.GetService<IJobNotifier>();
 
         app.UseCube(env);
 

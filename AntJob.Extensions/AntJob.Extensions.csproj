@@ -6,7 +6,7 @@
     <Description>AntJob 扩展组件库，支持 SQL 数据驱动、消息驱动、动态脚本等多种调度模式。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>©2002-2026 NewLife</Copyright>
-    <VersionPrefix>4.5</VersionPrefix>
+    <VersionPrefix>5.0</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>

@@ -62,7 +62,7 @@ AntJob 以 “蚂蚁搬家” 思想把任意大任务切分成可并行的小�
 - 作业时间/数据切片：精细到秒级，支持追赶、回溯补齐、批量重置
 - 任务可靠投递：失败自动延迟重试（容忍暂时性依赖失败）
 - 集群弹性：天然无状态执行节点，可随时扩缩容
-- 通信协议：基于 NewLife.Remoting (TCP) + 规划中的 WebSocket/Http 轻量接入
+- 通信协议：HTTP REST + WebSocket 下行通知（默认推荐），兼容 NewLife.Remoting TCP RPC
 - 监控可视化：Web 控制台实时查看作业曲线、任务状态、节点在线
 - 可插拔提供者 (IJobProvider)：网络、文件、本地自定义源
 - 轻依赖：核心依赖 NewLife 自家生态（日志、配置、追踪），减少外部复杂度
@@ -117,7 +117,19 @@ dotnet run
 不配置 NetworkJobProvider 时使用默认本地 Provider，适合调试。
 
 ### 5.4 引入 Web 控制台
-部署 AntJob.Web（IIS / Kestrel / Docker）后修改客户端配置 Server 指向其服务地址即可。
+部署 AntJob.Web（IIS / Kestrel / Docker）后修改客户端配置 Server 指向其服务地址即可。无需独立 AntServer：
+
+```json
+{
+  "Ant": {
+    "Server": "https://ant.example.com",
+    "AppId": "MyJobApp",
+    "Secret": ""
+  }
+}
+```
+
+客户端登录后经 HTTP 心跳建立 `/AntJob/Notify` WebSocket 长连接，接收作业变更与消息到达通知；WebSocket 不可用时仍按轮询周期工作。
 
 ### 5.5 Docker（示意）
 > 官方暂未提供镜像，可在企业内封装：
@@ -151,7 +163,7 @@ Doc/                    文档与资源
 ---
 ## 8. 配置说明
 核心客户端配置类：`AntSetting`
-- Server：调度中心地址，支持多地址 `tcp://a:9999,tcp://b:9999`
+- Server：调度中心地址，支持多地址；`http(s)://` 走 HTTP + WebSocket 通道，`tcp://` 走 RPC 兼容通道。例如 `https://a.example.com,https://b.example.com` 或 `tcp://a:9999,tcp://b:9999`
 - AppID / Secret：应用隔离凭据（可自动注册或手动分发）
 - Debug：调试开关，输出更详细日志
 
@@ -208,14 +220,13 @@ Q: 任务失败是否会阻塞后续?
 A: 不会；失败任务延迟重试，其它窗口继续调度。  
 
 Q: 能否只用 Http/WebSocket 接入?  
-A: Http 已支持，使用 `HttpJobProvider` 基于 HTTP REST API 与调度中心通信，轻量场景无需独立 AntServer；WebSocket 仍在规划中。  
+A: 可以。`Server` 配置为 `http://` 或 `https://` 地址即可，客户端自动使用 HTTP REST + WebSocket 通知，无需独立 AntServer。`tcp://` 地址继续走 RPC 兼容通道。
 
 Q: 如何限制脚本风险?  
 A: 关闭未使用的 CSharpHandler；或隔离运行进程 + 最小权限配置。  
 
 ---
 ## 14. Roadmap（补充 v4 外）
-- WebSocket Provider（无 TCP 端口环境支持；Http 已通过 HttpJobProvider 实现）
 - 任务主动延迟 API（执行中评估延时再执行而不计错）
 - 可插拔告警渠道（邮件 / Webhook / 企业微信等）
 - 多维度监控指标导出（Prometheus/OpenTelemetry）
@@ -310,7 +321,7 @@ internal class HelloJob : Handler
 ```
 
 ### 编译 & 运行
-首次运行会自动尝试连接 `tcp://127.0.0.1:9999` 与 `tcp://ant.newlifex.com:9999`（主备机制），来源于 `AntSetting` 配置。
+首次运行会自动尝试连接 `tcp://127.0.0.1:9999` 与 `tcp://ant.newlifex.com:9999`（主备机制），来源于 `AntSetting` 配置。若 `Server` 配置为 `http(s)://` 地址，则自动切换到 HTTP 通道，并通过 WebSocket 接收下行通知。
 
 日志示例：
 ```sql
@@ -335,7 +346,7 @@ internal class HelloJob : Handler
 ---
 ## 18. v4 架构升级 (进展)
 v4 亮点：
-1. [] 新增 Http 接入（AntWeb 提供调度服务，无需 AntServer）
+1. [x] 新增 Http 接入（AntWeb 提供调度服务，无需 AntServer）；WebSocket 下行通知已随 HTTP 通道落地
 2. [x] 增强定时调度：支持 Cron 表达式，逐步替代 Start+Step 固定步进
 3. [] 提前生成任务：到点即执行（精度提升，待评估）
 4. [x] 任务主动延迟：执行中请求延迟但不计失败，提高鲁棒性
@@ -456,8 +467,9 @@ sequenceDiagram
 | 文档 | 说明 |
 |------|------|
 | [需求文档](Doc/需求文档.md) | 愿景、核心目标、7 大模块的功能需求与暂缓清单 |
-| [功能清单](Doc/功能清单.md) | 80 项功能点的实现/测试/注释三维状态追踪（含强制拆分检查） |
+| [功能清单](Doc/功能清单.md) | 85 项功能点的实现/测试/注释三维状态追踪（含强制拆分检查） |
 | [架构设计](Doc/架构设计.md) | 分层架构、核心组件职责、关键流程时序图、设计决策 |
+| [HTTP 与 WebSocket 部署](Doc/HTTP与WebSocket部署.md) | 网关配置、Redis 广播、迁移步骤与排查清单 |
 | [核心组件性能测试](Doc/Benchmark/核心组件性能测试.md) | 时间表达式、模板替换、SQL 片段解析基准数据与优化建议 |
 
 新生命团队（NewLife）成立于2002年，是新时代物联网行业解决方案提供者，致力于提供软硬件应用方案咨询、系统架构规划与开发服务。  

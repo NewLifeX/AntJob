@@ -5,7 +5,7 @@
     <Description>AntJob 分布式调度系统的数据层，包含任务、日志和状态管理的数据模型与存储接口。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
-    <VersionPrefix>4.4</VersionPrefix>
+    <VersionPrefix>5.0</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>

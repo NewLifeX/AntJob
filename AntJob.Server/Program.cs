@@ -37,6 +37,9 @@ services.AddSingleton<ICacheProvider, RedisCacheProvider>();
 services.AddSingleton<AppService>();
 services.AddSingleton<JobService>();
 
+// 作业变更与消息到达通知。RPC 兼容通道与 Web 通道共用同一事件总线主题
+services.AddSingleton<IJobNotifier, EventBusNotifier>();
+
 // 注册密码提供者，用于通信过程中保护密钥，避免明文传输
 services.AddSingleton<IPasswordProvider>(new SaltPasswordProvider { Algorithm = "md5", SaltTime = 60 });
 
@@ -50,5 +53,8 @@ _ = Task.Run(() => JobService.FixOld());
 var host = services.BuildHost();
 
 host.Add<Worker>();
+
+// 提前实例化通知器，确保启动时即订阅作业变更事件
+_ = host.Services.GetService(typeof(IJobNotifier));
 
 await host.RunAsync();

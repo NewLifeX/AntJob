@@ -7,7 +7,7 @@
     <Description>AntJob 可视化管理平台，提供任务调度、监控、日志查询和集群管理功能。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
-    <VersionPrefix>4.5</VersionPrefix>
+    <VersionPrefix>5.0</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>
@@ -21,11 +21,13 @@
     <LangVersion>latest</LangVersion>
     <IsPackable>true</IsPackable>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
-    <PackageReleaseNotes>HttpJobProvider 重构为全异步接口并补全 SetJob 方法，适用于无 TCP 端口环境；补充数据层与处理器 SQLite 集成测试及单元测试，提升测试覆盖率；新增需求、功能清单与架构设计文档；修正版本号生成逻辑，修复 TrimEnd 误用；升级依赖包至最新版</PackageReleaseNotes>
+    <PackageReleaseNotes>新增 /AntJob/Notify WebSocket 长连接，向客户端推送作业变更与消息到达通知；HTTP API 补齐 Login 令牌、Ping、Logout；多实例经 Redis 事件总线广播，无需粘性会话；客户端可直接对接 Web 站点，无需独立 AntServer</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\AntJob.Server\Services\AppService.cs" Link="Services\AppService.cs" />
     <Compile Include="..\AntJob.Server\Services\JobService.cs" Link="Services\JobService.cs" />
+    <Compile Include="..\AntJob.Server\Services\IJobNotifier.cs" Link="Services\IJobNotifier.cs" />
+    <Compile Include="..\AntJob.Server\Services\EventBusNotifier.cs" Link="Services\EventBusNotifier.cs" />
     <Compile Include="..\AntJob.Server\Setting.cs" Link="Setting.cs" />
   </ItemGroup>
   <ItemGroup>

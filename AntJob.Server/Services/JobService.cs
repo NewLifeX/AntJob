@@ -11,12 +11,13 @@ using XCode.DataAccessLayer;
 
 namespace AntJob.Server.Services;
 
-public class JobService(AppService appService, ICacheProvider cacheProvider, ITracer tracer, ILog log)
+public class JobService(AppService appService, ICacheProvider cacheProvider, ITracer tracer, ILog log, IJobNotifier notifier = null)
 {
     private readonly AppService _appService = appService;
     private readonly ICacheProvider _cacheProvider = cacheProvider;
     private readonly ITracer _tracer = tracer;
     private readonly ILog _log = log;
+    private readonly IJobNotifier _notifier = notifier;
 
     #region 业务
     /// <summary>获取指定名称的作业</summary>
@@ -425,6 +426,9 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
             target.MessageCount += total;
             target.SaveAsync();
+
+            // 通知在线消费者立即申请任务，降低消息延迟；通知丢失时由客户端兜底轮询修复
+            _notifier?.NotifyMessage(target.Name, model.Topic, total);
         }
 
         return total;

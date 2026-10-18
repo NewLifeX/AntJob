@@ -2,6 +2,7 @@
 using AntJob.Handlers;
 using AntJob.Models;
 using NewLife;
+using NewLife.Remoting.Models;
 using NewLife.Threading;
 
 namespace AntJob.Providers;
@@ -10,6 +11,9 @@ namespace AntJob.Providers;
 public class NetworkJobProvider(AntSetting setting) : JobProvider
 {
     #region 属性
+    /// <summary>配置</summary>
+    protected AntSetting Setting { get; } = setting;
+
     /// <summary>客户端</summary>
     public AntClient Ant { get; set; }
 
@@ -32,17 +36,41 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     #endregion
 
     #region 启动停止
+    /// <summary>创建客户端。派生类可注入自定义客户端</summary>
+    /// <param name="setting">配置</param>
+    /// <returns></returns>
+    protected virtual AntClient CreateClient(AntSetting setting) => new(setting);
+
+    /// <summary>收到服务端下行信号。清除作业缓存并立即唤醒调度</summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OnReceived(Object sender, CommandEventArgs e)
+    {
+        var command = e.Model?.Command;
+        if (command.IsNullOrEmpty()) return;
+
+        switch (command)
+        {
+            case "JobChanged":
+            case "Message":
+            case "Reload":
+                // 让下一次 GetJobs 立即命中服务端，随后立刻执行一轮调度
+                _jobs = null;
+                Schedule?.WakeUp();
+                break;
+        }
+    }
+
     /// <summary>开始</summary>
     public override async Task Start()
     {
-        WriteLog("正在连接调度中心：{0}", setting.Server);
+        WriteLog("正在连接调度中心：{0}", Setting.Server);
 
         // 使用配置中心账号
-        var ant = new AntClient(setting)
-        {
-            Tracer = Tracer,
-            Log = Log,
-        };
+        var ant = CreateClient(Setting);
+        ant.Tracer = Tracer;
+        ant.Log = Log;
+        ant.Received += OnReceived;
         await ant.Login();
 
         // 断开前一个连接
@@ -145,11 +173,11 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     /// <returns></returns>
     public override async Task<IJob[]> GetJobs()
     {
-        // 周期性获取，避免请求过快
+        // 周期性获取，避免请求过快。HTTP 通道依赖 WebSocket 通知触发即时刷新，轮询只做兜底
         var now = TimerX.Now;
         if (_jobs == null || _NextGetJobs <= now)
         {
-            _NextGetJobs = now.AddSeconds(5);
+            _NextGetJobs = now.AddSeconds(Ant?.IsHttp == true ? 30 : 5);
 
             var jobs = await Ant.GetJobs();
             if (jobs != null)

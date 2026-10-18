@@ -6,7 +6,7 @@
     <Description>AntJob 分布式任务调度系统核心 SDK，提供高吞吐量的任务切片、可靠重试与弹性伸缩能力。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>©2002-2026 NewLife</Copyright>
-    <VersionPrefix>4.5</VersionPrefix>
+    <VersionPrefix>5.0</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>
@@ -29,7 +29,7 @@
     <RepositoryUrl>https://github.com/NewLifeX/AntJob</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>新生命团队;X组件;NewLife;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes>HttpJobProvider 重构为全异步接口并补全 SetJob 方法，适用于无 TCP 端口环境；补充数据层与处理器 SQLite 集成测试及单元测试，提升测试覆盖率；新增需求、功能清单与架构设计文档；修正版本号生成逻辑，修复 TrimEnd 误用；升级依赖包至最新版</PackageReleaseNotes>
+    <PackageReleaseNotes>HTTP 通道完整化：客户端按地址协议自动选择 HTTP 或 TCP RPC，HTTP 通道补齐登录令牌、心跳保活、UTC 换算与增量 SetJob；新增 WebSocket 下行通知（作业变更/消息到达），收到通知后立即拉取，丢失由轮询兜底；HttpJobProvider 与 NetworkJobProvider 统一实现，消除两套通信代码漂移</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>

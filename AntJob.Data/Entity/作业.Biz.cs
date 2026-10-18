@@ -88,6 +88,55 @@ public partial class Job : EntityBase<Job>
         return 3600;
     }
 
+    /// <summary>作业调度参数变更事件。作业新增、删除或调度参数变化时触发</summary>
+    /// <remarks>服务端订阅该事件，向在线客户端推送变更通知；统计字段更新不会触发</remarks>
+    public static event EventHandler<JobChangedEventArgs> Changed;
+
+    /// <summary>判断本次更新是否修改了影响调度的字段</summary>
+    /// <returns></returns>
+    private Boolean IsScheduleChanged()
+    {
+        var d = Dirtys;
+        return d[nameof(Enable)] ||
+               d[nameof(DataTime)] ||
+               d[nameof(End)] ||
+               d[nameof(Step)] ||
+               d[nameof(Offset)] ||
+               d[nameof(Mode)] ||
+               d[nameof(Cron)] ||
+               d[nameof(MaxTask)] ||
+               d[nameof(BatchSize)] ||
+               d[nameof(QuietTime)] ||
+               d[nameof(Topic)] ||
+               d[nameof(Data)] ||
+               d[nameof(ClassName)];
+    }
+
+    /// <summary>新增后触发变更事件</summary>
+    /// <returns></returns>
+    protected override Int32 OnInsert()
+    {
+        var rs = base.OnInsert();
+
+        if (rs != 0) NotifyChanged(nameof(OnInsert));
+
+        return rs;
+    }
+
+    /// <summary>更新后触发变更事件。仅在调度字段变化时触发，避免统计更新造成通知风暴</summary>
+    /// <returns></returns>
+    protected override Int32 OnUpdate()
+    {
+        // 脏标记会在 base.OnUpdate 后清空，必须提前判断
+        var changed = IsScheduleChanged();
+
+        var rs = base.OnUpdate();
+
+        if (rs != 0 && changed) NotifyChanged(nameof(OnUpdate));
+
+        return rs;
+    }
+
     /// <summary>删除</summary>
     /// <returns></returns>
     protected override Int32 OnDelete()
@@ -101,7 +150,21 @@ public partial class Job : EntityBase<Job>
             app.SaveAsync();
         }
 
+        if (rs != 0) NotifyChanged(nameof(OnDelete));
+
         return rs;
+    }
+
+    private void NotifyChanged(String action)
+    {
+        try
+        {
+            Changed?.Invoke(this, new JobChangedEventArgs(this, action));
+        }
+        catch
+        {
+            // 通知失败不影响作业本身的增删改
+        }
     }
     #endregion
 

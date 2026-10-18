@@ -4,6 +4,7 @@ using System.Reflection;
 using AntJob.Data;
 using AntJob.Models;
 using NewLife;
+using NewLife.Data;
 using NewLife.Model;
 using NewLife.Reflection;
 using NewLife.Remoting.Clients;
@@ -16,6 +17,9 @@ public class AntClient : ClientBase
 {
     #region 属性
     private readonly AntSetting _setting;
+
+    /// <summary>是否使用 HTTP 通道。地址以 http/https 开头时启用</summary>
+    public Boolean IsHttp => Server.StartsWithIgnoreCase("http://", "https://");
     #endregion
 
     #region 构造
@@ -35,11 +39,20 @@ public class AntClient : ClientBase
     {
         Features = Features.Login | Features.Ping;
 
-        if (Server.StartsWithIgnoreCase("http://", "https://"))
+        if (IsHttp)
+        {
+            // HTTP 通道通过 WebSocket 接收下行通知
+            Features |= Features.Notify;
             SetActions("AntJob/");
+        }
         else
             SetActions("");
     }
+
+    /// <summary>获取业务接口路径。HTTP 通道统一加 AntJob 前缀</summary>
+    /// <param name="name">接口名</param>
+    /// <returns></returns>
+    private String GetAction(String name) => IsHttp ? "AntJob/" + name : name;
     #endregion
 
     #region 方法
@@ -63,6 +76,29 @@ public class AntClient : ClientBase
         InitClient();
 
         base.OnInit();
+    }
+
+    /// <summary>心跳。维持在线状态，并维护 HTTP 通道的 WebSocket 长连接</summary>
+    /// <remarks>
+    /// HTTP 通道不走基类的 WebSocket/SSE 自动降级，避免在网关不支持 WebSocket 时反复请求 SSE 端点。
+    /// 这里通过 SendAsync 间接维护 WebSocket，并发送 Ping 文本消息供服务端刷新会话。
+    /// </remarks>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    protected override async Task OnPing(Object state)
+    {
+        if (Features.HasFlag(Features.Ping)) await Ping().ConfigureAwait(false);
+
+        if (!IsHttp) return;
+
+        try
+        {
+            await SendAsync(new ArrayPacket("Ping".GetBytes())).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            Log?.Debug("[{0}]WebSocket心跳失败：{1}", Name, ex.Message);
+        }
     }
     #endregion
 
@@ -92,24 +128,27 @@ public class AntClient : ClientBase
     #region 核心方法
     /// <summary>获取指定名称的作业</summary>
     /// <returns></returns>
-    public async Task<IJob[]> GetJobs() => await InvokeAsync<JobModel[]>(nameof(GetJobs));
+    public async Task<IJob[]> GetJobs() => await InvokeAsync<JobModel[]>(GetAction(nameof(GetJobs)));
 
     /// <summary>批量添加作业</summary>
     /// <param name="jobs"></param>
     /// <returns></returns>
-    public Task<String[]> AddJobs(IJob[] jobs) => InvokeAsync<String[]>(nameof(AddJobs), new { jobs });
+    public Task<String[]> AddJobs(IJob[] jobs) => IsHttp
+        // HTTP 接口直接接收数组，RPC 接口使用参数对象
+        ? InvokeAsync<String[]>(GetAction(nameof(AddJobs)), jobs)
+        : InvokeAsync<String[]>(GetAction(nameof(AddJobs)), new { jobs });
 
     /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
     /// <param name="job"></param>
     /// <returns></returns>
-    public async Task<IJob> SetJob(IDictionary<String, Object> job) => await InvokeAsync<JobModel>(nameof(SetJob), job);
+    public async Task<IJob> SetJob(IDictionary<String, Object> job) => await InvokeAsync<JobModel>(GetAction(nameof(SetJob)), job);
 
     /// <summary>申请作业任务</summary>
     /// <param name="job">作业</param>
     /// <param name="topic">主题</param>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public async Task<ITask[]> Acquire(String job, String topic, Int32 count) => await InvokeAsync<TaskModel[]>(nameof(Acquire), new AcquireModel
+    public async Task<ITask[]> Acquire(String job, String topic, Int32 count) => await InvokeAsync<TaskModel[]>(GetAction(nameof(Acquire)), new AcquireModel
     {
         Job = job,
         Topic = topic,
@@ -119,7 +158,7 @@ public class AntClient : ClientBase
     /// <summary>生产消息</summary>
     /// <param name="model">模型</param>
     /// <returns></returns>
-    public Task<Int32> Produce(ProduceModel model) => InvokeAsync<Int32>(nameof(Produce), model);
+    public Task<Int32> Produce(ProduceModel model) => InvokeAsync<Int32>(GetAction(nameof(Produce)), model);
 
     /// <summary>报告状态（进度、成功、错误）</summary>
     /// <param name="task"></param>
@@ -132,7 +171,7 @@ public class AntClient : ClientBase
         {
             try
             {
-                return await InvokeAsync<Boolean>(nameof(Report), task);
+                return await InvokeAsync<Boolean>(GetAction(nameof(Report)), task);
             }
             catch (Exception ex)
             {
@@ -145,6 +184,6 @@ public class AntClient : ClientBase
 
     /// <summary>获取当前应用的所有在线实例</summary>
     /// <returns></returns>
-    public async Task<IPeer[]> GetPeers() => await InvokeAsync<PeerModel[]>(nameof(GetPeers));
+    public async Task<IPeer[]> GetPeers() => await InvokeAsync<PeerModel[]>(GetAction(nameof(GetPeers)));
     #endregion
 }

@@ -7,7 +7,7 @@
     <Description>AntJob 分布式调度中心，负责任务分片、分配、调度和监控，支持集群弹性伸缩。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
-    <VersionPrefix>4.4</VersionPrefix>
+    <VersionPrefix>5.0</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(Version)</FileVersion>
