@@ -57,16 +57,19 @@ public class AppService
             if (secret.IsNullOrEmpty() || !_passwordProvider.Verify(app.Secret, secret)) throw new Exception("密码错误！");
         }
 
-        // 版本和编译时间
-        if (app.Version.IsNullOrEmpty() || app.Version.CompareTo(model.Version) < 0) app.Version = model.Version;
+        // 版本和编译时间。应用实体由单对象缓存共享，多实例并发登录时需串行写入
         var compile = model.Compile.ToDateTime().ToLocalTime();
-        if (app.CompileTime < compile) app.CompileTime = compile;
-        if (app.DisplayName.IsNullOrEmpty()) app.DisplayName = model.DisplayName;
-
-        // 多客户端并发自动注册时，可能同时插入同名应用而触发唯一约束，冲突后重新加载
         try
         {
-            app.Save();
+            lock (app)
+            {
+                if (app.Version.IsNullOrEmpty() || app.Version.CompareTo(model.Version) < 0) app.Version = model.Version;
+                if (app.CompileTime < compile) app.CompileTime = compile;
+                if (app.DisplayName.IsNullOrEmpty()) app.DisplayName = model.DisplayName;
+
+                // 多客户端并发自动注册时，可能同时插入同名应用而触发唯一约束，冲突后重新加载
+                app.Save();
+            }
         }
         catch (Exception) when (autoReg)
         {

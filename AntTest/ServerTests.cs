@@ -336,6 +336,33 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Null(AppOnline.Find(AppOnline._.ID == online.ID));
     }
 
+    [Fact(DisplayName = "并发生产累计应用消息数")]
+    public async Task JobService_Produce_Concurrent_MessageCount()
+    {
+        var name = "SrvProdSum_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        app.MessageCount = 0;
+        app.Save();
+
+        var jobName = "ProdSumJob";
+        var topic = "P1";
+        fixture.JobService.AddJobs(app, [new JobModel { Name = jobName, Mode = JobModes.Message, Topic = topic, Enable = true }]);
+
+        var before = App.FindByName(name).MessageCount;
+
+        // 应用实体由单对象缓存共享，并发生产必须串行累加
+        var runs = Enumerable.Range(0, 8).Select(i => Task.Run(() =>
+            fixture.JobService.Produce(app, new ProduceModel { Job = jobName, Topic = topic, Messages = [$"m{i}"] }))).ToArray();
+        var counts = await Task.WhenAll(runs);
+
+        Assert.Equal(8, counts.Sum());
+
+        var entity = App.FindByName(name);
+        Assert.Equal(before + 8, entity.MessageCount);
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {
