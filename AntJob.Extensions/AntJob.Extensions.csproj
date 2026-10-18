@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net45;net8.0</TargetFrameworks>
     <AssemblyTitle>蚂蚁调度扩展库</AssemblyTitle>
     <Description>AntJob 扩展组件库，支持 SQL 数据驱动、消息驱动、动态脚本等多种调度模式。</Description>
     <Company>新生命开发团队</Company>
@@ -51,4 +51,8 @@
   <ItemGroup>
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
 </Project>

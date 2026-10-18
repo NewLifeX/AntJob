@@ -30,6 +30,11 @@
     <Compile Include="..\AntJob.Server\Services\EventBusNotifier.cs" Link="Services\EventBusNotifier.cs" />
     <Compile Include="..\AntJob.Server\Setting.cs" Link="Setting.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- 直接编译 AntJob.Server 的源码文件，需同步挂载其多语言词表 -->
+    <AdditionalFiles Include="$(MSBuildProjectDirectory)\..\AntJob.Server\Locales\*.yml" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
   </ItemGroup>

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net461;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net461;net45;net8.0</TargetFrameworks>
     <AssemblyTitle>蚂蚁调度SDK</AssemblyTitle>
     <Description>AntJob 分布式任务调度系统核心 SDK，提供高吞吐量的任务切片、可靠重试与弹性伸缩能力。</Description>
     <Company>新生命开发团队</Company>
@@ -52,7 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="12.0.2026.1017-beta1103" />
+    <PackageReference Include="NewLife.Core" Version="12.0.2026.1018-beta1517" />
     <PackageReference Include="NewLife.Remoting" Version="3.9.2026.1017-beta1444" />
     <PackageReference Include="NewLife.Stardust" Version="3.10.2026.1017-beta1056" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.9.0" Condition="'$(TargetFramework)' != 'net45'" />
@@ -67,4 +67,8 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
 </Project>
