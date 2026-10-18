@@ -3,6 +3,7 @@ using AntJob.Handlers;
 using AntJob.Models;
 using NewLife;
 using NewLife.Remoting.Models;
+using NewLife.Serialization;
 using NewLife.Threading;
 
 namespace AntJob.Providers;
@@ -19,6 +20,9 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
 
     /// <summary>邻居伙伴。用于应用判断自身有多少个实例在运行</summary>
     public IPeer[] Peers { get; private set; }
+
+    /// <summary>消息型作业空闲时的申请周期（秒）。HTTP 通道由 WebSocket 通知触发，RPC 通道保持轮询</summary>
+    public virtual Int32 MessageIdlePeriod => 0;
     #endregion
 
     #region 构造
@@ -54,6 +58,22 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
             case "JobChanged":
             case "Message":
             case "Reload":
+                // 解析主题，消息通知只唤醒订阅该主题的处理器
+                var topic = "";
+                var dic = JsonParser.Decode(e.Model?.Argument);
+                if (dic != null && dic.TryGetValue("topic", out var value)) topic = value + "";
+
+                var handlers = Schedule?.Handlers;
+                if (handlers != null)
+                {
+                    foreach (var handler in handlers)
+                    {
+                        if (command == "Message" && !topic.IsNullOrEmpty() && handler.Job?.Mode == JobModes.Message && !handler.Job.Topic.EqualIgnoreCase(topic)) continue;
+
+                        handler.NextAcquire = DateTime.MinValue;
+                    }
+                }
+
                 // 让下一次 GetJobs 立即命中服务端，随后立刻执行一轮调度
                 _jobs = null;
                 Schedule?.WakeUp();

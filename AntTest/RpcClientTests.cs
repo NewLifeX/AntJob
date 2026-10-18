@@ -31,11 +31,13 @@ public class RpcClientTests(RpcServerFixture fixture) : IClassFixture<RpcServerF
         var jobs = await client.GetJobs();
         Assert.NotNull(jobs);
 
-        var added = await client.AddJobs([new JobModel { Name = "RpcJob1", Mode = JobModes.Time, DataTime = DateTime.Today }]);
-        Assert.Contains("RpcJob1", added);
+        // 作业名按运行隔离，避免共享数据库时与其它测试相互影响
+        var jobName = "RpcJob_" + Guid.NewGuid().ToString("N")[..6];
+        var added = await client.AddJobs([new JobModel { Name = jobName, Mode = JobModes.Time, DataTime = DateTime.Today }]);
+        Assert.Contains(jobName, added);
 
         jobs = await client.GetJobs();
-        Assert.Contains(jobs, e => e.Name == "RpcJob1");
+        Assert.Contains(jobs, e => e.Name == jobName);
 
         var peers = await client.GetPeers();
         Assert.NotNull(peers);

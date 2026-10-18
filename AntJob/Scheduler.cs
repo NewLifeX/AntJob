@@ -259,6 +259,7 @@ public class Scheduler : DisposeBase
 
         var flag = false;
         Handler inactive = null;
+        var now = TimerX.Now;
         // 遍历处理器，给空闲的增加任务
         foreach (var handler in handlers)
         {
@@ -299,6 +300,9 @@ public class Scheduler : DisposeBase
                 }
             }
 
+            // 空闲退避：消息型作业在未收到通知前不必每轮都申请
+            if (handler.NextAcquire > now) continue;
+
             // 如果正在处理任务数没达到最大并行度，则继续安排任务
             //var max = job.MaxTask;
             //if (prv is NetworkJobProvider nprv)
@@ -316,6 +320,15 @@ public class Scheduler : DisposeBase
             {
                 // 循环申请任务，喂饱处理器
                 var ts = await handler.Acquire(count);
+
+                // 消息型作业在没有任务时进入空闲退避，收到通知后重置
+                if (ts == null || ts.Length == 0)
+                {
+                    var idle = (prv as NetworkJobProvider)?.MessageIdlePeriod ?? 0;
+                    if (idle > 0 && job.Mode == JobModes.Message) handler.NextAcquire = TimerX.Now.AddSeconds(idle);
+                }
+                else
+                    handler.NextAcquire = DateTime.MinValue;
 
                 // 送给处理器处理
                 for (var i = 0; i < count && ts != null && i < ts.Length; i++)

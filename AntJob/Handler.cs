@@ -64,6 +64,9 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
 
     /// <summary>最大不活跃时间（秒）。单个任务从开始执行超过该时间仍未结束，视为僵死。默认0表示禁用检测</summary>
     public Int32 MaxInactiveTime { get; set; }
+
+    /// <summary>下一次允许申请任务的时间。用于消息型作业的空闲退避，收到通知时重置</summary>
+    public DateTime NextAcquire { get; set; }
     #endregion
 
     #region 索引器

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using AntJob;
 using AntJob.Data;
 using AntJob.Providers;
@@ -34,6 +35,26 @@ public class SchedulerTests : IDisposable
     public void Constructor_Provider_Null()
     {
         Assert.Null(_scheduler.Provider);
+    }
+
+    [Fact]
+    public async Task JoinAsync_Selects_Http_Provider()
+    {
+        var set = new AntSetting { Server = "http://127.0.0.1:1", AppId = "TestApp" };
+
+        await _scheduler.JoinAsync(set);
+
+        Assert.IsType<HttpJobProvider>(_scheduler.Provider);
+    }
+
+    [Fact]
+    public async Task JoinAsync_Selects_Rpc_Provider()
+    {
+        var set = new AntSetting { Server = "tcp://127.0.0.1:1", AppId = "TestApp" };
+
+        await _scheduler.JoinAsync(set);
+
+        Assert.IsType<NetworkJobProvider>(_scheduler.Provider);
     }
 
     [Fact]
@@ -90,5 +111,54 @@ public class SchedulerTests : IDisposable
 
         Assert.NotNull(_scheduler.Provider);
         Assert.Same(provider, _scheduler.Provider);
+    }
+
+    [Fact]
+    public async Task Process_MessageJob_IdleBackoff()
+    {
+        var provider = new CountingProvider();
+        _scheduler.Provider = provider;
+        provider.Schedule = _scheduler;
+
+        var handler = new TestHandler { Name = "MsgJob", Mode = JobModes.Message };
+        _scheduler.AddHandler(handler);
+
+        await _scheduler.Process();
+        Assert.Equal(1, provider.AcquireCount);
+        Assert.True(handler.NextAcquire > DateTime.Now);
+
+        // 未到下一次申请时间，直接跳过
+        await _scheduler.Process();
+        Assert.Equal(1, provider.AcquireCount);
+
+        // 通知到达后重置，立即再次申请
+        handler.NextAcquire = DateTime.MinValue;
+        await _scheduler.Process();
+        Assert.Equal(2, provider.AcquireCount);
+    }
+
+    private class CountingProvider : NetworkJobProvider
+    {
+        public CountingProvider() : base(new AntSetting { Server = "http://127.0.0.1:1" }) { }
+
+        public override Int32 MessageIdlePeriod => 15;
+
+        public Int32 AcquireCount;
+
+        public override Task<IJob[]> GetJobs() => Task.FromResult<IJob[]>([new JobModel
+        {
+            Name = "MsgJob",
+            Mode = JobModes.Message,
+            Enable = true,
+            MaxTask = 1,
+            Topic = "T1",
+        }]);
+
+        public override Task<ITask[]> Acquire(IJob job, String topic, Int32 count)
+        {
+            AcquireCount++;
+
+            return Task.FromResult(Array.Empty<ITask>());
+        }
     }
 }
