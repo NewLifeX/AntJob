@@ -1,4 +1,5 @@
-﻿using AntJob.Data;
+﻿using System.Collections.Concurrent;
+using AntJob.Data;
 using AntJob.Data.Entity;
 using AntJob.Models;
 using NewLife;
@@ -482,90 +483,103 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         // 判断是否有权
 
         var task = JobTask.FindByID(result.ID) ?? throw new InvalidOperationException($"找不到任务[{result.ID}]");
-        var job = Job.FindByID(task.JobID);
-        if (job == null || job.AppID != app.ID)
+
+        // 同一作业的统计更新必须串行：并发上报各自读到旧值再写回，增量会丢失
+        lock (GetJobLock(task.JobID))
         {
-            _log.Info(result.ToJson());
-            throw new InvalidOperationException($"应用[{app}]无权操作作业[{job}#{task}]");
-        }
+            var job = Job.FindByID(task.JobID);
+            if (job == null || job.AppID != app.ID)
+            {
+                _log.Info(result.ToJson());
+                throw new InvalidOperationException($"应用[{app}]无权操作作业[{job}#{task}]");
+            }
 
-        // 上报可能重复（客户端超时重试）或乱序（中间状态晚于最终状态到达）。
-        // 任务终结后再接受中间状态，会把状态回退并让统计重复累加，进而被当成中断任务重新分配
-        if (task.Status is JobStatus.完成) return true;
-        if (task.Status is JobStatus.错误 && result.Status is not JobStatus.完成)
-        {
-            _log.Debug("任务[{0}]已错误终结，忽略状态[{1}]上报", task.ID, result.Status);
-            return true;
-        }
+            // 上报可能重复（客户端超时重试）或乱序（中间状态晚于最终状态到达）。
+            // 任务终结后再接受中间状态，会把状态回退并让统计重复累加，进而被当成中断任务重新分配
+            if (task.Status is JobStatus.完成) return true;
+            if (task.Status is JobStatus.错误 && result.Status is not JobStatus.完成)
+            {
+                _log.Debug("任务[{0}]已错误终结，忽略状态[{1}]上报", task.ID, result.Status);
+                return true;
+            }
 
-        // 只有部分字段允许客户端修改
-        if (result.Status > 0) task.Status = result.Status;
+            // 只有部分字段允许客户端修改
+            if (result.Status > 0) task.Status = result.Status;
 
-        task.Total = result.Total;
-        task.Success = result.Success;
-        task.Cost = (Int32)Math.Round(result.Cost / 1000d);
-        task.Speed = result.Cost <= 0 ? 0 : (Int32)Math.Round(result.Total * 1000d / result.Cost);
-        task.Key = result.Key;
-        task.Remark = result.Remark;
+            task.Total = result.Total;
+            task.Success = result.Success;
+            task.Cost = (Int32)Math.Round(result.Cost / 1000d);
+            task.Speed = result.Cost <= 0 ? 0 : (Int32)Math.Round(result.Total * 1000d / result.Cost);
+            task.Key = result.Key;
+            task.Remark = result.Remark;
 #pragma warning disable CS0612 // 类型或成员已过时
-        if (result.Remark.IsNullOrEmpty()) task.Remark = result.Message; // 兼容旧版，Message字段已废弃
+            if (result.Remark.IsNullOrEmpty()) task.Remark = result.Message; // 兼容旧版，Message字段已废弃
 #pragma warning restore CS0612 // 类型或成员已过时
 
-        var traceId = result.TraceId ?? DefaultSpan.Current + "";
-        // 已终结的任务，汇总统计
-        if (result.Status is JobStatus.完成)
-        {
-            task.Times++;
-
-            SetJobFinish(job, task);
-
-            // 记录状态
-            _appService.UpdateOnline(app, task, online);
-        }
-        else if (result.Status == JobStatus.错误)
-        {
-            task.Times++;
-            task.Error++;
-
-            SetJobError(job, task, online.UpdateIP);
-
-            // 出错时判断如果超过最大错误数，则停止作业
-            CheckMaxError(app, job, online);
-
-            // 记录状态
-            _appService.UpdateOnline(app, task, online);
-        }
-        else if (result.Status == JobStatus.延迟)
-        {
-            using var span = _tracer?.NewSpan("Delay", new { job.Name, task.DataTime, NextTime = result.NextTime.ToLocalTime() });
-
-            task.Times++;
-
-            // 延迟任务的下一次执行时间
-            if (result.NextTime.Year > 2000)
+            var traceId = result.TraceId ?? DefaultSpan.Current + "";
+            // 已终结的任务，汇总统计
+            if (result.Status is JobStatus.完成)
             {
-                task.UpdateTime = result.NextTime.ToLocalTime();
+                task.Times++;
 
-                SetDelay(task.JobID, task.UpdateTime);
+                SetJobFinish(job, task);
+
+                // 记录状态
+                _appService.UpdateOnline(app, task, online);
             }
-            else
+            else if (result.Status == JobStatus.错误)
             {
-                SetDelay(task.JobID, DateTime.Now.AddSeconds(job.ErrorDelay));
+                task.Times++;
+                task.Error++;
+
+                SetJobError(job, task, online.UpdateIP);
+
+                // 出错时判断如果超过最大错误数，则停止作业
+                CheckMaxError(app, job, online);
+
+                // 记录状态
+                _appService.UpdateOnline(app, task, online);
             }
+            else if (result.Status == JobStatus.延迟)
+            {
+                using var span = _tracer?.NewSpan("Delay", new { job.Name, task.DataTime, NextTime = result.NextTime.ToLocalTime() });
+
+                task.Times++;
+
+                // 延迟任务的下一次执行时间
+                if (result.NextTime.Year > 2000)
+                {
+                    task.UpdateTime = result.NextTime.ToLocalTime();
+
+                    SetDelay(task.JobID, task.UpdateTime);
+                }
+                else
+                {
+                    SetDelay(task.JobID, DateTime.Now.AddSeconds(job.ErrorDelay));
+                }
+            }
+
+            // 从创建到完成的全部耗时
+            var ts = DateTime.Now - task.CreateTime;
+            task.FullCost = (Int32)ts.TotalSeconds;
+
+            task.Update();
+
+            job.LastStatus = result.Status;
+            job.LastTime = DateTime.Now;
+            job.Save();
         }
-
-        // 从创建到完成的全部耗时
-        var ts = DateTime.Now - task.CreateTime;
-        task.FullCost = (Int32)ts.TotalSeconds;
-
-        task.Update();
-
-        job.LastStatus = result.Status;
-        job.LastTime = DateTime.Now;
-        job.SaveAsync();
 
         return true;
     }
+
+    /// <summary>作业统计更新锁。按作业编号串行，避免并发上报丢失增量</summary>
+    /// <param name="jobId">作业编号</param>
+    /// <returns></returns>
+    private Object GetJobLock(Int32 jobId) => _jobLocks.GetOrAdd(jobId, _ => new Object());
+
+    private readonly ConcurrentDictionary<Int32, Object> _jobLocks = new();
+
 
     private void SetJobFinish(Job job, JobTask task)
     {

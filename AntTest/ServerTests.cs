@@ -217,6 +217,38 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Equal(total, entity.Tasks);
     }
 
+    [Fact(DisplayName = "并发上报累计作业统计")]
+    public async Task JobService_Report_Concurrent_Stats()
+    {
+        var name = "SrvRepSum_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var jobName = "RepSumJob";
+        fixture.JobService.AddJobs(app, [new JobModel { Name = jobName, Mode = JobModes.Time, Enable = true, DataTime = DateTime.Today.AddDays(-5), Step = 30, Offset = 15 }]);
+
+        var online = fixture.AppService.GetOnline(app, $"{name}@rep", "127.0.0.1");
+        var tasks = fixture.JobService.Acquire(app, new AcquireModel { Job = jobName, Count = 10 }, online);
+        Assert.Equal(10, tasks.Length);
+
+        var before = Job.FindByAppIDAndName(app.ID, jobName);
+
+        var reports = tasks.Select(e => Task.Run(() => fixture.JobService.Report(app, new TaskResult
+        {
+            ID = e.ID,
+            Status = JobStatus.完成,
+            Total = 1,
+            Success = 1,
+            Cost = 10,
+        }, online))).ToArray();
+        await Task.WhenAll(reports);
+
+        var job = Job.FindByAppIDAndName(app.ID, jobName);
+        Assert.Equal(before.Total + 10, job.Total);
+        Assert.Equal(before.Success + 10, job.Success);
+        Assert.Equal(before.Times + 10, job.Times);
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {
