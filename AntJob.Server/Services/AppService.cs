@@ -201,6 +201,8 @@ public class AppService
                 lock (online)
                 {
                     online.UpdateIP = ip;
+                    // 显式刷新更新时间，保证心跳能延长在线记录寿命
+                    online.UpdateTime = DateTime.Now;
                     online.Save();
                 }
             }
@@ -218,13 +220,8 @@ public class AppService
     /// <returns>清理条数</returns>
     public static Int32 ClearOnline(Int32 minutes = 10)
     {
-        var count = 0;
-        foreach (var item in AppOnline.GetOnlines(minutes))
-        {
-            count += item.Delete();
-        }
-
-        return count;
+        // 条件删除由数据库在同一条语句内完成，避免查询后心跳刷新了记录仍被删除
+        return AppOnline.Delete(AppOnline._.UpdateTime <= DateTime.Now.AddMinutes(-minutes));
     }
 
     /// <summary>获取当前应用的所有在线实例</summary>
@@ -264,6 +261,8 @@ public class AppService
 
             if (ji.Status == JobStatus.错误) online.Error++;
 
+            // 显式刷新更新时间，保证上报能延长在线记录寿命
+            online.UpdateTime = DateTime.Now;
             online.Update();
         }
     }
