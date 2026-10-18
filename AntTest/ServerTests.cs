@@ -249,6 +249,33 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Equal(before.Times + 10, job.Times);
     }
 
+    [Fact(DisplayName = "消息消费后去重缓存被清理")]
+    public void JobService_Produce_UniqueAfterConsume()
+    {
+        var name = "SrvUnique_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var jobName = "UniqueJob";
+        var topic = "U1";
+        fixture.JobService.AddJobs(app, [new JobModel { Name = jobName, Mode = JobModes.Message, Topic = topic, Enable = true }]);
+
+        var online = fixture.AppService.GetOnline(app, $"{name}@uniq", "127.0.0.1");
+        var model = new ProduceModel { Job = jobName, Topic = topic, Messages = ["u1"], Unique = true };
+
+        Assert.Equal(1, fixture.JobService.Produce(app, model));
+
+        // 未消费前重复生产应被去重
+        Assert.Equal(0, fixture.JobService.Produce(app, model));
+
+        // 消费掉消息
+        var tasks = fixture.JobService.Acquire(app, new AcquireModel { Job = jobName, Topic = topic, Count = 1 }, online);
+        Assert.NotEmpty(tasks);
+
+        // 消费完成后同一条消息应可再次生产
+        Assert.Equal(1, fixture.JobService.Produce(app, model));
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {

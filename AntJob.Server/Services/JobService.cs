@@ -956,8 +956,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
                 ti.Insert();
 
-                // 从去重缓存去掉
-                cache.Remove(msgList.Select(e => $"antjob:{job.AppID}:{job.Topic}:{e}").ToArray());
+                // 从去重缓存去掉。必须使用消息内容，实体转字符串为空，会导致去重键长期残留
+                cache.Remove(msgList.Select(e => $"antjob:{job.AppID}:{job.Topic}:{e.Data}").ToArray());
 
                 list.Add(ti);
             }
