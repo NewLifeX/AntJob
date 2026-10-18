@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AntJob;
 using AntJob.Data;
+using AntJob.Data.Entity;
 using AntJob.Providers;
 using AntJob.Server;
 using NewLife;
@@ -120,9 +121,15 @@ public class RpcClientTests(RpcServerFixture fixture) : IClassFixture<RpcServerF
         var provider = new NetworkJobProvider(setting) { Schedule = scheduler };
         await provider.Start();
 
-        var job = new JobModel { Name = "NetTest", Enable = true };
+        // 时间字段按UTC传输，服务端转换回本地时间后应保持一致
+        var dataTime = DateTime.Today.AddHours(1);
+        var job = new JobModel { Name = "NetTest", Enable = true, DataTime = dataTime };
         var rs = await provider.SetJob(job);
         Assert.NotNull(rs);
+
+        var app = App.FindByName(setting.AppId);
+        var entity = Job.FindByAppIDAndName(app.ID, "NetTest");
+        Assert.Equal(dataTime, entity.DataTime);
 
         await provider.Stop();
         provider.Dispose();

@@ -148,6 +148,43 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
     }
 
     [Fact]
+    public void JobService_SetJob_Utc_ConvertsToLocal()
+    {
+        var name = "SrvUtc_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+        var app = App.FindByName(name);
+
+        fixture.JobService.AddJobs(app, [new JobModel { Name = "SrvUtcJob", Enable = true, Mode = JobModes.Time, DataTime = DateTime.Today, Step = 30 }]);
+
+        var utc = new DateTime(2026, 10, 18, 6, 0, 0, DateTimeKind.Utc);
+        var job = fixture.JobService.SetJob(app, new JobModel { Name = "SrvUtcJob", DataTime = utc },
+            new System.Collections.Generic.Dictionary<String, Object> { ["DataTime"] = null, ["__utc"] = null });
+
+        Assert.NotNull(job);
+        var entity = Job.FindByAppIDAndName(app.ID, "SrvUtcJob");
+        Assert.Equal(utc.ToLocalTime(), entity.DataTime);
+    }
+
+    [Fact]
+    public void JobService_SetJob_WithoutUtc_KeepsLocal()
+    {
+        var name = "SrvLocal_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+        var app = App.FindByName(name);
+
+        fixture.JobService.AddJobs(app, [new JobModel { Name = "SrvLocalJob", Enable = true, Mode = JobModes.Time, DataTime = DateTime.Today, Step = 30 }]);
+
+        // 旧版客户端不带 __utc，服务端按本地时间处理
+        var local = new DateTime(2026, 10, 18, 14, 0, 0, DateTimeKind.Local);
+        var job = fixture.JobService.SetJob(app, new JobModel { Name = "SrvLocalJob", DataTime = local },
+            new System.Collections.Generic.Dictionary<String, Object> { ["DataTime"] = null });
+
+        Assert.NotNull(job);
+        var entity = Job.FindByAppIDAndName(app.ID, "SrvLocalJob");
+        Assert.Equal(local, entity.DataTime);
+    }
+
+    [Fact]
     public async Task Worker_Start_And_Stop()
     {
         var setting = new AntJobSetting { Port = 0, AutoRegistry = true, TokenSecret = "HS256:antjob_test_secret" };

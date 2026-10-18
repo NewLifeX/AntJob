@@ -118,12 +118,21 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         var job = Job.FindByAppIDAndName(app.ID, model.Name);
         if (job == null) return null;
 
+        // 新版客户端按UTC传输时间字段，旧版客户端不带 __utc 标记，保持原有本地时间语义
+        var utc = parameters.ContainsKey("__utc");
+
         // 可以修改的字段
         var fs = new[] { nameof(IJob.Enable), nameof(IJob.DataTime), nameof(IJob.End), nameof(IJob.Step), nameof(JobModel.DisplayName), nameof(JobModel.Description), nameof(IJob.Topic), nameof(IJob.Data) };
         foreach (var item in fs)
         {
             if (parameters.ContainsKey(item))
-                job.SetItem(item, model.GetValue(item));
+            {
+                var value = model.GetValue(item);
+                if (utc && value is DateTime dt && dt.Year > 1000 && (item == nameof(IJob.DataTime) || item == nameof(IJob.End)))
+                    value = dt.ToLocalTime();
+
+                job.SetItem(item, value);
+            }
         }
 
         job.Update();

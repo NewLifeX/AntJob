@@ -219,6 +219,13 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
                 dic.Remove(item.Key);
         }
 
+        // 通信约定UTC，时间字段先转UTC再提交；__utc 用于兼容旧版服务端
+        if (dic.TryGetValue(nameof(IJob.DataTime), out var dt) && dt is DateTime d1 && d1.Year > 1000)
+            dic[nameof(IJob.DataTime)] = d1.ToUniversalTime();
+        if (dic.TryGetValue(nameof(IJob.End), out var end) && end is DateTime d2 && d2.Year > 1000)
+            dic[nameof(IJob.End)] = d2.ToUniversalTime();
+        dic["__utc"] = true;
+
         return Ant.SetJob(dic);
     }
 
