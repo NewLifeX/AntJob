@@ -300,6 +300,9 @@ public class Scheduler : DisposeBase
             handler.Job = job;
             if (job.Mode == 0) job.Mode = handler.Mode;
             if (job.MaxTime > 0) handler.MaxInactiveTime = job.MaxTime * 2;
+
+            // 服务端修改主题后，同步给消息处理器
+            if (handler is MessageHandler mh && !job.Topic.IsNullOrEmpty()) mh.Topic = job.Topic;
             if (!handler.Active)
             {
                 try

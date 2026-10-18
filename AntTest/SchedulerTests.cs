@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AntJob;
 using AntJob.Data;
+using AntJob.Handlers;
 using AntJob.Providers;
 using NewLife;
 using Xunit;
@@ -137,6 +138,26 @@ public class SchedulerTests : IDisposable
         Assert.Equal(2, provider.AcquireCount);
     }
 
+    [Fact]
+    public async Task Process_Syncs_JobTopic_To_MessageHandler()
+    {
+        var provider = new CountingProvider { JobTopic = "T2" };
+        _scheduler.Provider = provider;
+        provider.Schedule = _scheduler;
+
+        var handler = new TestMessageHandler { Name = "MsgJob", Topic = "T1" };
+        _scheduler.AddHandler(handler);
+
+        await _scheduler.Process();
+
+        Assert.Equal("T2", handler.Topic);
+    }
+
+    private class TestMessageHandler : MessageHandler
+    {
+        public override Int32 Execute(JobContext ctx) => 1;
+    }
+
     private class CountingProvider : NetworkJobProvider
     {
         public CountingProvider() : base(new AntSetting { Server = "http://127.0.0.1:1" }) { }
@@ -145,13 +166,15 @@ public class SchedulerTests : IDisposable
 
         public Int32 AcquireCount;
 
+        public String JobTopic { get; set; } = "T1";
+
         public override Task<IJob[]> GetJobs() => Task.FromResult<IJob[]>([new JobModel
         {
             Name = "MsgJob",
             Mode = JobModes.Message,
             Enable = true,
             MaxTask = 1,
-            Topic = "T1",
+            Topic = JobTopic,
         }]);
 
         public override Task<ITask[]> Acquire(IJob job, String topic, Int32 count)
