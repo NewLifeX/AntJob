@@ -8,7 +8,6 @@ using AntJob.Server.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NewLife;
 using NewLife.Caching;
-using NewLife.Caching.Services;
 using NewLife.Remoting.Models;
 using NewLife.Remoting.Services;
 using NewLife.Serialization;

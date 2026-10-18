@@ -31,6 +31,10 @@ public class AntSetting : Config<AntSetting>, IClientSetting
     [Description("是否使用星尘注册中心解析服务地址。默认true；客户端经网关直连时建议关闭")]
     public Boolean UseRegistry { get; set; } = true;
 
+    /// <summary>消息型作业空闲申请周期（秒）。HTTP 通道收到通知会立即复位，默认15秒</summary>
+    [Description("消息型作业空闲申请周期（秒）。HTTP 通道收到通知会立即复位，默认15秒")]
+    public Int32 MessageIdlePeriod { get; set; } = 15;
+
     String IClientSetting.Code { get => AppId; set => AppId = value; }
     #endregion
 

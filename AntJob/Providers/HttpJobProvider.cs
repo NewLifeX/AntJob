@@ -24,7 +24,7 @@ public class HttpJobProvider : NetworkJobProvider
     public String Secret { get => Setting.Secret; set => Setting.Secret = value; }
 
     /// <summary>消息型作业空闲时的申请周期（秒）。HTTP 通道由 WebSocket 通知触发即时申请</summary>
-    public override Int32 MessageIdlePeriod => 15;
+    public override Int32 MessageIdlePeriod => Setting.MessageIdlePeriod;
     #endregion
 
     #region 构造

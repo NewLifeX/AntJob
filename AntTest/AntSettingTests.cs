@@ -48,6 +48,13 @@ public class AntSettingTests
     }
 
     [Fact]
+    public void Default_MessageIdlePeriod()
+    {
+        var set = new AntSetting();
+        Assert.Equal(15, set.MessageIdlePeriod);
+    }
+
+    [Fact]
     public void Set_Properties()
     {
         var set = new AntSetting
@@ -57,6 +64,7 @@ public class AntSettingTests
             Secret = "mysecret",
             Debug = true,
             UseRegistry = false,
+            MessageIdlePeriod = 5,
         };
 
         Assert.Equal("tcp://localhost:1234", set.Server);
@@ -64,6 +72,7 @@ public class AntSettingTests
         Assert.Equal("mysecret", set.Secret);
         Assert.True(set.Debug);
         Assert.False(set.UseRegistry);
+        Assert.Equal(5, set.MessageIdlePeriod);
     }
 
     [Fact]
