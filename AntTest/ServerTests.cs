@@ -363,6 +363,40 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Equal(before + 8, entity.MessageCount);
     }
 
+    [Fact(DisplayName = "申请不存在的作业给出明确错误")]
+    public void JobService_Acquire_UnknownJob()
+    {
+        var name = "SrvUnknown_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var online = fixture.AppService.GetOnline(app, $"{name}@unk", "127.0.0.1");
+
+        // 作业不存在时应抛出明确的业务异常，而不是空引用
+        var ex = Assert.Throws<NewLife.XException>(() =>
+            fixture.JobService.Acquire(app, new AcquireModel { Job = "NoSuchJob_" + name, Count = 1 }, online));
+        Assert.Contains("未找到作业", ex.Message);
+    }
+
+    [Fact(DisplayName = "单次申请任务数受上限约束")]
+    public void JobService_Acquire_Clamps_Count()
+    {
+        var name = "SrvClamp_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var jobName = "ClampJob";
+        fixture.JobService.AddJobs(app, [new JobModel { Name = jobName, Mode = JobModes.Time, Enable = true, DataTime = DateTime.Today.AddDays(-5), Step = 30, Offset = 15 }]);
+
+        var online = fixture.AppService.GetOnline(app, $"{name}@clamp", "127.0.0.1");
+
+        // 客户端异常请求超大数量时，服务端必须收敛到上限
+        var tasks = fixture.JobService.Acquire(app, new AcquireModel { Job = jobName, Count = 100_000 }, online);
+
+        Assert.True(tasks.Length <= JobService.MaxAcquireCount, $"返回了{tasks.Length}个任务");
+        Assert.NotEmpty(tasks);
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {

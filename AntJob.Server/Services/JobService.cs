@@ -169,8 +169,9 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             return [];
         }
 
-        // 全局锁，确保单个作业只有一个线程在分配作业
-        using var ck = _cacheProvider.AcquireLock($"antjob:lock:{job.ID}", 15_000);
+        // 全局锁，确保单个作业只有一个线程在分配作业。
+        // 用应用编号+作业名作为锁键，作业尚未创建时也能安全取锁
+        using var ck = _cacheProvider.AcquireLock($"antjob:lock:{app.ID}:{jobName}", 15_000);
         if (ck == null)
         {
             // 锁竞争超时说明其它节点正在分配，本次不分配，避免切出重复任务
@@ -187,6 +188,9 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         if (job == null) throw new XException($"应用[{app.ID}/{app.Name}]下未找到作业[{jobName}]");
         if (job.DataTime.Year <= 2000 && job.Mode is JobModes.Time or JobModes.Data)
             throw new XException("作业[{0}/{1}]未设置数据时间", job.ID, job.Name);
+
+        // 单次申请数量上限，避免异常请求一次性切出过多分片
+        if (model.Count > MaxAcquireCount) model.Count = MaxAcquireCount;
 
         // 应用在线，但可能禁止向其分配任务
         var ip = online.UpdateIP;
@@ -675,6 +679,9 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     #endregion
 
     #region 申请任务
+    /// <summary>单次申请任务数上限。防止异常请求一次性切出过多分片</summary>
+    public const Int32 MaxAcquireCount = 100;
+
     /// <summary>用于表示切片批次的序号</summary>
     private Int32 _idxBatch;
 

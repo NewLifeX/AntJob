@@ -220,7 +220,7 @@ public class AppService
 
         return new PingResponse
         {
-            Time = request.Time,
+            Time = request?.Time ?? 0,
             ServerTime = DateTime.UtcNow.ToLong(),
         };
     }
