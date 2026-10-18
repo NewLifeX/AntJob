@@ -147,8 +147,15 @@ public partial class AppOnline : EntityBase<AppOnline>
     }
 
     /// <summary>根据编码查询或添加</summary>
+    /// <remarks>实体缓存可能尚未包含其它节点刚写入的记录，未命中时回源数据库确认，避免重复创建在线实例</remarks>
     /// <param name="sessionid"></param>
     /// <returns></returns>
-    public static AppOnline GetOrAdd(String sessionid) => GetOrAdd(sessionid, FindByInstance, k => new AppOnline { Instance = k, Enable = true });
+    public static AppOnline GetOrAdd(String sessionid)
+    {
+        var online = FindByInstance(sessionid);
+        online ??= Find(_.Instance == sessionid);
+
+        return online ?? new AppOnline { Instance = sessionid, Enable = true };
+    }
     #endregion
 }
