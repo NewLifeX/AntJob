@@ -124,34 +124,8 @@ public class Worker : IHostedService
 
     private static void ClearItems(Object state)
     {
-        // 遍历所有作业
-        var p = 0;
-        var rs = 0;
         var sw = Stopwatch.StartNew();
-        while (true)
-        {
-            var list = Job.FindAll(null, null, null, p, 1000);
-            if (list.Count == 0) break;
-
-            foreach (var job in list)
-            {
-                try
-                {
-                    rs += job.DeleteItems();
-                }
-                catch (Exception ex)
-                {
-                    XTrace.WriteException(ex);
-                }
-            }
-
-            if (list.Count < 1000) break;
-            p += list.Count;
-        }
-
-        // 删除作业已不存在的任务
-        rs += JobTask.DeleteNoJob();
-
+        var rs = JobService.ClearItems();
         if (rs > 0)
         {
             sw.Stop();

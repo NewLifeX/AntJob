@@ -62,6 +62,18 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Null(AppOnline.Find(AppOnline._.ID == online.ID));
     }
 
+    [Fact(DisplayName = "清理作业已不存在的任务")]
+    public void JobService_ClearItems_DeletesOrphanTask()
+    {
+        var task = new JobTask { JobID = 999_999_999, DataTime = DateTime.Now, Status = JobStatus.就绪 };
+        task.Insert();
+        Assert.True(task.ID > 0);
+
+        var count = JobService.ClearItems();
+        Assert.True(count >= 1);
+        Assert.Null(JobTask.Find(JobTask._.ID == task.ID));
+    }
+
     [Fact]
     public void AppService_GetOnline_And_History()
     {

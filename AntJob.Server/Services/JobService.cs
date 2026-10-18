@@ -958,6 +958,39 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
     #endregion
 
     #region 辅助
+    /// <summary>清理过期任务，以及作业已不存在的任务</summary>
+    /// <returns>删除行数</returns>
+    public static Int32 ClearItems()
+    {
+        var total = 0;
+        var p = 0;
+        while (true)
+        {
+            var list = Job.FindAll(null, null, null, p, 1000);
+            if (list.Count == 0) break;
+
+            foreach (var job in list)
+            {
+                try
+                {
+                    total += job.DeleteItems();
+                }
+                catch (Exception ex)
+                {
+                    XTrace.WriteException(ex);
+                }
+            }
+
+            if (list.Count < 1000) break;
+            p += list.Count;
+        }
+
+        // 删除作业已不存在的任务
+        total += JobTask.DeleteNoJob();
+
+        return total;
+    }
+
     /// <summary>兼容旧数据库。如DataTime对应Start</summary>
     public static void FixOld()
     {
