@@ -30,6 +30,7 @@ public class Scheduler : DisposeBase
 
     private readonly ICache _cache = MemoryCache.Default;
     private readonly Object _handlersLock = new();
+    private readonly SemaphoreSlim _acquireSemaphore = new(8);
     #endregion
 
     #region 构造
@@ -261,6 +262,23 @@ public class Scheduler : DisposeBase
         Provider?.Stop().Wait();
     }
 
+    /// <summary>申请任务。限制并发度，避免多作业同时请求压垮调度中心</summary>
+    /// <param name="handler">处理器</param>
+    /// <param name="count">要申请的任务个数</param>
+    /// <returns></returns>
+    private async Task<ITask[]> AcquireTasks(Handler handler, Int32 count)
+    {
+        await _acquireSemaphore.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            return await handler.Acquire(count).ConfigureAwait(false);
+        }
+        finally
+        {
+            _acquireSemaphore.Release();
+        }
+    }
+
     /// <summary>任务调度</summary>
     /// <returns></returns>
     public async Task<Boolean> Process()
@@ -283,6 +301,7 @@ public class Scheduler : DisposeBase
 
         var flag = false;
         Handler inactive = null;
+        var acquires = new List<(Handler Handler, IJob Job, Int32 Count, Task<ITask[]> Task)>();
         // 遍历处理器快照，给空闲的增加任务
         foreach (var handler in GetHandlers())
         {
@@ -342,10 +361,28 @@ public class Scheduler : DisposeBase
             //}
             //var count = max - handler.Busy;
             var count = job.MaxTask - handler.Busy;
-            if (count > 0)
+            if (count > 0) acquires.Add((handler, job, count, AcquireTasks(handler, count)));
+        }
+
+        // 并行申请任务，缩短多作业场景的轮次耗时；并发度受限，避免瞬时压垮调度中心
+        if (acquires.Count > 0)
+        {
+            try
             {
-                // 循环申请任务，喂饱处理器
-                var ts = await handler.Acquire(count);
+                await Task.WhenAll(acquires.Select(e => e.Task)).ConfigureAwait(false);
+            }
+            catch
+            {
+                // 单个作业申请失败在下面逐个处理
+            }
+
+            foreach (var item in acquires)
+            {
+                var handler = item.Handler;
+                var job = item.Job;
+                var ts = item.Task.Status == TaskStatus.RanToCompletion ? item.Task.Result : null;
+                if (item.Task.IsFaulted)
+                    Log?.Error("作业[{0}]申请任务失败！{1}", handler.Name, item.Task.Exception?.GetTrue()?.Message);
 
                 // 消息型作业在没有任务时进入空闲退避，收到通知后重置
                 if (ts == null || ts.Length == 0)
@@ -356,8 +393,10 @@ public class Scheduler : DisposeBase
                 else
                     handler.NextAcquire = DateTime.MinValue;
 
+                if (ts == null || ts.Length == 0) continue;
+
                 // 送给处理器处理
-                for (var i = 0; i < count && ts != null && i < ts.Length; i++)
+                for (var i = 0; i < item.Count && i < ts.Length; i++)
                 {
                     // 准备就绪，增加Busy，避免超额分配
                     handler.Prepare(ts[i]);
@@ -385,7 +424,7 @@ public class Scheduler : DisposeBase
                     }
                 }
 
-                if (ts != null && ts.Length > 0) flag = true;
+                flag = true;
             }
         }
 

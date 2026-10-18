@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AntJob;
 using AntJob.Data;
@@ -138,6 +140,25 @@ public class SchedulerTests : IDisposable
         Assert.Equal(2, provider.AcquireCount);
     }
 
+    [Fact(DisplayName = "多个作业并行申请任务")]
+    public async Task Process_Acquires_InParallel()
+    {
+        var provider = new ParallelAcquireProvider();
+        _scheduler.Provider = provider;
+        provider.Schedule = _scheduler;
+
+        for (var i = 0; i < 3; i++)
+        {
+            _scheduler.AddHandler(new TestHandler { Name = $"Job{i}", Mode = JobModes.Time });
+        }
+
+        var rs = await _scheduler.Process();
+
+        Assert.Equal(3, provider.AcquireCount);
+        Assert.All(provider.Waited, Assert.True);
+        Assert.False(rs);
+    }
+
     [Fact]
     public async Task Process_Syncs_JobTopic_To_MessageHandler()
     {
@@ -156,6 +177,34 @@ public class SchedulerTests : IDisposable
     private class TestMessageHandler : MessageHandler
     {
         public override Int32 Execute(JobContext ctx) => 1;
+    }
+
+    private class ParallelAcquireProvider : NetworkJobProvider
+    {
+        private readonly TaskCompletionSource _release = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public ParallelAcquireProvider() : base(new AntSetting { Server = "http://127.0.0.1:1" }) { }
+
+        public Int32 AcquireCount;
+
+        public List<Boolean> Waited { get; } = [];
+
+        public override Task<IJob[]> GetJobs() => Task.FromResult<IJob[]>([
+            new JobModel { Name = "Job0", Mode = JobModes.Time, Enable = true, MaxTask = 1 },
+            new JobModel { Name = "Job1", Mode = JobModes.Time, Enable = true, MaxTask = 1 },
+            new JobModel { Name = "Job2", Mode = JobModes.Time, Enable = true, MaxTask = 1 },
+        ]);
+
+        public override async Task<ITask[]> Acquire(IJob job, String topic, Int32 count)
+        {
+            // 等到三个申请都进入，才能证明它们是并行发起的；串行申请会在此超时
+            if (Interlocked.Increment(ref AcquireCount) >= 3) _release.TrySetResult();
+
+            var ok = await Task.WhenAny(_release.Task, Task.Delay(2_000)) == _release.Task;
+            lock (Waited) Waited.Add(ok);
+
+            return [];
+        }
     }
 
     private class CountingProvider : NetworkJobProvider
