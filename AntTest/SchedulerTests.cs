@@ -194,6 +194,22 @@ public class SchedulerTests : IDisposable
         Assert.False(handler.Active);
     }
 
+    [Fact(DisplayName = "服务端作业可通过类名动态创建处理器")]
+    public async Task Process_Creates_Handler_By_ClassName()
+    {
+        var provider = new DynamicHandlerProvider { ClassName = typeof(DynamicHandler).FullName };
+        _scheduler.Provider = provider;
+        provider.Schedule = _scheduler;
+
+        // 本地不注册任何处理器，只能靠服务端下发的类名创建
+        Assert.Empty(_scheduler.Handlers);
+
+        await _scheduler.Process();
+
+        Assert.Single(_scheduler.Handlers);
+        Assert.IsType<DynamicHandler>(_scheduler.Handlers[0]);
+    }
+
     [Fact]
     public void Setting_Assign()
     {
@@ -331,6 +347,18 @@ public class SchedulerTests : IDisposable
         }
     }
 
+    private class DynamicHandlerProvider : NetworkJobProvider
+    {
+        public DynamicHandlerProvider() : base(new AntSetting { Server = "http://127.0.0.1:1" }) { }
+
+        public String ClassName { get; set; }
+
+        public override Task<IJob[]> GetJobs() => Task.FromResult<IJob[]>(
+            [new JobModel { Name = "DynamicJob", Mode = JobModes.Time, Enable = true, ClassName = ClassName, MaxTask = 1 }]);
+
+        public override Task<ITask[]> Acquire(IJob job, String topic, Int32 count) => Task.FromResult(Array.Empty<ITask>());
+    }
+
     private class BlockingTaskProvider : NetworkJobProvider
     {
         public BlockingTaskProvider() : base(new AntSetting { Server = "http://127.0.0.1:1" }) { }
@@ -363,6 +391,12 @@ public class SchedulerTests : IDisposable
 
             return 1;
         }
+    }
+
+    /// <summary>由服务端类名动态创建的处理器</summary>
+    private class DynamicHandler : Handler
+    {
+        public override Int32 Execute(JobContext ctx) => 1;
     }
 
     private class ThrowingProvider : NetworkJobProvider

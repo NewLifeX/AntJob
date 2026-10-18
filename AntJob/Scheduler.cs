@@ -548,8 +548,8 @@ public class Scheduler : DisposeBase
                 WriteLog("发现未知作业[{0}]@[{1}]", job.Name, job.ClassName);
                 try
                 {
-                    // 实例化一个处理器
-                    var type = Type.GetType(job.ClassName) ?? (handlers.Where(e => e.GetType().FullName == job.ClassName)?.FirstOrDefault()?.GetType());
+                    // 实例化一个处理器。GetTypeEx 会搜索已加载的程序集，Type.GetType 只能找到当前程序集内的类型
+                    var type = job.ClassName.GetTypeEx() ?? handlers.Where(e => e.GetType().FullName == job.ClassName)?.FirstOrDefault()?.GetType();
                     if (type != null)
                     {
                         handler = type.CreateInstance() as Handler;
