@@ -45,6 +45,25 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     /// <returns></returns>
     protected virtual AntClient CreateClient(AntSetting setting) => new(setting);
 
+    /// <summary>下行通知通道连接成功。断线期间可能丢失通知，重连后立即拉取一次</summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OnNotifyConnected(Object sender, EventArgs e)
+    {
+        _jobs = null;
+
+        var handlers = Schedule?.GetHandlers();
+        if (handlers != null)
+        {
+            foreach (var handler in handlers)
+            {
+                handler.NextAcquire = DateTime.MinValue;
+            }
+        }
+
+        Schedule?.WakeUp();
+    }
+
     /// <summary>收到服务端下行信号。清除作业缓存并立即唤醒调度</summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
@@ -98,6 +117,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         ant.Tracer = Tracer;
         ant.Log = Log;
         ant.Received += OnReceived;
+        ant.NotifyConnectedChanged += OnNotifyConnected;
         await ant.Login();
 
         // 断开前一个连接

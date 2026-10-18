@@ -215,6 +215,7 @@ public class NotifyTests(WebHostFixture fixture)
         var command = await tcs.Task.WaitAsync(TimeSpan.FromSeconds(1));
 
         Assert.Equal("JobChanged", command);
+        Assert.True(client.NotifyConnected);
 
         http.Dispose();
     }
