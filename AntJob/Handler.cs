@@ -293,7 +293,15 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         ctx.Cost = sw.Elapsed.TotalMilliseconds;
         Speed = ctx.Speed;
 
-        OnFinish(ctx);
+        // 任务已经执行完毕，完成上报失败只能记录，不能抛出到线程池
+        try
+        {
+            OnFinish(ctx);
+        }
+        catch (Exception ex)
+        {
+            Log?.Error("作业[{0}]完成上报失败！{1}", Name, ex.GetTrue()?.Message);
+        }
         Schedule?.OnFinish(ctx);
 
         return ctx;
@@ -371,7 +379,15 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         ctx.Cost = sw.Elapsed.TotalMilliseconds;
         Speed = ctx.Speed;
 
-        await OnFinishAsync(ctx);
+        // 任务已经执行完毕，完成上报失败只能记录，不能抛出到线程池
+        try
+        {
+            await OnFinishAsync(ctx).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            Log?.Error("作业[{0}]完成上报失败！{1}", Name, ex.GetTrue()?.Message);
+        }
         Schedule?.OnFinish(ctx);
 
         return ctx;

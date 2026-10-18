@@ -476,8 +476,19 @@ public class Scheduler : DisposeBase
                     }
                     else
                     {
-                        // 使用线程池调度，避免Task排队影响使用
-                        ThreadPool.QueueUserWorkItem(s => handler.Process(s as ITask), ts[i]);
+                        // 使用线程池调度，避免Task排队影响使用。
+                        // 必须捕获异常：线程池线程上的未处理异常会直接终止进程
+                        ThreadPool.QueueUserWorkItem(s =>
+                        {
+                            try
+                            {
+                                handler.Process(s as ITask);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log?.Error("作业[{0}]执行失败！{1}", handler.GetType().FullName, ex.Message);
+                            }
+                        }, ts[i]);
                     }
                 }
 

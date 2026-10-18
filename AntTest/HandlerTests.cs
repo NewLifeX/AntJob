@@ -23,6 +23,14 @@ internal class TestHandler : Handler
     public override Int32 Execute(JobContext ctx) => 1;
 }
 
+/// <summary>完成上报抛异常的处理器</summary>
+internal class FinishThrowsHandler : Handler
+{
+    public override Int32 Execute(JobContext ctx) => 1;
+
+    protected override void OnFinish(JobContext ctx) => throw new InvalidOperationException("模拟上报失败");
+}
+
 /// <summary>处理器基类生命周期测试</summary>
 public class HandlerTests
 {
@@ -151,6 +159,20 @@ public class HandlerTests
         Assert.NotNull(ctx);
         Assert.NotNull(ctx.Error);
         Assert.Contains("测试异常", ctx.Error.Message);
+    }
+
+    [Fact(DisplayName = "结束回调异常不会中断执行流程")]
+    public void Process_FinishException_ReturnsContext()
+    {
+        var handler = new FinishThrowsHandler();
+        var task = new TaskModel { ID = 3, DataTime = DateTime.Now };
+
+        // 任务已执行完毕，上报失败只能记录，不能把异常抛给线程池
+        var ctx = handler.Process(task);
+
+        Assert.NotNull(ctx);
+        Assert.Equal(1, ctx.Success);
+        Assert.Null(ctx.Error);
     }
 
     [Fact]
