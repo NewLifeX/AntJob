@@ -102,6 +102,35 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Equal(10, entity.Success);
     }
 
+    [Fact(DisplayName = "心跳刷新在线记录更新时间")]
+    public void AppService_ClearOnline_KeepsRefreshed()
+    {
+        var name = "SrvClearKeep_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var online = fixture.AppService.GetOnline(app, $"{name}@keep", "127.0.0.1");
+        online.Save();
+
+        // 模拟长时间未心跳：数据库与内存实体都退回到一小时前
+        var old = DateTime.Now.AddHours(-1);
+        AppOnline.Meta.Session.Execute($"Update {AppOnline.Meta.TableName} Set UpdateTime='{old:yyyy-MM-dd HH:mm:ss}' Where ID={online.ID}");
+        var fresh = AppOnline.FindByID(online.ID);
+        Assert.True(fresh.UpdateTime < DateTime.Now.AddMinutes(-30));
+
+        // 心跳必须把更新时间推进，否则在线记录会被周期清理误删
+        var rs = fixture.AppService.Ping(app, fresh, new PingRequest(), "10.0.0.9");
+        Assert.NotNull(rs);
+
+        var entity = AppOnline.Find(AppOnline._.ID == online.ID);
+        Assert.NotNull(entity);
+        Assert.True(entity.UpdateTime > DateTime.Now.AddMinutes(-1), $"心跳未刷新更新时间：{entity.UpdateTime:O}");
+
+        // 条件删除不能误删刚刷新过的记录
+        AppService.ClearOnline(10);
+        Assert.NotNull(AppOnline.Find(AppOnline._.ID == online.ID));
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {

@@ -118,6 +118,29 @@ public class SchedulerTests : IDisposable
         provider.Dispose();
     }
 
+    [Fact(DisplayName = "停止调度器时并行停止全部处理器")]
+    public async Task Stop_Stops_All_Handlers()
+    {
+        var provider = new CountingProvider();
+        _scheduler.Provider = provider;
+        provider.Schedule = _scheduler;
+
+        var h1 = new TestHandler { Name = "MsgJob" };
+        var h2 = new TestHandler { Name = "OtherJob" };
+        _scheduler.AddHandler(h1);
+        _scheduler.AddHandler(h2);
+
+        // 处理器必须处于工作状态才能被停止
+        await _scheduler.Process();
+        Assert.True(h1.Active);
+        Assert.True(h2.Active);
+
+        _scheduler.Stop();
+
+        Assert.False(h1.Active);
+        Assert.False(h2.Active);
+    }
+
     [Fact]
     public void Setting_Assign()
     {
@@ -288,14 +311,10 @@ public class SchedulerTests : IDisposable
 
         public String JobTopic { get; set; } = "T1";
 
-        public override Task<IJob[]> GetJobs() => Task.FromResult<IJob[]>([new JobModel
-        {
-            Name = "MsgJob",
-            Mode = JobModes.Message,
-            Enable = true,
-            MaxTask = 1,
-            Topic = JobTopic,
-        }]);
+        public override Task<IJob[]> GetJobs() => Task.FromResult<IJob[]>([
+            new JobModel { Name = "MsgJob", Mode = JobModes.Message, Enable = true, MaxTask = 1, Topic = JobTopic },
+            new JobModel { Name = "OtherJob", Mode = JobModes.Message, Enable = true, MaxTask = 1, Topic = JobTopic },
+        ]);
 
         public override Task<ITask[]> Acquire(IJob job, String topic, Int32 count)
         {
