@@ -206,6 +206,10 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     /// <summary>停止</summary>
     public override async Task Stop()
     {
+        // 邻居检查依赖连接，停止后必须一并停止，避免空引用与后台线程泄漏
+        _timer.TryDispose();
+        _timer = null;
+
         var ant = Ant;
         if (ant != null)
         {
@@ -420,7 +424,11 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
 
     private async Task DoCheckPeer(Object state)
     {
-        var ps = await Ant?.GetPeers();
+        // 停止过程中定时器回调可能仍在执行
+        var ant = Ant;
+        if (ant == null) return;
+
+        var ps = await ant.GetPeers();
         if (ps == null || ps.Length == 0) return;
 
         var old = (Peers ?? []).ToList();
