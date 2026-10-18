@@ -51,6 +51,8 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
     private void OnNotifyConnected(Object sender, EventArgs e)
     {
         _jobs = null;
+        // 重置有效期，避免通知到达时恰好有一次请求在途，旧结果写回缓存后长期不刷新
+        _NextGetJobs = DateTime.MinValue;
 
         var handlers = Schedule?.GetHandlers();
         if (handlers != null)
@@ -105,6 +107,7 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
 
                 // 让下一次 GetJobs 立即命中服务端，随后立刻执行一轮调度
                 _jobs = null;
+                _NextGetJobs = DateTime.MinValue;
                 Schedule?.WakeUp();
                 break;
         }
