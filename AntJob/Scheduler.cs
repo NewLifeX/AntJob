@@ -274,12 +274,19 @@ public class Scheduler : DisposeBase
         // 运行时动态往集合里面加处理器，为了配合Sql+C#
         CheckHandlers(prv, jobs);
 
+        // 作业按名称建索引，避免每个处理器都线性扫描
+        var jobMap = new Dictionary<String, IJob>(StringComparer.OrdinalIgnoreCase);
+        foreach (var job in jobs)
+        {
+            if (!job.Name.IsNullOrEmpty()) jobMap[job.Name] = job;
+        }
+
         var flag = false;
         Handler inactive = null;
         // 遍历处理器快照，给空闲的增加任务
         foreach (var handler in GetHandlers())
         {
-            var job = jobs.FirstOrDefault(e => e.Name == handler.Name);
+            var job = !handler.Name.IsNullOrEmpty() && jobMap.TryGetValue(handler.Name, out var jb) ? jb : null;
             // 找不到或者已停用
             if (job == null || !job.Enable)
             {
@@ -411,9 +418,15 @@ public class Scheduler : DisposeBase
     private void CheckHandlers(IJobProvider provider, IList<IJob> jobs)
     {
         var handlers = GetHandlers();
+        var handlerMap = new Dictionary<String, Handler>(StringComparer.OrdinalIgnoreCase);
+        foreach (var item in handlers)
+        {
+            if (!item.Name.IsNullOrEmpty()) handlerMap[item.Name] = item;
+        }
+
         foreach (var job in jobs)
         {
-            var handler = handlers.FirstOrDefault(e => e.Name == job.Name);
+            var handler = !job.Name.IsNullOrEmpty() && handlerMap.TryGetValue(job.Name, out var hd) ? hd : null;
             if (handler == null && job.Enable && !job.ClassName.IsNullOrEmpty())
             {
                 // 遇到废弃作业时，避免反复输出日志
@@ -446,6 +459,7 @@ public class Scheduler : DisposeBase
                             handler.Start();
 
                             AddHandler(handler);
+                            handlerMap[handler.Name] = handler;
                         }
                     }
                 }
