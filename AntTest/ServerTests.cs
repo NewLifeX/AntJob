@@ -131,6 +131,34 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.NotNull(AppOnline.Find(AppOnline._.ID == online.ID));
     }
 
+    [Fact(DisplayName = "生产消息返回时消息数已落库")]
+    public void JobService_Produce_CountPersisted()
+    {
+        var name = "SrvProduceCnt_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        var jobName = "ProduceCntJob";
+        var topic = "T1";
+        fixture.JobService.AddJobs(app, [new JobModel { Name = jobName, Mode = JobModes.Message, Topic = topic, Enable = true }]);
+
+        var job = Job.FindByAppIDAndName(app.ID, jobName);
+        Assert.NotNull(job);
+
+        // 消费者刚申请过且没有消息，2分钟内的兜底查询会被跳过，因此计数必须立即可见
+        fixture.JobService.Acquire(app, new AcquireModel { Job = jobName, Topic = topic, Count = 1 }, fixture.AppService.GetOnline(app, $"{name}@cons", "127.0.0.1"));
+
+        var count = fixture.JobService.Produce(app, new ProduceModel { Job = jobName, Topic = topic, Messages = ["m1", "m2"] });
+        Assert.Equal(2, count);
+
+        var job2 = Job.FindByAppIDAndName(app.ID, jobName);
+        Assert.Equal(2, job2.MessageCount);
+
+        // 计数立即可见，随后的申请必须拿到任务
+        var tasks = fixture.JobService.Acquire(app, new AcquireModel { Job = jobName, Topic = topic, Count = 1 }, fixture.AppService.GetOnline(app, $"{name}@cons", "127.0.0.1"));
+        Assert.NotEmpty(tasks);
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {

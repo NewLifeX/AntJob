@@ -426,15 +426,17 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         if (total < 0) total = messages.Length;
         if (total > 0)
         {
+            // 消息数必须与消息同批落库。消费者收到通知后会立即申请任务，
+            // 若计数仍在异步更新，可能读到 0 而跳过本次消费，直到兜底查询才拿到消息
             var job2 = target.Jobs?.FirstOrDefault(e => e.Topic == model.Topic);
             if (job2 != null)
             {
                 job2.MessageCount += total;
-                job2.SaveAsync();
+                job2.Save();
             }
 
             target.MessageCount += total;
-            target.SaveAsync();
+            target.Save();
 
             // 通知在线消费者立即申请任务，降低消息延迟；通知丢失时由客户端兜底轮询修复
             _notifier?.NotifyMessage(target.Name, model.Topic, total);
