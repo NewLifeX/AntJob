@@ -80,11 +80,21 @@ public class SchedulerTests : IDisposable
     [Fact]
     public void AddHandler_Multiple()
     {
-        _scheduler.AddHandler(new TestHandler());
+        _scheduler.AddHandler(new TestHandler { Name = "JobA" });
+        _scheduler.AddHandler(new TestHandler { Name = "JobB" });
+        _scheduler.AddHandler(new TestHandler { Name = "JobC" });
+
+        Assert.Equal(3, _scheduler.Handlers.Count);
+    }
+
+    [Fact(DisplayName = "重复添加同类型同名处理器时去重")]
+    public void AddHandler_Deduplicates()
+    {
         _scheduler.AddHandler(new TestHandler());
         _scheduler.AddHandler(new TestHandler());
 
-        Assert.Equal(3, _scheduler.Handlers.Count);
+        // 启动失败重试会再次解析处理器，不能重复执行同一个作业
+        Assert.Single(_scheduler.Handlers);
     }
 
     [Fact]

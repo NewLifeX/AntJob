@@ -51,7 +51,8 @@ public class Scheduler : DisposeBase
     {
         lock (_handlersLock)
         {
-            Handlers.Add(handler);
+            // 启动失败重试时会再次从容器解析处理器，按类型和名称去重，避免同一个作业被重复执行
+            if (!Handlers.Any(e => e.GetType() == handler.GetType() && e.Name.EqualIgnoreCase(handler.Name))) Handlers.Add(handler);
         }
 
         return this;
