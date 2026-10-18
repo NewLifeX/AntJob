@@ -301,15 +301,15 @@ public class AntJobController : ControllerBase, IActionFilter
 
     /// <summary>申请作业任务</summary>
     /// <param name="model">模型</param>
+    /// <param name="clientId">客户端标识。用于定位同一IP下的不同实例</param>
     /// <returns></returns>
     [HttpPost(nameof(Acquire))]
-    public ITask[] Acquire(AcquireModel model)
+    public ITask[] Acquire(AcquireModel model, [FromQuery] String clientId)
     {
         var job = model.Job?.Trim();
         if (job.IsNullOrEmpty()) return [];
 
-        //var sessionId = $"{_App.Name}@{UserHost}";
-        var online = _appService.GetOnline(_App, null, UserHost);
+        var online = _appService.GetOnline(_App, BuildSessionId(_App.Name, clientId, UserHost), UserHost);
 
         return _jobService.Acquire(_App, model, online);
     }
@@ -328,14 +328,14 @@ public class AntJobController : ControllerBase, IActionFilter
 
     /// <summary>报告状态（进度、成功、错误）</summary>
     /// <param name="task"></param>
+    /// <param name="clientId">客户端标识。用于定位同一IP下的不同实例</param>
     /// <returns></returns>
     [HttpPost(nameof(Report))]
-    public Boolean Report(TaskResult task)
+    public Boolean Report(TaskResult task, [FromQuery] String clientId)
     {
         if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
 
-        //var sessionId = $"{_App.Name}@{UserHost}";
-        var online = _appService.GetOnline(_App, null, UserHost);
+        var online = _appService.GetOnline(_App, BuildSessionId(_App.Name, clientId, UserHost), UserHost);
         return _jobService.Report(_App, task, online);
     }
     #endregion

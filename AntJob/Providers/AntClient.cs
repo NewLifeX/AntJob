@@ -125,7 +125,7 @@ public class AntClient : ClientBase
     {
         if (!IsHttp) return base.PingAsync(request, cancellationToken);
 
-        return InvokeAsync<IPingResponse>(Actions[Features.Ping] + "?clientId=" + Runtime.ClientId, request, cancellationToken);
+        return InvokeAsync<IPingResponse>(Actions[Features.Ping] + "?clientId=" + Uri.EscapeDataString(Runtime.ClientId), request, cancellationToken);
     }
 
     /// <summary>注销。HTTP 通道同样携带客户端标识，及时清理对应在线记录</summary>
@@ -192,12 +192,19 @@ public class AntClient : ClientBase
     /// <param name="topic">主题</param>
     /// <param name="count">要申请的任务个数</param>
     /// <returns></returns>
-    public async Task<ITask[]> Acquire(String job, String topic, Int32 count) => await InvokeAsync<TaskModel[]>(GetAction(nameof(Acquire)), new AcquireModel
+    public async Task<ITask[]> Acquire(String job, String topic, Int32 count)
     {
-        Job = job,
-        Topic = topic,
-        Count = count,
-    });
+        // HTTP 通道携带客户端标识，服务端据此绑定登录时创建的在线实例
+        var action = GetAction(nameof(Acquire));
+        if (IsHttp) action += "?clientId=" + Uri.EscapeDataString(Runtime.ClientId);
+
+        return await InvokeAsync<TaskModel[]>(action, new AcquireModel
+        {
+            Job = job,
+            Topic = topic,
+            Count = count,
+        });
+    }
 
     /// <summary>生产消息</summary>
     /// <param name="model">模型</param>
@@ -209,13 +216,17 @@ public class AntClient : ClientBase
     /// <returns></returns>
     public async Task<Boolean> Report(ITaskResult task)
     {
+        // HTTP 通道携带客户端标识，统计才能累计到登录时创建的在线实例
+        var action = GetAction(nameof(Report));
+        if (IsHttp) action += "?clientId=" + Uri.EscapeDataString(Runtime.ClientId);
+
         var retry = 3;
         var lastex = new Exception();
         while (retry-- > 0)
         {
             try
             {
-                return await InvokeAsync<Boolean>(GetAction(nameof(Report)), task);
+                return await InvokeAsync<Boolean>(action, task);
             }
             catch (Exception ex)
             {
