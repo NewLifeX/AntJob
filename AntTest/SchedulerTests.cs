@@ -141,6 +141,23 @@ public class SchedulerTests : IDisposable
         Assert.False(h2.Active);
     }
 
+    [Fact(DisplayName = "调度异常后仍可继续下一轮")]
+    public async Task Process_Recovers_After_Exception()
+    {
+        var provider = new ThrowingProvider();
+        _scheduler.Provider = provider;
+        provider.Schedule = _scheduler;
+
+        _scheduler.AddHandler(new TestHandler { Name = "ErrJob", Mode = JobModes.Time });
+
+        // 取作业失败时异常向上抛出，交由定时器记录
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _scheduler.Process());
+
+        // 单飞标记必须被释放，否则后续轮次永远被跳过
+        provider.Throw = false;
+        Assert.False(await _scheduler.Process());
+    }
+
     [Fact]
     public void Setting_Assign()
     {
@@ -276,6 +293,22 @@ public class SchedulerTests : IDisposable
 
             return [];
         }
+    }
+
+    private class ThrowingProvider : NetworkJobProvider
+    {
+        public ThrowingProvider() : base(new AntSetting { Server = "http://127.0.0.1:1" }) { }
+
+        public Boolean Throw { get; set; } = true;
+
+        public override Task<IJob[]> GetJobs()
+        {
+            if (Throw) throw new InvalidOperationException("模拟调度中心不可用");
+
+            return Task.FromResult<IJob[]>([new JobModel { Name = "ErrJob", Mode = JobModes.Time, Enable = true, MaxTask = 1 }]);
+        }
+
+        public override Task<ITask[]> Acquire(IJob job, String topic, Int32 count) => Task.FromResult(Array.Empty<ITask>());
     }
 
     private class BlockingProvider : NetworkJobProvider

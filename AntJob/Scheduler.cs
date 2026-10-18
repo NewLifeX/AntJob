@@ -584,11 +584,19 @@ public class Scheduler : DisposeBase
 
     private async Task Loop(Object state)
     {
-        // 任务调度
-        var rs = await Process();
+        try
+        {
+            // 任务调度
+            var rs = await Process();
 
-        // 如果有数据，马上开始下一轮
-        if (rs) TimerX.Current.SetNext(-1);
+            // 如果有数据，马上开始下一轮
+            if (rs) TimerX.Current.SetNext(-1);
+        }
+        catch (Exception ex)
+        {
+            // 单轮调度异常不能中断定时器，下一周期继续尝试
+            Log?.Error("作业调度失败！{0}", ex.GetTrue()?.Message);
+        }
     }
     #endregion
 
