@@ -297,6 +297,24 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Equal(traceId, task.TraceId);
     }
 
+    [Fact(DisplayName = "注册作业后刷新应用作业数")]
+    public void JobService_AddJobs_Refreshes_JobCount()
+    {
+        var name = "SrvJobCnt_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+
+        var app = App.FindByName(name);
+        app.JobCount = 0;
+        app.Save();
+
+        var jobName = "JobCntJob";
+        fixture.JobService.AddJobs(app, [new JobModel { Name = jobName, Mode = JobModes.Time, Enable = true, DataTime = DateTime.Today }]);
+
+        var entity = App.FindByName(name);
+        Assert.True(entity.JobCount >= 1);
+        Assert.Equal(Job.FindCountByAppID(entity.ID), entity.JobCount);
+    }
+
     [Fact(DisplayName = "清理作业已不存在的任务")]
     public void JobService_ClearItems_DeletesOrphanTask()
     {

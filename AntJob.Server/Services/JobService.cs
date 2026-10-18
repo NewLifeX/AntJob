@@ -98,13 +98,14 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
                 if (next.Year > 2000) job.DataTime = next;
             }
 
-            if (job.Save() != 0)
-            {
-                // 更新作业数
-                job.SaveAsync();
+            if (job.Save() != 0) list.Add(job.Name);
+        }
 
-                list.Add(job.Name);
-            }
+        // 作业数随注册变化，及时刷新应用统计，避免看板长期显示旧值
+        if (list.Count > 0)
+        {
+            app.JobCount = Job.FindCountByAppID(app.ID);
+            app.Save();
         }
 
         return list.ToArray();
@@ -605,7 +606,8 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
                 job.Speed = p1;
         }
 
-        job.SaveAsync();
+        // 统计更新在作业锁内完成，必须同步落库，避免异步保存延后清空脏标记
+        job.Save();
         //job.Save();
     }
 
@@ -911,7 +913,7 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
         if (job.Topic != topic)
         {
             job.Topic = topic;
-            job.SaveAsync();
+            job.Save();
         }
 
         var list = new List<JobTask>();
