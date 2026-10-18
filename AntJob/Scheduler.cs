@@ -160,6 +160,10 @@ public class Scheduler : DisposeBase
             catch (Exception ex)
             {
                 Log?.Error(ex.Message);
+
+                // 启动失败时释放本次创建的提供者，避免定时重试过程中不断累积连接与定时器
+                Provider.TryDispose();
+                Provider = null;
             }
         }
 

@@ -124,7 +124,16 @@ public class NetworkJobProvider(AntSetting setting) : JobProvider
         ant.Log = Log;
         ant.Received += OnReceived;
         ant.NotifyConnectedChanged += OnNotifyConnected;
-        await ant.Login();
+        try
+        {
+            await ant.Login();
+        }
+        catch
+        {
+            // 登录失败时释放本次创建的客户端，避免定时重连时不断累积连接与定时器
+            ant.TryDispose();
+            throw;
+        }
 
         // 断开前一个连接
         if (Ant != null)

@@ -95,6 +95,19 @@ public class SchedulerTests : IDisposable
         Assert.Empty(_scheduler.Handlers);
     }
 
+    [Fact(DisplayName = "连接失败时不保留客户端")]
+    public async Task NetworkJobProvider_Start_Failure_Disposes()
+    {
+        var provider = new NetworkJobProvider(new AntSetting { Server = "http://127.0.0.1:1", AppId = "FailApp" });
+
+        await Assert.ThrowsAnyAsync<Exception>(() => provider.Start());
+
+        // 登录失败时客户端已被释放，定时重连不会累积连接
+        Assert.Null(provider.Ant);
+
+        provider.Dispose();
+    }
+
     [Fact]
     public void Setting_Assign()
     {
