@@ -169,6 +169,12 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
 
         // 全局锁，确保单个作业只有一个线程在分配作业
         using var ck = _cacheProvider.AcquireLock($"antjob:lock:{job.ID}", 15_000);
+        if (ck == null)
+        {
+            // 锁竞争超时说明其它节点正在分配，本次不分配，避免切出重复任务
+            span?.AppendTag("作业锁超时");
+            return [];
+        }
 
         // 找到作业。为了确保能够快速拿到新的作业参数，这里做二次查询
         if (job != null)
