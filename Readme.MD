@@ -1,16 +1,21 @@
 # NewLife.AntJob - 蚂蚁调度
 
 ![GitHub top language](https://img.shields.io/github/languages/top/newlifex/antjob?logo=github)
-![GitHub License](https://img.shields.io/github/license/newlifex/antjob?logo=github)
-![Nuget Downloads](https://img.shields.io/nuget/dt/newlife.antjob?logo=nuget)
-![Nuget](https://img.shields.io/nuget/v/newlife.antjob?logo=nuget)
-![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/newlife.antjob?label=dev%20nuget&logo=nuget)
-
-![Nuget Downloads](https://img.shields.io/nuget/dt/newlife.antjob.extensions?logo=nuget)
-![Nuget](https://img.shields.io/nuget/v/newlife.antjob.extensions?logo=nuget)
-![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/newlife.antjob.extensions?label=dev%20nuget&logo=nuget)
 
 ![Ant](Doc/ant.png)  
+
+
+![GitHub License](https://img.shields.io/github/license/NewLifeX/AntJob?logo=github)
+![NuGet Downloads](https://img.shields.io/nuget/dt/NewLife.AntJob?logo=nuget)
+![NuGet](https://img.shields.io/nuget/v/NewLife.AntJob?logo=nuget)
+![NuGet prerelease](https://img.shields.io/nuget/vpre/NewLife.AntJob?label=dev%20nuget&logo=nuget)
+[![test](https://github.com/NewLifeX/AntJob/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/NewLifeX/AntJob/actions/workflows/test.yml)
+![platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blue)
+[![contributors](https://img.shields.io/github/contributors/NewLifeX/AntJob?logo=github)](https://github.com/NewLifeX/AntJob/graphs/contributors)
+
+<!-- lang:start -->
+🌐 [繁體中文](README.zh-TW.md) | [English](README.en.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Français](README.fr.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [한국어](README.ko.md) | [العربية](README.ar.md)
+<!-- lang:end -->
 
 > EN: AntJob is a high-throughput distributed job scheduling & real-time computing platform for .NET, focusing on massive (10^11+) task slicing, reliable retry and elastic horizontal scaling. Chinese documentation below is the canonical version.
 
@@ -456,8 +461,6 @@ sequenceDiagram
 |          [SmartA2](https://github.com/NewLifeX/SmartA2)          | 2019  | 嵌入式工业计算机，物联网边缘网关，高性能.NET8主机，应用于工业、农业、交通、医疗             |
 |                          FIoT物联网平台                          | 2020  | 物联网整体解决方案，建筑、环保、农业，软硬件及大数据分析一体化，单机十万级点位项目验证      |
 |                        UWB高精度室内定位                         | 2020  | 厘米级（10~20cm）高精度室内定位，软硬件一体化，与其它系统联动，大型展厅项目验证             |
-
-
 
 ## 新生命开发团队
 ![XCode](https://newlifex.com/logo.png)  
