@@ -366,9 +366,13 @@ public class Scheduler : DisposeBase
             // 找不到或者已停用
             if (job == null || !job.Enable)
             {
-                if (handler.Active) handler.Stop("ConfigChanged");
+                // 停止需等待在途任务结束（最长15秒），放到后台执行，避免阻塞整轮调度
+                if (handler.Active) handler.StopInBackground("ConfigChanged");
                 continue;
             }
+
+            // 后台停止尚未结束，等它完成后再恢复调度，避免新旧任务交错
+            if (handler.Stopping) continue;
 
             // 可能外部添加的Worker并不完整
             handler.Schedule = this;

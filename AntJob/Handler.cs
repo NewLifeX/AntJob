@@ -41,6 +41,10 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
     /// <summary>是否工作中</summary>
     public Boolean Active { get; private set; }
 
+    private volatile Boolean _stopping;
+    /// <summary>是否正在后台停止。停止需等待在途任务结束，期间不应再分配新任务</summary>
+    public Boolean Stopping => _stopping;
+
     /// <summary>调度模式</summary>
     public virtual JobModes Mode { get; set; } = JobModes.Time;
 
@@ -190,6 +194,30 @@ public abstract class Handler : IExtend, ITracerFeature, ILogFeature
         }
 
         return true;
+    }
+
+    /// <summary>后台停止。避免调度循环等待在途任务而阻塞其它作业</summary>
+    /// <param name="reason">原因</param>
+    internal void StopInBackground(String reason)
+    {
+        if (_stopping) return;
+        _stopping = true;
+
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                Stop(reason);
+            }
+            catch (Exception ex)
+            {
+                Log?.Error("作业[{0}]停止失败！{1}", Name, ex.GetTrue()?.Message);
+            }
+            finally
+            {
+                _stopping = false;
+            }
+        });
     }
     #endregion
 

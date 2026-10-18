@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -158,6 +159,41 @@ public class SchedulerTests : IDisposable
         Assert.False(await _scheduler.Process());
     }
 
+    [Fact(DisplayName = "停用作业时停止处理器不阻塞调度轮次")]
+    public async Task Process_Disabled_Job_Does_Not_Block()
+    {
+        var provider = new BlockingTaskProvider();
+        _scheduler.Provider = provider;
+        provider.Schedule = _scheduler;
+
+        var handler = new BlockingHandler { Name = "DisableJob", Mode = JobModes.Time, Release = provider.Release };
+        _scheduler.AddHandler(handler);
+
+        // 首轮把任务交给处理器，Execute 阻塞不退，Busy 保持为1
+        await _scheduler.Process();
+        var deadline = DateTime.UtcNow.AddSeconds(5);
+        while (handler.Busy == 0 && DateTime.UtcNow < deadline) await Task.Delay(50);
+        Assert.True(handler.Busy > 0);
+
+        // 服务端停用作业
+        provider.Enable = false;
+        var sw = Stopwatch.StartNew();
+        await _scheduler.Process();
+        sw.Stop();
+
+        // 停止需要等待在途任务，必须转到后台，本轮调度立即返回
+        Assert.True(sw.ElapsedMilliseconds < 2_000, $"调度轮次被阻塞 {sw.ElapsedMilliseconds}ms");
+        Assert.True(handler.Stopping || !handler.Active);
+
+        // 在途任务结束后，后台停止完成
+        provider.Release.Set();
+        deadline = DateTime.UtcNow.AddSeconds(10);
+        while (handler.Stopping && DateTime.UtcNow < deadline) await Task.Delay(50);
+
+        Assert.False(handler.Stopping);
+        Assert.False(handler.Active);
+    }
+
     [Fact]
     public void Setting_Assign()
     {
@@ -292,6 +328,40 @@ public class SchedulerTests : IDisposable
             lock (Waited) Waited.Add(ok);
 
             return [];
+        }
+    }
+
+    private class BlockingTaskProvider : NetworkJobProvider
+    {
+        public BlockingTaskProvider() : base(new AntSetting { Server = "http://127.0.0.1:1" }) { }
+
+        /// <summary>是否启用作业。修改后立即生效，用于模拟服务端停用</summary>
+        public Boolean Enable { get; set; } = true;
+
+        /// <summary>放行阻塞中的任务</summary>
+        public ManualResetEventSlim Release { get; } = new(false);
+
+        public override Task<IJob[]> GetJobs() => Task.FromResult<IJob[]>(
+            [new JobModel { Name = "DisableJob", Mode = JobModes.Time, Enable = Enable, MaxTask = 1 }]);
+
+        public override Task<ITask[]> Acquire(IJob job, String topic, Int32 count)
+        {
+            if (!Enable) return Task.FromResult(Array.Empty<ITask>());
+
+            return Task.FromResult<ITask[]>([new TaskModel { ID = 991, DataTime = DateTime.Now }]);
+        }
+    }
+
+    private class BlockingHandler : Handler
+    {
+        public ManualResetEventSlim Release { get; set; } = new(false);
+
+        public override Int32 Execute(JobContext ctx)
+        {
+            // 模拟长时间不退出的任务，最长等待10秒
+            Release.Wait(10_000);
+
+            return 1;
         }
     }
 
