@@ -27,6 +27,10 @@ public class AntSetting : Config<AntSetting>, IClientSetting
     [Description("应用密钥。")]
     public String Secret { get; set; }
 
+    /// <summary>是否使用星尘注册中心解析服务地址。默认true；客户端经网关直连时建议关闭</summary>
+    [Description("是否使用星尘注册中心解析服务地址。默认true；客户端经网关直连时建议关闭")]
+    public Boolean UseRegistry { get; set; } = true;
+
     String IClientSetting.Code { get => AppId; set => AppId = value; }
     #endregion
 

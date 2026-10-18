@@ -166,6 +166,7 @@ Doc/                    文档与资源
 - Server：调度中心地址，支持多地址；`http(s)://` 走 HTTP + WebSocket 通道，`tcp://` 走 RPC 兼容通道。例如 `https://a.example.com,https://b.example.com` 或 `tcp://a:9999,tcp://b:9999`
 - AppID / Secret：应用隔离凭据（可自动注册或手动分发）
 - Debug：调试开关，输出更详细日志
+- UseRegistry：是否使用星尘注册中心解析服务地址，默认 true；经网关直连时建议设为 false
 
 Web/Server 侧：
 - 数据库连接通过 XCode 自动反向工程创建表

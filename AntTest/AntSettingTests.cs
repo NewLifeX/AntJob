@@ -41,6 +41,13 @@ public class AntSettingTests
     }
 
     [Fact]
+    public void Default_UseRegistry_True()
+    {
+        var set = new AntSetting();
+        Assert.True(set.UseRegistry);
+    }
+
+    [Fact]
     public void Set_Properties()
     {
         var set = new AntSetting
@@ -49,12 +56,14 @@ public class AntSettingTests
             AppId = "MyApp",
             Secret = "mysecret",
             Debug = true,
+            UseRegistry = false,
         };
 
         Assert.Equal("tcp://localhost:1234", set.Server);
         Assert.Equal("MyApp", set.AppId);
         Assert.Equal("mysecret", set.Secret);
         Assert.True(set.Debug);
+        Assert.False(set.UseRegistry);
     }
 
     [Fact]

@@ -98,7 +98,7 @@ public class Scheduler : DisposeBase
         var server = set.Server;
         var isHttp = server.StartsWithIgnoreCase("http://", "https://");
 
-        var registry = ServiceProvider?.GetService<IRegistry>();
+        var registry = set.UseRegistry ? ServiceProvider?.GetService<IRegistry>() : null;
         if (registry != null)
         {
             // 按地址协议选择注册中心里的服务名，HTTP 通道对应 AntWeb

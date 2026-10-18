@@ -25,7 +25,7 @@ WebSocket 只下发信号，客户端收到后再通过 HTTP 拉取权威数据�
 
 1. 部署 AntJob.Web（IIS / Kestrel / Docker），并确保站点支持 WebSocket。
 2. 配置 `AntJobSetting.TokenSecret`（如 `HS256:请替换为足够长的随机密钥`），用于签发 JWT。未配置时服务端会自动生成一个随机密钥，仅适合单实例开发环境；**多实例必须显式配置同一个密钥**，否则各实例签发的令牌互不认可。
-3. 多实例部署时配置 Redis。`ICacheProvider` 会创建 Redis Stream 事件总线，每个实例以自身 `Runtime.ClientId` 作为消费组，各自收到一份通知。
+3. 多实例部署时配置 Redis。`ICacheProvider` 会创建 Redis Stream 事件总线，每个实例以自身 `Runtime.ClientId` 作为消费组，各自收到一份通知。连接串配置在 `RedisCache`，例如：`server=127.0.0.1:6379;db=0`。
 4. 未配置 Redis 时只能单实例推送，功能由轮询兜底，不会报错。
 5. 若同时运行 AntJob.Server（RPC 兼容通道）与 AntJob.Web，并希望 Server 侧产生的消息通知到连接在 Web 上的客户端，必须配置 Redis 事件总线；否则跨进程通知无法送达。
 
@@ -85,6 +85,7 @@ location /AntJob/ {
 - 首次登录且 `Secret` 为空时，服务端自动注册并下发密钥，客户端保存到配置文件。
 - 多个地址用逗号分隔，客户端自动主备切换。
 - 继续使用 `tcp://` 地址时走 RPC 兼容通道，行为不变。
+- 客户端经网关直连时，建议配置 `UseRegistry=false`，避免星尘注册中心用内网地址覆盖网关地址；默认 `true` 保持原有服务发现行为。
 
 ---
 
