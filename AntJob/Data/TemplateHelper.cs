@@ -64,15 +64,15 @@ public static class TemplateHelper
     private static VarItem Find(String str, String key, Int32 p)
     {
         // 头尾
-        var p1 = str.IndexOf("{" + key, p);
+        var p1 = str.IndexOf("{" + key, p, StringComparison.Ordinal);
         if (p1 < 0) return _empty;
 
-        var p2 = str.IndexOf("}", p1);
+        var p2 = str.IndexOf('}', p1);
         if (p2 < 0) return _empty;
 
         // 格式化字符串
         var format = "";
-        var p3 = str.IndexOf(":", p1);
+        var p3 = str.IndexOf(':', p1);
         if (p3 > 0 && p3 < p2) format = str.Substring(p3 + 1, p2 - p3 - 1);
 
         // 左括号位置，右括号位置，格式化字符串
@@ -102,7 +102,7 @@ public static class TemplateHelper
         var p = 0;
         while (true)
         {
-            var p1 = str.IndexOf("{Message}", p);
+            var p1 = str.IndexOf("{Message}", p, StringComparison.Ordinal);
             if (p1 < 0)
             {
                 sb.Append(str.Substring(p));

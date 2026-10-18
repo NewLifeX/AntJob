@@ -1,0 +1,27 @@
+<Solution>
+  <Folder Name="/Benchmark/">
+    <Project Path="Benchmark/AntJob.Benchmarks/AntJob.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/Others/">
+    <File Path=".editorconfig" />
+    <File Path=".github/copilot-instructions.md" />
+    <File Path=".github/workflows/publish-beta.yml" />
+    <File Path=".github/workflows/publish.yml" />
+    <File Path=".github/workflows/test.yml" />
+    <File Path="Readme.MD" />
+  </Folder>
+  <Folder Name="/Samples/">
+    <Project Path="Samples/HisAgent/HisAgent.csproj" />
+    <Project Path="Samples/HisData/HisData.csproj" />
+    <Project Path="Samples/HisWeb/HisWeb.csproj" />
+  </Folder>
+  <Project Path="AntJob.Agent/AntJob.Agent.csproj" />
+  <Project Path="AntJob.Data/AntJob.Data.csproj" />
+  <Project Path="AntJob.Extensions/AntJob.Extensions.csproj" />
+  <Project Path="AntJob.Server/AntJob.Server.csproj" />
+  <Project Path="AntJob.Web/AntJob.Web.csproj" />
+  <Project Path="AntJob/AntJob.csproj" />
+  <Project Path="AntTest.Web/AntTest.Web.csproj" />
+  <Project Path="AntTest/AntTest.csproj" />
+  <Project Path="Test/Test.csproj" />
+</Solution>

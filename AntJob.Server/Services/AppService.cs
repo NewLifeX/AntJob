@@ -63,7 +63,18 @@ public class AppService
         if (app.CompileTime < compile) app.CompileTime = compile;
         if (app.DisplayName.IsNullOrEmpty()) app.DisplayName = model.DisplayName;
 
-        app.Save();
+        // 多客户端并发自动注册时，可能同时插入同名应用而触发唯一约束，冲突后重新加载
+        try
+        {
+            app.Save();
+        }
+        catch (Exception) when (autoReg)
+        {
+            var app2 = App.FindByName(model.Code);
+            if (app2 == null) throw;
+
+            app = app2;
+        }
 
         // 应用上线。RPC用ClientId，Web用AppName@IP
         //if (!model.ClientId.IsNullOrEmpty()) sessionId = model.ClientId;

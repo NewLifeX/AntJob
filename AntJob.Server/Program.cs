@@ -29,9 +29,6 @@ if (set2.IsNew)
     set2.Save();
 }
 
-//// 过渡期暂时使用FastJson，为了兼容旧数据序列化Start
-//JsonHelper.Default = new FastJson();
-
 services.AddSingleton(AntJobSetting.Current);
 
 // 分布式缓存，锚定配置中心RedisCache，若无配置则使用本地MemoryCache

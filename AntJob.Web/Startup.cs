@@ -62,6 +62,9 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
+            // AntJobController 使用 [Route("AntJob")] 特性路由，必须显式映射
+            endpoints.MapControllers();
+
             endpoints.MapControllerRoute(
                 "Default",
                 "{controller=CubeHome}/{action=Index}/{id?}"

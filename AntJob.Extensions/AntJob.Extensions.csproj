@@ -10,7 +10,8 @@
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>
-    <AssemblyVersion>$(VersionPrefix).*</AssemblyVersion>
+    <AssemblyVersion Condition="'$(Deterministic)' == 'true'">$(VersionPrefix).0.0</AssemblyVersion>
+    <AssemblyVersion Condition="'$(Deterministic)' != 'true'">$(VersionPrefix).*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin</OutputPath>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -44,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="12.2.2026.901" />
+    <PackageReference Include="NewLife.XCode" Version="12.2.2026.1017-beta1246" />
   </ItemGroup>
 
   <ItemGroup>

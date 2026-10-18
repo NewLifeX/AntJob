@@ -8,6 +8,7 @@ using Xunit;
 
 namespace AntTest;
 
+[Collection("Integration")]
 public class SqlHandlerTests
 {
     [Fact]
@@ -46,9 +47,10 @@ public class SqlHandlerTests
         //method.Invoke(handler, new Object[] { ctx });
         var rs = handler.Execute(ctx);
 
-        Assert.Equal(4, ctx.Total);
+        Assert.Equal(count, ctx.Total);
         //Assert.Equal(4, ctx.Success);
-        Assert.Equal(8, rs);
+        Assert.Equal(count * 2, rs);
         //Assert.True(ctx.Success > 0);
     }
 }
+

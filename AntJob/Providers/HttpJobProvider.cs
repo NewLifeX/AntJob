@@ -66,7 +66,7 @@ public class HttpJobProvider : JobProvider
 
         client.Filter = new TokenHttpFilter
         {
-            Action = "/AntJob/Login",
+            Action = "/AntJob/Token",
             UserName = AppId,
             Password = Secret,
         };
@@ -106,7 +106,7 @@ public class HttpJobProvider : JobProvider
 
             list.Add(job);
         }
-        if (list.Count > 0) await Client.PostAsync<Object>("/AntJob/AddJobs", new { jobs = list.ToArray() });
+        if (list.Count > 0) await Client.PostAsync<String[]>("/AntJob/AddJobs", list.ToArray());
 
         // 定时更新邻居
         _timer = new TimerX(DoCheckPeer, null, 1_000, 30_000) { Async = true };
@@ -176,7 +176,7 @@ public class HttpJobProvider : JobProvider
             model.Unique = option.Unique;
         }
 
-        return await Client.PostAsync<Int32>("/AntJob/Product", model);
+        return await Client.PostAsync<Int32>("/AntJob/Produce", model);
     }
     #endregion
 

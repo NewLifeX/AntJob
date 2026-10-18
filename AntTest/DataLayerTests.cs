@@ -14,25 +14,13 @@ using Xunit;
 namespace AntTest;
 
 /// <summary>数据层集成测试（SQLite 文件模式）</summary>
-public class DataLayerTests : IDisposable
+[Collection("Integration")]
+public class DataLayerTests
 {
-    private readonly String _tempDb;
-
     public DataLayerTests()
     {
-        // 配置 SQLite 文件数据库
-        _tempDb = Path.GetTempFileName() + ".db";
         XTrace.UseConsole();
-        var connStr = $"Data Source={_tempDb};Cache=Shared";
-        DAL.AddConnStr("Ant", connStr, null, "SQLite");
-        EntityFactory.InitConnection("Ant");
-    }
-
-    public void Dispose()
-    {
-        // 清理连接池
-        DAL.ConnStrs.TryRemove("Ant", out _);
-        if (File.Exists(_tempDb)) File.Delete(_tempDb);
+        TestDb.Init();
     }
 
     [Fact]

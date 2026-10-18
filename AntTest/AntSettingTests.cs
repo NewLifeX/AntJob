@@ -9,6 +9,7 @@ using Xunit;
 namespace AntTest;
 
 /// <summary>蚂蚁配置测试</summary>
+[Collection("Integration")]
 public class AntSettingTests
 {
     [Fact]
@@ -67,6 +68,7 @@ public class AntSettingTests
 }
 
 /// <summary>邻居伙伴模型测试</summary>
+[Collection("Integration")]
 public class PeerModelTests
 {
     [Fact]
@@ -105,6 +107,7 @@ public class PeerModelTests
 }
 
 /// <summary>DI扩展测试</summary>
+[Collection("Integration")]
 public class AntJobExtensionsTests
 {
     [Fact]

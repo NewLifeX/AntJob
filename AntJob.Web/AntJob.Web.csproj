@@ -11,7 +11,8 @@
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>
-    <AssemblyVersion>$(VersionPrefix).*</AssemblyVersion>
+    <AssemblyVersion Condition="'$(Deterministic)' == 'true'">$(VersionPrefix).0.0</AssemblyVersion>
+    <AssemblyVersion Condition="'$(Deterministic)' != 'true'">$(VersionPrefix).*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin\Web</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -31,10 +32,10 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="6.15.2026.901" />
-    <PackageReference Include="NewLife.MySql" Version="1.4.2026.801" />
-    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.9.2026.901" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.10.2026.901" />
+    <PackageReference Include="NewLife.Cube.Core" Version="6.15.2026.1017-beta1435" />
+    <PackageReference Include="NewLife.MySql" Version="1.4.2026.1016-beta0206" />
+    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.9.2026.1017-beta1444" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.10.2026.1017-beta1056" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj">

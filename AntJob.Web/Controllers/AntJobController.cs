@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.Json;
 using AntJob.Data;
 using AntJob.Data.Entity;
 using AntJob.Models;
@@ -24,6 +25,7 @@ namespace AntJob.Web.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[ApiFilter]
 public class AntJobController : ControllerBase, IActionFilter
 {
     ///// <summary>令牌</summary>
@@ -111,7 +113,8 @@ public class AntJobController : ControllerBase, IActionFilter
         return rs;
     }
 
-    [ApiFilter]
+    [AllowAnonymous]
+    [HttpPost(nameof(Token))]
     public TokenModel Token([FromBody] TokenInModel model)
     {
         var set = _setting;
@@ -187,6 +190,24 @@ public class AntJobController : ControllerBase, IActionFilter
         if (jobs == null || jobs.Length == 0) return [];
 
         return _jobService.AddJobs(_App, jobs);
+    }
+
+    /// <summary>设置作业。支持控制作业启停、数据时间、步进等参数</summary>
+    /// <param name="json">作业参数。仅提交需要修改的字段</param>
+    /// <returns></returns>
+    [HttpPost(nameof(SetJob))]
+    public IJob SetJob([FromBody] JsonElement json)
+    {
+        var model = json.GetRawText().ToJsonEntity<JobModel>();
+
+        // 仅把提交过来的字段作为可修改参数，与 RPC 通道保持一致
+        var parameters = new Dictionary<String, Object>(StringComparer.OrdinalIgnoreCase);
+        foreach (var item in json.EnumerateObject())
+        {
+            parameters[item.Name] = null;
+        }
+
+        return _jobService.SetJob(_App, model, parameters);
     }
 
     /// <summary>申请作业任务</summary>

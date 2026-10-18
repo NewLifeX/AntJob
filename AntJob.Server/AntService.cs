@@ -19,7 +19,7 @@ namespace AntJob.Server;
 /// 服务注册到内部对象容器IObjectContainer，要求宿主ApiServer指定ServiceProvider为IObjectContainer。
 /// </remarks>
 [Api(null)]
-class AntService(AppService appService, JobService jobService) : IApi, IActionFilter
+public class AntService(AppService appService, JobService jobService) : IApi, IActionFilter
 {
     #region 属性
     /// <summary>本地节点</summary>

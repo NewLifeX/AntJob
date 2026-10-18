@@ -34,3 +34,6 @@ bld/
 /AntJob.Web/.config
 *.csproj.lscache
 /out
+
+# BenchmarkDotNet 运行产物
+BenchmarkDotNet.Artifacts/

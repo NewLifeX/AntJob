@@ -10,7 +10,8 @@
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>
-    <AssemblyVersion>$(VersionPrefix).*</AssemblyVersion>
+    <AssemblyVersion Condition="'$(Deterministic)' == 'true'">$(VersionPrefix).0.0</AssemblyVersion>
+    <AssemblyVersion Condition="'$(Deterministic)' != 'true'">$(VersionPrefix).*</AssemblyVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\Bin</OutputPath>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -38,6 +39,11 @@
     <EnableSourceLink>false</EnableSourceLink>
   </PropertyGroup>
   
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
+    <!-- C#脚本组件仅提供 netstandard2.0 资产，其依赖在 net461 下会触发 TFM 支持性警告，实际通过 netstandard 兼容层加载 -->
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.400">
       <PrivateAssets>all</PrivateAssets>
@@ -46,9 +52,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="11.19.2026.901" />
-    <PackageReference Include="NewLife.Remoting" Version="3.9.2026.901" />
-    <PackageReference Include="NewLife.Stardust" Version="3.10.2026.901" />
+    <PackageReference Include="NewLife.Core" Version="12.0.2026.1017-beta1103" />
+    <PackageReference Include="NewLife.Remoting" Version="3.9.2026.1017-beta1444" />
+    <PackageReference Include="NewLife.Stardust" Version="3.10.2026.1017-beta1056" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.9.0" Condition="'$(TargetFramework)' != 'net45'" />
   </ItemGroup>
   
   <ItemGroup>
