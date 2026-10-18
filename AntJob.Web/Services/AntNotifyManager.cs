@@ -79,6 +79,7 @@ public class AntNotifyManager : SessionManager
         // 按应用索引取本机会话，避免遍历全部连接
         if (!_apps.TryGetValue(code, out var bucket)) return;
 
+        var tasks = new List<Task>();
         foreach (var item in bucket)
         {
             // 会话可能已被清理或替换，顺手剔除失效项
@@ -88,15 +89,23 @@ public class AntNotifyManager : SessionManager
                 continue;
             }
 
-            try
-            {
-                await item.Value.HandleAsync(null, json, cancellationToken).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                // 单个会话发送失败不影响其它会话
-                XTrace.Log.Debug("WebSocket通知[{0}]失败：{1}", item.Key, ex.Message);
-            }
+            tasks.Add(SendAsync(item.Key, item.Value, json, cancellationToken));
+        }
+
+        // 并发下发，避免慢连接的实例拖住同应用的其它实例
+        if (tasks.Count > 0) await Task.WhenAll(tasks).ConfigureAwait(false);
+    }
+
+    private static async Task SendAsync(String code, ICommandSession session, String json, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await session.HandleAsync(null, json, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            // 单个会话发送失败不影响其它会话
+            XTrace.Log.Debug("WebSocket通知[{0}]失败：{1}", code, ex.Message);
         }
     }
 }
