@@ -502,6 +502,41 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         await worker.StopAsync(CancellationToken.None);
     }
 
+    [Fact(DisplayName = "Worker停止后释放监听端口")]
+    public async Task Worker_Stop_Releases_Port()
+    {
+        var setting = new AntJobSetting { Port = 0, AutoRegistry = true, TokenSecret = "HS256:antjob_test_secret" };
+        var worker = new Worker(fixture.CacheProvider, BuildProvider(fixture), setting, DefaultTracer.Instance ?? new DefaultTracer());
+
+        await worker.StartAsync(CancellationToken.None);
+
+        // 使用指定端口，停止后应能立即重新监听同一端口
+        var port = FreePort();
+        var setting2 = new AntJobSetting { Port = port, AutoRegistry = true, TokenSecret = "HS256:antjob_test_secret" };
+        var worker2 = new Worker(fixture.CacheProvider, BuildProvider(fixture), setting2, DefaultTracer.Instance ?? new DefaultTracer());
+        await worker2.StartAsync(CancellationToken.None);
+        await worker2.StopAsync(CancellationToken.None);
+
+        // 端口已释放，可再次绑定
+        var worker3 = new Worker(fixture.CacheProvider, BuildProvider(fixture), setting2, DefaultTracer.Instance ?? new DefaultTracer());
+        await worker3.StartAsync(CancellationToken.None);
+
+        var ex = await Record.ExceptionAsync(() => worker3.StopAsync(CancellationToken.None));
+        Assert.Null(ex);
+
+        await worker.StopAsync(CancellationToken.None);
+    }
+
+    private static Int32 FreePort()
+    {
+        using var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+
+        return port;
+    }
+
     [Fact]
     public void AntJobSetting_Defaults()
     {

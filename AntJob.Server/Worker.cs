@@ -28,6 +28,7 @@ public class Worker : IHostedService
     private readonly IServiceProvider _provider;
     private readonly AntJobSetting _setting;
     private readonly ITracer _tracer;
+    private ApiServer _server;
 
     /// <summary>实例化后台服务</summary>
     /// <param name="cacheProvider">缓存提供者，用于分布式锁</param>
@@ -48,7 +49,7 @@ public class Worker : IHostedService
     /// <returns></returns>
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        InitData();
+        await InitData();
 
         //var set = AntJobSetting.Current;
         var set = _setting;
@@ -69,6 +70,7 @@ public class Worker : IHostedService
         AntService.Local = new IPEndPoint(NetHelper.MyIP(), set.Port);
 
         server.Start();
+        _server = server;
 
         _clearOnlineTimer = new TimerX(ClearOnline, null, 1000, 10 * 1000) { Async = true };
         _clearItemTimer = new TimerX(ClearItems, null, 10_000, 3600_000) { Async = true };
@@ -85,10 +87,14 @@ public class Worker : IHostedService
         _clearOnlineTimer.TryDispose();
         _clearItemTimer.TryDispose();
 
+        // 释放监听端口，避免进程重启或同进程再次启动时端口占用
+        _server.TryDispose();
+        _server = null;
+
         return Task.CompletedTask;
     }
 
-    private static void InitData()
+    private static async Task InitData()
     {
         var set = NewLife.Setting.Current;
         if (set.IsNew)
@@ -109,7 +115,8 @@ public class Worker : IHostedService
             set2.Save();
         }
 
-        _ = EntityFactory.InitAllAsync();
+        // 等待反向工程完成，避免服务已开始接收请求但数据表尚未就绪
+        await EntityFactory.InitAllAsync();
     }
 
     #region 清理过时
