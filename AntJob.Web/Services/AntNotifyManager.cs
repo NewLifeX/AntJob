@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using AntJob.Server.Services;
 using NewLife;
 using NewLife.Log;
@@ -13,9 +14,53 @@ namespace AntJob.Web.Services;
 /// </remarks>
 public class AntNotifyManager : SessionManager
 {
+    private readonly ConcurrentDictionary<String, ConcurrentDictionary<String, ICommandSession>> _apps = new(StringComparer.OrdinalIgnoreCase);
+
     /// <summary>实例化通知会话管理器</summary>
     /// <param name="serviceProvider">服务提供者</param>
     public AntNotifyManager(IServiceProvider serviceProvider) : base(serviceProvider) => Topic = AntNotifyTopic.Name;
+
+    /// <summary>添加会话，并按应用建立索引</summary>
+    /// <param name="session">命令会话</param>
+    public override void Add(ICommandSession session)
+    {
+        base.Add(session);
+
+        var app = GetApp(session?.Code);
+        if (!app.IsNullOrEmpty())
+            _apps.GetOrAdd(app, _ => new(StringComparer.OrdinalIgnoreCase))[session.Code] = session;
+    }
+
+    /// <summary>移除会话，同时清理应用索引</summary>
+    /// <param name="session">命令会话</param>
+    public override void Remove(ICommandSession session)
+    {
+        base.Remove(session);
+
+        var app = GetApp(session?.Code);
+        if (!app.IsNullOrEmpty() && _apps.TryGetValue(app, out var bucket))
+        {
+            bucket.TryRemove(session.Code, out _);
+            if (bucket.IsEmpty) _apps.TryRemove(app, out _);
+        }
+    }
+
+    /// <summary>关闭全部会话，同时清空应用索引</summary>
+    /// <param name="reason">原因</param>
+    public override void CloseAll(String reason)
+    {
+        base.CloseAll(reason);
+
+        _apps.Clear();
+    }
+
+    private static String GetApp(String code)
+    {
+        if (code.IsNullOrEmpty()) return null;
+
+        var p = code.IndexOf('@');
+        return p > 0 ? code[..p] : code;
+    }
 
     /// <summary>从事件总线收到通知消息，按应用前缀分发给本机会话</summary>
     /// <param name="message">消息。格式为 应用名#JSON</param>
@@ -32,11 +77,17 @@ public class AntNotifyManager : SessionManager
         var code = message[..p];
         var json = message[(p + 1)..];
 
-        // 直接转发原始消息，避免为每个会话重复反序列化
-        var prefix = code + "@";
-        foreach (var item in Sessions)
+        // 按应用索引取本机会话，避免遍历全部连接
+        if (!_apps.TryGetValue(code, out var bucket)) return;
+
+        foreach (var item in bucket)
         {
-            if (!item.Key.EqualIgnoreCase(code) && !item.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) continue;
+            // 会话可能已被清理或替换，顺手剔除失效项
+            if (!Sessions.TryGetValue(item.Key, out var current) || !ReferenceEquals(current, item.Value) || !current.Active)
+            {
+                bucket.TryRemove(item.Key, out _);
+                continue;
+            }
 
             try
             {

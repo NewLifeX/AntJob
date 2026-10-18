@@ -43,6 +43,15 @@ public class NotifyRoutingTests
         var ok = await WaitUntilAsync(() => a.Messages.Count > 0 && b.Messages.Count > 0, 5);
         Assert.True(ok);
         Assert.Empty(c.Messages);
+
+        // 移除会话后不再向其分发
+        var before = a.Messages.Count;
+        manager.Remove(a);
+        await bus.PublishAsync($"AppX#{command.ToJson()}");
+
+        ok = await WaitUntilAsync(() => b.Messages.Count > 1, 5);
+        Assert.True(ok);
+        Assert.Equal(before, a.Messages.Count);
     }
 
     [Fact(DisplayName = "Redis 多实例广播（需 REDIS_CONNECTION 或本机 6379）")]
