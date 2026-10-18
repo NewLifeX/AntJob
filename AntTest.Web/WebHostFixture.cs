@@ -23,6 +23,9 @@ public sealed class WebHostFixture : IAsyncLifetime
     /// <summary>服务地址，如 http://127.0.0.1:5000</summary>
     public String Server { get; private set; }
 
+    /// <summary>宿主服务提供者，用于观察服务端内部状态</summary>
+    public IServiceProvider Services => _host.Services;
+
     public async Task InitializeAsync()
     {
         XTrace.UseConsole();
