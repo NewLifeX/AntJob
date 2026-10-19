@@ -1,0 +1,9 @@
+# 한국어 词表（ko）。键为英文源文，与源码字符串逐字一致；缺少的键运行时回退英文。
+"Stop working: {0}": "작업 중지: {0}"
+"{0} tasks are still running (possibly hung); giving up waiting.": "{0}개의 작업이 아직 실행 중입니다(중단되었을 수 있음). 대기를 포기합니다."
+"Task [{0}] exceeded the maximum inactive time of {1}s; marking the job as hung.": "작업 [{0}]이(가) 최대 비활성 시간 {1}초를 초과했습니다. 해당 작업을 중단됨으로 표시합니다."
+"C# scripting is not supported on net45; use net461 or later.": "net45에서는 C# 스크립팅이 지원되지 않습니다. net461 이상을 사용하세요."
+"Message scheduling requires a topic.": "메시지 스케줄링에는 토픽이 필요합니다."
+"No handler is available.": "사용 가능한 처리기가 없습니다."
+"Connecting to the scheduling center: {0}": "스케줄링 센터에 연결하는 중: {0}"
+"Status report failed for [{1}] of [{0}]: {2}": "[{0}]의 [{1}]에 대한 상태 보고에 실패했습니다: {2}"

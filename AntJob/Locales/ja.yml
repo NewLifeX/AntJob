@@ -1,0 +1,9 @@
+# 日本語 词表（ja）。键为英文源文，与源码字符串逐字一致；缺少的键运行时回退英文。
+"Stop working: {0}": "処理を停止します: {0}"
+"{0} tasks are still running (possibly hung); giving up waiting.": "{0} 個のタスクがまだ実行中です (ハングしている可能性があります)。待機を断念します。"
+"Task [{0}] exceeded the maximum inactive time of {1}s; marking the job as hung.": "タスク [{0}] が最大非アクティブ時間 {1} 秒を超えました。ジョブをハングとしてマークします。"
+"C# scripting is not supported on net45; use net461 or later.": "net45 では C# スクリプトはサポートされていません。net461 以降を使用してください。"
+"Message scheduling requires a topic.": "メッセージ スケジューリングにはトピックが必要です。"
+"No handler is available.": "利用可能なハンドラーがありません。"
+"Connecting to the scheduling center: {0}": "スケジューリング センターに接続しています: {0}"
+"Status report failed for [{1}] of [{0}]: {2}": "[{0}] の [{1}] の状態レポートに失敗しました: {2}"

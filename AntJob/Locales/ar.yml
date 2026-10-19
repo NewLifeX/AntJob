@@ -1,0 +1,9 @@
+# العربية 词表（ar）。键为英文源文，与源码字符串逐字一致；缺少的键运行时回退英文。
+"Stop working: {0}": "إيقاف العمل: {0}"
+"{0} tasks are still running (possibly hung); giving up waiting.": "لا تزال {0} مهام قيد التشغيل (ربما معلّقة)؛ التخلي عن الانتظار."
+"Task [{0}] exceeded the maximum inactive time of {1}s; marking the job as hung.": "تجاوزت المهمة [{0}] الحد الأقصى لعدم النشاط {1} ثانية؛ يتم تعليم المهمة كمعلّقة."
+"C# scripting is not supported on net45; use net461 or later.": "برمجة C# غير مدعومة على net45؛ استخدم net461 أو أحدث."
+"Message scheduling requires a topic.": "يتطلب جدولة الرسائل موضوعًا."
+"No handler is available.": "لا يوجد معالج متاح."
+"Connecting to the scheduling center: {0}": "جارٍ الاتصال بمركز الجدولة: {0}"
+"Status report failed for [{1}] of [{0}]: {2}": "فشل تقرير الحالة لـ [{1}] من [{0}]: {2}"

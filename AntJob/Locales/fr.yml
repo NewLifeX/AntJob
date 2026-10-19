@@ -1,0 +1,9 @@
+# Français 词表（fr）。键为英文源文，与源码字符串逐字一致；缺少的键运行时回退英文。
+"Stop working: {0}": "Arrêt du travail : {0}"
+"{0} tasks are still running (possibly hung); giving up waiting.": "{0} tâches sont encore en cours d'exécution (peut-être bloquées) ; abandon de l'attente."
+"Task [{0}] exceeded the maximum inactive time of {1}s; marking the job as hung.": "La tâche [{0}] a dépassé le temps d'inactivité maximal de {1}s ; la tâche est marquée comme bloquée."
+"C# scripting is not supported on net45; use net461 or later.": "Les scripts C# ne sont pas pris en charge sous net45 ; utilisez net461 ou ultérieur."
+"Message scheduling requires a topic.": "La planification des messages nécessite un sujet."
+"No handler is available.": "Aucun gestionnaire n'est disponible."
+"Connecting to the scheduling center: {0}": "Connexion au centre de planification : {0}"
+"Status report failed for [{1}] of [{0}]: {2}": "Échec du rapport d'état pour [{1}] de [{0}] : {2}"

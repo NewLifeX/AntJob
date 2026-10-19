@@ -1,0 +1,3 @@
+# Português 词表（pt）。键为英文源文，与源码字符串逐字一致；缺少的键运行时回退英文。
+"Job [{0}/{1}] has no data time set.": "O trabalho [{0}/{1}] não tem hora de dados definida."
+"The application is not enabled.": "O aplicativo não está habilitado."

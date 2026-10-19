@@ -1,0 +1,9 @@
+# Español 词表（es）。键为英文源文，与源码字符串逐字一致；缺少的键运行时回退英文。
+"Stop working: {0}": "Deteniendo el trabajo: {0}"
+"{0} tasks are still running (possibly hung); giving up waiting.": "Todavía se están ejecutando {0} tareas (posiblemente bloqueadas); se abandona la espera."
+"Task [{0}] exceeded the maximum inactive time of {1}s; marking the job as hung.": "La tarea [{0}] superó el tiempo máximo de inactividad de {1}s; se marca el trabajo como bloqueado."
+"C# scripting is not supported on net45; use net461 or later.": "La creación de scripts de C# no se admite en net45; use net461 o posterior."
+"Message scheduling requires a topic.": "La programación de mensajes requiere un tema."
+"No handler is available.": "No hay ningún controlador disponible."
+"Connecting to the scheduling center: {0}": "Conectando al centro de programación: {0}"
+"Status report failed for [{1}] of [{0}]: {2}": "Error al informar del estado de [{1}] de [{0}]: {2}"
