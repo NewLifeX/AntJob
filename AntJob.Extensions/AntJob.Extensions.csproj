@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0;net45;net8.0</TargetFrameworks>
-    <AssemblyTitle>蚂蚁调度扩展库</AssemblyTitle>
-    <Description>AntJob 扩展组件库，支持 SQL 数据驱动、消息驱动、动态脚本等多种调度模式。</Description>
+    <AssemblyTitle>AntJob Extensions Library</AssemblyTitle>
+    <Description>AntJob extension components on top of the core SDK: SQL-driven, message-driven and dynamic-script scheduling modes. NativeAOT-ready, with built-in runtime localization; targets .NET Framework 4.5, .NET Standard 2.0/2.1 and .NET 8.0.</Description>
     <Company>新生命开发团队</Company>
     <Copyright>©2002-2026 NewLife</Copyright>
-    <VersionPrefix>5.0</VersionPrefix>
+    <VersionPrefix>5.1</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>
@@ -23,33 +23,50 @@
 
   <PropertyGroup>
     <PackageId>NewLife.$(AssemblyName)</PackageId>
+    <PackageDescription>AntJob extension components on top of the core SDK: SQL-driven, message-driven and dynamic-script scheduling modes. NativeAOT-ready, with built-in runtime localization; targets .NET Framework 4.5, .NET Standard 2.0/2.1 and .NET 8.0. 蚂蚁调度扩展库：在核心 SDK 之上提供 SQL 数据驱动、消息驱动与动态脚本等多种调度模式；原生 AOT 就绪，内置运行时多语言消息；单包覆盖 .NET Framework 4.5 至 .NET 8.0 共 4 个目标框架。</PackageDescription>
     <Authors>$(Company)</Authors>
     <PackageProjectUrl>https://newlifex.com/blood/antjob</PackageProjectUrl>
-    <PackageIconUrl>http://www.NewLifeX.com/favicon.ico</PackageIconUrl>
+    <PackageIcon>ant.png</PackageIcon>
     <RepositoryUrl>https://github.com/NewLifeX/AntJob</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>新生命团队;X组件;NewLife;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes>HttpJobProvider 重构为全异步接口并补全 SetJob 方法，适用于无 TCP 端口环境；补充数据层与处理器 SQLite 集成测试及单元测试，提升测试覆盖率；新增需求、功能清单与架构设计文档；修正版本号生成逻辑，修复 TrimEnd 误用；升级依赖包至最新版</PackageReleaseNotes>
+    <PackageTags>新生命团队;X组件;NewLife;AOT;NativeAOT;本地化;$(AssemblyName)</PackageTags>
+    <PackageReleaseNotes>原生 AOT 就绪，处理器与数据模型在裁剪后仍可实例化；新增 11 种语言运行时词表，数据工厂、数据抽取与连接名相关异常消息支持本地化；HTTP 通道与 WebSocket 通知贯通后，DataHandler、SqlHandler、MessageHandler 与 CSharpHandler 均可走 HTTP 接入；执行与上报异常不再抛到线程池；包描述中英双语并补齐 AOT/本地化标签；跟随核心库升级到 NewLife.Core 12、Remoting 4.0、XCode 12.3 最新正式版</PackageReleaseNotes>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReadmeFile>README.nuget.md</PackageReadmeFile>
     <EnableSourceLink>false</EnableSourceLink>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.400">
+    <Content Include="..\Doc\ant.png" Link="ant.png" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.nuget.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.403">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="12.2.2026.1017-beta1246" />
+    <PackageReference Include="NewLife.XCode" Version="12.3.2026.1024" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Locales 目录由 NewLife.Core 源生成器编译期解析；本项目未直接引用 Core 包，显式挂载输入 -->
+    <AdditionalFiles Include="$(MSBuildProjectDirectory)\Locales\*.yml" />
   </ItemGroup>
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
     <IsAotCompatible>true</IsAotCompatible>

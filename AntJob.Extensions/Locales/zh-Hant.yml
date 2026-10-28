@@ -1,0 +1,5 @@
+# 繁體中文譯文。鍵為英文源文，缺少時執行期回退英文。
+"Data factory is not configured for {0}.": "未為{0}設定資料工廠。"
+"Data extraction is not configured.": "未設定資料抽取設定。"
+"Field data of type [{0}] cannot be extracted.": "無法抽取[{0}]型別的欄位資料。"
+"Connection name is not specified for [{0}].": "未為[{0}]指定連線名稱。"

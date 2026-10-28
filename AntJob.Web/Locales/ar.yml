@@ -1,0 +1,5 @@
+# AntJob web host translations (ar).
+"Invalid operation, TaskID={0}.": "عملية غير صالحة، TaskID={0}."
+"Authentication failed.": "فشلت المصادقة."
+"Unsupported grant_type {0}.": "نوع المنحة {0} غير مدعوم."
+"WebSocket notification [{0}] failed: {1}": "فشل إشعار WebSocket [{0}]: {1}"

@@ -438,6 +438,21 @@ public class SchedulerTests : IDisposable
         public override Task<ITask[]> Acquire(IJob job, String topic, Int32 count) => Task.FromResult(Array.Empty<ITask>());
     }
 
+    [Fact(DisplayName = "未注入服务提供者时调度器仍可启动")]
+    public void Start_WithoutServiceProvider_DoesNotThrow()
+    {
+        // 手工实例化调度器（不经过依赖注入）同样受支持，例如控制台示例
+        using var scheduler = new Scheduler { Provider = new TestJobProvider() };
+        scheduler.AddHandler(new AgentTestHandler());
+
+#pragma warning disable CS0618 // Start 已过时，这里需要同步等待启动流程完成
+        scheduler.Start();
+#pragma warning restore CS0618
+
+        Assert.NotNull(scheduler.Provider);
+        Assert.False(scheduler.Handlers[0].Active);
+    }
+
     private class CountingProvider : NetworkJobProvider
     {
         public CountingProvider() : base(new AntSetting { Server = "http://127.0.0.1:1" }) { }

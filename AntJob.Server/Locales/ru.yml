@@ -1,3 +1,9 @@
 # Русский 词表（ru）。键为英文源文，与源码字符串逐字一致；缺少的键运行时回退英文。
 "Job [{0}/{1}] has no data time set.": "Для задания [{0}/{1}] не задано время данных."
 "The application is not enabled.": "Приложение не включено."
+"Debug switch. Defaults to true.": "Переключатель отладки. По умолчанию true."
+"Port": "Порт"
+"Token secret. Algorithm and key used to generate JWT tokens, e.g. HS256:ABCD1234.": "Секрет токена. Алгоритм и ключ для создания токенов JWT, например HS256:ABCD1234."
+"Token validity period. Defaults to 2*3600 seconds.": "Срок действия токена. По умолчанию 2*3600 секунд."
+"Session timeout. Defaults to 600 seconds.": "Тайм-аут сеанса. По умолчанию 600 секунд."
+"Auto registration. Registers automatically when any application logs in, saving the trouble of manually configuring application accounts, defaults to true.": "Автоматическая регистрация. Автоматически регистрируется при входе любого приложения, избавляя от необходимости вручную настраивать учётные записи приложений, по умолчанию true."

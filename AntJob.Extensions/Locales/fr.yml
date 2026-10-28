@@ -1,0 +1,5 @@
+# French translations (fr). Keys are the English source text and must match it verbatim.
+"Data factory is not configured for {0}.": "Aucune fabrique de données n'est configurée pour {0}."
+"Data extraction is not configured.": "L'extraction de données n'est pas configurée."
+"Field data of type [{0}] cannot be extracted.": "Les données de champ de type [{0}] ne peuvent pas être extraites."
+"Connection name is not specified for [{0}].": "Aucun nom de connexion n'est spécifié pour [{0}]."

@@ -1,3 +1,9 @@
 # 繁體中文譯文。鍵為英文源文，缺失時執行期回退英文。
 "Job [{0}/{1}] has no data time set.": "作業[{0}/{1}]未設置數據時間"
 "The application is not enabled.": "應用未啟用"
+"Debug switch. Defaults to true.": "除錯開關。預設 true"
+"Port": "連接埠"
+"Token secret. Algorithm and key used to generate JWT tokens, e.g. HS256:ABCD1234.": "權杖金鑰。用於產生 JWT 權杖的演算法和金鑰，如 HS256:ABCD1234"
+"Token validity period. Defaults to 2*3600 seconds.": "權杖有效期。預設 2*3600 秒"
+"Session timeout. Defaults to 600 seconds.": "工作階段逾時。預設 600 秒"
+"Auto registration. Registers automatically when any application logs in, saving the trouble of manually configuring application accounts, defaults to true.": "自動註冊。任意應用程式登入時自動註冊，省去人工設定應用程式帳號的麻煩，預設 true"

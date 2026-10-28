@@ -1,3 +1,9 @@
 # العربية 词表（ar）。键为英文源文，与源码字符串逐字一致；缺少的键运行时回退英文。
 "Job [{0}/{1}] has no data time set.": "المهمة [{0}/{1}] ليس لها وقت بيانات محدد."
 "The application is not enabled.": "التطبيق غير مُمكّن."
+"Debug switch. Defaults to true.": "مفتاح التصحيح. الافتراضي true."
+"Port": "المنفذ"
+"Token secret. Algorithm and key used to generate JWT tokens, e.g. HS256:ABCD1234.": "سر الرمز المميز. الخوارزمية والمفتاح المستخدمان لإنشاء رموز JWT، مثل HS256:ABCD1234."
+"Token validity period. Defaults to 2*3600 seconds.": "مدة صلاحية الرمز المميز. الافتراضي 2*3600 ثانية."
+"Session timeout. Defaults to 600 seconds.": "مهلة الجلسة. الافتراضي 600 ثانية."
+"Auto registration. Registers automatically when any application logs in, saving the trouble of manually configuring application accounts, defaults to true.": "التسجيل التلقائي. يسجّل تلقائيًا عند تسجيل دخول أي تطبيق، مما يوفر عناء إعداد حسابات التطبيقات يدويًا، الافتراضي true."

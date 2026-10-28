@@ -105,7 +105,7 @@ public class AntNotifyManager : SessionManager
         catch (Exception ex)
         {
             // 单个会话发送失败不影响其它会话
-            XTrace.Log.Debug("WebSocket通知[{0}]失败：{1}", code, ex.Message);
+            XTrace.Log.Debug(Localization.TranslateForLog("WebSocket notification [{0}] failed: {1}"), code, ex.Message);
         }
     }
 }

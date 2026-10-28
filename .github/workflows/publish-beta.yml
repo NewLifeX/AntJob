@@ -6,12 +6,19 @@ on:
     paths:
         - 'AntJob/**'
         - 'AntJob.Extensions/**'
+        - 'AntJob.Web/**'
   pull_request:
     branches: [ master ]
     paths:
         - 'AntJob/**'
         - 'AntJob.Extensions/**'
+        - 'AntJob.Web/**'
   workflow_dispatch:
+
+# GitHub Packages 推送需要 packages: write
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build-publish:

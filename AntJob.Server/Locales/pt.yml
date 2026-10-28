@@ -1,3 +1,9 @@
 # Português 词表（pt）。键为英文源文，与源码字符串逐字一致；缺少的键运行时回退英文。
 "Job [{0}/{1}] has no data time set.": "O trabalho [{0}/{1}] não tem hora de dados definida."
 "The application is not enabled.": "O aplicativo não está habilitado."
+"Debug switch. Defaults to true.": "Interruptor de depuração. Padrão true."
+"Port": "Porta"
+"Token secret. Algorithm and key used to generate JWT tokens, e.g. HS256:ABCD1234.": "Segredo do token. Algoritmo e chave usados para gerar tokens JWT, ex.: HS256:ABCD1234."
+"Token validity period. Defaults to 2*3600 seconds.": "Período de validade do token. Padrão 2*3600 segundos."
+"Session timeout. Defaults to 600 seconds.": "Tempo limite da sessão. Padrão 600 segundos."
+"Auto registration. Registers automatically when any application logs in, saving the trouble of manually configuring application accounts, defaults to true.": "Registro automático. Registra-se automaticamente quando qualquer aplicação faz login, evitando a configuração manual de contas de aplicação; padrão true."

@@ -1,0 +1,5 @@
+# AntJob web host translations (ko).
+"Invalid operation, TaskID={0}.": "잘못된 작업입니다. TaskID={0}."
+"Authentication failed.": "인증에 실패했습니다."
+"Unsupported grant_type {0}.": "지원되지 않는 grant_type {0}입니다."
+"WebSocket notification [{0}] failed: {1}": "WebSocket 알림 [{0}] 실패: {1}"

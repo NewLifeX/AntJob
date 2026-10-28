@@ -1,0 +1,5 @@
+# AntJob web host translations (pt).
+"Invalid operation, TaskID={0}.": "Operação inválida, TaskID={0}."
+"Authentication failed.": "Falha na autenticação."
+"Unsupported grant_type {0}.": "grant_type {0} não suportado."
+"WebSocket notification [{0}] failed: {1}": "Falha na notificação WebSocket [{0}]: {1}"

@@ -2,8 +2,16 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net45;netcoreapp3.1</TargetFrameworks>
-    <AssemblyVersion>1.0.*</AssemblyVersion>
+    <TargetFrameworks>net45;net8.0</TargetFrameworks>
+    <AssemblyTitle>蚂蚁调度 HelloWork 示例</AssemblyTitle>
+    <Description>手工实例化调度器并注册一个定时作业的最小控制台示例。</Description>
+    <Company>新生命开发团队</Company>
+    <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
+    <VersionPrefix>1.0</VersionPrefix>
+    <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
+    <Version>$(VersionPrefix).$(VersionSuffix)</Version>
+    <AssemblyVersion>$(VersionPrefix).0.0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).$(VersionSuffix)</FileVersion>
     <Deterministic>false</Deterministic>
     <OutputPath>..\..\Bin\Hello</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>

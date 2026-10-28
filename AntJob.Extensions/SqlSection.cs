@@ -1,4 +1,4 @@
-﻿using NewLife;
+using NewLife;
 using NewLife.Data;
 using NewLife.Model;
 using XCode.DataAccessLayer;
@@ -61,7 +61,7 @@ public class SqlSection
             else
                 connName = section.ConnName;
 
-            if (section.ConnName.IsNullOrEmpty()) throw new XException($"未指定连接名！{section.Sql}");
+            if (section.ConnName.IsNullOrEmpty()) throw new XException(Localization.Translate("Connection name is not specified for [{0}].", section.Sql));
 
             list.Add(section);
         }

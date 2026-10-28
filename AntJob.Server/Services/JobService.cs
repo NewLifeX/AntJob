@@ -92,8 +92,16 @@ public class JobService(AppService appService, ICacheProvider cacheProvider, ITr
             }
 
             // 添加定时作业时，计算下一次执行时间
+            // Cron 作业的时间点是执行时刻而不是数据窗口，客户端首次注册携带的历史时间没有意义；
+            // 以当前时间为基准计算下一次执行，避免启用后按历史时间补跑大量时间片
             if (job.ID == 0 && job.Mode == JobModes.Time)
             {
+                if (!job.Cron.IsNullOrEmpty())
+                {
+                    var now = DateTime.Now;
+                    if (job.DataTime.Year < 2000 || job.DataTime < now) job.DataTime = now;
+                }
+
                 var next = job.GetNext();
                 if (next.Year > 2000) job.DataTime = next;
             }

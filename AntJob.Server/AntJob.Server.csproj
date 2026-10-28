@@ -7,7 +7,7 @@
     <Description>AntJob 分布式调度中心，负责任务分片、分配、调度和监控，支持集群弹性伸缩。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
-    <VersionPrefix>5.0</VersionPrefix>
+    <VersionPrefix>5.1</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(Version)</FileVersion>
@@ -30,8 +30,8 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.MySql" Version="1.4.2026.1016-beta0206" />
-    <PackageReference Include="NewLife.Redis" Version="6.6.2026.1017-beta1441" />
+    <PackageReference Include="NewLife.MySql" Version="1.5.2026.1024" />
+    <PackageReference Include="NewLife.Redis" Version="7.0.2026.1024" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj" />
@@ -40,4 +40,9 @@
     <!-- Locales 目录由 NewLife.Core 源生成器编译期解析；本项目未直接引用 Core 包，显式挂载输入 -->
     <AdditionalFiles Include="$(MSBuildProjectDirectory)\Locales\*.yml" />
   </ItemGroup>
+
+  <!-- net8.0+ 常驻启用 AOT/裁剪分析器：0 告警成为构建期硬约束 -->
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
 </Project>

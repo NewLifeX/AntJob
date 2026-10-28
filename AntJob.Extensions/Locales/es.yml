@@ -1,0 +1,5 @@
+# Spanish translations (es). Keys are the English source text and must match it verbatim.
+"Data factory is not configured for {0}.": "No hay una fábrica de datos configurada para {0}."
+"Data extraction is not configured.": "La extracción de datos no está configurada."
+"Field data of type [{0}] cannot be extracted.": "No se pueden extraer datos de campos de tipo [{0}]."
+"Connection name is not specified for [{0}].": "No se especificó el nombre de conexión para [{0}]."

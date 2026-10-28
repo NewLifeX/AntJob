@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <AssemblyName>AntWeb</AssemblyName>
-    <TargetFramework>net10.0</TargetFramework>
     <TargetFrameworks Condition="'$(PackageTargetFrameworks)' != ''">$(PackageTargetFrameworks)</TargetFrameworks>
+    <TargetFramework Condition="'$(TargetFrameworks)' == ''">net10.0</TargetFramework>
     <AssemblyTitle>蚂蚁调度管理</AssemblyTitle>
     <Description>AntJob 可视化管理平台，提供任务调度、监控、日志查询和集群管理功能。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
-    <VersionPrefix>5.0</VersionPrefix>
+    <VersionPrefix>5.1</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>
@@ -21,7 +21,9 @@
     <LangVersion>latest</LangVersion>
     <IsPackable>true</IsPackable>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
-    <PackageReleaseNotes>新增 /AntJob/Notify WebSocket 长连接，向客户端推送作业变更与消息到达通知；HTTP API 补齐 Login 令牌、Ping、Logout；多实例经 Redis 事件总线广播，无需粘性会话；客户端可直接对接 Web 站点，无需独立 AntServer</PackageReleaseNotes>
+    <PackageReleaseNotes>升级 NewLife.Cube.Core 6.16.2026.1027 正式版，管理站点获得 RESTful 标准端点、自描述 meta 与页面呈现配置；新增 /AntJob/Notify WebSocket 长连接，作业变更与消息到达即时下发，多实例经 Redis 事件总线广播且无需粘性会话；HTTP API 补齐登录令牌、Ping、Logout 与 SetJob；按客户端标识维护在线记录并定时清理超时在线与过期任务；接入 NewLife.Core 12 多语言，本站 API 错误消息与配置项描述覆盖 11 种语言；客户端可直接对接 Web 站点，无需独立 AntServer</PackageReleaseNotes>
+    <PackageIcon>ant.png</PackageIcon>
+    <PackageReadmeFile>README.nuget.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\AntJob.Server\Services\AppService.cs" Link="Services\AppService.cs" />
@@ -32,17 +34,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- 直接编译 AntJob.Server 的源码文件，需同步挂载其多语言词表 -->
+    <!-- 直接编译 AntJob.Server 的源码文件，需同步挂载其多语言词表；本宿主自身的词表在本目录 -->
     <AdditionalFiles Include="$(MSBuildProjectDirectory)\..\AntJob.Server\Locales\*.yml" />
+    <AdditionalFiles Include="$(MSBuildProjectDirectory)\Locales\*.yml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.Cube.Core" Version="6.15.2026.1017-beta1435" />
-    <PackageReference Include="NewLife.MySql" Version="1.4.2026.1016-beta0206" />
-    <PackageReference Include="NewLife.Remoting.Extensions" Version="3.9.2026.1017-beta1444" />
-    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.10.2026.1017-beta1056" />
+    <Content Include="..\Doc\ant.png" Link="ant.png" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.nuget.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NewLife.Cube.Core" Version="6.16.2026.1027" />
+    <PackageReference Include="NewLife.MySql" Version="1.5.2026.1024" />
+    <PackageReference Include="NewLife.Remoting.Extensions" Version="4.0.2026.1024" />
+    <PackageReference Include="NewLife.Stardust.Extensions" Version="3.10.2026.1024" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Data\AntJob.Data.csproj">
@@ -56,12 +68,18 @@
   </PropertyGroup>
   <Target Name="IncludeDataBuildOutput">
     <ItemGroup>
-      <BuildOutputInPackage Include="..\Bin\netstandard2.1\AntJob.Data.dll" />
-      <BuildOutputInPackage Include="..\Bin\netstandard2.1\AntJob.Data.xml" />
+      <!-- AntJob.Data 多目标（netstandard2.1;net8.0），Web 的 net8.0 与 net10.0 都直接引用其 net8.0 资产，
+           因此统一内嵌 net8.0 产物；写死 netstandard2.1 会在干净工作区打包时找不到文件（NU5026） -->
+      <BuildOutputInPackage Include="..\Bin\net8.0\AntJob.Data.dll" />
+      <BuildOutputInPackage Include="..\Bin\net8.0\AntJob.Data.xml" />
     </ItemGroup>
   </Target>
 
   <ItemGroup>
     <Folder Include="Services\" />
   </ItemGroup>
+
+  <!-- 本宿主基于 ASP.NET Core MVC/Razor，上游明确不支持裁剪与 NativeAOT（https://aka.ms/aspnet/trimming），
+       因此不在此项目开启 AOT 分析器：Razor 视图的 dynamic 用法会产生 25 条 IL2026/IL3050 噪声。
+       本项目编译进的服务层与数据层源码另有 AntJob.Server 承载，AOT 0 告警由它把关。 -->
 </Project>

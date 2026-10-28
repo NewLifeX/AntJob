@@ -1,3 +1,9 @@
 # 简体中文译文。键为英文源文，缺失时运行期回退英文。
 "Job [{0}/{1}] has no data time set.": "作业[{0}/{1}]未设置数据时间"
 "The application is not enabled.": "应用未启用"
+"Debug switch. Defaults to true.": "调试开关。默认true"
+"Port": "端口"
+"Token secret. Algorithm and key used to generate JWT tokens, e.g. HS256:ABCD1234.": "令牌密钥。用于生成JWT令牌的算法和密钥，如HS256:ABCD1234"
+"Token validity period. Defaults to 2*3600 seconds.": "令牌有效期。默认2*3600秒"
+"Session timeout. Defaults to 600 seconds.": "会话超时。默认600秒"
+"Auto registration. Registers automatically when any application logs in, saving the trouble of manually configuring application accounts, defaults to true.": "自动注册。任意应用登录时自动注册，省去人工配置应用账号的麻烦，默认true"

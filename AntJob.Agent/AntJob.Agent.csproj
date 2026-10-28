@@ -7,7 +7,7 @@
     <Description>调度中心下发C#或Sql给蚂蚁代理执行</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
-    <VersionPrefix>5.0</VersionPrefix>
+    <VersionPrefix>5.1</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(Version)</FileVersion>
@@ -33,11 +33,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Stardust" Version="3.10.2026.1017-beta1056" />
+    <PackageReference Include="NewLife.Stardust" Version="3.10.2026.1024" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AntJob.Extensions\AntJob.Extensions.csproj" />
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
+
+  <!-- net8.0+ 常驻启用 AOT/裁剪分析器：0 告警成为构建期硬约束 -->
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
 </Project>

@@ -1,0 +1,5 @@
+# Russian translations (ru). Keys are the English source text and must match it verbatim.
+"Data factory is not configured for {0}.": "Для {0} не настроена фабрика данных."
+"Data extraction is not configured.": "Извлечение данных не настроено."
+"Field data of type [{0}] cannot be extracted.": "Данные поля типа [{0}] невозможно извлечь."
+"Connection name is not specified for [{0}].": "Для [{0}] не указано имя подключения."

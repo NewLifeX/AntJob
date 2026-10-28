@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using AntJob.Data;
 using NewLife;
 using NewLife.Log;
@@ -116,7 +116,7 @@ public abstract class DataHandler : Handler
     /// <summary>初始化。作业处理器启动之前</summary>
     public override void Init()
     {
-        if (Factory == null) throw new ArgumentNullException(nameof(Factory), $"{GetType().FullName}的参数错误");
+        if (Factory == null) throw new ArgumentNullException(nameof(Factory), Localization.Translate("Data factory is not configured for {0}.", GetType().FullName));
 
         // 自动识别雪花Id字段
         if (Field == null)
@@ -213,7 +213,7 @@ public abstract class DataHandler : Handler
     protected virtual Object Fetch(JobContext ctx, ref Int32 row)
     {
         var task = ctx.Task;
-        if (task == null) throw new ArgumentNullException(nameof(task), "没有设置数据抽取配置");
+        if (task == null) throw new ArgumentNullException(nameof(task), Localization.Translate("Data extraction is not configured."));
 
         // 验证时间段
         var start = task.DataTime;
@@ -237,7 +237,7 @@ public abstract class DataHandler : Handler
             if (end > DateTime.MinValue && end < DateTime.MaxValue) exp &= fi < snow.GetId(end);
         }
         else
-            throw new NotSupportedException($"不支持抽取[{fi.Type.FullName}]类型的字段数据！");
+            throw new NotSupportedException(Localization.Translate("Field data of type [{0}] cannot be extracted.", fi.Type.FullName));
 
         if (!Where.IsNullOrEmpty()) exp &= Where;
 

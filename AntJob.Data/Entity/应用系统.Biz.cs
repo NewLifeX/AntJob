@@ -38,7 +38,7 @@ public partial class App : EntityBase<App>
         if (!HasDirty) return;
 
         // 这里验证参数范围，建议抛出参数异常，指定参数名，前端用户界面可以捕获参数异常并聚焦到对应的参数输入框
-        if (Name.IsNullOrEmpty()) throw new ArgumentNullException(nameof(Name), "名称不能为空！");
+        if (Name.IsNullOrEmpty()) throw new ArgumentNullException(nameof(Name), Localization.Translate("Name cannot be empty."));
 
         if (!isNew && JobCount == 0 && !Dirtys[nameof(JobCount)]) JobCount = Job.FindCountByAppID(ID);
         if (!isNew && MessageCount == 0 && !Dirtys[nameof(MessageCount)]) MessageCount = AppMessage.FindCountByAppID(ID);

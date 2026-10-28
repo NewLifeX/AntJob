@@ -1,0 +1,5 @@
+# Japanese translations (ja). Keys are the English source text and must match it verbatim.
+"Data factory is not configured for {0}.": "{0} にデータファクトリが構成されていません。"
+"Data extraction is not configured.": "データ抽出が構成されていません。"
+"Field data of type [{0}] cannot be extracted.": "[{0}] 型のフィールドデータは抽出できません。"
+"Connection name is not specified for [{0}].": "[{0}] の接続名が指定されていません。"

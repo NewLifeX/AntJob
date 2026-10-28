@@ -105,12 +105,19 @@ public class TimeExpression
     #endregion
 
     /// <summary>处理时间偏移模版。如{dt+1M+5d:yyyyMMdd}</summary>
-    /// <param name="template"></param>
-    /// <param name="time"></param>
-    /// <returns></returns>
+    /// <param name="template">模版，其中第一对花括号内的部分按时间表达式解析</param>
+    /// <param name="time">基准时间</param>
+    /// <returns>替换后的字符串；模版不含花括号时原样返回</returns>
     public static String Build(String template, DateTime time)
     {
-        return null;
+        if (template.IsNullOrEmpty()) return template;
+
+        var p1 = template.IndexOf('{');
+        var p2 = template.IndexOf('}', p1 + 1);
+        if (p1 < 0 || p2 < 0) return template;
+
+        var exp = new TimeExpression(template.Substring(p1, p2 - p1 + 1));
+        return template[..p1] + exp.Build(time) + template[(p2 + 1)..];
     }
 }
 

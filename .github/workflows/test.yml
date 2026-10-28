@@ -47,10 +47,34 @@ jobs:
             if ($LASTEXITCODE -ne 0) { $failed = $true }
           }
         }
+        # AntJob.Web 直接编译 AntJob.Server 的源码并挂载其词表，需检查两份词表合并后的键冲突
+        if (Test-Path './AntJob.Server/Locales/zh-Hans.yml') {
+          pwsh -File ./check-locales.ps1 -LocaleDir ./AntJob.Web/Locales -Baseline zh-Hans.yml -SourceDir ./AntJob.Web -MergeDir ./AntJob.Server/Locales
+          if ($LASTEXITCODE -ne 0) { $failed = $true }
+        }
         if ($failed) { exit 1 }
     - name: Check README languages
       shell: pwsh
       run: pwsh -File ./sync-readme-languages.ps1 -Check
+
+  # NativeAOT 冒烟：以 PublishAot 发布后运行，确保主库/扩展库/数据模型在裁剪与原生编译后仍可用
+  aot:
+    name: nativeaot smoke (linux-x64)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup dotNET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.x
+    - name: Install NativeAOT toolchain
+      run: sudo apt-get update -qq && sudo apt-get install -y -qq clang zlib1g-dev
+    - name: Publish (NativeAOT)
+      run: dotnet publish Samples/AotSmoke/AotSmoke.csproj -c Release -r linux-x64 -o Bin/AotSmoke
+    - name: Run smoke
+      run: ./Bin/AotSmoke/AotSmoke
 
   # 多平台单元测试矩阵：win-x64 原生 runner 覆盖 Windows 行为，linux-arm64 覆盖另一指令集（观察期）
   test-matrix:

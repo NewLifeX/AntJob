@@ -1,0 +1,5 @@
+# German translations (de). Keys are the English source text and must match it verbatim.
+"Data factory is not configured for {0}.": "Für {0} ist keine Datenfabrik konfiguriert."
+"Data extraction is not configured.": "Die Datenextraktion ist nicht konfiguriert."
+"Field data of type [{0}] cannot be extracted.": "Felddaten vom Typ [{0}] können nicht extrahiert werden."
+"Connection name is not specified for [{0}].": "Für [{0}] ist kein Verbindungsname angegeben."

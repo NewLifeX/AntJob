@@ -1,5 +1,6 @@
 ﻿using System;
 using AntJob;
+using AntJob.Data;
 
 namespace HelloWork
 {
@@ -7,16 +8,17 @@ namespace HelloWork
     {
         public HelloJob()
         {
-            // 今天零点开始，每10秒一次
+            // 定时调度，每10秒一个时间片
             var job = Job;
-            job.Start = DateTime.Today;
+            job.Mode = JobModes.Time;
+            job.DataTime = DateTime.Today;
             job.Step = 10;
         }
 
-        protected override Int32 Execute(JobContext ctx)
+        public override Int32 Execute(JobContext ctx)
         {
             // 当前任务时间
-            var time = ctx.Task.Start;
+            var time = ctx.Task.DataTime;
             WriteLog("新生命蚂蚁调度系统！当前任务时间：{0}", time);
 
             // 成功处理数据量

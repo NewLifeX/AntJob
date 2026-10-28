@@ -16,6 +16,8 @@ public class Startup
 
     public Startup() { }
 
+    // ASP.NET Core MVC/Razor 上游明确不支持裁剪与 NativeAOT（https://aka.ms/aspnet/trimming），
+    // 因此 AntJob.Web 不参与 AOT 分析；服务层与数据层的 AOT 0 告警由 AntJob.Server 把关。
     public void ConfigureServices(IServiceCollection services)
     {
         // 配置星尘。借助StarAgent，或者读取配置文件 config/star.config 中的服务器地址

@@ -1,0 +1,5 @@
+# Arabic translations (ar). Keys are the English source text and must match it verbatim.
+"Data factory is not configured for {0}.": "لم يتم تكوين مصنع بيانات لـ {0}."
+"Data extraction is not configured.": "لم يتم تكوين استخراج البيانات."
+"Field data of type [{0}] cannot be extracted.": "لا يمكن استخراج بيانات الحقل من النوع [{0}]."
+"Connection name is not specified for [{0}].": "لم يتم تحديد اسم الاتصال لـ [{0}]."

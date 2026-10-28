@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using AntJob.Data;
 using Xunit;
 
@@ -106,5 +107,20 @@ public class TimeExpressionTests
 
         var rs = exp.Build(time);
         Assert.Equal(time3.ToString("yy-MM-dd"), rs);
+    }
+
+    [Fact]
+    [DisplayName("静态模板替换支持前后缀与时间偏移")]
+    public void StaticBuild()
+    {
+        var time = new DateTime(2026, 10, 28, 10, 30, 0);
+
+        // 保留花括号之外的前后缀
+        Assert.Equal("job-20261028", TimeExpression.Build("job-{dt:yyyyMMdd}", time));
+        Assert.Equal("2026-11-02", TimeExpression.Build("{dt+5d:yyyy-MM-dd}", time));
+
+        // 不含花括号时原样返回，不再返回 null
+        Assert.Equal("plain", TimeExpression.Build("plain", time));
+        Assert.Equal("", TimeExpression.Build("", time));
     }
 }

@@ -37,3 +37,6 @@ bld/
 
 # BenchmarkDotNet 运行产物
 BenchmarkDotNet.Artifacts/
+
+# 会话临时目录（过程性产物不入库）
+/.tmp/

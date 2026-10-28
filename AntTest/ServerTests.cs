@@ -43,6 +43,25 @@ public class ServerTests(RpcServerFixture fixture) : IClassFixture<RpcServerFixt
         Assert.Equal(name, rs.Name);
     }
 
+    [Fact(DisplayName = "新建Cron定时作业以当前时间为基准")]
+    public void JobService_AddJobs_CronStartsFromNow()
+    {
+        var name = "SrvCron_" + Guid.NewGuid().ToString("N")[..6];
+        Login(fixture.AppService, name);
+        var app = App.FindByName(name);
+
+        var jobName = "CronFromNow";
+        var before = DateTime.Now.AddSeconds(-5);
+        fixture.JobService.AddJobs(app, [new JobModel { Name = jobName, Mode = JobModes.Time, Enable = true, Cron = "0/30 * * * * ?", DataTime = DateTime.Today, Step = 30 }]);
+
+        var job = Job.FindByAppIDAndName(app.ID, jobName);
+        Assert.NotNull(job);
+
+        // 客户端首次注册携带的是当天零点，Cron 作业应改以当前时间为基准，避免启用后补跑数小时
+        Assert.True(job.DataTime >= before, $"DataTime={job.DataTime:yyyy-MM-dd HH:mm:ss}");
+        Assert.True(job.DataTime <= DateTime.Now.AddMinutes(2), $"DataTime={job.DataTime:yyyy-MM-dd HH:mm:ss}");
+    }
+
     [Fact(DisplayName = "清理长时间未心跳的在线记录")]
     public void AppService_ClearOnline()
     {

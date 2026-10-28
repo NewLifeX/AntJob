@@ -71,7 +71,7 @@ public class AntJobController : ControllerBase, IActionFilter
             if (context.ActionDescriptor is ControllerActionDescriptor act && !act.MethodInfo.IsDefined(typeof(AllowAnonymousAttribute)))
             {
                 var rs = !token.IsNullOrEmpty() && OnAuthorize(token);
-                if (!rs) throw new ApiException(403, "认证失败");
+                if (!rs) throw new ApiException(403, Localization.Translate("Authentication failed."));
             }
         }
         catch (Exception ex)
@@ -205,7 +205,7 @@ public class AntJobController : ControllerBase, IActionFilter
             }
             else
             {
-                throw new NotSupportedException($"未支持 grant_type={model.grant_type}");
+                throw new NotSupportedException(Localization.Translate("Unsupported grant_type {0}.", model.grant_type));
             }
         }
         catch (Exception ex)
@@ -328,7 +328,7 @@ public class AntJobController : ControllerBase, IActionFilter
     [HttpPost(nameof(Report))]
     public Boolean Report(TaskResult task, [FromQuery] String clientId)
     {
-        if (task == null || task.ID == 0) throw new InvalidOperationException("无效操作 TaskID=" + task?.ID);
+        if (task == null || task.ID == 0) throw new InvalidOperationException(Localization.Translate("Invalid operation, TaskID={0}.", task?.ID));
 
         var online = _appService.GetOnline(_App, BuildSessionId(_App.Name, clientId, UserHost), UserHost);
         return _jobService.Report(_App, task, online);

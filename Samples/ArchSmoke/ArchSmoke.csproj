@@ -9,6 +9,10 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>ArchSmoke</AssemblyName>
     <RootNamespace>ArchSmoke</RootNamespace>
+    <AssemblyTitle>蚂蚁调度指令集冒烟</AssemblyTitle>
+    <Description>在目标架构运行时上加载主库并执行核心 API，验证指令集兼容性。</Description>
+    <Company>新生命开发团队</Company>
+    <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

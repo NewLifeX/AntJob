@@ -1,3 +1,9 @@
 # 한국어 词表（ko）。键为英文源文，与源码字符串逐字一致；缺少的键运行时回退英文。
 "Job [{0}/{1}] has no data time set.": "작업 [{0}/{1}]에 데이터 시간이 설정되지 않았습니다."
 "The application is not enabled.": "애플리케이션이 활성화되지 않았습니다."
+"Debug switch. Defaults to true.": "디버그 스위치. 기본값 true."
+"Port": "포트"
+"Token secret. Algorithm and key used to generate JWT tokens, e.g. HS256:ABCD1234.": "토큰 비밀 키. JWT 토큰 생성에 사용되는 알고리즘과 키(예: HS256:ABCD1234)."
+"Token validity period. Defaults to 2*3600 seconds.": "토큰 유효 기간. 기본값 2*3600초."
+"Session timeout. Defaults to 600 seconds.": "세션 시간 초과. 기본값 600초."
+"Auto registration. Registers automatically when any application logs in, saving the trouble of manually configuring application accounts, defaults to true.": "자동 등록. 모든 애플리케이션이 로그인할 때 자동으로 등록되어 애플리케이션 계정을 수동으로 구성하는 번거로움을 덜어주며, 기본값 true."

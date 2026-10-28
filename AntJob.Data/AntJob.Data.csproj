@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net8.0</TargetFrameworks>
     <AssemblyTitle>蚂蚁调度数据</AssemblyTitle>
     <Description>AntJob 分布式调度系统的数据层，包含任务、日志和状态管理的数据模型与存储接口。</Description>
     <Company>新生命开发团队</Company>
     <Copyright>版权所有(C) 新生命开发团队 2026</Copyright>
-    <VersionPrefix>5.0</VersionPrefix>
+    <VersionPrefix>5.1</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>
@@ -38,7 +38,7 @@
     <None Remove="Build.tt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NewLife.XCode" Version="12.2.2026.1017-beta1246" />
+    <PackageReference Include="NewLife.XCode" Version="12.3.2026.1024" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Build.log">
@@ -50,5 +50,15 @@
   <ItemGroup>
     <ProjectReference Include="..\AntJob\AntJob.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Locales 目录由 NewLife.Core 源生成器编译期解析；本项目未直接引用 Core 包，显式挂载输入 -->
+    <AdditionalFiles Include="$(MSBuildProjectDirectory)\Locales\*.yml" />
+  </ItemGroup>
+
+  <!-- netstandard2.1 走兼容层不做 AOT 分析；net8.0 目标常驻启用分析器，0 告警成为构建期硬约束 -->
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
 
 </Project>

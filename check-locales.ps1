@@ -5,10 +5,12 @@
 #   pwsh -File check-locales.ps1                                      # Core 默认目录
 #   pwsh -File check-locales.ps1 -LocaleDir src\Lib\Locales -SourceDir src\Lib
 #   pwsh -File check-locales.ps1 -LocaleDir src\Lib\Locales -SkipOrphan   # 下游只想校验词表内部一致性
+#   pwsh -File check-locales.ps1 -LocaleDir Web\Locales -MergeDir Web\..\Server\Locales   # 同一程序集合并多份词表时检查键冲突
 param(
     [String]$LocaleDir = "NewLife.Core\Locales",
     [String]$Baseline = "zh-Hans.yml",
     [String[]]$SourceDir = @("NewLife.Core", "NewLife.Core.SourceGenerator"),
+    [String[]]$MergeDir = @(),
     [Switch]$SkipOrphan
 )
 
@@ -121,6 +123,24 @@ foreach ($file in Get-ChildItem $localeDir -Filter *.yml | Sort-Object Name) {
                 $allWarnings += "$($file.Name): 格式说明符不一致 → $key"
                 break
             }
+        }
+    }
+}
+
+# 同一程序集可能合并多份词表（如 AntJob.Web 直接编译 AntJob.Server 源码并挂载其 Locales），
+# 键重复时后注册的译文会被忽略，这里提前报错
+foreach ($dir in $MergeDir) {
+    $other = if ([IO.Path]::IsPathRooted($dir)) { $dir } else { Join-Path $root $dir }
+    if (!(Test-Path $other)) { $allErrors += "合并词表目录不存在：$other"; continue }
+
+    foreach ($file in Get-ChildItem $localeDir -Filter *.yml | Sort-Object Name) {
+        $peer = Join-Path $other $file.Name
+        if (!(Test-Path $peer)) { continue }
+
+        $mine = Read-Locale $file.FullName
+        $theirs = Read-Locale $peer
+        foreach ($key in $mine.Entries.Keys) {
+            if ($theirs.Entries.Contains($key)) { $allErrors += "$($file.Name): 与其他词表目录键重复 $key" }
         }
     }
 }

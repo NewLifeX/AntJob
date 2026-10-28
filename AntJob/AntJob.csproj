@@ -2,11 +2,11 @@
   
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0;net461;net45;net8.0</TargetFrameworks>
-    <AssemblyTitle>蚂蚁调度SDK</AssemblyTitle>
-    <Description>AntJob 分布式任务调度系统核心 SDK，提供高吞吐量的任务切片、可靠重试与弹性伸缩能力。</Description>
+    <AssemblyTitle>AntJob SDK Library</AssemblyTitle>
+    <Description>AntJob distributed task scheduling SDK: high-throughput job slicing, reliable retries and elastic scaling across worker nodes. NativeAOT-ready, with built-in runtime localization; targets .NET Framework 4.5, .NET Standard 2.0/2.1 and .NET 8.0.</Description>
     <Company>新生命开发团队</Company>
     <Copyright>©2002-2026 NewLife</Copyright>
-    <VersionPrefix>5.0</VersionPrefix>
+    <VersionPrefix>5.1</VersionPrefix>
     <VersionSuffix>$([System.DateTime]::Now.ToString(`yyyy.MMdd`))</VersionSuffix>
     <Version>$(VersionPrefix).$(VersionSuffix)</Version>
     <FileVersion>$(VersionPrefix).$(VersionSuffix.Split('-')[0])</FileVersion>
@@ -23,19 +23,20 @@
   
   <PropertyGroup>
     <PackageId>NewLife.$(AssemblyName)</PackageId>
+    <PackageDescription>AntJob distributed task scheduling SDK: high-throughput job slicing, reliable retries and elastic scaling across worker nodes. NativeAOT-ready, with built-in runtime localization; targets .NET Framework 4.5, .NET Standard 2.0/2.1 and .NET 8.0. 蚂蚁调度 SDK：分布式任务调度核心库，提供高吞吐量的任务切片、可靠重试与弹性伸缩能力；原生 AOT 就绪，内置运行时多语言消息；单包覆盖 .NET Framework 4.5 至 .NET 8.0 共 5 个目标框架。</PackageDescription>
     <Authors>$(Company)</Authors>
     <PackageProjectUrl>https://newlifex.com/blood/antjob</PackageProjectUrl>
     <PackageIcon>ant.png</PackageIcon>
     <RepositoryUrl>https://github.com/NewLifeX/AntJob</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>新生命团队;X组件;NewLife;$(AssemblyName)</PackageTags>
-    <PackageReleaseNotes>HTTP 通道完整化：客户端按地址协议自动选择 HTTP 或 TCP RPC，HTTP 通道补齐登录令牌、心跳保活、UTC 换算与增量 SetJob；新增 WebSocket 下行通知（作业变更/消息到达），收到通知后立即拉取，丢失由轮询兜底；HttpJobProvider 与 NetworkJobProvider 统一实现，消除两套通信代码漂移</PackageReleaseNotes>
+    <PackageTags>新生命团队;X组件;NewLife;AOT;NativeAOT;本地化;$(AssemblyName)</PackageTags>
+    <PackageReleaseNotes>原生 AOT 就绪，AOT/裁剪分析器 0 告警，泛型处理器注册补齐裁剪标注；HTTP 通道完整化，客户端按地址自动选择 HTTP 或 TCP RPC，直接对接 AntWeb 无需独立服务端；新增 WebSocket 下行通知并支持断线补偿拉取；新增 UseRegistry 注册中心解析开关与 MessageIdlePeriod 空闲周期配置；上报幂等与锁超时保护，重复或乱序上报不再污染统计；调度循环多作业并行申请，动态处理器按名称建索引；内置 11 种语言运行时词表，包描述中英双语；依赖对齐 NewLife.* 2026-10-24 最新正式版</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageReadmeFile>Readme.MD</PackageReadmeFile>
+    <PackageReadmeFile>README.nuget.md</PackageReadmeFile>
     <EnableSourceLink>false</EnableSourceLink>
   </PropertyGroup>
   
@@ -45,16 +46,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.400">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.403">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NewLife.Core" Version="12.0.2026.1018-beta1517" />
-    <PackageReference Include="NewLife.Remoting" Version="3.9.2026.1017-beta1444" />
-    <PackageReference Include="NewLife.Stardust" Version="3.10.2026.1017-beta1056" />
+    <PackageReference Include="NewLife.Core" Version="12.0.2026.1024" />
+    <PackageReference Include="NewLife.Remoting" Version="4.0.2026.1024" />
+    <PackageReference Include="NewLife.Stardust" Version="3.10.2026.1024" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="5.9.0" Condition="'$(TargetFramework)' != 'net45'" />
   </ItemGroup>
   
@@ -62,7 +63,7 @@
     <Content Include="..\Doc\ant.png" Link="ant.png" PackagePath="\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Readme.MD">
+    <None Include="..\README.nuget.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

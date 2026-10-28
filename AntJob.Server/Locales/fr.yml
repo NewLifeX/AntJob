@@ -1,3 +1,9 @@
 # Français 词表（fr）。键为英文源文，与源码字符串逐字一致；缺少的键运行时回退英文。
 "Job [{0}/{1}] has no data time set.": "La tâche [{0}/{1}] n'a pas d'heure de données définie."
 "The application is not enabled.": "L'application n'est pas activée."
+"Debug switch. Defaults to true.": "Commutateur de débogage. Valeur par défaut true."
+"Port": "Port"
+"Token secret. Algorithm and key used to generate JWT tokens, e.g. HS256:ABCD1234.": "Secret du jeton. Algorithme et clé utilisés pour générer les jetons JWT, par ex. HS256:ABCD1234."
+"Token validity period. Defaults to 2*3600 seconds.": "Durée de validité du jeton. Valeur par défaut 2*3600 secondes."
+"Session timeout. Defaults to 600 seconds.": "Délai d'expiration de session. Valeur par défaut 600 secondes."
+"Auto registration. Registers automatically when any application logs in, saving the trouble of manually configuring application accounts, defaults to true.": "Enregistrement automatique. S'enregistre automatiquement lors de la connexion de n'importe quelle application, évitant la configuration manuelle des comptes d'application ; valeur par défaut true."

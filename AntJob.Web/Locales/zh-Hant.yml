@@ -1,0 +1,5 @@
+# AntJob web host translations (zh-Hant).
+"Invalid operation, TaskID={0}.": "無效操作，TaskID={0}。"
+"Authentication failed.": "驗證失敗。"
+"Unsupported grant_type {0}.": "不支援的 grant_type {0}。"
+"WebSocket notification [{0}] failed: {1}": "WebSocket 通知[{0}]失敗：{1}"

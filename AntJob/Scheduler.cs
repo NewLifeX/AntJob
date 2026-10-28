@@ -1,4 +1,5 @@
-﻿using AntJob.Data;
+using System.Diagnostics.CodeAnalysis;
+using AntJob.Data;
 using AntJob.Handlers;
 using AntJob.Providers;
 using NewLife;
@@ -69,8 +70,8 @@ public class Scheduler : DisposeBase
     }
 
     /// <summary>按类型添加处理器，支持依赖注入</summary>
-    /// <typeparam name="T"></typeparam>
-    public Scheduler AddHandler<T>() where T : Handler
+    /// <typeparam name="T">处理器类型</typeparam>
+    public Scheduler AddHandler<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>() where T : Handler
     {
         // 把服务类型注册到容器中，以便后续获取
         var ioc = ServiceProvider?.GetService<IObjectContainer>() ?? ObjectContainer.Current;
@@ -184,9 +185,12 @@ public class Scheduler : DisposeBase
     {
         // 从容器中获取所有服务
         var serviceProvider = ServiceProvider;
-        foreach (var item in serviceProvider.GetServices<Handler>())
+        if (serviceProvider != null)
         {
-            AddHandler(item);
+            foreach (var item in serviceProvider.GetServices<Handler>())
+            {
+                AddHandler(item);
+            }
         }
         // 有可能DI中注入IObjectContainer，后者再次注册Handler
         var ioc = serviceProvider?.GetService<IObjectContainer>() ?? ObjectContainer.Current;
@@ -206,6 +210,8 @@ public class Scheduler : DisposeBase
 
         // 埋点
         Tracer ??= serviceProvider?.GetService<ITracer>();
+        // 手工实例化调度器时没有依赖注入，回落全局日志，避免全过程静默
+        Log ??= XTrace.Log;
         using var span = Tracer?.NewSpan("job:SchedulerStart");
 
         // 启动作业提供者
@@ -234,9 +240,18 @@ public class Scheduler : DisposeBase
 
             // 查找作业参数，分配给处理器
             var job = jobs?.FirstOrDefault(e => e.Name == handler.Name);
-            if (job == null || !job.Enable) continue;
+            if (job == null)
+            {
+                WriteLog(L.T("Job [{0}] is not registered in the scheduling center; it will not start this time."), handler.Name);
+                continue;
+            }
+            if (!job.Enable)
+            {
+                WriteLog(L.T("Job [{0}] is disabled; enable it in the console before it can run."), handler.Name);
+                continue;
+            }
 
-            if (job != null && job.Mode == 0) job.Mode = handler.Mode;
+            if (job.Mode == 0) job.Mode = handler.Mode;
             handler.Job = job;
 
             try
