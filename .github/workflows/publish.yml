@@ -57,14 +57,7 @@ jobs:
         $tag = $env:GITHUB_REF_NAME
         $repo = $env:GITHUB_REPOSITORY
 
-        # 幂等：同 tag 已有 Release 就直接跳过，失败重跑不会报错
-        gh release view $tag --repo $repo *> $null
-        if ($LASTEXITCODE -eq 0) {
-          Write-Host "Release $tag 已存在，跳过"
-          exit 0
-        }
-
-        # 发布说明优先取 ChangeLog.md 中当前版本段落（标题形如 "## v5.0.2026.1024 (2026-10-24)"）
+        # 发布说明优先取 ChangeLog.md 中当前版本段落（标题形如 "## v5.1.2026.1028 (2026-10-28)"）
         $version = $tag.TrimStart('v')
         $pattern = '^##\s+v?' + [regex]::Escape($version) + '(\s|\(|$)'
         $lines = Get-Content -LiteralPath 'ChangeLog.md'
@@ -73,7 +66,7 @@ jobs:
           if ($lines[$i] -match $pattern) { $start = $i; break }
         }
 
-        $ghArgs = @('release', 'create', $tag, '--repo', $repo, '--title', $tag, '--verify-tag')
+        $notes = $null
         if ($start -ge 0) {
           $end = $lines.Count
           for ($i = $start + 1; $i -lt $lines.Count; $i++) {
@@ -81,15 +74,34 @@ jobs:
           }
           $notes = Join-Path $env:RUNNER_TEMP 'release-notes.md'
           $lines[$start..($end - 1)] | Set-Content -LiteralPath $notes -Encoding utf8
-          $ghArgs += @('--notes-file', $notes)
           Write-Host "发布说明取自 ChangeLog.md 的 $version 段落（$($end - $start) 行）"
         }
         else {
-          $ghArgs += '--generate-notes'
           Write-Host "ChangeLog.md 未找到 $version 段落，改用自动生成说明"
         }
 
         $assets = @(Get-ChildItem -LiteralPath 'out' -File | Where-Object { $_.Extension -in '.nupkg', '.snupkg' } | ForEach-Object { $_.FullName })
+
+        # 幂等：同 tag 已有 Release 时更新说明与资产，并把草稿发布出去（删 tag 会让 Release 变成草稿）
+        gh release view $tag --repo $repo *> $null
+        if ($LASTEXITCODE -eq 0) {
+          $editArgs = @('release', 'edit', $tag, '--repo', $repo, '--title', $tag, '--draft=false')
+          if ($notes) { $editArgs += @('--notes-file', $notes) }
+          & gh @editArgs
+          if ($LASTEXITCODE -ne 0) { throw "gh release edit 失败，退出码 $LASTEXITCODE" }
+
+          if ($assets.Count -gt 0) {
+            & gh release upload $tag @assets --clobber --repo $repo
+            if ($LASTEXITCODE -ne 0) { throw "gh release upload 失败，退出码 $LASTEXITCODE" }
+          }
+
+          Write-Host "已更新 Release $tag，资产 $($assets.Count) 个"
+          exit 0
+        }
+
+        $ghArgs = @('release', 'create', $tag, '--repo', $repo, '--title', $tag, '--verify-tag')
+        if ($notes) { $ghArgs += @('--notes-file', $notes) }
+        else { $ghArgs += '--generate-notes' }
         $ghArgs += $assets
 
         & gh @ghArgs
